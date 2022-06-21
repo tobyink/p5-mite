@@ -3,6 +3,25 @@
 use lib 't/lib';
 use Test::Mite;
 
+tests "strict_contructor" => sub {
+    mite_load <<'CODE';
+package MyTest;
+use Mite::Shim;
+has foo =>
+    is => 'rw',
+    default => 99;
+1;
+CODE
+
+    my $o = MyTest->new;
+    is $o->foo, 99;
+
+    local $@;
+    my $o2 = eval { MyTest->new( bar => 66, baz => 33 ); };
+    my $e = $@;
+    like $e, qr/^Unexpected keys in contructor to MyTest: bar, baz/;
+};
+
 tests "all_attributes" => sub {
     my $gparent = sim_class( name => "GP1" );
     my $parent  = sim_class( name => "P1" );

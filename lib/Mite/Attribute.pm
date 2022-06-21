@@ -77,6 +77,41 @@ sub _empty {
     return ';';
 }
 
+sub _compile_default {
+    my ( $self, $selfvar ) = @_;
+
+    if ( $self->has_coderef_default ) {
+        my $var = $self->coderef_default_variable;
+        return sprintf 'do { our %s; %s->(%s) }',
+          $var, $var, $selfvar;
+    }
+    elsif ( $self->has_simple_default ) {
+        require B;
+        return defined( $self->default ) ? B::perlstring( $self->default ) : 'undef';
+    }
+
+    # should never get here
+    return 'undef';
+}
+
+sub compile_init {
+    my ( $self, $selfvar, $argvar ) = @_;
+
+    if ( $self->has_default ) {
+        return sprintf '%s->{%s} = exists(%s->{%s}) ? delete(%s->{%s}) : %s;',
+            $selfvar, $self->name,
+            $argvar,  $self->name,
+            $argvar,  $self->name,
+            $self->_compile_default( $selfvar );
+    }
+    else {
+        return sprintf '%s->{%s} = delete(%s->{%s}) if exists(%s->{%s});',
+            $selfvar, $self->name,
+            $argvar,  $self->name,
+            $argvar,  $self->name;
+    }
+}
+
 sub compile {
     my $self = shift;
 

@@ -194,7 +194,7 @@ sub compile {
                       $self->_compile_pragmas,
                       $self->_compile_extends,
                       $self->_compile_new,
-                      $self->_compile_attributes,
+                      $self->_compile_attribute_accessors,
                       '1;',
                       '}';
 }
@@ -244,18 +244,27 @@ END
 sub _compile_bless {
     my $self = shift;
 
-    return 'bless \%args, $class';
+    return 'bless {}, $class';
+}
+
+sub _compile_strict_constructor {
+    my $self = shift;
+
+    return sprintf 'keys %%$args and do { require Carp; Carp::croak("Unexpected keys in contructor to %s: " . join(q[, ], sort keys %%$args)) };',
+        $self->name;
 }
 
 sub _compile_new {
     my $self = shift;
 
-    return sprintf <<'CODE', $self->_compile_bless, $self->_compile_defaults;
+    return sprintf <<'CODE', $self->_compile_bless, $self->_compile_init_attributes, $self->_compile_strict_constructor;
 sub new {
     my $class = shift;
-    my %%args  = @_;
+    my $args  = { ( @_ == 1 ) ? %%{$_[0]} : @_ };
 
     my $self = %s;
+
+    %s
 
     %s
 
@@ -264,64 +273,19 @@ sub new {
 CODE
 }
 
-sub _compile_undef_default {
-    my ( $self, $attribute ) = ( shift, @_ );
-
-    return sprintf '$self->{%s} //= undef;', $attribute->name;
-}
-
-sub _compile_simple_default {
-    my ( $self, $attribute ) = ( shift, @_ );
-
-    return $self->_compile_undef_default($attribute) if !defined $attribute->default;
-    return sprintf '$self->{%s} //= q[%s];', $attribute->name, $attribute->default;
-}
-
-sub _compile_coderef_default {
-    my ( $self, $attribute ) = ( shift, @_ );
-
-    my $var = $attribute->coderef_default_variable;
-
-    return sprintf 'our %s; $self->{%s} //= %s->(\$self);',
-      $var, $attribute->name, $var;
-}
-
-sub _compile_defaults {
+sub _compile_init_attributes {
     my $self = shift;
 
-    my @simple_defaults = map { $self->_compile_simple_default($_) }
-                              $self->_attributes_with_simple_defaults;
-    my @coderef_defaults = map { $self->_compile_coderef_default($_) }
-                               $self->_attributes_with_coderef_defaults;
+    my @code;
+    my $attributes = $self->all_attributes;
+    for my $name ( sort keys %$attributes ) {
+        push @code, $attributes->{$name}->compile_init( '$self', '$args' );
+    }
 
-    return join "\n", @simple_defaults, @coderef_defaults;
+    return join "\n    ", @code;
 }
 
-sub _attributes_with_defaults {
-    my $self = shift;
-
-    return grep { $_->has_default } values %{$self->all_attributes};
-}
-
-sub _attributes_with_simple_defaults {
-    my $self = shift;
-
-    return grep { $_->has_simple_default } values %{$self->all_attributes};
-}
-
-sub _attributes_with_coderef_defaults {
-    my $self = shift;
-
-    return grep { $_->has_coderef_default } values %{$self->all_attributes};
-}
-
-sub _attributes_with_dataref_defaults {
-    my $self = shift;
-
-    return grep { $_->has_dataref_default } values %{$self->all_attributes};
-}
-
-sub _compile_attributes {
+sub _compile_attribute_accessors {
     my $self = shift;
 
     my $code = '';
