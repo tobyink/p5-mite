@@ -1,9 +1,5 @@
 TODO:
 
-  - Implement separate readers, writers, and accessors for attributes
-  - Implement predicate for attributes
-  - Implement clearer for attributes
-  - Implement is => 'rwp' for attributes
   - Implement lazy attributes
   - Implement builder for attributes
   - Implement isa for attributes

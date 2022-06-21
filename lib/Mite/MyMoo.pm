@@ -7,6 +7,7 @@ my %constants;
 BEGIN {
 	%constants = (
 		rw        => 'rw',
+		rwp       => 'rwp',
 		ro        => 'ro',
 		true      => !!1,
 		false     => !!0,

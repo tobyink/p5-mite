@@ -111,7 +111,11 @@ else, please read L<Moose> and L<Moose::Manual>.
 
 =head2 C<has>
 
-Supports C<is>, C<init_arg>, C<required>, and C<default>.
+Supports C<is>, C<reader>, C<writer>, C<accessor>, C<clearer>, C<predicate>,
+C<init_arg>, C<required>, and C<default>.
+
+(No support yet for C<lazy>, C<isa>, C<coerce>, C<builder>, C<trigger>, or
+C<handles>.)
 
 =head2 C<extends>
 

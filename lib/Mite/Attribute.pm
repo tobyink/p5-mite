@@ -29,7 +29,7 @@ has coderef_default_variable =>
 
 has is =>
   is            => rw,
-  isa           => Enum[ ro, rw, 'bare' ],
+  isa           => Enum[ ro, rw, rwp, 'bare' ],
   default       => 'bare';
 
 has name =>
@@ -37,11 +37,51 @@ has name =>
   isa           => Str->where('length($_) > 0'),
   required      => true;
 
+has [ 'reader', 'writer', 'accessor', 'clearer', 'predicate' ] =>
+  is            => rw,
+  isa           => Str->where('length($_) > 0') | Undef,
+  builder       => true,
+  lazy          => true;
+
+# Not actually supported yet
+has builder =>
+    is            => rw,
+    isa           => Str->where('length($_) > 0') | CodeRef | Undef,
+
+my @method_name_generator = (
+    { # public
+        reader      => sub { "get_$_" },
+        writer      => sub { "set_$_" },
+        accessor    => sub { $_ },
+        clearer     => sub { "clear_$_" },
+        predicate   => sub { "has_$_" },
+        builder     => sub { "_build_$_" },
+    },
+    { # private
+        reader      => sub { "_get_$_" },
+        writer      => sub { "_set_$_" },
+        accessor    => sub { $_ },
+        clearer     => sub { "_clear_$_" },
+        predicate   => sub { "_has_$_" },
+        builder     => sub { "_build_$_" },
+    },
+);
+
 sub BUILD {
     my $self = shift;
-    
+
     croak "Required attribute with no init_arg"
         if $self->required && !defined $self->init_arg;
+
+    for my $property ( 'reader', 'writer', 'accessor', 'clearer', 'predicate', 'builder' ) {
+        my $name = $self->$property;
+        if ( defined $name and $name eq 1 ) {
+            my $gen = $method_name_generator[$self->is_private]{$property};
+            local $_ = $self->name;
+            my $newname = $gen->( $_ );
+            $self->$property( $newname );
+        }
+    }
 }
 
 sub clone {
@@ -56,6 +96,35 @@ sub clone {
 
     return $self->new( %args );
 }
+
+sub is_private {
+    ( shift->name =~ /^_/ ) ? 1 : 0;
+}
+
+sub _build_reader {
+    my $self = shift;
+    ( $self->is eq 'ro' || $self->is eq 'rwp' )
+        ? $self->name
+        : undef;
+}
+
+sub _build_writer {
+    my $self = shift;
+    $self->is eq 'rwp'
+        ? sprintf( '_set_%s', $self->name )
+        : undef;
+}
+
+sub _build_accessor {
+    my $self = shift;
+    $self->is eq 'rw'
+        ? $self->name
+        : undef;
+}
+
+sub _build_predicate { undef; }
+
+sub _build_clearer { undef; }
 
 sub has_dataref_default {
     my $self = shift;
@@ -156,15 +225,7 @@ sub compile_init {
 sub compile {
     my $self = shift;
 
-    my $perl_method = $self->is eq 'rw' ? '_compile_rw_perl'    :
-                      $self->is eq 'ro' ? '_compile_ro_perl'    :
-                                          '_empty'              ;
-
-    my $xs_method   = $self->is eq 'rw' ? '_compile_rw_xs'      :
-                      $self->is eq 'ro' ? '_compile_ro_xs'      :
-                                          '_empty'              ;
-
-    return sprintf <<'CODE', $self->$xs_method, $self->$perl_method;
+    return sprintf <<'CODE', $self->_compile_xs, $self->_compile_perl;
 if( !$ENV{MITE_PURE_PERL} && eval { require Class::XSAccessor } ) {
 %s
 }
@@ -174,59 +235,82 @@ else {
 CODE
 }
 
-sub _compile_rw_xs {
-    my $self = shift;
-
-    my $name = $self->name;
-
-    return <<"CODE";
-Class::XSAccessor->import(
-    accessors => { q[$name] => q[$name] }
+my %code_template = (
+    reader => sub {
+        my $slot_name = shift->name;
+        sprintf '@_ > 1 ? require Carp && Carp::croak("%s is a read-only attribute of @{[ref $_[0]]}") : $_[0]->{ q[%s] }',
+            $slot_name, $slot_name;
+    },
+    writer => sub {
+        my $slot_name = shift->name;
+        sprintf '$_[0]->{ q[%s] } = $_[1];',
+            $slot_name;
+    },
+    accessor => sub {
+        my $slot_name = shift->name;
+        sprintf '@_ > 1 ? $_[0]->{ q[%s] } = $_[1] : $_[0]->{ q[%s] }',
+            $slot_name, $slot_name;
+    },
+    clearer => sub {
+        my $slot_name = shift->name;
+        sprintf 'delete $_[0]->{ q[%s] }; $_[0];',
+            $slot_name;
+    },
+    predicate => sub {
+        my $slot_name = shift->name;
+        sprintf 'exists $_[0]->{ q[%s] };',
+            $slot_name;
+    },
 );
-CODE
 
-}
-
-sub _compile_rw_perl {
+sub _compile_xs {
     my $self = shift;
 
-    my $name = $self->name;
+    my $slot_name = $self->name;
 
-    return sprintf <<'CODE', $name, $name, $name;
-*%s = sub {
-    # This is hand optimized.  Yes, even adding
-    # return will slow it down.
-    @_ > 1 ? $_[0]->{ q[%s] } = $_[1]
-           : $_[0]->{ q[%s] };
+    my %options = (
+        reader    => 'getters',
+        writer    => 'setters',
+        accessor  => 'accessors',
+        predicate => 'exists_predicates',
+    );
+
+    my $xs = 0;
+    my $code = "Class::XSAccessor->import(\n";
+    for my $property ( 'reader', 'writer', 'accessor', 'predicate' ) {
+        my $method_name = $self->$property;
+        next unless defined $method_name;
+        my $option = $options{$property};
+        $code .= "    $option => { q[$method_name] => q[$slot_name] },\n";
+        $xs++;
+    }
+    $code .= ");\n";
+    $code = '' unless $xs;
+
+    # Class::XSAccessor doesn't have clearers
+    if ( my $clearer = $self->clearer ) {
+        $code .= sprintf '*%s = sub { %s };' . "\n",
+            $clearer, $code_template{clearer}->($self);
+    }
+
+    return $code;
 }
-CODE
 
-}
-
-sub _compile_ro_xs {
+sub _compile_perl {
     my $self = shift;
 
-    my $name = $self->name;
+    my $slot_name = $self->name;
 
-    return <<"CODE";
-Class::XSAccessor->import(
-    getters => { q[$name] => q[$name] }
-);
-CODE
-}
+    my $code = '';
 
-sub _compile_ro_perl {
-    my $self = shift;
+    for my $property ( 'reader', 'writer', 'accessor', 'predicate', 'clearer' ) {
+        my $method_name = $self->$property;
+        next unless defined $method_name;
+        $code .= sprintf "    *%s = sub { %s };\n",
+            $method_name, $code_template{$property}->($self);
+    }
 
-    my $name = $self->name;
-    return sprintf <<'CODE', $name, $name, $name;
-*%s = sub {
-    # This is hand optimized.  Yes, even adding
-    # return will slow it down.
-    @_ > 1 ? require Carp && Carp::croak("%s is a read-only attribute of @{[ref $_[0]]}")
-           : $_[0]->{ q[%s] };
-};
-CODE
+    return $code;
 }
 
 1;

@@ -91,7 +91,11 @@ FEATURES
     please read Moose and Moose::Manual.
 
   "has"
-    Supports "is", "init_arg", "required", and "default".
+    Supports "is", "reader", "writer", "accessor", "clearer", "predicate",
+    "init_arg", "required", and "default".
+
+    (No support yet for "lazy", "isa", "coerce", "builder", "trigger", or
+    "handles".)
 
   "extends"
     Works as in Moose. Options are not implemented.
