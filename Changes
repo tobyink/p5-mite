@@ -1,0 +1,17 @@
+Mite
+====
+
+Creator:      Michael G Schwern (MSCHWERN)
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+v0.0.2    2022-06-21
+
+  - New maintainer
+  - Port from Mouse to Moo
+  - Implement strict constructors
+  - Implement init_arg for attributes
+  - Implement required attributes
+
+v0.0.1    2014-07-19
+
+  - Initial release
