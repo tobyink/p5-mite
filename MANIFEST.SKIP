@@ -9,6 +9,7 @@
 \B\.git\b
 \B\.hg\b
 \B\.gitignore\b
+\B\.github\b
 \b_darcs\b
 \B\.cvsignore$
 

@@ -1,6 +1,5 @@
 .perlcriticrc
 .perltidyrc
-.travis.yml
 bin/mite
 Build.PL
 Changes
