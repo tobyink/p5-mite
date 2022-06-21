@@ -4,6 +4,16 @@ Mite
 Creator:      Michael G Schwern (MSCHWERN)
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+v0.0.3    2022-06-21
+
+  - Bugfixes
+  - Implement reader option for has
+  - Implement writer option for has
+  - Implement accessor option for has
+  - Implement predicates
+  - Implement clearers
+  - Implement is => 'rwp' like Moo
+
 v0.0.2    2022-06-21
 
   - New maintainer
