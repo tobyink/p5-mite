@@ -34,7 +34,6 @@ L<Mite::Class>, L<Mite::Compiled>, L<Mite::Project>
 
 use Mite::Compiled;
 use Mite::Class;
-use Method::Signatures;
 
 has file =>
   is            => ro,
