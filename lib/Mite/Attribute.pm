@@ -1,51 +1,57 @@
 package Mite::Attribute;
-
-use Carp;
-use Mouse;
-use Method::Signatures;
+use Mite::MyMoo;
 
 has default =>
-  is            => 'rw',
-  isa           => 'Maybe[Str|Ref]',
+  is            => rw,
+  isa           => Maybe[Str|Ref],
   predicate     => 'has_default';
 
 has coderef_default_variable =>
-  is            => 'rw',
-  isa           => 'Str',
-  lazy          => 1,           # else $self->name might not be set
-  default       => method {
+  is            => rw,
+  isa           => Str,
+  lazy          => true,     # else $self->name might not be set
+  default       => sub {
+      my $self = shift;
       # This must be coordinated with Mite.pm
       return sprintf '$__%s_DEFAULT__', $self->name;
   };
 
 has is =>
-  is            => 'rw',
+  is            => rw,
+  isa           => Str,
   default       => '',
-  trigger       => method($new, $old?) {
+  trigger       => sub {
+      state $sig = sig_pos( Object, Any, Optional[Any] );
+      my ( $self, $new, $old ) = &$sig;
+
+      my $name = $self->name // 'unknown name';
       croak
-        "I do not understand this option (is => $new) on attribute (@{[$self->name]})"
+        "I do not understand this option (is => $new) on attribute ($name)"
         unless $new =~ /^(ro|rw|)$/;
       return;
   };
 
 has name =>
-  is            => 'rw',
-  isa           => 'Str',
-  required      => 1;
+  is            => rw,
+  isa           => Str->where('length($_) > 0'),
+  required      => true;
 
-method clone(%args) {
+sub clone {
+    my ( $self, %args ) = ( shift, @_ );
+
     $args{name} //= $self->name;
     $args{is}   //= $self->is;
 
     # Because undef is a valid default
-    $args{default} = $self->default if !exists $args{default} and $self->has_default;
+    $args{default} = $self->default
+        if !exists $args{default} and $self->has_default;
 
-    return $self->new(
-        %args
-    );
+    return $self->new( %args );
 }
 
-method has_dataref_default() {
+sub has_dataref_default {
+    my $self = shift;
+
     # We don't have a default
     return 0 unless $self->has_default;
 
@@ -55,14 +61,18 @@ method has_dataref_default() {
     return ref $self->default ne 'CODE';
 }
 
-method has_coderef_default() {
+sub has_coderef_default {
+    my $self = shift;
+
     # We don't have a default
     return 0 unless $self->has_default;
 
     return ref $self->default eq 'CODE';
 }
 
-method has_simple_default() {
+sub has_simple_default {
+    my $self = shift;
+
     return 0 unless $self->has_default;
 
     # Special case for regular expressions, they do not need to be dumped.
@@ -71,9 +81,15 @@ method has_simple_default() {
     return !ref $self->default;
 }
 
-method _empty() { return ';' }
+sub _empty {
+    my $self = shift;
 
-method compile() {
+    return ';';
+}
+
+sub compile {
+    my $self = shift;
+
     my $perl_method = $self->is eq 'rw' ? '_compile_rw_perl'    :
                       $self->is eq 'ro' ? '_compile_ro_perl'    :
                                           '_empty'              ;
@@ -92,7 +108,9 @@ else {
 CODE
 }
 
-method _compile_rw_xs() {
+sub _compile_rw_xs {
+    my $self = shift;
+
     my $name = $self->name;
 
     return <<"CODE";
@@ -103,7 +121,9 @@ CODE
 
 }
 
-method _compile_rw_perl() {
+sub _compile_rw_perl {
+    my $self = shift;
+
     my $name = $self->name;
 
     return sprintf <<'CODE', $name, $name, $name;
@@ -117,7 +137,9 @@ CODE
 
 }
 
-method _compile_ro_xs() {
+sub _compile_ro_xs {
+    my $self = shift;
+
     my $name = $self->name;
 
     return <<"CODE";
@@ -127,7 +149,9 @@ Class::XSAccessor->import(
 CODE
 }
 
-method _compile_ro_perl() {
+sub _compile_ro_perl {
+    my $self = shift;
+
     my $name = $self->name;
     return sprintf <<'CODE', $name, $name, $name;
 *%s = sub {
