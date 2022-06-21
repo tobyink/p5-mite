@@ -1,6 +1,5 @@
 package Mite::App::Command;
 use Mite::MyMoo;
-extends qw(Mite::App::Command);
 
 sub opt_spec {
     my ($class, $app) = (shift, @_);
@@ -23,7 +22,7 @@ sub options {
 
 
 sub should_exit_quietly {
-    my ($class, $opts) = (shift, @_);
+    my ($self, $opts) = (shift, @_);
 
     my $config = $self->config;
 
