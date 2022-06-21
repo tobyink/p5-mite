@@ -18,18 +18,8 @@ has coderef_default_variable =>
 
 has is =>
   is            => rw,
-  isa           => Str,
-  default       => '',
-  trigger       => sub {
-      state $sig = sig_pos( Object, Any, Optional[Any] );
-      my ( $self, $new, $old ) = &$sig;
-
-      my $name = $self->name // 'unknown name';
-      croak
-        "I do not understand this option (is => $new) on attribute ($name)"
-        unless $new =~ /^(ro|rw|)$/;
-      return;
-  };
+  isa           => Enum[ ro, rw, 'bare' ],
+  default       => 'bare';
 
 has name =>
   is            => rw,
