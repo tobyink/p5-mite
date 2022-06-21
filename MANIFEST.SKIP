@@ -7,7 +7,7 @@
 ,v$
 \B\.svn\b
 \B\.git\b
-\B\.hg\b
+\B\.hg
 \B\.gitignore\b
 \B\.github\b
 \b_darcs\b

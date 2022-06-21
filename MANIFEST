@@ -34,6 +34,7 @@ t/MakeMaker/build.t
 t/MakeMaker/pm_to_blib.t
 t/MakeMaker/Some-Project/lib/Some/Project.pm
 t/MakeMaker/Some-Project/Makefile.PL
+t/Mite-Attribute/clearer_predicate.t
 t/Mite-Attribute/clone.t
 t/Mite-Attribute/defaults.t
 t/Mite-Attribute/init_arg.t
@@ -41,6 +42,7 @@ t/Mite-Attribute/is.t
 t/Mite-Attribute/required.t
 t/Mite-Attribute/ro.t
 t/Mite-Attribute/rw.t
+t/Mite-Attribute/rwp.t
 t/Mite-Class/attributes.t
 t/Mite-Class/default.t
 t/Mite-Class/default_coderef.t
