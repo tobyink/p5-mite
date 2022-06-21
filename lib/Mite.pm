@@ -111,7 +111,7 @@ else, please read L<Moose> and L<Moose::Manual>.
 
 =head2 C<has>
 
-Supports C<is> and C<default>.
+Supports C<is>, C<init_arg>, and C<default>.
 
 =head2 C<extends>
 

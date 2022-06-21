@@ -6,6 +6,12 @@ has default =>
   isa           => Maybe[Str|Ref],
   predicate     => 'has_default';
 
+has init_arg =>
+  is            => rw,
+  isa           => Str|Undef,
+  default       => sub { shift->name },
+  lazy          => true;
+
 has coderef_default_variable =>
   is            => rw,
   isa           => Str,
@@ -97,18 +103,27 @@ sub _compile_default {
 sub compile_init {
     my ( $self, $selfvar, $argvar ) = @_;
 
+    my $init_arg = $self->init_arg;
+
+    if ( $self->has_default and not defined $init_arg ) {
+        return sprintf '%s->{%s} = %s;',
+            $selfvar, $self->name,
+            $self->_compile_default( $selfvar );
+    }
+
     if ( $self->has_default ) {
         return sprintf '%s->{%s} = exists(%s->{%s}) ? delete(%s->{%s}) : %s;',
             $selfvar, $self->name,
-            $argvar,  $self->name,
-            $argvar,  $self->name,
+            $argvar,  $init_arg,
+            $argvar,  $init_arg,
             $self->_compile_default( $selfvar );
     }
-    else {
+
+    if ( defined $init_arg ) {
         return sprintf '%s->{%s} = delete(%s->{%s}) if exists(%s->{%s});',
             $selfvar, $self->name,
-            $argvar,  $self->name,
-            $argvar,  $self->name;
+            $argvar,  $init_arg,
+            $argvar,  $init_arg;
     }
 }
 
