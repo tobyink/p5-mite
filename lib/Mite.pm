@@ -112,10 +112,13 @@ else, please read L<Moose> and L<Moose::Manual>.
 =head2 C<has>
 
 Supports C<is>, C<reader>, C<writer>, C<accessor>, C<clearer>, C<predicate>,
-C<init_arg>, C<required>, and C<default>.
+C<init_arg>, C<required>, C<isa>, and C<default>.
 
-(No support yet for C<lazy>, C<isa>, C<coerce>, C<builder>, C<trigger>, or
-C<handles>.)
+C<isa> should be strings understood by C<dwim_type> from L<Type::Utils>.
+More complex type constraints are not supported. (This does still allow
+some pretty complex types though, like C<< ArrayRef[ Int | Math::BigInt ] >>.)
+
+(No support yet for C<lazy>, C<coerce>, C<builder>, C<trigger>, or C<handles>.)
 
 =head2 C<extends>
 

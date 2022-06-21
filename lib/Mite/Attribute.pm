@@ -1,10 +1,10 @@
 package Mite::Attribute;
 use Mite::MyMoo;
 
-has default =>
+has name =>
   is            => rw,
-  isa           => Maybe[Str|Ref],
-  predicate     => 'has_default';
+  isa           => Str->where('length($_) > 0'),
+  required      => true;
 
 has init_arg =>
   is            => rw,
@@ -17,6 +17,34 @@ has required =>
   isa           => Bool,
   default       => false;
 
+has is =>
+  is            => rw,
+  isa           => Enum[ ro, rw, rwp, 'bare' ],
+  default       => 'bare';
+
+has [ 'reader', 'writer', 'accessor', 'clearer', 'predicate' ] =>
+  is            => rw,
+  isa           => Str->where('length($_) > 0') | Undef,
+  builder       => true,
+  lazy          => true;
+
+has isa =>
+  is            => 'bare',
+  isa           => Str,
+  reader        => '_isa',
+  init_arg      => 'isa';
+
+has type =>
+  init_arg      => undef,
+  is            => 'lazy',
+  isa           => Object|Undef,
+  builder       => 1;
+
+has default =>
+  is            => rw,
+  isa           => Maybe[Str|Ref],
+  predicate     => 'has_default';
+
 has coderef_default_variable =>
   is            => rw,
   isa           => Str,
@@ -26,22 +54,6 @@ has coderef_default_variable =>
       # This must be coordinated with Mite.pm
       return sprintf '$__%s_DEFAULT__', $self->name;
   };
-
-has is =>
-  is            => rw,
-  isa           => Enum[ ro, rw, rwp, 'bare' ],
-  default       => 'bare';
-
-has name =>
-  is            => rw,
-  isa           => Str->where('length($_) > 0'),
-  required      => true;
-
-has [ 'reader', 'writer', 'accessor', 'clearer', 'predicate' ] =>
-  is            => rw,
-  isa           => Str->where('length($_) > 0') | Undef,
-  builder       => true,
-  lazy          => true;
 
 # Not actually supported yet
 has builder =>
@@ -126,6 +138,16 @@ sub _build_predicate { undef; }
 
 sub _build_clearer { undef; }
 
+sub _build_type {
+    my $self = shift;
+
+    my $isa = $self->_isa
+        or return undef;
+
+    require Type::Utils;
+    return Type::Utils::dwim_type( $isa, fallback => [ 'make_class_type' ] );
+}
+
 sub has_dataref_default {
     my $self = shift;
 
@@ -184,11 +206,26 @@ sub _compile_default {
 sub _compile_required_error {
     my $self = shift;
 
-    return sprintf 'do { require Carp; Carp::croak("Missing key in contructor: %s") }',
+    return sprintf 'do { require Carp; Carp::croak("Missing key in constructor: %s") }',
         $self->init_arg;
 }
 
 sub compile_init {
+    my ( $self, $selfvar, $argvar ) = @_;
+    
+    my $code = $self->_compile_init_basic( $selfvar, $argvar );
+
+    if ( my $type = $self->type ) {
+        $code .= "\n    # GOT HERE: $type";
+        local $Type::Tiny::AvoidCallbacks = 1;
+        $code .= sprintf "\n    %s or do { require Carp; Carp::croak(q[Type check failed in constructor: %s should be %s]) };",
+            $type->inline_check(sprintf '%s->{%s}', $selfvar, $self->name), $self->init_arg, $type->display_name;
+    }
+
+    return $code;
+}
+
+sub _compile_init_basic {
     my ( $self, $selfvar, $argvar ) = @_;
 
     my $init_arg = $self->init_arg;
@@ -242,14 +279,27 @@ my %code_template = (
             $slot_name, $slot_name;
     },
     writer => sub {
-        my $slot_name = shift->name;
-        sprintf '$_[0]->{ q[%s] } = $_[1];',
-            $slot_name;
+        my $self = shift;
+        my $slot_name = $self->name;
+        my $code = sprintf '$_[0]->{ q[%s] } = $_[1];', $slot_name;
+        if ( my $type = $self->type ) {
+            local $Type::Tiny::AvoidCallbacks = 1;
+            $code = sprintf '%s or do { require Carp; Carp::croak(q[Type check failed in writer: value should be %s]) }; %s',
+                $type->inline_check('$_[1]'), $type->display_name, $code;
+        }
+        return $code;
     },
     accessor => sub {
-        my $slot_name = shift->name;
-        sprintf '@_ > 1 ? $_[0]->{ q[%s] } = $_[1] : $_[0]->{ q[%s] }',
+        my $self = shift;
+        my $slot_name = $self->name;
+        my $code = sprintf '@_ > 1 ? $_[0]->{ q[%s] } = $_[1] : $_[0]->{ q[%s] }',
             $slot_name, $slot_name;
+        if ( my $type = $self->type ) {
+            local $Type::Tiny::AvoidCallbacks = 1;
+            $code = sprintf '@_==1 or %s or do { require Carp; Carp::croak(q[Type check failed in accessor: value should be %s]) }; %s',
+                $type->inline_check('$_[1]'), $type->display_name, $code;
+        }
+        return $code;
     },
     clearer => sub {
         my $slot_name = shift->name;
@@ -275,9 +325,25 @@ sub _compile_xs {
         predicate => 'exists_predicates',
     );
 
+    my %use_xs = (
+        'reader' => 1,
+        'writer' => 1,
+        'accessor' => 1,
+        'predicate' => 1,
+    );
+    my %use_pp = (
+        'clearer' => 1,
+    );
+
+    if ( $self->type ) {
+        delete $use_xs{writer};
+        delete $use_xs{accessor};
+        $use_pp{writer} = $use_pp{accessor} = 1;
+    }
+
     my $xs = 0;
     my $code = "Class::XSAccessor->import(\n";
-    for my $property ( 'reader', 'writer', 'accessor', 'predicate' ) {
+    for my $property ( sort keys %use_xs ) {
         my $method_name = $self->$property;
         next unless defined $method_name;
         my $option = $options{$property};
@@ -287,10 +353,11 @@ sub _compile_xs {
     $code .= ");\n";
     $code = '' unless $xs;
 
-    # Class::XSAccessor doesn't have clearers
-    if ( my $clearer = $self->clearer ) {
+    for my $property ( sort keys %use_pp ) {
+        my $method_name = $self->$property;
+        next unless defined $method_name;
         $code .= sprintf '*%s = sub { %s };' . "\n",
-            $clearer, $code_template{clearer}->($self);
+            $method_name, $code_template{$property}->($self);
     }
 
     return $code;

@@ -92,9 +92,13 @@ FEATURES
 
   "has"
     Supports "is", "reader", "writer", "accessor", "clearer", "predicate",
-    "init_arg", "required", and "default".
+    "init_arg", "required", "isa", and "default".
 
-    (No support yet for "lazy", "isa", "coerce", "builder", "trigger", or
+    "isa" should be strings understood by "dwim_type" from Type::Utils. More
+    complex type constraints are not supported. (This does still allow some
+    pretty complex types though, like "ArrayRef[ Int | Math::BigInt ]".)
+
+    (No support yet for "lazy", "coerce", "builder", "trigger", or
     "handles".)
 
   "extends"

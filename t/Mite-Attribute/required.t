@@ -24,7 +24,7 @@ CODE
     local $@;
     my $o2 = eval { MyTest->new( bar => 66 ); };
     my $e = $@;
-    like $e, qr/^Missing key in contructor: foo/;
+    like $e, qr/^Missing key in constructor: foo/;
 
     my $o3 = MyTest->new( foo => 42 );
     is $o3->foo, 42;
