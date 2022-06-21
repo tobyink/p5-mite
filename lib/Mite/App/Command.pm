@@ -1,5 +1,6 @@
 package Mite::App::Command;
 use Mite::MyMoo;
+extends qw(App::Cmd::Command);
 
 sub opt_spec {
     my ($class, $app) = (shift, @_);
