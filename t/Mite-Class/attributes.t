@@ -19,7 +19,7 @@ CODE
     local $@;
     my $o2 = eval { MyTest->new( bar => 66, baz => 33 ); };
     my $e = $@;
-    like $e, qr/^Unexpected keys in contructor to MyTest: bar, baz/;
+    like $e, qr/^Unexpected keys in contructor: bar, baz/;
 };
 
 tests "all_attributes" => sub {

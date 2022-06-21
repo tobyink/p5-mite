@@ -250,8 +250,7 @@ sub _compile_bless {
 sub _compile_strict_constructor {
     my $self = shift;
 
-    return sprintf 'keys %%$args and do { require Carp; Carp::croak("Unexpected keys in contructor to %s: " . join(q[, ], sort keys %%$args)) };',
-        $self->name;
+    return 'keys %$args and do { require Carp; Carp::croak("Unexpected keys in contructor: " . join(q[, ], sort keys %$args)) };';
 }
 
 sub _compile_new {

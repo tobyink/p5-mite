@@ -12,6 +12,11 @@ has init_arg =>
   default       => sub { shift->name },
   lazy          => true;
 
+has required =>
+  is            => rw,
+  isa           => Bool,
+  default       => false;
+
 has coderef_default_variable =>
   is            => rw,
   isa           => Str,
@@ -31,6 +36,13 @@ has name =>
   is            => rw,
   isa           => Str->where('length($_) > 0'),
   required      => true;
+
+sub BUILD {
+    my $self = shift;
+    
+    croak "Required attribute with no init_arg"
+        if $self->required && !defined $self->init_arg;
+}
 
 sub clone {
     my ( $self, %args ) = ( shift, @_ );
@@ -100,6 +112,13 @@ sub _compile_default {
     return 'undef';
 }
 
+sub _compile_required_error {
+    my $self = shift;
+
+    return sprintf 'do { require Carp; Carp::croak("Missing key in contructor: %s") }',
+        $self->init_arg;
+}
+
 sub compile_init {
     my ( $self, $selfvar, $argvar ) = @_;
 
@@ -120,6 +139,13 @@ sub compile_init {
     }
 
     if ( defined $init_arg ) {
+        if ( $self->required ) {
+            return sprintf '%s->{%s} = exists(%s->{%s}) ? delete(%s->{%s}) : %s;',
+                $selfvar, $self->name,
+                $argvar,  $init_arg,
+                $argvar,  $init_arg,
+                $self->_compile_required_error;
+        }
         return sprintf '%s->{%s} = delete(%s->{%s}) if exists(%s->{%s});',
             $selfvar, $self->name,
             $argvar,  $init_arg,
