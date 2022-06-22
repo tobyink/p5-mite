@@ -23,7 +23,7 @@ CODE
 
 tests "Fail in the constructor" => sub {
     mite_load <<'CODE';
-package Foo;
+package Foo2;
 use Mite::Shim;
 has num =>
    is => 'rw',
@@ -34,7 +34,7 @@ CODE
 
     local $@;
     eval {
-        my $obj = Foo->new( num => "Hello" );
+        my $obj = Foo2->new( num => "Hello" );
     };
     my $e = $@;
     like $e, qr/Type check failed in constructor/;
@@ -42,7 +42,7 @@ CODE
 
 tests "Fail in the accessor" => sub {
     mite_load <<'CODE';
-package Foo;
+package Foo3;
 use Mite::Shim;
 has num =>
    is => 'rw',
@@ -51,7 +51,7 @@ has num =>
 1;
 CODE
 
-    my $obj = Foo->new( num => 42 );
+    my $obj = Foo3->new( num => 42 );
     local $@;
     eval {
         $obj->num( "Hello" );

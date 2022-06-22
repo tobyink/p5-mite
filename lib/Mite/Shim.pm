@@ -50,9 +50,14 @@ sub import {
             my %args = @_;
 
             my $default = $args{default};
-            return unless ref $default eq 'CODE';
+            if ( ref $default eq 'CODE' ) {
+                ${$caller .'::__'.$name.'_DEFAULT__'} = $default;
+            }
 
-            ${$caller .'::__'.$name.'_DEFAULT__'} = $default;
+            my $builder = $args{builder};
+            if ( ref $builder eq 'CODE' ) {
+                *{"$caller\::_build_$name"} = $builder;
+            }
 
             return;
         };

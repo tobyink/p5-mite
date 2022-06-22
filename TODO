@@ -1,8 +1,5 @@
 TODO:
 
-  - Implement lazy attributes
-  - Implement builder for attributes
-  - Implement isa for attributes
   - Implement coerce for attributes
   - Implement triggers for attributes?
   - Implement BUILD and BUILDARGS

@@ -1,6 +1,11 @@
 package Mite::Attribute;
 use Mite::MyMoo;
 
+has class =>
+  is            => rw,
+  isa           => Object,
+  weak_ref      => true;
+
 has name =>
   is            => rw,
   isa           => Str->where('length($_) > 0'),
@@ -19,7 +24,7 @@ has required =>
 
 has is =>
   is            => rw,
-  isa           => Enum[ ro, rw, rwp, 'bare' ],
+  isa           => Enum[ ro, rw, rwp, 'lazy', 'bare' ],
   default       => 'bare';
 
 has [ 'reader', 'writer', 'accessor', 'clearer', 'predicate' ] =>
@@ -45,6 +50,11 @@ has default =>
   isa           => Maybe[Str|Ref],
   predicate     => 'has_default';
 
+has lazy =>
+  is            => rw,
+  isa           => Bool,
+  default       => false;
+
 has coderef_default_variable =>
   is            => rw,
   isa           => Str,
@@ -59,6 +69,7 @@ has coderef_default_variable =>
 has builder =>
     is            => rw,
     isa           => Str->where('length($_) > 0') | CodeRef | Undef,
+    predicate     => true;
 
 my @method_name_generator = (
     { # public
@@ -84,6 +95,30 @@ sub BUILD {
 
     croak "Required attribute with no init_arg"
         if $self->required && !defined $self->init_arg;
+
+    if ( $self->is eq 'lazy' ) {
+        $self->lazy( true );
+        $self->builder( 1 ) unless $self->has_builder;
+        $self->is( 'ro' );
+    }
+
+    if ( CodeRef->check( $self->builder ) ) {
+        my $coderef = $self->builder;
+        my $newname = do {
+            my $gen = $method_name_generator[$self->is_private]{builder};
+            local $_ = $self->name;
+            $gen->( $_ );
+        };
+        no strict 'refs';
+        my $classname;
+        if ( $self->class and $classname = $self->class->name ) {
+            *{"$classname\::$newname"} = $coderef;
+            $self->builder( $newname );
+        }
+        else {
+            croak "Could not install builder=>CODEREF as Mite could not determine which class to install it into.";
+        }
+    }
 
     for my $property ( 'reader', 'writer', 'accessor', 'clearer', 'predicate', 'builder' ) {
         my $name = $self->$property;
@@ -186,6 +221,16 @@ sub _empty {
     return ';';
 }
 
+sub _compile_checked_default {
+    my ( $self, $selfvar ) = @_;
+
+    my $default = $self->_compile_default( $selfvar );
+    my $type = $self->type or return $default;
+
+    return sprintf 'do { my $default_value = %s; %s or do { require Carp; Carp::croak(q[Type check failed in default: %s should be %s]) }; $default_value }',
+        $default, $type->inline_check('$default_value'), $self->name, $type->display_name;
+}
+
 sub _compile_default {
     my ( $self, $selfvar ) = @_;
 
@@ -198,65 +243,55 @@ sub _compile_default {
         require B;
         return defined( $self->default ) ? B::perlstring( $self->default ) : 'undef';
     }
+    elsif ( $self->has_builder ) {
+        return sprintf '%s->%s', $selfvar, $self->builder;
+    }
 
     # should never get here
     return 'undef';
 }
 
-sub _compile_required_error {
-    my $self = shift;
-
-    return sprintf 'do { require Carp; Carp::croak("Missing key in constructor: %s") }',
-        $self->init_arg;
-}
-
 sub compile_init {
-    my ( $self, $selfvar, $argvar ) = @_;
-    
-    my $code = $self->_compile_init_basic( $selfvar, $argvar );
-
-    if ( my $type = $self->type ) {
-        $code .= "\n    # GOT HERE: $type";
-        local $Type::Tiny::AvoidCallbacks = 1;
-        $code .= sprintf "\n    %s or do { require Carp; Carp::croak(q[Type check failed in constructor: %s should be %s]) };",
-            $type->inline_check(sprintf '%s->{%s}', $selfvar, $self->name), $self->init_arg, $type->display_name;
-    }
-
-    return $code;
-}
-
-sub _compile_init_basic {
     my ( $self, $selfvar, $argvar ) = @_;
 
     my $init_arg = $self->init_arg;
 
-    if ( $self->has_default and not defined $init_arg ) {
-        return sprintf '%s->{%s} = %s;',
-            $selfvar, $self->name,
-            $self->_compile_default( $selfvar );
-    }
-
-    if ( $self->has_default ) {
-        return sprintf '%s->{%s} = exists(%s->{%s}) ? delete(%s->{%s}) : %s;',
-            $selfvar, $self->name,
-            $argvar,  $init_arg,
-            $argvar,  $init_arg,
-            $self->_compile_default( $selfvar );
-    }
-
+    my $code = '';
     if ( defined $init_arg ) {
-        if ( $self->required ) {
-            return sprintf '%s->{%s} = exists(%s->{%s}) ? delete(%s->{%s}) : %s;',
-                $selfvar, $self->name,
-                $argvar,  $init_arg,
-                $argvar,  $init_arg,
-                $self->_compile_required_error;
+        $code .= sprintf 'if ( exists(%s->{q[%s]}) ) { ',
+            $argvar, $init_arg;
+        if ( my $type = $self->type ) {
+            local $Type::Tiny::AvoidCallbacks = 1;
+            $code .= sprintf '%s or do { require Carp; Carp::croak(q[Type check failed in constructor: %s should be %s]) }; ',
+                $type->inline_check(sprintf '%s->{q[%s]}', $argvar, $init_arg),
+                $self->init_arg,
+                $type->display_name;
         }
-        return sprintf '%s->{%s} = delete(%s->{%s}) if exists(%s->{%s});',
-            $selfvar, $self->name,
-            $argvar,  $init_arg,
-            $argvar,  $init_arg;
+        $code .= sprintf '%s->{q[%s]} = delete %s->{q[%s]}; ',
+            $selfvar, $self->name, $argvar, $init_arg;
+        $code .= ' }';
     }
+
+    if ( $self->has_default || $self->has_builder
+    and not $self->lazy ) {
+        if ( $code ) {
+            $code .= ' else { ';
+        }
+        else {
+            $code .= 'do { ';
+        }
+        $code .= sprintf '%s->{q[%s]} = %s; ',
+            $selfvar, $self->name, $self->_compile_checked_default( $selfvar );
+        $code .= ' }';
+    }
+    elsif ( defined $init_arg
+    and $self->required
+    and not ($self->has_default || $self->has_builder) ) {
+        $code .= sprintf ' else { require Carp; Carp::croak("Missing key in constructor: %s") }',
+            $init_arg;
+    }
+
+    return $code;
 }
 
 sub compile {
@@ -274,9 +309,16 @@ CODE
 
 my %code_template = (
     reader => sub {
-        my $slot_name = shift->name;
-        sprintf '@_ > 1 ? require Carp && Carp::croak("%s is a read-only attribute of @{[ref $_[0]]}") : $_[0]->{ q[%s] }',
-            $slot_name, $slot_name;
+        my $self = shift;
+        my $slot_name = $self->name;
+        my $code = sprintf '$_[0]->{q[%s]}', $slot_name;
+        if ( $self->lazy ) {
+            $code = sprintf '( exists($_[0]{q[%s]}) ? $_[0]{q[%s]} : ( $_[0]{q[%s]} = %s ) )',
+                $slot_name, $slot_name, $slot_name, $self->_compile_checked_default( '$_[0]' );
+        }
+        $code = sprintf '@_ > 1 ? require Carp && Carp::croak("%s is a read-only attribute of @{[ref $_[0]]}") : %s',
+            $slot_name, $code;
+        return $code;
     },
     writer => sub {
         my $self = shift;
@@ -292,8 +334,13 @@ my %code_template = (
     accessor => sub {
         my $self = shift;
         my $slot_name = $self->name;
-        my $code = sprintf '@_ > 1 ? $_[0]->{ q[%s] } = $_[1] : $_[0]->{ q[%s] }',
-            $slot_name, $slot_name;
+        my $code = sprintf '$_[0]->{q[%s]}', $slot_name;
+        if ( $self->lazy ) {
+            $code = sprintf '( exists($_[0]{q[%s]}) ? $_[0]{q[%s]} : ( $_[0]{q[%s]} = %s ) )',
+                $slot_name, $slot_name, $slot_name, $self->_compile_checked_default( '$_[0]' );
+        }
+        $code = sprintf '@_ > 1 ? ( $_[0]->{ q[%s] } = $_[1] ) : %s',
+            $slot_name, $code;
         if ( my $type = $self->type ) {
             local $Type::Tiny::AvoidCallbacks = 1;
             $code = sprintf '@_==1 or %s or do { require Carp; Carp::croak(q[Type check failed in accessor: value should be %s]) }; %s',
@@ -339,6 +386,12 @@ sub _compile_xs {
         delete $use_xs{writer};
         delete $use_xs{accessor};
         $use_pp{writer} = $use_pp{accessor} = 1;
+    }
+
+    if ( $self->lazy ) {
+        delete $use_xs{reader};
+        delete $use_xs{accessor};
+        $use_pp{reader} = $use_pp{accessor} = 1;
     }
 
     my $xs = 0;

@@ -74,6 +74,7 @@ sub inject_mite_functions {
 
         if( my $is_extension = $name =~ s{^\+}{} ) {
             $class->extend_attribute(
+                class   => $class,
                 name    => $name,
                 %args
             );
@@ -81,6 +82,7 @@ sub inject_mite_functions {
         else {
             require Mite::Attribute;
             my $attribute = Mite::Attribute->new(
+                class   => $class,
                 name    => $name,
                 %args
             );

@@ -19,6 +19,7 @@
         # Make everything in @INC absolute so we can chdir in tests
         @INC = map { path($_)->absolute->stringify } @INC;
 
+        #push @_, test_sort => 'ordered';
         goto &Fennec::import;
     }
 
