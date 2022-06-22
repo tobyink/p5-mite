@@ -4,6 +4,13 @@ Mite
 Creator:      Michael G Schwern (MSCHWERN)
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+v0.0.4    2022-06-22
+
+  - Implement builder option for has
+  - Implement lazy option for has
+  - Implement isa option for has
+  - Implement is => 'lazy' like Moo
+
 v0.0.3    2022-06-21
 
   - Bugfixes
