@@ -20,8 +20,14 @@ jobs:
       - run: perl -V
       - run: cpanm -n --installdeps .
       - run: cpanm -n setenv
+      - run: cpanm -n Class::XSAccessor
       - run: prove -lr t
-      - run: cd devel.examples/Acme-Mitey-Cards
-      - run: perl -I../../lib ../../bin/mite compile
-      - run: prove -lr t
-      - run: prove -Msetenv=MITE_PURE_PERL,1 -lr t
+      - name: Compile Acme-Mitey-Cards
+        run: perl -I../../lib ../../bin/mite compile
+        working-directory: devel.examples/Acme-Mitey-Cards
+      - name: Run Acme-Mitey-Cards test suite
+        run: prove -lr t
+        working-directory: devel.examples/Acme-Mitey-Cards
+      - name: Run Acme-Mitey-Cards test suite in PP mode
+        run: prove -Msetenv=MITE_PURE_PERL,1 -lr t
+        working-directory: devel.examples/Acme-Mitey-Cards
