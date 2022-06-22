@@ -60,7 +60,7 @@
       },
       "Mite" : {
          "file" : "lib/Mite.pm",
-         "version" : "v0.0.3"
+         "version" : "v0.0.4"
       },
       "Mite::App" : {
          "file" : "lib/Mite/App.pm"
@@ -112,7 +112,7 @@
       },
       "Mite::Shim" : {
          "file" : "lib/Mite/Shim.pm",
-         "version" : "v0.0.3"
+         "version" : "v0.0.4"
       },
       "Mite::Source" : {
          "file" : "lib/Mite/Source.pm"
@@ -130,6 +130,6 @@
          "url" : "https://github.com/tobyink/Mite"
       }
    },
-   "version" : "v0.0.3",
+   "version" : "v0.0.4",
    "x_serialization_backend" : "JSON::PP version 4.09"
 }

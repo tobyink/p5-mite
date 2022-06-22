@@ -39,6 +39,8 @@ t/Mite-Attribute/clone.t
 t/Mite-Attribute/defaults.t
 t/Mite-Attribute/init_arg.t
 t/Mite-Attribute/is.t
+t/Mite-Attribute/isa.t
+t/Mite-Attribute/lazy.t
 t/Mite-Attribute/required.t
 t/Mite-Attribute/ro.t
 t/Mite-Attribute/rw.t
