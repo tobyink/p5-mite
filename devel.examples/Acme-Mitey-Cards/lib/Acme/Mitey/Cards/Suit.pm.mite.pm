@@ -29,22 +29,22 @@ else {
 }
 if( !$ENV{MITE_PURE_PERL} && eval { require Class::XSAccessor } ) {
 Class::XSAccessor->import(
-    getters => { q[name] => q[name] },
-);
-
-}
-else {
-    *name = sub { @_ > 1 ? require Carp && Carp::croak("name is a read-only attribute of @{[ref $_[0]]}") : $_[0]->{q[name]} };
-
-}
-if( !$ENV{MITE_PURE_PERL} && eval { require Class::XSAccessor } ) {
-Class::XSAccessor->import(
     getters => { q[colour] => q[colour] },
 );
 
 }
 else {
     *colour = sub { @_ > 1 ? require Carp && Carp::croak("colour is a read-only attribute of @{[ref $_[0]]}") : $_[0]->{q[colour]} };
+
+}
+if( !$ENV{MITE_PURE_PERL} && eval { require Class::XSAccessor } ) {
+Class::XSAccessor->import(
+    getters => { q[name] => q[name] },
+);
+
+}
+else {
+    *name = sub { @_ > 1 ? require Carp && Carp::croak("name is a read-only attribute of @{[ref $_[0]]}") : $_[0]->{q[name]} };
 
 }
 

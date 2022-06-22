@@ -29,6 +29,16 @@ sub new {
 
 if( !$ENV{MITE_PURE_PERL} && eval { require Class::XSAccessor } ) {
 Class::XSAccessor->import(
+    getters => { q[face] => q[face] },
+);
+
+}
+else {
+    *face = sub { @_ > 1 ? require Carp && Carp::croak("face is a read-only attribute of @{[ref $_[0]]}") : $_[0]->{q[face]} };
+
+}
+if( !$ENV{MITE_PURE_PERL} && eval { require Class::XSAccessor } ) {
+Class::XSAccessor->import(
     getters => { q[deck] => q[deck] },
 );
 
@@ -53,16 +63,6 @@ if( !$ENV{MITE_PURE_PERL} && eval { require Class::XSAccessor } ) {
 }
 else {
     *reverse = sub { @_ > 1 ? require Carp && Carp::croak("reverse is a read-only attribute of @{[ref $_[0]]}") : ( exists($_[0]{q[reverse]}) ? $_[0]{q[reverse]} : ( $_[0]{q[reverse]} = do { my $default_value = $_[0]->_build_reverse; do { package Type::Tiny; defined($default_value) and do { ref(\$default_value) eq 'SCALAR' or ref(\(my $val = $default_value)) eq 'SCALAR' } } or do { require Carp; Carp::croak(q[Type check failed in default: reverse should be Str]) }; $default_value } ) ) };
-
-}
-if( !$ENV{MITE_PURE_PERL} && eval { require Class::XSAccessor } ) {
-Class::XSAccessor->import(
-    getters => { q[face] => q[face] },
-);
-
-}
-else {
-    *face = sub { @_ > 1 ? require Carp && Carp::croak("face is a read-only attribute of @{[ref $_[0]]}") : $_[0]->{q[face]} };
 
 }
 
