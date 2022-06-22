@@ -40,7 +40,6 @@ has isa =>
   init_arg      => 'isa';
 
 has type =>
-  init_arg      => undef,
   is            => 'lazy',
   isa           => Object|Undef,
   builder       => 1;
@@ -297,7 +296,7 @@ sub compile_init {
     if ( $self->has_default || $self->has_builder
     and not $self->lazy ) {
         if ( $code ) {
-            $code .= ' else { ';
+            $code .= 'type->display_name else { ';
         }
         else {
             $code .= 'do { ';
