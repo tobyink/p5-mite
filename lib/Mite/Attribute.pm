@@ -178,8 +178,24 @@ sub _build_type {
     my $isa = $self->_isa
         or return undef;
 
+    state $type_registry = do {
+        require Type::Registry;
+        my $reg = 'Type::Registry'->for_me;
+        $reg->add_types('Types::Standard');
+        $reg->add_types('Types::Common::Numeric');
+        $reg->add_types('Types::Common::String');
+        $reg;
+    };
+
     require Type::Utils;
-    my $type = Type::Utils::dwim_type( $isa, fallback => [ 'make_class_type' ] );
+    my $type = Type::Utils::dwim_type(
+        $isa,
+        fallback => [ 'make_class_type' ],
+        for => __PACKAGE__,
+    );
+
+    $type
+        or croak sprintf 'Type %s cannot be found', $isa;
 
     $type->can_be_inlined
         or croak sprintf 'Type %s cannot be inlined', $type->display_name;

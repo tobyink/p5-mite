@@ -60,4 +60,26 @@ CODE
     like $e, qr/Type check failed in accessor/;
 };
 
+tests "Types::Common::Numeric works" => sub {
+    mite_load <<'CODE';
+package FooPos;
+use Mite::Shim;
+has num =>
+   is => 'rw',
+   isa => 'PositiveInt';
+1;
+CODE
+
+    my $obj = FooPos->new( num => 42 );
+    $obj->num( 23 );
+    is $obj->num, 23;
+
+    local $@;
+    eval {
+        $obj->num( -12 );
+    };
+    my $e = $@;
+    like $e, qr/Type check failed in accessor/;
+};
+
 done_testing;
