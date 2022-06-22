@@ -31,7 +31,7 @@ provides:
     file: lib/Mite/MakeMaker.pm
   Mite:
     file: lib/Mite.pm
-    version: v0.0.4
+    version: v0.0.5
   Mite::App:
     file: lib/Mite/App.pm
   Mite::App::Command:
@@ -66,7 +66,7 @@ provides:
     file: lib/Mite/Role/HasYAML.pm
   Mite::Shim:
     file: lib/Mite/Shim.pm
-    version: v0.0.4
+    version: v0.0.5
   Mite::Source:
     file: lib/Mite/Source.pm
 requires:
