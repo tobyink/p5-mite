@@ -46,8 +46,8 @@ my $build = Module::Build->new(
 
     meta_merge => {
         resources => {
-            bugtracker => 'https://github.com/tobyink/Mite/issues',
-            repository => 'https://github.com/tobyink/Mite',
+            bugtracker => 'https://github.com/tobyink/p5-mite/issues',
+            repository => 'https://github.com/tobyink/p5-mite',
         },
         no_index => {
             package => [qw(MY)],
