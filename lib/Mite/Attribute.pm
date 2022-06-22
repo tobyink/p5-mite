@@ -65,7 +65,6 @@ has coderef_default_variable =>
       return sprintf '$__%s_DEFAULT__', $self->name;
   };
 
-# Not actually supported yet
 has builder =>
     is            => rw,
     isa           => Str->where('length($_) > 0') | CodeRef | Undef,
