@@ -232,6 +232,8 @@ sub _compile_checked_default {
     my $default = $self->_compile_default( $selfvar );
     my $type = $self->type or return $default;
 
+    local $Type::Tiny::AvoidCallbacks = 1;
+
     return sprintf 'do { my $default_value = %s; %s or do { require Carp; Carp::croak(q[Type check failed in default: %s should be %s]) }; $default_value }',
         $default, $type->inline_check('$default_value'), $self->name, $type->display_name;
 }

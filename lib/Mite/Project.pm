@@ -229,7 +229,9 @@ sub add_mite_shim {
 OUT
 
     my $src_shim = $self->_find_mite_shim;
-    $shim_file->append( $src_shim->slurp );
+    my $code = $src_shim->slurp;
+    $code =~ s/package Mite::Shim/package # hide\n  Mite::Shim/;
+    $shim_file->append( $code );
 
     return $shim_file;
 }
