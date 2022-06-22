@@ -180,7 +180,12 @@ sub _build_type {
         or return undef;
 
     require Type::Utils;
-    return Type::Utils::dwim_type( $isa, fallback => [ 'make_class_type' ] );
+    my $type = Type::Utils::dwim_type( $isa, fallback => [ 'make_class_type' ] );
+
+    $type->can_be_inlined
+        or croak sprintf 'Type %s cannot be inlined', $type->display_name;
+
+    return $type;
 }
 
 sub has_dataref_default {

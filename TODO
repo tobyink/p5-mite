@@ -1,5 +1,6 @@
 TODO:
 
+  - Implement weak_ref for attributes
   - Implement coerce for attributes
   - Implement triggers for attributes?
   - Implement BUILD and BUILDARGS
