@@ -1,18 +1,10 @@
-{
-    package Acme::Mitey::Cards::Mite;
-    BEGIN { our @ISA = qw(Mite::Shim); }
-}
-
-package # hide
-  Mite::Shim;
+package Acme::Mitey::Cards::Mite;
 
 # NOTE: Since the intention is to ship this file with a project, this file
 # cannot have any non-core dependencies.
 
 use strict;
 use warnings;
-
-use version 0.77; our $VERSION = qv("v0.0.6");
 
 sub _is_compiling {
     return $ENV{MITE_COMPILE} ? 1 : 0;

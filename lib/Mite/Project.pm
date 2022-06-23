@@ -220,18 +220,10 @@ sub add_mite_shim {
     $shim_file->parent->mkpath;
 
     my $shim_package = $self->config->data->{shim};
-    $shim_file->spew(<<"OUT");
-{
-    package $shim_package;
-    BEGIN { our \@ISA = qw(Mite::Shim); }
-}
-
-OUT
-
     my $src_shim = $self->_find_mite_shim;
     my $code = $src_shim->slurp;
-    $code =~ s/package Mite::Shim/package # hide\n  Mite::Shim/;
-    $shim_file->append( $code );
+    $code =~ s/package Mite::Shim;/package $shim_package;/;
+    $shim_file->spew( $code );
 
     return $shim_file;
 }
