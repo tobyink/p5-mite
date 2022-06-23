@@ -13,7 +13,7 @@
         if ( exists( $args->{q[abbreviation]} ) ) {
             do {
 
-                package Type::Tiny;
+                package Acme::Mitey::Cards::Mite;
                 defined( $args->{q[abbreviation]} ) and do {
                     ref( \$args->{q[abbreviation]} ) eq 'SCALAR'
                       or ref( \( my $val = $args->{q[abbreviation]} ) ) eq
@@ -30,7 +30,7 @@
         if ( exists( $args->{q[colour]} ) ) {
             do {
 
-                package Type::Tiny;
+                package Acme::Mitey::Cards::Mite;
                 defined( $args->{q[colour]} ) and do {
                     ref( \$args->{q[colour]} ) eq 'SCALAR'
                       or ref( \( my $val = $args->{q[colour]} ) ) eq 'SCALAR';
@@ -46,7 +46,7 @@
         if ( exists( $args->{q[name]} ) ) {
             do {
 
-                package Type::Tiny;
+                package Acme::Mitey::Cards::Mite;
                 defined( $args->{q[name]} ) and do {
                     ref( \$args->{q[name]} ) eq 'SCALAR'
                       or ref( \( my $val = $args->{q[name]} ) ) eq 'SCALAR';
@@ -81,7 +81,7 @@
                     my $default_value = $_[0]->_build_abbreviation;
                     do {
 
-                        package Type::Tiny;
+                        package Acme::Mitey::Cards::Mite;
                         defined($default_value) and do {
                             ref( \$default_value ) eq 'SCALAR'
                               or ref( \( my $val = $default_value ) ) eq

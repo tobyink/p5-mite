@@ -20,7 +20,11 @@
 
         if ( exists( $args->{q[cards]} ) ) {
             (
-                do { package Type::Tiny; ref( $args->{q[cards]} ) eq 'ARRAY' }
+                do {
+
+                    package Acme::Mitey::Cards::Mite;
+                    ref( $args->{q[cards]} ) eq 'ARRAY';
+                  }
                   and do {
                     my $ok = 1;
                     for my $i ( @{ $args->{q[cards]} } ) {
@@ -46,11 +50,11 @@ q[Type check failed in constructor: cards should be ArrayRef[InstanceOf["Acme::M
         if ( exists( $args->{q[owner]} ) ) {
             do {
 
-                package Type::Tiny;
+                package Acme::Mitey::Cards::Mite;
                 (
                     do {
 
-                        package Type::Tiny;
+                        package Acme::Mitey::Cards::Mite;
                         defined( $args->{q[owner]} ) and do {
                             ref( \$args->{q[owner]} ) eq 'SCALAR'
                               or ref( \( my $val = $args->{q[owner]} ) ) eq
@@ -60,7 +64,7 @@ q[Type check failed in constructor: cards should be ArrayRef[InstanceOf["Acme::M
                       or (
                         do {
 
-                            package Type::Tiny;
+                            package Acme::Mitey::Cards::Mite;
                             use Scalar::Util ();
                             Scalar::Util::blessed( $args->{q[owner]} );
                         }
@@ -97,7 +101,7 @@ q[Type check failed in constructor: cards should be ArrayRef[InstanceOf["Acme::M
                     my $default_value = $_[0]->_build_cards;
                     do {
 
-                        package Type::Tiny;
+                        package Acme::Mitey::Cards::Mite;
                         ( ref($default_value) eq 'ARRAY' ) and do {
                             my $ok = 1;
                             for my $i ( @{$default_value} ) {
@@ -132,11 +136,11 @@ q[Type check failed in default: cards should be ArrayRef[InstanceOf["Acme::Mitey
           ? do {
             do {
 
-                package Type::Tiny;
+                package Acme::Mitey::Cards::Mite;
                 (
                     do {
 
-                        package Type::Tiny;
+                        package Acme::Mitey::Cards::Mite;
                         defined( $_[1] ) and do {
                             ref( \$_[1] ) eq 'SCALAR'
                               or ref( \( my $val = $_[1] ) ) eq 'SCALAR';
@@ -145,7 +149,7 @@ q[Type check failed in default: cards should be ArrayRef[InstanceOf["Acme::Mitey
                       or (
                         do {
 
-                            package Type::Tiny;
+                            package Acme::Mitey::Cards::Mite;
                             use Scalar::Util ();
                             Scalar::Util::blessed( $_[1] );
                         }

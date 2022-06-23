@@ -20,7 +20,11 @@
 
         if ( exists( $args->{q[cards]} ) ) {
             (
-                do { package Type::Tiny; ref( $args->{q[cards]} ) eq 'ARRAY' }
+                do {
+
+                    package Acme::Mitey::Cards::Mite;
+                    ref( $args->{q[cards]} ) eq 'ARRAY';
+                  }
                   and do {
                     my $ok = 1;
                     for my $i ( @{ $args->{q[cards]} } ) {
@@ -47,7 +51,7 @@ q[Type check failed in constructor: cards should be ArrayRef[InstanceOf["Acme::M
             (
                 do {
 
-                    package Type::Tiny;
+                    package Acme::Mitey::Cards::Mite;
                     ref( $args->{q[original_cards]} ) eq 'ARRAY';
                   }
                   and do {
@@ -75,7 +79,7 @@ q[Type check failed in constructor: original_cards should be ArrayRef[InstanceOf
         if ( exists( $args->{q[reverse]} ) ) {
             do {
 
-                package Type::Tiny;
+                package Acme::Mitey::Cards::Mite;
                 defined( $args->{q[reverse]} ) and do {
                     ref( \$args->{q[reverse]} ) eq 'SCALAR'
                       or ref( \( my $val = $args->{q[reverse]} ) ) eq 'SCALAR';
@@ -92,7 +96,7 @@ q[Type check failed in constructor: original_cards should be ArrayRef[InstanceOf
                 my $default_value = "plain";
                 do {
 
-                    package Type::Tiny;
+                    package Acme::Mitey::Cards::Mite;
                     defined($default_value) and do {
                         ref( \$default_value ) eq 'SCALAR'
                           or ref( \( my $val = $default_value ) ) eq 'SCALAR';
@@ -130,7 +134,7 @@ q[Type check failed in constructor: original_cards should be ArrayRef[InstanceOf
                     my $default_value = $_[0]->_build_cards;
                     do {
 
-                        package Type::Tiny;
+                        package Acme::Mitey::Cards::Mite;
                         ( ref($default_value) eq 'ARRAY' ) and do {
                             my $ok = 1;
                             for my $i ( @{$default_value} ) {
@@ -169,7 +173,7 @@ q[Type check failed in default: cards should be ArrayRef[InstanceOf["Acme::Mitey
                     my $default_value = $_[0]->_build_original_cards;
                     do {
 
-                        package Type::Tiny;
+                        package Acme::Mitey::Cards::Mite;
                         ( ref($default_value) eq 'ARRAY' ) and do {
                             my $ok = 1;
                             for my $i ( @{$default_value} ) {

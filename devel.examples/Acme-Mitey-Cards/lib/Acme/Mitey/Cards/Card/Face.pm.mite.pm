@@ -37,7 +37,7 @@ q[Type check failed in constructor: deck should be InstanceOf["Acme::Mitey::Card
         if ( exists( $args->{q[face]} ) ) {
             do {
 
-                package Type::Tiny;
+                package Acme::Mitey::Cards::Mite;
                 (         defined( $args->{q[face]} )
                       and !ref( $args->{q[face]} )
                       and $args->{q[face]} =~ m{\A(?:(?:Jack|King|Queen))\z} );
@@ -53,7 +53,7 @@ q[Type check failed in constructor: face should be Enum["Jack","Queen","King"]]
         if ( exists( $args->{q[reverse]} ) ) {
             do {
 
-                package Type::Tiny;
+                package Acme::Mitey::Cards::Mite;
                 defined( $args->{q[reverse]} ) and do {
                     ref( \$args->{q[reverse]} ) eq 'SCALAR'
                       or ref( \( my $val = $args->{q[reverse]} ) ) eq 'SCALAR';
@@ -136,7 +136,7 @@ q[Type check failed in constructor: suit should be InstanceOf["Acme::Mitey::Card
                     my $default_value = $_[0]->_build_reverse;
                     do {
 
-                        package Type::Tiny;
+                        package Acme::Mitey::Cards::Mite;
                         defined($default_value) and do {
                             ref( \$default_value ) eq 'SCALAR'
                               or ref( \( my $val = $default_value ) ) eq
