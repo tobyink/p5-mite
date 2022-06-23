@@ -130,39 +130,35 @@ q[Type check failed in default: cards should be ArrayRef[InstanceOf["Acme::Mitey
     *owner = sub {
         @_ > 1
           ? do {
-            $_[0]{q[owner]} = do {
-                my $value = $_[1];
-                do {
+            do {
 
-                    package Type::Tiny;
-                    (
+                package Type::Tiny;
+                (
+                    do {
+
+                        package Type::Tiny;
+                        defined( $_[1] ) and do {
+                            ref( \$_[1] ) eq 'SCALAR'
+                              or ref( \( my $val = $_[1] ) ) eq 'SCALAR';
+                        }
+                      }
+                      or (
                         do {
 
                             package Type::Tiny;
-                            defined($value) and do {
-                                ref( \$value ) eq 'SCALAR'
-                                  or ref( \( my $val = $value ) ) eq 'SCALAR';
-                            }
-                          }
-                          or (
-                            do {
-
-                                package Type::Tiny;
-                                use Scalar::Util ();
-                                Scalar::Util::blessed($value);
-                            }
-                          )
-                    );
-                  }
-                  or require Carp
-                  && Carp::croak(
-                    q[Type check failed in accessor: value should be Str|Object]
-                  );
-                $value;
-            };
+                            use Scalar::Util ();
+                            Scalar::Util::blessed( $_[1] );
+                        }
+                      )
+                );
+              }
+              or require Carp
+              && Carp::croak(
+                q[Type check failed in accessor: value should be Str|Object]);
+            $_[0]{q[owner]} = $_[1];
             $_[0];
           }
-          : $_[0]{q[owner]};
+          : ( $_[0]->{q[owner]} );
     };
 
     1;

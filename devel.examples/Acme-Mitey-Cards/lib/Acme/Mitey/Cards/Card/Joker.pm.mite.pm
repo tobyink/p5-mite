@@ -33,6 +33,7 @@ q[Type check failed in constructor: deck should be InstanceOf["Acme::Mitey::Card
             $self->{q[deck]} = $args->{q[deck]};
             delete $args->{q[deck]};
         }
+        require Scalar::Util && Scalar::Util::weaken( $self->{q[deck]} );
         if ( exists( $args->{q[reverse]} ) ) {
             do {
 
@@ -62,7 +63,10 @@ q[Type check failed in constructor: deck should be InstanceOf["Acme::Mitey::Card
 
     # Accessors for deck
     if ($__XS) {
-        Class::XSAccessor->import( getters => { q[deck] => q[deck] }, );
+        Class::XSAccessor->import(
+            chained => 1,
+            getters => { q[deck] => q[deck] },
+        );
     }
     else {
         *deck = sub {

@@ -3,4 +3,12 @@
 `Acme-Mitey-Cards 0.001 cpan:TOBYINK`
 	issued  2022-06-22;
 	label   "Initial release".
-
+	
+`Acme-Mitey-Cards 0.002 cpan:TOBYINK`
+	issued  2022-06-23;
+	changeset [
+		item [
+			a dcs:Update;
+			label "Rebuild using Mite v0.0.6.";
+		];
+	].

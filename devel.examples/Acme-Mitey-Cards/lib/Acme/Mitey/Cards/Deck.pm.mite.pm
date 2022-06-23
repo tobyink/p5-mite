@@ -200,7 +200,10 @@ q[Type check failed in default: original_cards should be ArrayRef[InstanceOf["Ac
 
     # Accessors for reverse
     if ($__XS) {
-        Class::XSAccessor->import( getters => { q[reverse] => q[reverse] }, );
+        Class::XSAccessor->import(
+            chained => 1,
+            getters => { q[reverse] => q[reverse] },
+        );
     }
     else {
         *reverse = sub {

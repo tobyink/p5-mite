@@ -102,7 +102,10 @@ q[Type check failed in default: abbreviation should be Str]
 
     # Accessors for colour
     if ($__XS) {
-        Class::XSAccessor->import( getters => { q[colour] => q[colour] }, );
+        Class::XSAccessor->import(
+            chained => 1,
+            getters => { q[colour] => q[colour] },
+        );
     }
     else {
         *colour = sub {
@@ -115,7 +118,10 @@ q[Type check failed in default: abbreviation should be Str]
 
     # Accessors for name
     if ($__XS) {
-        Class::XSAccessor->import( getters => { q[name] => q[name] }, );
+        Class::XSAccessor->import(
+            chained => 1,
+            getters => { q[name] => q[name] },
+        );
     }
     else {
         *name = sub {
