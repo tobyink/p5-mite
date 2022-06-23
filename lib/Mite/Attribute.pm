@@ -22,6 +22,11 @@ has required =>
   isa           => Bool,
   default       => false;
 
+has weak_ref =>
+  is            => rw,
+  isa           => Bool,
+  default       => false;
+
 has is =>
   is            => rw,
   isa           => Enum[ ro, rw, rwp, 'lazy', 'bare' ],
@@ -348,24 +353,34 @@ sub compile_init {
             $init_arg;
     }
 
+    if ( $self->weak_ref ) {
+      $code .= sprintf ' require Scalar::Util && Scalar::Util::weaken(%s->{q[%s]});',
+         $selfvar, $self->name;
+    }
+
     return $code;
 }
 
-my %code_template = (
+my %code_template;
+%code_template = (
     reader => sub {
         my $self = shift;
+        my %arg = @_;
         my $slot_name = $self->name;
         my $code = sprintf '$_[0]->{q[%s]}', $slot_name;
         if ( $self->lazy ) {
             $code = sprintf '( exists($_[0]{q[%s]}) ? $_[0]{q[%s]} : ( $_[0]{q[%s]} = %s ) )',
                 $slot_name, $slot_name, $slot_name, $self->_compile_checked_default( '$_[0]' );
         }
-        $code = sprintf '@_ > 1 ? require Carp && Carp::croak("%s is a read-only attribute of @{[ref $_[0]]}") : %s',
-            $slot_name, $code;
+        unless ( $arg{no_croak} ) {
+            $code = sprintf '@_ > 1 ? require Carp && Carp::croak("%s is a read-only attribute of @{[ref $_[0]]}") : %s',
+                $slot_name, $code;
+        }
         return $code;
     },
     writer => sub {
         my $self = shift;
+        my %arg = @_;
         my $slot_name = $self->name;
         my $code = '';
         if ( my $type = $self->type ) {
@@ -375,41 +390,42 @@ my %code_template = (
                 $code .= sprintf 'my $value = %s; ', $self->_compile_coercion($valuevar);
                 $valuevar = '$value';
             }
-            $code .= sprintf '%s or do { require Carp; Carp::croak(q[Type check failed in writer: value should be %s]) }; $_[0]{q[%s]} = %s; $_[0];',
-                $type->inline_check($valuevar), $type->display_name, $slot_name, $valuevar;
+            $code .= sprintf '%s or require Carp && Carp::croak(q[Type check failed in %s: value should be %s]); $_[0]{q[%s]} = %s;',
+                $type->inline_check($valuevar), $arg{label}//'writer', $type->display_name, $slot_name, $valuevar;
         }
         else {
-            $code = sprintf '$_[0]->{ q[%s] } = $_[1]; $_[0];', $slot_name;
+            $code = sprintf '$_[0]->{q[%s]} = $_[1];', $slot_name;
         }
+        if ( $self->weak_ref ) {
+            $code .= sprintf ' require Scalar::Util && Scalar::Util::weaken($_[0]->{q[%s]});',
+                $slot_name;
+        }
+        $code .= ' $_[0];';
         return $code;
     },
     accessor => sub {
         my $self = shift;
-        my $slot_name = $self->name;
-        my ( $read_code, $write_code, $prelim_code );
-        $read_code = sprintf '$_[0]{q[%s]}', $slot_name;
-        if ( $self->lazy ) {
-            $read_code = sprintf '( exists(%s) ? %s : ( %s = %s ) )',
-                $read_code, $read_code, $read_code, $self->_compile_checked_default( '$_[0]' );
+        my %arg = @_;
+        my @parts = (
+            $code_template{writer}->( $self, label => 'accessor' ),
+            $code_template{reader}->( $self, no_croak => true ),
+        );
+        for my $i ( 0 .. 1 ) {
+            $parts[$i] = $parts[$i] =~ /\;/
+                ? "do { $parts[$i] }"
+                : "( $parts[$i] )"
         }
-        if ( my $type = $self->type ) {
-            local $Type::Tiny::AvoidCallbacks = 1;
-            $write_code = sprintf 'do { $_[0]{q[%s]} = do { my $value = %s; %s or require Carp && Carp::croak(q[Type check failed in accessor: value should be %s]); $value }; $_[0] }',
-                $slot_name, $self->_compile_coercion('$_[1]'), $type->inline_check('$value'), $type->display_name;
-        }
-        else {
-            $write_code = sprintf 'do { $_[0]{q[%s]} = $_[1]; $_[0] }', $slot_name;
-        }
-        return sprintf '@_ > 1 ? %s : %s', $write_code, $read_code;
+        sprintf '@_ > 1 ? %s : %s', @parts;
     },
     clearer => sub {
         my $slot_name = shift->name;
-        sprintf 'delete $_[0]->{ q[%s] }; $_[0];',
+        my %arg = @_;
+        sprintf 'delete $_[0]->{q[%s]}; $_[0];',
             $slot_name;
     },
     predicate => sub {
         my $slot_name = shift->name;
-        sprintf 'exists $_[0]->{ q[%s] };',
+        sprintf 'exists $_[0]->{q[%s]}',
             $slot_name;
     },
 );
@@ -444,8 +460,8 @@ sub compile {
         $want_pp{$property} = 1;
     }
 
-    # Class::XSAccessor can't do type checks
-    if ( $self->type ) {
+    # Class::XSAccessor can't do type checks or handle weaken
+    if ( $self->type or $self->weak_ref ) {
         delete $want_xs{writer};
         delete $want_xs{accessor};
     }
