@@ -351,19 +351,6 @@ sub compile_init {
     return $code;
 }
 
-sub compile {
-    my $self = shift;
-
-    return sprintf <<'CODE', $self->_compile_xs, $self->_compile_perl;
-if( !$ENV{MITE_PURE_PERL} && eval { require Class::XSAccessor } ) {
-%s
-}
-else {
-%s
-}
-CODE
-}
-
 my %code_template = (
     reader => sub {
         my $self = shift;
@@ -427,75 +414,72 @@ my %code_template = (
     },
 );
 
-sub _compile_xs {
+sub compile {
     my $self = shift;
+    my %args = @_;
 
+    my $xs_condition = $args{xs_condition}
+        || '!$ENV{MITE_PURE_PERL} && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") }';
     my $slot_name = $self->name;
 
-    my %options = (
+    my %xs_option_name = (
         reader    => 'getters',
         writer    => 'setters',
         accessor  => 'accessors',
         predicate => 'exists_predicates',
     );
 
-    my %use_xs = (
-        'reader' => 1,
-        'writer' => 1,
-        'accessor' => 1,
-        'predicate' => 1,
-    );
-    my %use_pp = (
-        'clearer' => 1,
-    );
+    my %want_xs;
+    my %want_pp;
+    my %method_name;
 
+    for my $property ( keys %code_template ) {
+        my $method_name = $self->$property;
+        next unless defined $method_name;
+
+        $method_name{$property} = $method_name;
+        if ( $xs_option_name{$property} ) {
+            $want_xs{$property} = 1;
+        }
+        $want_pp{$property} = 1;
+    }
+
+    # Class::XSAccessor can't do type checks
     if ( $self->type ) {
-        delete $use_xs{writer};
-        delete $use_xs{accessor};
-        $use_pp{writer} = $use_pp{accessor} = 1;
+        delete $want_xs{writer};
+        delete $want_xs{accessor};
     }
 
+    # Class::XSAccessor can't do lazy builders checks
     if ( $self->lazy ) {
-        delete $use_xs{reader};
-        delete $use_xs{accessor};
-        $use_pp{reader} = $use_pp{accessor} = 1;
+        delete $want_xs{reader};
+        delete $want_xs{accessor};
     }
 
-    my $xs = 0;
-    my $code = "Class::XSAccessor->import(\n";
-    for my $property ( sort keys %use_xs ) {
-        my $method_name = $self->$property;
-        next unless defined $method_name;
-        my $option = $options{$property};
-        $code .= "    $option => { q[$method_name] => q[$slot_name] },\n";
-        $xs++;
+    my $code = "# Accessors for $slot_name\n";
+    if ( keys %want_xs ) {
+        $code .= "if ( $xs_condition ) {\n";
+        $code .= "    Class::XSAccessor->import(\n";
+        for my $property ( sort keys %want_xs ) {
+            $code .= "        $xs_option_name{$property} => { q[$method_name{$property}] => q[$slot_name] },\n";
+        }
+        $code .= "    );\n";
+        $code .= "}\n";
+        $code .= "else {\n";
+        for my $property ( sort keys %want_xs ) {
+            $code .= sprintf '    *%s = sub { %s };' . "\n",
+                $method_name{$property}, $code_template{$property}->($self);
+            delete $want_pp{$property};
+        }
+        $code .= "}\n";
     }
-    $code .= ");\n";
-    $code = '' unless $xs;
 
-    for my $property ( sort keys %use_pp ) {
-        my $method_name = $self->$property;
-        next unless defined $method_name;
+    for my $property ( sort keys %want_pp ) {
         $code .= sprintf '*%s = sub { %s };' . "\n",
-            $method_name, $code_template{$property}->($self);
+            $method_name{$property}, $code_template{$property}->($self);
     }
 
-    return $code;
-}
-
-sub _compile_perl {
-    my $self = shift;
-
-    my $slot_name = $self->name;
-
-    my $code = '';
-
-    for my $property ( 'reader', 'writer', 'accessor', 'predicate', 'clearer' ) {
-        my $method_name = $self->$property;
-        next unless defined $method_name;
-        $code .= sprintf "    *%s = sub { %s };\n",
-            $method_name, $code_template{$property}->($self);
-    }
+    $code .= "\n";
 
     return $code;
 }

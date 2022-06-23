@@ -197,7 +197,7 @@ sub compile {
                       $self->_compile_attribute_accessors,
                       '1;',
                       '}';
-    #diag $code;
+    #::diag $code;
     return $code;
 }
 
@@ -289,9 +289,12 @@ sub _compile_init_attributes {
 sub _compile_attribute_accessors {
     my $self = shift;
 
-    my $code = '';
-    for my $attribute (values %{$self->all_attributes}) {
-        $code .= $attribute->compile;
+    my @attrs = values %{$self->all_attributes}
+        or return '';
+
+    my $code = 'my $__XS = !$ENV{MITE_PURE_PERL} && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };' . "\n\n";
+    for my $attribute ( @attrs ) {
+        $code .= $attribute->compile( xs_condition => '$__XS' );
     }
 
     return $code;
