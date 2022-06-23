@@ -21,6 +21,7 @@ jobs:
       - run: cpanm -n --installdeps .
       - run: cpanm -n setenv
       - run: cpanm -n Class::XSAccessor
+      - run: cpanm -n Perl::Tidy
       - run: prove -lr t
       - name: Compile Acme-Mitey-Cards
         run: perl -I../../lib ../../bin/mite compile
