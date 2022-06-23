@@ -56,7 +56,7 @@ sub compile {
 
         # Only supported by Type::Tiny 1.013_001 but no harm
         # in doing this anyway.
-        $Type::Tiny::SafePackage = sprintf 'package %s;',
+        local $Type::Tiny::SafePackage = sprintf 'package %s;',
             eval { $self->source->project->config->data->{shim} }
             // do { $class->name . '::__SAFE_NAMESPACE__' };
 
