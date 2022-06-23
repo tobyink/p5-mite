@@ -10,7 +10,7 @@ v0.0.6    2022-06-23
   - Support Types::Common::String types
   - Implement coerce => 1 for has
   - Implement weak_ref => 1 for has
-  - Setters and accessors called as setters are now chainable
+  - Clearers, setters and accessors used as setters are now chainable
   - Add "perltidy" option in ".mite/config"
   - Output accessor code in a stable order instead of hash order
   - Allow type => $blessed_type for has. Using it will void your warranty.

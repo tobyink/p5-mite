@@ -476,6 +476,7 @@ sub compile {
     if ( keys %want_xs ) {
         $code .= "if ( $xs_condition ) {\n";
         $code .= "    Class::XSAccessor->import(\n";
+        $code .= "        chained => 1,\n";
         for my $property ( sort keys %want_xs ) {
             $code .= "        $xs_option_name{$property} => { q[$method_name{$property}] => q[$slot_name] },\n";
         }
