@@ -4,6 +4,11 @@ Mite
 Creator:      Michael G Schwern (MSCHWERN)
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+v0.0.7    2022-06-23
+
+  - Avoid Mite::Shim and Type::Tiny from appearing in compiled modules
+    so they don't confuse the CPAN indexer.
+
 v0.0.6    2022-06-23
 
   - Support Types::Common::Numeric types
