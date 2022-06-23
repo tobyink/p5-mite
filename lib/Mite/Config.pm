@@ -79,4 +79,9 @@ sub find_mite_dir {
     return;
 }
 
+sub should_tidy {
+    my $self = shift;
+    $self->data->{perltidy} && eval { require Perl::Tidy; 1 };
+}
+
 1;

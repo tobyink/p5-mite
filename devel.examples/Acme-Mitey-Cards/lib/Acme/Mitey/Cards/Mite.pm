@@ -12,7 +12,7 @@ package # hide
 use strict;
 use warnings;
 
-use version 0.77; our $VERSION = qv("v0.0.4");
+use version 0.77; our $VERSION = qv("v0.0.5");
 
 sub _is_compiling {
     return $ENV{MITE_COMPILE} ? 1 : 0;

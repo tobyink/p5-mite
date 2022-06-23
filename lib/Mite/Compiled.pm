@@ -56,6 +56,15 @@ sub compile {
         $code .= $class->compile;
     }
 
+    if ( $self->source->project->config->should_tidy ) {
+        my $untidy = $code;
+        Perl::Tidy::perltidy(
+            source      => \$untidy,
+            destination => \$code,
+            argv        => [],
+        );
+    }
+
     return $code;
 }
 
