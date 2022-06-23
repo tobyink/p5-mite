@@ -42,7 +42,12 @@ has isa =>
 has type =>
   is            => 'lazy',
   isa           => Object|Undef,
-  builder       => 1;
+  builder       => true;
+
+has coerce =>
+  is            => 'rw',
+  isa           => Bool,
+  default       => false;
 
 has default =>
   is            => rw,
@@ -199,6 +204,13 @@ sub _build_type {
     $type->can_be_inlined
         or croak sprintf 'Type %s cannot be inlined', $type->display_name;
 
+    if ( $self->coerce ) {
+        $type->has_coercion
+            or carp sprintf 'Type %s has no coercions', $type->display_name;
+        $type->coercion->can_be_inlined
+            or carp sprintf 'Coercion to type %s cannot be inlined', $type->display_name;
+    }
+
     return $type;
 }
 
@@ -240,6 +252,15 @@ sub _empty {
     return ';';
 }
 
+sub _compile_coercion {
+    my ( $self, $expression ) = @_;
+    if ( $self->coerce and my $type = $self->type ) {
+        return sprintf 'do { my $to_coerce = %s; %s }',
+            $expression, $type->coercion->inline_coercion( '$to_coerce' );
+    }
+    return $expression;
+}
+
 sub _compile_checked_default {
     my ( $self, $selfvar ) = @_;
 
@@ -247,6 +268,10 @@ sub _compile_checked_default {
     my $type = $self->type or return $default;
 
     local $Type::Tiny::AvoidCallbacks = 1;
+
+    if ( $self->coerce ) {
+        $default = $self->_compile_coercion( $default );
+    }
 
     return sprintf 'do { my $default_value = %s; %s or do { require Carp; Carp::croak(q[Type check failed in default: %s should be %s]) }; $default_value }',
         $default, $type->inline_check('$default_value'), $self->name, $type->display_name;
@@ -283,26 +308,37 @@ sub compile_init {
             $argvar, $init_arg;
         if ( my $type = $self->type ) {
             local $Type::Tiny::AvoidCallbacks = 1;
-            $code .= sprintf '%s or do { require Carp; Carp::croak(q[Type check failed in constructor: %s should be %s]) }; ',
-                $type->inline_check(sprintf '%s->{q[%s]}', $argvar, $init_arg),
+            my $valuevar = sprintf '%s->{q[%s]}', $argvar, $init_arg;
+            if ( $self->coerce ) {
+                $code .= sprintf 'my $value = %s; ', $self->_compile_coercion( $valuevar );
+                $valuevar = '$value';
+            }
+            $code .= sprintf '%s or require Carp && Carp::croak(q[Type check failed in constructor: %s should be %s]); ',
+                $type->inline_check( $valuevar ),
                 $self->init_arg,
                 $type->display_name;
+            $code .= sprintf '%s->{q[%s]} = %s; delete %s->{q[%s]}; ',
+                $selfvar, $self->name, $valuevar, $argvar, $init_arg;
         }
-        $code .= sprintf '%s->{q[%s]} = delete %s->{q[%s]}; ',
-            $selfvar, $self->name, $argvar, $init_arg;
+        else {
+            $code .= sprintf '%s->{q[%s]} = delete %s->{q[%s]}; ',
+                $selfvar, $self->name, $argvar, $init_arg;
+        }
         $code .= ' }';
     }
 
     if ( $self->has_default || $self->has_builder
     and not $self->lazy ) {
         if ( $code ) {
-            $code .= 'type->display_name else { ';
+            $code .= ' else { ';
         }
         else {
             $code .= 'do { ';
         }
+        $code .= sprintf 'my $value = %s; ',
+            $self->_compile_checked_default( $selfvar );
         $code .= sprintf '%s->{q[%s]} = %s; ',
-            $selfvar, $self->name, $self->_compile_checked_default( $selfvar );
+            $selfvar, $self->name, '$value';
         $code .= ' }';
     }
     elsif ( defined $init_arg
@@ -344,30 +380,40 @@ my %code_template = (
     writer => sub {
         my $self = shift;
         my $slot_name = $self->name;
-        my $code = sprintf '$_[0]->{ q[%s] } = $_[1];', $slot_name;
+        my $code = '';
         if ( my $type = $self->type ) {
             local $Type::Tiny::AvoidCallbacks = 1;
-            $code = sprintf '%s or do { require Carp; Carp::croak(q[Type check failed in writer: value should be %s]) }; %s',
-                $type->inline_check('$_[1]'), $type->display_name, $code;
+            my $valuevar = '$_[1]';
+            if ( $self->coerce ) {
+                $code .= sprintf 'my $value = %s; ', $self->_compile_coercion($valuevar);
+                $valuevar = '$value';
+            }
+            $code .= sprintf '%s or do { require Carp; Carp::croak(q[Type check failed in writer: value should be %s]) }; $_[0]{q[%s]} = %s; $_[0];',
+                $type->inline_check($valuevar), $type->display_name, $slot_name, $valuevar;
+        }
+        else {
+            $code = sprintf '$_[0]->{ q[%s] } = $_[1]; $_[0];', $slot_name;
         }
         return $code;
     },
     accessor => sub {
         my $self = shift;
         my $slot_name = $self->name;
-        my $code = sprintf '$_[0]->{q[%s]}', $slot_name;
+        my ( $read_code, $write_code, $prelim_code );
+        $read_code = sprintf '$_[0]{q[%s]}', $slot_name;
         if ( $self->lazy ) {
-            $code = sprintf '( exists($_[0]{q[%s]}) ? $_[0]{q[%s]} : ( $_[0]{q[%s]} = %s ) )',
-                $slot_name, $slot_name, $slot_name, $self->_compile_checked_default( '$_[0]' );
+            $read_code = sprintf '( exists(%s) ? %s : ( %s = %s ) )',
+                $read_code, $read_code, $read_code, $self->_compile_checked_default( '$_[0]' );
         }
-        $code = sprintf '@_ > 1 ? ( $_[0]->{ q[%s] } = $_[1] ) : %s',
-            $slot_name, $code;
         if ( my $type = $self->type ) {
             local $Type::Tiny::AvoidCallbacks = 1;
-            $code = sprintf '@_==1 or %s or do { require Carp; Carp::croak(q[Type check failed in accessor: value should be %s]) }; %s',
-                $type->inline_check('$_[1]'), $type->display_name, $code;
+            $write_code = sprintf 'do { $_[0]{q[%s]} = do { my $value = %s; %s or require Carp && Carp::croak(q[Type check failed in accessor: value should be %s]); $value }; $_[0] }',
+                $slot_name, $self->_compile_coercion('$_[1]'), $type->inline_check('$value'), $type->display_name;
         }
-        return $code;
+        else {
+            $write_code = sprintf 'do { $_[0]{q[%s]} = $_[1]; $_[0] }', $slot_name;
+        }
+        return sprintf '@_ > 1 ? %s : %s', $write_code, $read_code;
     },
     clearer => sub {
         my $slot_name = shift->name;

@@ -197,7 +197,7 @@ sub compile {
                       $self->_compile_attribute_accessors,
                       '1;',
                       '}';
-    #::diag $code;
+    #diag $code;
     return $code;
 }
 
@@ -252,7 +252,7 @@ sub _compile_bless {
 sub _compile_strict_constructor {
     my $self = shift;
 
-    return 'keys %$args and do { require Carp; Carp::croak("Unexpected keys in constructor: " . join(q[, ], sort keys %$args)) };';
+    return 'keys %$args and require Carp and Carp::croak("Unexpected keys in constructor: " . join(q[, ], sort keys %$args));';
 }
 
 sub _compile_new {
