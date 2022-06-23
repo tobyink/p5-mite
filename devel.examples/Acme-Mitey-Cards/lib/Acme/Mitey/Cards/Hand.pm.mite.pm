@@ -86,45 +86,6 @@ q[Type check failed in constructor: cards should be ArrayRef[InstanceOf["Acme::M
     my $__XS = !$ENV{MITE_PURE_PERL}
       && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
-    # Accessors for owner
-    *owner = sub {
-        @_ > 1
-          ? do {
-            $_[0]{q[owner]} = do {
-                my $value = $_[1];
-                do {
-
-                    package Type::Tiny;
-                    (
-                        do {
-
-                            package Type::Tiny;
-                            defined($value) and do {
-                                ref( \$value ) eq 'SCALAR'
-                                  or ref( \( my $val = $value ) ) eq 'SCALAR';
-                            }
-                          }
-                          or (
-                            do {
-
-                                package Type::Tiny;
-                                use Scalar::Util ();
-                                Scalar::Util::blessed($value);
-                            }
-                          )
-                    );
-                  }
-                  or require Carp
-                  && Carp::croak(
-                    q[Type check failed in accessor: value should be Str|Object]
-                  );
-                $value;
-            };
-            $_[0];
-          }
-          : $_[0]{q[owner]};
-    };
-
     # Accessors for cards
     *cards = sub {
         @_ > 1
@@ -163,6 +124,45 @@ q[Type check failed in default: cards should be ArrayRef[InstanceOf["Acme::Mitey
                 }
             )
           );
+    };
+
+    # Accessors for owner
+    *owner = sub {
+        @_ > 1
+          ? do {
+            $_[0]{q[owner]} = do {
+                my $value = $_[1];
+                do {
+
+                    package Type::Tiny;
+                    (
+                        do {
+
+                            package Type::Tiny;
+                            defined($value) and do {
+                                ref( \$value ) eq 'SCALAR'
+                                  or ref( \( my $val = $value ) ) eq 'SCALAR';
+                            }
+                          }
+                          or (
+                            do {
+
+                                package Type::Tiny;
+                                use Scalar::Util ();
+                                Scalar::Util::blessed($value);
+                            }
+                          )
+                    );
+                  }
+                  or require Carp
+                  && Carp::croak(
+                    q[Type check failed in accessor: value should be Str|Object]
+                  );
+                $value;
+            };
+            $_[0];
+          }
+          : $_[0]{q[owner]};
     };
 
     1;

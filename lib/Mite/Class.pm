@@ -289,12 +289,12 @@ sub _compile_init_attributes {
 sub _compile_attribute_accessors {
     my $self = shift;
 
-    my @attrs = values %{$self->all_attributes}
-        or return '';
+    my $attributes = $self->all_attributes;
+    keys %$attributes or return '';
 
     my $code = 'my $__XS = !$ENV{MITE_PURE_PERL} && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };' . "\n\n";
-    for my $attribute ( @attrs ) {
-        $code .= $attribute->compile( xs_condition => '$__XS' );
+    for my $name ( sort keys %$attributes ) {
+        $code .= $attributes->{$name}->compile( xs_condition => '$__XS' );
     }
 
     return $code;

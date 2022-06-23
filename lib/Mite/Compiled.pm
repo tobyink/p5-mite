@@ -56,14 +56,18 @@ sub compile {
         $code .= $class->compile;
     }
 
-    if ( $self->source->project->config->should_tidy ) {
-        my $untidy = $code;
-        Perl::Tidy::perltidy(
-            source      => \$untidy,
-            destination => \$code,
-            argv        => [],
-        );
-    }
+    my $tidied;
+    eval {
+        my $flag;
+        if ( $self->source->project->config->should_tidy ) {
+            $flag = Perl::Tidy::perltidy(
+                source      => \$code,
+                destination => \$tidied,
+                argv        => [],
+            );
+        }
+        !$flag;
+    } and length($tidied) and ( $code = $tidied );
 
     return $code;
 }

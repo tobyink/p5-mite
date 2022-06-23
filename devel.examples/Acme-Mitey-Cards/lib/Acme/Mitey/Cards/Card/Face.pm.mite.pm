@@ -92,6 +92,32 @@ q[Type check failed in constructor: suit should be InstanceOf["Acme::Mitey::Card
     my $__XS = !$ENV{MITE_PURE_PERL}
       && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
+    # Accessors for deck
+    if ($__XS) {
+        Class::XSAccessor->import( getters => { q[deck] => q[deck] }, );
+    }
+    else {
+        *deck = sub {
+            @_ > 1
+              ? require Carp
+              && Carp::croak("deck is a read-only attribute of @{[ref $_[0]]}")
+              : $_[0]->{q[deck]};
+        };
+    }
+
+    # Accessors for face
+    if ($__XS) {
+        Class::XSAccessor->import( getters => { q[face] => q[face] }, );
+    }
+    else {
+        *face = sub {
+            @_ > 1
+              ? require Carp
+              && Carp::croak("face is a read-only attribute of @{[ref $_[0]]}")
+              : $_[0]->{q[face]};
+        };
+    }
+
     # Accessors for reverse
     *reverse = sub {
         @_ > 1
@@ -122,19 +148,6 @@ q[Type check failed in default: reverse should be Str]
           );
     };
 
-    # Accessors for deck
-    if ($__XS) {
-        Class::XSAccessor->import( getters => { q[deck] => q[deck] }, );
-    }
-    else {
-        *deck = sub {
-            @_ > 1
-              ? require Carp
-              && Carp::croak("deck is a read-only attribute of @{[ref $_[0]]}")
-              : $_[0]->{q[deck]};
-        };
-    }
-
     # Accessors for suit
     if ($__XS) {
         Class::XSAccessor->import( getters => { q[suit] => q[suit] }, );
@@ -145,19 +158,6 @@ q[Type check failed in default: reverse should be Str]
               ? require Carp
               && Carp::croak("suit is a read-only attribute of @{[ref $_[0]]}")
               : $_[0]->{q[suit]};
-        };
-    }
-
-    # Accessors for face
-    if ($__XS) {
-        Class::XSAccessor->import( getters => { q[face] => q[face] }, );
-    }
-    else {
-        *face = sub {
-            @_ > 1
-              ? require Carp
-              && Carp::croak("face is a read-only attribute of @{[ref $_[0]]}")
-              : $_[0]->{q[face]};
         };
     }
 

@@ -71,32 +71,6 @@
     my $__XS = !$ENV{MITE_PURE_PERL}
       && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
-    # Accessors for name
-    if ($__XS) {
-        Class::XSAccessor->import( getters => { q[name] => q[name] }, );
-    }
-    else {
-        *name = sub {
-            @_ > 1
-              ? require Carp
-              && Carp::croak("name is a read-only attribute of @{[ref $_[0]]}")
-              : $_[0]->{q[name]};
-        };
-    }
-
-    # Accessors for colour
-    if ($__XS) {
-        Class::XSAccessor->import( getters => { q[colour] => q[colour] }, );
-    }
-    else {
-        *colour = sub {
-            @_ > 1
-              ? require Carp && Carp::croak(
-                "colour is a read-only attribute of @{[ref $_[0]]}")
-              : $_[0]->{q[colour]};
-        };
-    }
-
     # Accessors for abbreviation
     *abbreviation = sub {
         @_ > 1 ? require Carp
@@ -125,6 +99,32 @@ q[Type check failed in default: abbreviation should be Str]
             )
             );
     };
+
+    # Accessors for colour
+    if ($__XS) {
+        Class::XSAccessor->import( getters => { q[colour] => q[colour] }, );
+    }
+    else {
+        *colour = sub {
+            @_ > 1
+              ? require Carp && Carp::croak(
+                "colour is a read-only attribute of @{[ref $_[0]]}")
+              : $_[0]->{q[colour]};
+        };
+    }
+
+    # Accessors for name
+    if ($__XS) {
+        Class::XSAccessor->import( getters => { q[name] => q[name] }, );
+    }
+    else {
+        *name = sub {
+            @_ > 1
+              ? require Carp
+              && Carp::croak("name is a read-only attribute of @{[ref $_[0]]}")
+              : $_[0]->{q[name]};
+        };
+    }
 
     1;
 }
