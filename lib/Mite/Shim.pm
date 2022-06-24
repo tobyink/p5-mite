@@ -46,6 +46,7 @@ sub import {
         *{ $caller .'::has' } = sub {
             my $name = shift;
             my %args = @_;
+            $name =~ s/^\+//;
 
             my $default = $args{default};
             if ( ref $default eq 'CODE' ) {
