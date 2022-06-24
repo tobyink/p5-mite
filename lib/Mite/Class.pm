@@ -194,6 +194,7 @@ sub compile {
                       $self->_compile_pragmas,
                       $self->_compile_extends,
                       $self->_compile_new,
+                      $self->_compile_buildall_method,
                       $self->_compile_meta_method,
                       $self->_compile_attribute_accessors,
                       '1;',
@@ -284,12 +285,6 @@ sub new {
 CODE
 }
 
-sub _compile_meta {
-    my ( $self, $classvar, $selfvar, $argvar, $metavar ) = @_;
-    return sprintf '( $Mite::META{%s} ||= %s->__META__ )',
-        $classvar, $classvar;
-}
-
 sub _compile_buildargs {
     my ( $self, $classvar, $selfvar, $argvar, $metavar ) = @_;
     return sprintf '%s->{HAS_BUILDARGS} ? %s->BUILDARGS( @_ ) : { ( @_ == 1 ) ? %%{$_[0]} : @_ }',
@@ -298,8 +293,23 @@ sub _compile_buildargs {
 
 sub _compile_buildall {
     my ( $self, $classvar, $selfvar, $argvar, $metavar, $nobuildvar ) = @_;
-    return sprintf '%s or do { %s->$_( %s ) for @{ %s->{BUILD} || [] } };',
-        $nobuildvar, $selfvar, $argvar, $metavar;
+    return sprintf '!%s and @{%s->{BUILD}||[]} and %s->BUILDALL(%s);',
+        $nobuildvar, $metavar, $selfvar, $argvar;
+}
+
+sub _compile_buildall_method {
+    my $self;
+    return <<'CODE';
+sub BUILDALL {
+    $_->(@_) for @{ $Mite::META{ref($_[0])}{BUILD} || [] };
+}
+CODE
+}
+
+sub _compile_meta {
+    my ( $self, $classvar, $selfvar, $argvar, $metavar ) = @_;
+    return sprintf '( $Mite::META{%s} ||= %s->__META__ )',
+        $classvar, $classvar;
 }
 
 sub _compile_meta_method {
