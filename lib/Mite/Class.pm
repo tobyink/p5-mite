@@ -339,7 +339,7 @@ sub _compile_init_attributes {
 sub _compile_attribute_accessors {
     my $self = shift;
 
-    my $attributes = $self->all_attributes;
+    my $attributes = $self->attributes;
     keys %$attributes or return '';
 
     my $code = 'my $__XS = !$ENV{MITE_PURE_PERL} && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };' . "\n\n";
