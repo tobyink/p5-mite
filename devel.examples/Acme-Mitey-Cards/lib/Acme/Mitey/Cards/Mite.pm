@@ -44,17 +44,26 @@ sub import {
 
         no strict 'refs';
         *{ $caller .'::has' } = sub {
-            my $name = shift;
+            my $names = shift;
+            $names = [$names] unless ref $names;
             my %args = @_;
+            for my $name ( @$names ) {
+               $name =~ s/^\+//;
 
-            my $default = $args{default};
-            if ( ref $default eq 'CODE' ) {
-                ${$caller .'::__'.$name.'_DEFAULT__'} = $default;
-            }
+               my $default = $args{default};
+               if ( ref $default eq 'CODE' ) {
+                   ${$caller .'::__'.$name.'_DEFAULT__'} = $default;
+               }
 
-            my $builder = $args{builder};
-            if ( ref $builder eq 'CODE' ) {
-                *{"$caller\::_build_$name"} = $builder;
+               my $builder = $args{builder};
+               if ( ref $builder eq 'CODE' ) {
+                   *{"$caller\::_build_$name"} = $builder;
+               }
+
+               my $trigger = $args{trigger};
+               if ( ref $trigger eq 'CODE' ) {
+                   *{"$caller\::_trigger_$name"} = $trigger;
+               }
             }
 
             return;

@@ -286,7 +286,7 @@ CODE
 
 sub _compile_meta {
     my ( $self, $classvar, $selfvar, $argvar, $metavar ) = @_;
-    return sprintf '( $Mite::META{q[%s]} ||= %s->__META__ )',
+    return sprintf '( $Mite::META{%s} ||= %s->__META__ )',
         $classvar, $classvar;
 }
 
