@@ -49,6 +49,8 @@ t/Mite-Attribute/rwp.t
 t/Mite-Attribute/trigger.t
 t/Mite-Attribute/weak_ref.t
 t/Mite-Class/attributes.t
+t/Mite-Class/build.t
+t/Mite-Class/buildargs.t
 t/Mite-Class/default.t
 t/Mite-Class/default_coderef.t
 t/Mite-Class/extends.t

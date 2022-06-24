@@ -31,7 +31,7 @@ provides:
     file: lib/Mite/MakeMaker.pm
   Mite:
     file: lib/Mite.pm
-    version: v0.0.7
+    version: v0.0.8
   Mite::App:
     file: lib/Mite/App.pm
   Mite::App::Command:
