@@ -18,7 +18,6 @@ use constant \%constants;
 
 use Import::Into;
 use Moo ();
-use Moo::Role ();
 use Carp ();
 use Scalar::Util ();
 use Types::Standard ();
@@ -46,11 +45,8 @@ sub constant_names {
 
 sub to_import {
 	my $class = shift;
-	my $opt   = $_[0] // '-Class';
 	return (
-		( $opt eq '-Class' ? [ 'Moo' ]
-		: $opt eq '-Role'  ? [ 'Moo::Role' ]
-		: () ),
+		[ 'Moo' ],
 		[ 'Carp' => [
 			qw( carp croak confess ),
 		] ],
