@@ -8,7 +8,7 @@ has mite_dir_name =>
 
 has mite_dir =>
   is            => ro,
-  isa           => Path,
+  isa           => Path->no_coercions->plus_coercions(Str, 'Path::Tiny::path($_)'),
   coerce        => true,
   lazy          => true,
   default       => sub {
@@ -19,7 +19,7 @@ has mite_dir =>
 
 has config_file =>
   is            => ro,
-  isa           => Path,
+  isa           => Path->no_coercions->plus_coercions(Str, 'Path::Tiny::path($_)'),
   coerce        => true,
   lazy          => true,
   default       => sub {
@@ -40,6 +40,8 @@ has search_for_mite_dir =>
   is            => rw,
   isa           => Bool,
   default       => true;
+
+##-
 
 sub make_mite_dir {
     my ( $self, $dir ) = ( shift, @_ );

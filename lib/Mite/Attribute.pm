@@ -69,15 +69,16 @@ has coderef_default_variable =>
   isa           => Str,
   lazy          => true,     # else $self->name might not be set
   default       => sub {
-      my $self = shift;
       # This must be coordinated with Mite.pm
-      return sprintf '$__%s_DEFAULT__', $self->name;
+      return sprintf '$__%s_DEFAULT__', $_[0]->name;
   };
 
 has [ 'trigger', 'builder' ] =>
     is            => rw,
     isa           => Str->where('length($_) > 0') | CodeRef | Undef,
     predicate     => true;
+
+##-
 
 my @method_name_generator = (
     { # public

@@ -44,9 +44,11 @@ sub constant_names {
 }
 
 sub to_import {
-	my $class = shift;
+	my ( $class, $arg ) = ( shift, @_ );
+	no warnings 'uninitialized';
 	return (
-		[ 'Moo' ],
+		( $arg eq '-Basic' ? () : [ 'Moo' ] ),
+		( $arg eq '-Basic' ? () : [ 'namespace::autoclean' ] ),
 		[ 'Carp' => [
 			qw( carp croak confess ),
 		] ],
@@ -66,7 +68,6 @@ sub to_import {
 		[ 'feature' => [
 			':5.10',
 		] ],
-		[ 'namespace::autoclean' ],
 	);
 }
 

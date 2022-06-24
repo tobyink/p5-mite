@@ -33,7 +33,7 @@ L<Mite::Source>, L<Mite::Class>, L<Mite::Project>
 
 has file =>
   is            => ro,
-  isa           => Path,
+  isa           => Path->no_coercions->plus_coercions(Str, 'Path::Tiny::path($_)'),
   coerce        => true,
   lazy          => true,
   default       => sub {
@@ -47,6 +47,8 @@ has source =>
   # avoid a circular dep with Mite::Source
   weak_ref      => true,
   required      => true;
+
+##-
 
 sub compile {
     my $self = shift;

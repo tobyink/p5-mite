@@ -61,6 +61,8 @@ has project =>
   # avoid a circular dep with Mite::Project
   weak_ref      => true;
 
+##-
+
 sub has_class {
     my ( $self, $name ) = ( shift, @_ );
 

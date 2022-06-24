@@ -2,6 +2,8 @@ package Mite::App::Command::clean;
 use Mite::Miteception;
 extends qw(Mite::App::Command);
 
+##-
+
 sub abstract {
     return "Remove compiled mite files";
 }

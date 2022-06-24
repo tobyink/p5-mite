@@ -2,6 +2,8 @@ package Mite::App::Command::init;
 use Mite::Miteception;
 extends qw(Mite::App::Command);
 
+##-
+
 sub usage_desc {
     return "%c init %o <project name>";
 }

@@ -2,6 +2,8 @@ package Mite::App::Command;
 use Mite::Miteception;
 extends qw(App::Cmd::Command);
 
+##-
+
 sub opt_spec {
     my ($class, $app) = (shift, @_);
 

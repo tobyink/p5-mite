@@ -44,6 +44,8 @@ has source =>
   # avoid a circular dep with Mite::Source
   weak_ref      => true;
 
+##-
+
 sub project {
     my $self = shift;
 
@@ -88,7 +90,7 @@ sub linear_parents {
 
     my $project = $self->project;
 
-    return map { $project->class($_) } $self->linear_isa;
+    return grep defined, map { $project->class($_) } $self->linear_isa;
 }
 
 sub chained_attributes {
