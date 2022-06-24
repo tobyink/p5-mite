@@ -1,5 +1,4 @@
 TODO:
 
-  - Implement triggers for attributes
   - Implement BUILD and BUILDARGS
   - Get tests running on Windows on Github Actions

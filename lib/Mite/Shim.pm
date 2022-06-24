@@ -57,6 +57,11 @@ sub import {
                 *{"$caller\::_build_$name"} = $builder;
             }
 
+            my $trigger = $args{trigger};
+            if ( ref $trigger eq 'CODE' ) {
+                *{"$caller\::_trigger_$name"} = $trigger;
+            }
+
             return;
         };
 

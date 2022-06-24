@@ -46,6 +46,7 @@ t/Mite-Attribute/required.t
 t/Mite-Attribute/ro.t
 t/Mite-Attribute/rw.t
 t/Mite-Attribute/rwp.t
+t/Mite-Attribute/trigger.t
 t/Mite-Attribute/weak_ref.t
 t/Mite-Class/attributes.t
 t/Mite-Class/default.t

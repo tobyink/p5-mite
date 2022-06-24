@@ -74,7 +74,7 @@ has coderef_default_variable =>
       return sprintf '$__%s_DEFAULT__', $self->name;
   };
 
-has builder =>
+has [ 'trigger', 'builder' ] =>
     is            => rw,
     isa           => Str->where('length($_) > 0') | CodeRef | Undef,
     predicate     => true;
@@ -87,6 +87,7 @@ my @method_name_generator = (
         clearer     => sub { "clear_$_" },
         predicate   => sub { "has_$_" },
         builder     => sub { "_build_$_" },
+        trigger     => sub { "_trigger_$_" },
     },
     { # private
         reader      => sub { "_get_$_" },
@@ -95,6 +96,7 @@ my @method_name_generator = (
         clearer     => sub { "_clear_$_" },
         predicate   => sub { "_has_$_" },
         builder     => sub { "_build_$_" },
+        trigger     => sub { "_trigger_$_" },
     },
 );
 
@@ -110,25 +112,27 @@ sub BUILD {
         $self->is( 'ro' );
     }
 
-    if ( CodeRef->check( $self->builder ) ) {
-        my $coderef = $self->builder;
-        my $newname = do {
-            my $gen = $method_name_generator[$self->is_private]{builder};
-            local $_ = $self->name;
-            $gen->( $_ );
-        };
-        no strict 'refs';
-        my $classname;
-        if ( $self->class and $classname = $self->class->name ) {
-            *{"$classname\::$newname"} = $coderef;
-            $self->builder( $newname );
-        }
-        else {
-            croak "Could not install builder=>CODEREF as Mite could not determine which class to install it into.";
+    for my $property ( 'builder', 'trigger' ) {
+        if ( CodeRef->check( $self->$property ) ) {
+            my $coderef = $self->$property;
+            my $newname = do {
+                my $gen = $method_name_generator[$self->is_private]{$property};
+                local $_ = $self->name;
+                $gen->( $_ );
+            };
+            no strict 'refs';
+            my $classname;
+            if ( $self->class and $classname = $self->class->name ) {
+                *{"$classname\::$newname"} = $coderef;
+                $self->$property( $newname );
+            }
+            else {
+                croak "Could not install $property => CODEREF as Mite could not determine which class to install it into.";
+            }
         }
     }
 
-    for my $property ( 'reader', 'writer', 'accessor', 'clearer', 'predicate', 'builder' ) {
+    for my $property ( 'reader', 'writer', 'accessor', 'clearer', 'predicate', 'builder', 'trigger' ) {
         my $name = $self->$property;
         if ( defined $name and $name eq 1 ) {
             my $gen = $method_name_generator[$self->is_private]{$property};
@@ -302,6 +306,14 @@ sub _compile_default {
     return 'undef';
 }
 
+sub _compile_trigger {
+    my ( $self, $selfvar, @args ) = @_;
+    my $method_name = $self->trigger;
+
+    return sprintf '%s->%s( %s )',
+        $selfvar, $method_name, join( q{, }, @args );
+}
+
 sub compile_init {
     my ( $self, $selfvar, $argvar ) = @_;
 
@@ -358,6 +370,13 @@ sub compile_init {
          $selfvar, $self->name;
     }
 
+    if ( $self->trigger ) {
+        $code .= ' ' . $self->_compile_trigger(
+            $selfvar,
+            sprintf( '%s->{q[%s]}', $selfvar, $self->name ),
+        ) . ';';
+    }
+
     return $code;
 }
 
@@ -367,7 +386,7 @@ my %code_template;
         my $self = shift;
         my %arg = @_;
         my $slot_name = $self->name;
-        my $code = sprintf '$_[0]->{q[%s]}', $slot_name;
+        my $code = sprintf '$_[0]{q[%s]}', $slot_name;
         if ( $self->lazy ) {
             $code = sprintf '( exists($_[0]{q[%s]}) ? $_[0]{q[%s]} : ( $_[0]{q[%s]} = %s ) )',
                 $slot_name, $slot_name, $slot_name, $self->_compile_checked_default( '$_[0]' );
@@ -383,6 +402,10 @@ my %code_template;
         my %arg = @_;
         my $slot_name = $self->name;
         my $code = '';
+        if ( $self->trigger ) {
+            $code .= sprintf 'my @oldvalue; @oldvalue = $_[0]{q[%s]} if exists $_[0]{q[%s]}; ',
+                $slot_name, $slot_name;
+        }
         if ( my $type = $self->type ) {
             local $Type::Tiny::AvoidCallbacks = 1;
             my $valuevar = '$_[1]';
@@ -394,10 +417,17 @@ my %code_template;
                 $type->inline_check($valuevar), $arg{label}//'writer', $type->display_name, $slot_name, $valuevar;
         }
         else {
-            $code = sprintf '$_[0]->{q[%s]} = $_[1];', $slot_name;
+            $code .= sprintf '$_[0]{q[%s]} = $_[1];', $slot_name;
+        }
+        if ( $self->trigger ) {
+            $code .= ' ' . $self->_compile_trigger(
+                '$_[0]',
+                sprintf( '$_[0]{q[%s]}', $self->name ),
+                '@oldvalue',
+            ) . ';';
         }
         if ( $self->weak_ref ) {
-            $code .= sprintf ' require Scalar::Util && Scalar::Util::weaken($_[0]->{q[%s]});',
+            $code .= sprintf ' require Scalar::Util && Scalar::Util::weaken($_[0]{q[%s]});',
                 $slot_name;
         }
         $code .= ' $_[0];';
@@ -460,8 +490,8 @@ sub compile {
         $want_pp{$property} = 1;
     }
 
-    # Class::XSAccessor can't do type checks or handle weaken
-    if ( $self->type or $self->weak_ref ) {
+    # Class::XSAccessor can't do type checks, triggers, or weaken
+    if ( $self->type or $self->weak_ref or $self->trigger ) {
         delete $want_xs{writer};
         delete $want_xs{accessor};
     }
