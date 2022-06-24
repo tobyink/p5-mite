@@ -135,6 +135,13 @@ Mite will turn strict on for you.
 
 Mite will turn warnings on for you.
 
+=head2 C<BUILDARGS>
+
+Works as in L<Moose>.
+
+=head2 B<BUILD>
+
+Works as in L<Moose>.
 
 =head1 OPTIMIZATIONS
 

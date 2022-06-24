@@ -194,6 +194,7 @@ sub compile {
                       $self->_compile_pragmas,
                       $self->_compile_extends,
                       $self->_compile_new,
+                      $self->_compile_meta_method,
                       $self->_compile_attribute_accessors,
                       '1;',
                       '}';
@@ -244,29 +245,38 @@ END
 }
 
 sub _compile_bless {
-    my $self = shift;
+    my ( $self, $classvar, $selfvar, $argvar, $metavar ) = @_;
 
-    return 'bless {}, $class';
+    return "bless {}, $classvar";
 }
 
 sub _compile_strict_constructor {
-    my $self = shift;
+    my ( $self, $classvar, $selfvar, $argvar, $metavar ) = @_;
+    my $check = Enum->of( keys %{ $self->all_attributes } )->inline_check( '$_' );
 
-    return 'keys %$args and require Carp and Carp::croak("Unexpected keys in constructor: " . join(q[, ], sort keys %$args));';
+    return sprintf 'my @unknown = grep not( %s ), keys %%{%s}; @unknown and require Carp and Carp::croak("Unexpected keys in constructor: " . join(q[, ], sort @unknown));',
+        $check, $argvar;
 }
 
 sub _compile_new {
     my $self = shift;
+    my @vars = ('$class', '$self', '$args', '$meta');
 
-    return sprintf <<'CODE', $self->_compile_bless, $self->_compile_init_attributes, $self->_compile_strict_constructor;
+    return sprintf <<'CODE', $self->_compile_meta(@vars), $self->_compile_bless(@vars), $self->_compile_buildargs(@vars), $self->_compile_init_attributes(@vars), $self->_compile_strict_constructor(@vars), $self->_compile_buildall(@vars, '$no_build');
 sub new {
     my $class = shift;
-    my $args  = { ( @_ == 1 ) ? %%{$_[0]} : @_ };
+    my $meta  = %s;
+    my $self  = %s;
+    my $args  = %s;
+    my $no_build = delete $args->{__no_BUILD__};
 
-    my $self = %s;
-
+    # Initialize attributes
     %s
 
+    # Enforce strict constructor
+    %s
+
+    # Call BUILD methods
     %s
 
     return $self;
@@ -274,13 +284,53 @@ sub new {
 CODE
 }
 
+sub _compile_meta {
+    my ( $self, $classvar, $selfvar, $argvar, $metavar ) = @_;
+    return sprintf '( $Mite::META{q[%s]} ||= %s->__META__ )',
+        $classvar, $classvar;
+}
+
+sub _compile_buildargs {
+    my ( $self, $classvar, $selfvar, $argvar, $metavar ) = @_;
+    return sprintf '%s->{HAS_BUILDARGS} ? %s->BUILDARGS( @_ ) : { ( @_ == 1 ) ? %%{$_[0]} : @_ }',
+        $metavar, $classvar;
+}
+
+sub _compile_buildall {
+    my ( $self, $classvar, $selfvar, $argvar, $metavar, $nobuildvar ) = @_;
+    return sprintf '%s or do { %s->$_( %s ) for @{ %s->{BUILD} || [] } };',
+        $nobuildvar, $selfvar, $argvar, $metavar;
+}
+
+sub _compile_meta_method {
+    return <<'CODE';
+sub __META__ {
+    no strict 'refs';
+    require mro;
+    my $class = shift;
+    my $linear_isa = mro::get_linear_isa( $class );
+    return {
+        BUILD => [
+            map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
+            map { "$_\::BUILD" } reverse @$linear_isa
+        ],
+        DEMOLISH => [
+            map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
+            map { "$_\::DEMOLISH" } reverse @$linear_isa
+        ],
+        HAS_BUILDARGS => $class->can('BUILDARGS'),
+    };
+}
+CODE
+}
+
 sub _compile_init_attributes {
-    my $self = shift;
+    my ( $self, $classvar, $selfvar, $argvar, $metavar ) = @_;
 
     my @code;
     my $attributes = $self->all_attributes;
     for my $name ( sort keys %$attributes ) {
-        push @code, $attributes->{$name}->compile_init( '$self', '$args' );
+        push @code, $attributes->{$name}->compile_init( $selfvar, $argvar );
     }
 
     return join "\n    ", @code;

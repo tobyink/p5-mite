@@ -334,11 +334,11 @@ sub compile_init {
                 $type->inline_check( $valuevar ),
                 $self->init_arg,
                 $type->display_name;
-            $code .= sprintf '%s->{q[%s]} = %s; delete %s->{q[%s]}; ',
-                $selfvar, $self->name, $valuevar, $argvar, $init_arg;
+            $code .= sprintf '%s->{q[%s]} = %s; ',
+                $selfvar, $self->name, $valuevar;
         }
         else {
-            $code .= sprintf '%s->{q[%s]} = delete %s->{q[%s]}; ',
+            $code .= sprintf '%s->{q[%s]} = %s->{q[%s]}; ',
                 $selfvar, $self->name, $argvar, $init_arg;
         }
         $code .= ' }';
