@@ -70,23 +70,26 @@ sub inject_mite_functions {
 
     no strict 'refs';
     *{ $package .'::has' } = sub {
-        my ( $name, %args ) = @_;
+        my ( $names, %args ) = @_;
+        $names = [$names] unless ref $names;
 
-        if( my $is_extension = $name =~ s{^\+}{} ) {
-            $class->extend_attribute(
-                class   => $class,
-                name    => $name,
-                %args
-            );
-        }
-        else {
-            require Mite::Attribute;
-            my $attribute = Mite::Attribute->new(
-                class   => $class,
-                name    => $name,
-                %args
-            );
-            $class->add_attribute($attribute);
+        for my $name ( @$names ) {
+           if( my $is_extension = $name =~ s{^\+}{} ) {
+               $class->extend_attribute(
+                   class   => $class,
+                   name    => $name,
+                   %args
+               );
+           }
+           else {
+               require Mite::Attribute;
+               my $attribute = Mite::Attribute->new(
+                   class   => $class,
+                   name    => $name,
+                   %args
+               );
+               $class->add_attribute($attribute);
+           }
         }
 
         return;

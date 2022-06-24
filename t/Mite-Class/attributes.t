@@ -7,7 +7,7 @@ tests "strict_contructor" => sub {
     mite_load <<'CODE';
 package MyTest;
 use Mite::Shim;
-has foo =>
+has [ 'foo', 'foo2' ] =>
     is => 'rw',
     default => 99;
 1;
@@ -15,6 +15,7 @@ CODE
 
     my $o = MyTest->new;
     is $o->foo, 99;
+    is $o->foo2, 99;
 
     local $@;
     my $o2 = eval { MyTest->new( bar => 66, baz => 33 ); };
