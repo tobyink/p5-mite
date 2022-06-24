@@ -1,5 +1,5 @@
 package Mite::Class;
-use Mite::MyMoo;
+use Mite::Miteception;
 
 use Path::Tiny;
 use mro;

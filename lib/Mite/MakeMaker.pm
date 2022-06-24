@@ -1,5 +1,5 @@
 package Mite::MakeMaker;
-use Mite::MyMoo;
+use Mite::Miteception;
 
 use File::Find;
 use autodie;

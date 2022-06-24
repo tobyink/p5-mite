@@ -1,5 +1,5 @@
 package Mite::Role::HasYAML;
-use Mite::MyMoo -Role;
+use Mite::Miteception -Role;
 
 sub yaml_load {
     my ( $class, $yaml ) = ( shift, @_ );

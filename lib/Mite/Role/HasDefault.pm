@@ -1,5 +1,5 @@
 package Mite::Role::HasDefault;
-use Mite::MyMoo -Role;
+use Mite::Miteception -Role;
 
 # Get/set the default for a class
 my %Defaults;

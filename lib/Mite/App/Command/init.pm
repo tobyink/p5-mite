@@ -1,5 +1,5 @@
 package Mite::App::Command::init;
-use Mite::MyMoo;
+use Mite::Miteception;
 extends qw(Mite::App::Command);
 
 sub usage_desc {

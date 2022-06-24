@@ -1,5 +1,5 @@
 package Mite::Attribute;
-use Mite::MyMoo;
+use Mite::Miteception;
 
 has class =>
   is            => rw,

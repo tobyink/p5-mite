@@ -1,5 +1,5 @@
 package Mite::Role::HasConfig;
-use Mite::MyMoo -Role;
+use Mite::Miteception -Role;
 
 has config =>
   is            => ro,

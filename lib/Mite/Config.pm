@@ -1,5 +1,5 @@
 package Mite::Config;
-use Mite::MyMoo;
+use Mite::Miteception;
 with qw(Mite::Role::HasYAML);
 
 has mite_dir_name =>

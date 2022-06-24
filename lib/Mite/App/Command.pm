@@ -1,5 +1,5 @@
 package Mite::App::Command;
-use Mite::MyMoo;
+use Mite::Miteception;
 extends qw(App::Cmd::Command);
 
 sub opt_spec {

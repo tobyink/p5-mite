@@ -1,5 +1,5 @@
 package Mite::App::Command::clean;
-use Mite::MyMoo;
+use Mite::Miteception;
 extends qw(Mite::App::Command);
 
 sub abstract {

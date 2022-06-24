@@ -1,5 +1,5 @@
 package Mite::Source;
-use Mite::MyMoo;
+use Mite::Miteception;
 
 =head1 NAME
 

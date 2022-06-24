@@ -1,5 +1,5 @@
 package Mite::Compiled;
-use Mite::MyMoo;
+use Mite::Miteception;
 
 use Path::Tiny;
 

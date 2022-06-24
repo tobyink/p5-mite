@@ -1,4 +1,4 @@
-package Mite::MyMoo;
+package Mite::Miteception;
 use v5.10;
 use strict;
 use warnings;
