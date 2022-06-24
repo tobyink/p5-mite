@@ -1,9 +1,5 @@
 package Mite::Project;
-use Mite::MyMoo;
-with qw(
-    Mite::Role::HasConfig
-    Mite::Role::HasDefault
-);
+use Mite::Miteception;
 
 use Mite::Source;
 use Mite::Class;
@@ -12,6 +8,17 @@ has sources =>
   is            => ro,
   isa           => HashRef[InstanceOf['Mite::Source']],
   default       => sub { {} };
+
+has config =>
+  is            => ro,
+  isa           => InstanceOf['Mite::Config'],
+  lazy          => 1,
+  default       => sub {
+      require Mite::Config;
+      state $config = Mite::Config->new;
+      return $config;
+  };
+
 
 sub classes {
     my $self = shift;
@@ -275,6 +282,21 @@ sub write_default_config {
         %args
     });
     return;
+}
+
+{
+    # Get/set the default for a class
+    my %Defaults;
+    sub default {
+        my $class = shift;
+        return $Defaults{$class} ||= $class->new;
+    }
+
+    sub set_default {
+        my ( $class, $new_default ) = ( shift, @_ );
+        $Defaults{$class} = $new_default;
+        return;
+    }
 }
 
 1;

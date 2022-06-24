@@ -1,6 +1,5 @@
 package Mite::Config;
 use Mite::Miteception;
-with qw(Mite::Role::HasYAML);
 
 has mite_dir_name =>
   is            => ro,
@@ -82,6 +81,20 @@ sub find_mite_dir {
 sub should_tidy {
     my $self = shift;
     $self->data->{perltidy} && eval { require Perl::Tidy; 1 };
+}
+
+sub yaml_load {
+    my ( $class, $yaml ) = ( shift, @_ );
+
+    require YAML::XS;
+    return YAML::XS::Load($yaml);
+}
+
+sub yaml_dump {
+    my ( $class, $data ) = ( shift, @_ );
+
+    require YAML::XS;
+    return YAML::XS::Dump($data);
 }
 
 1;
