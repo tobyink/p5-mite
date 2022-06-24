@@ -83,5 +83,5 @@ resources:
   bugtracker: https://github.com/tobyink/p5-mite/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/tobyink/p5-mite
-version: v0.0.7
+version: v0.0.8
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

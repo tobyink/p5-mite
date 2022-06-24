@@ -4,6 +4,16 @@ Mite
 Creator:      Michael G Schwern (MSCHWERN)
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+v0.0.8    2022-06-24
+
+  - Implement trigger for has
+  - Implement BUILD
+  - Implement BUILDARGS
+  - Child classes no longer re-implement accessors for attributes defined
+    in parent classes, unless they have altered the attribute in some way
+  - Mite::Shim now copes better with "+" prefix on attribute names.
+  - has \@names is now supported, like Moose and Moo
+
 v0.0.7    2022-06-23
 
   - Avoid Mite::Shim and Type::Tiny from appearing in compiled modules
