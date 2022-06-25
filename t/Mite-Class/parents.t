@@ -11,7 +11,7 @@ tests "parents as objects" => sub {
         sim_class( name => "P1" ),
         sim_class( name => "P2")
     );
-    $child->extends([map { $_->name } @parents]);
+    $child->superclasses([map { $_->name } @parents]);
 
     cmp_deeply $child->parents, \@parents;
     cmp_deeply [$child->get_isa],    [map { $_->name } @parents];
@@ -24,7 +24,7 @@ tests "parents as objects" => sub {
         sim_class( name => "NP1" ),
         sim_class( name => "NP2")
     );
-    $child->extends([map { $_->name } @new_parents]);
+    $child->superclasses([map { $_->name } @new_parents]);
     cmp_deeply $child->parents, \@new_parents, "YOU'RE NOT MY REAL PARENTS!!";
     cmp_deeply [$child->get_isa],    [map { $_->name } @new_parents];
     cmp_deeply [$child->linear_isa], [$child->name, map { $_->name } @new_parents];
@@ -32,8 +32,8 @@ tests "parents as objects" => sub {
 
     # Test diamond inheritance, ensure C3 style is in use
     my $grand_parent = sim_class( name => "GP1" );
-    $new_parents[0]->extends([ $grand_parent->name ]);
-    $new_parents[1]->extends([ $grand_parent->name ]);
+    $new_parents[0]->superclasses([ $grand_parent->name ]);
+    $new_parents[1]->superclasses([ $grand_parent->name ]);
 
     cmp_deeply [$child->linear_isa], [
         map { $_->name } $child, @new_parents, $grand_parent

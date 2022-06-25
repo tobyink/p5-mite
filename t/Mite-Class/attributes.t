@@ -28,8 +28,8 @@ tests "all_attributes" => sub {
     my $parent  = sim_class( name => "P1" );
     my $child   = sim_class( name => "C1" );
 
-    $parent->extends(["GP1"]);
-    $child->extends(["P1"]);
+    $parent->superclasses(["GP1"]);
+    $child->superclasses(["P1"]);
 
     $gparent->add_attributes(
         sim_attribute( name => "from_gp" ),
@@ -77,8 +77,8 @@ tests "extend_attribute" => sub {
     my $parent  = sim_class( name => "P1" );
     my $child   = sim_class( name => "C1" );
 
-    $parent->extends(["GP1"]);
-    $child->extends(["P1"]);
+    $parent->superclasses(["GP1"]);
+    $child->superclasses(["P1"]);
 
     $gparent->add_attributes(
         sim_attribute( name => "foo", is => "ro", default => 23 ),
