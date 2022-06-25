@@ -1,7 +1,8 @@
 #!/usr/bin/env perl
-
 use v5.34;
 use warnings;
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
 use Path::Tiny qw(path);
 use Mite::Class;
 use Mite::Source;
@@ -42,7 +43,7 @@ sub has {
 
 sub extends {
 	my (@classes) = @_;
-	$class->extends(\@classes);
+	$class->superclasses(\@classes);
 	return;
 }
 

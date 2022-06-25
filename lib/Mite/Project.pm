@@ -1,9 +1,6 @@
 package Mite::Project;
 use Mite::Miteception;
 
-use Mite::Source;
-use Mite::Class;
-
 has sources =>
   is            => ro,
   isa           => HashRef[InstanceOf['Mite::Source']],
@@ -20,6 +17,9 @@ has config =>
   };
 
 ##-
+
+use Mite::Source;
+use Mite::Class;
 
 sub classes {
     my $self = shift;

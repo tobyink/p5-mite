@@ -18,6 +18,7 @@ use constant \%constants;
 
 use Import::Into;
 use Moo ();
+use Mite::Shim ();
 use Carp ();
 use Scalar::Util ();
 use Types::Standard ();
@@ -28,14 +29,14 @@ use feature ();
 
 sub import {
 	my $class  = shift;
-	my $caller = caller;
 	local $ENV{MITE_COMPILE} = 0;
 	for my $import ( $class->to_import( @_ ) ) {
 		my ( $pkg, $args ) = @$import;
-		$pkg->import::into( $caller, @{ $args || [] } );
+		$pkg->import::into( 1, @{ $args || [] } );
 	}
 	
 	no strict 'refs';
+	my $caller = caller;
 	*{"$caller\::$_"} = \&{$_} for $class->constant_names;
 }
 

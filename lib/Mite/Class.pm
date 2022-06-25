@@ -18,6 +18,8 @@ has extends =>
   trigger       => sub {
       my $self = shift;
 
+      return if !$self->name; # called from constructor
+
       # Set up our @ISA so we can use mro to calculate the class hierarchy
       $self->_set_isa;
 
@@ -43,9 +45,15 @@ has source =>
   is            => rw,
   isa           => InstanceOf['Mite::Source'],
   # avoid a circular dep with Mite::Source
-  weak_ref      => true;
+  weak_ref      => false;
 
 ##-
+
+sub BUILD {
+    my $self = shift;
+    $self->_trigger_extends( $self->superclasses )
+        if $self->can('_trigger_extends');
+}
 
 sub project {
     my $self = shift;
