@@ -117,9 +117,10 @@ C<default>, C<builder>, and C<lazy>.
 
 C<isa> should be strings understood by C<dwim_type> from L<Type::Utils>,
 including all the type constraints from L<Types::Standard>,
-L<Types::Common::Numeric>, and L<Types::Common::String>. Other type
-constraints are not supported. (This does still allow some pretty complex
-types though, like C<< "ArrayRef[ Int | Math::BigInt ]" >>.)
+L<Types::Common::Numeric>, and L<Types::Common::String>. Blessed
+L<Type::Tiny> type constraint objects are also supported, but then
+your project will have a dependency on L<Type::Tiny> and the type library,
+which defeats the purpose of using a zero-dependency class builder.
 
 (No support yet for C<handles>.)
 

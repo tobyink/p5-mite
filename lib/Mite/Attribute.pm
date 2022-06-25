@@ -40,7 +40,7 @@ has [ 'reader', 'writer', 'accessor', 'clearer', 'predicate' ] =>
 
 has isa =>
   is            => 'bare',
-  isa           => Str,
+  isa           => Str|Object,
   reader        => '_isa',
   init_arg      => 'isa';
 
