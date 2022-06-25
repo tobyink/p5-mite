@@ -139,7 +139,7 @@ Mite will turn warnings on for you.
 
 Works as in L<Moose>.
 
-=head2 B<BUILD>
+=head2 C<BUILD>
 
 Works as in L<Moose>.
 

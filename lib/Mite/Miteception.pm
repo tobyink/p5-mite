@@ -29,6 +29,7 @@ use feature ();
 sub import {
 	my $class  = shift;
 	my $caller = caller;
+	local $ENV{MITE_COMPILE} = 0;
 	for my $import ( $class->to_import( @_ ) ) {
 		my ( $pkg, $args ) = @$import;
 		$pkg->import::into( $caller, @{ $args || [] } );
