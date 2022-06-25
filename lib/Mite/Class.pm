@@ -11,7 +11,8 @@ has attributes =>
 
 # Super classes as class names
 has extends =>
-  is            => rw,
+  is            => 'bare',
+  accessor      => 'superclasses',
   isa           => ArrayRef[Str],
   default       => sub { [] },
   trigger       => sub {
@@ -24,7 +25,7 @@ has extends =>
       $self->_clear_parents;
   };
 
-# Super classes as Mite::Classes populated from $self->extends
+# Super classes as Mite::Classes populated from $self->superclasses
 has parents =>
   is            => ro,
   isa           => ArrayRef[InstanceOf['Mite::Class']],
@@ -65,7 +66,7 @@ sub _set_isa {
 
     mro::set_mro($name, "c3");
     no strict 'refs';
-    @{$name.'::ISA'} = @{$self->extends};
+    @{$name.'::ISA'} = @{$self->superclasses};
 
     return;
 }
@@ -123,7 +124,7 @@ sub parents_attributes {
 sub _build_parents {
     my $self = shift;
 
-    my $extends = $self->extends;
+    my $extends = $self->superclasses;
     return [] if !@$extends;
 
     # Load each parent and store its Mite::Class
@@ -223,7 +224,7 @@ CODE
 sub _compile_extends {
     my $self = shift;
 
-    my $extends = $self->extends;
+    my $extends = $self->superclasses;
     return '' unless @$extends;
 
     my $source = $self->source;

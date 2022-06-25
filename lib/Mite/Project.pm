@@ -106,7 +106,7 @@ sub inject_mite_functions {
     *{ $package .'::extends' } = sub {
         my (@classes) = @_;
 
-        $class->extends(\@classes);
+        $class->superclasses(\@classes);
 
         return;
     };
