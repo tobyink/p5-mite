@@ -1,7 +1,7 @@
 package Mite;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001000';
+our $VERSION   = '0.001001';
 
 =head1 NAME
 

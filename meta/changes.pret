@@ -1,6 +1,14 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.001001 cpan:TOBYINK`
+	issued  2022-06-29;
+	changeset [
+		item "handles for attributes"^^Addition;
+		item "documentation for attributes"^^Addition;
+		item "Switch to Dist::Inkt"^^Packaging;
+	].
+
 # 0.001000  2022-06-28
 #
 #   - Mite is now self-hosting! It no longer requires Moo.

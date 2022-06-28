@@ -2,7 +2,7 @@ package Mite::Compiled;
 use Mite::Miteception;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001000';
+our $VERSION   = '0.001001';
 
 use Path::Tiny;
 

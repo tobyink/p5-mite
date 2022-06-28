@@ -4,7 +4,7 @@ use warnings;
 use feature ':5.10';
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001000';
+our $VERSION   = '0.001001';
 
 use parent 'Module::Build';
 
