@@ -1,6 +1,7 @@
 package Mite;
 
-use version; our $VERSION = qv("v0.1.0");
+our $AUTHORITY = 'cpan:TOBYINK';
+our $VERSION   = '0.001000';
 
 =head1 NAME
 
