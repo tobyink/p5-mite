@@ -1,0 +1,18 @@
+# This file contains general metadata about the project.
+
+@prefix : <http://usefulinc.com/ns/doap#>.
+
+`Mite`
+	:programming-language "Perl" ;
+	:shortdesc            "Moose-like OO, fast to load, with zero dependencies";
+	:homepage             <https://metacpan.org/release/Mite>;
+	:download-page        <https://metacpan.org/release/Mite>;
+	:bug-database         <https://github.com/tobyink/p5-mite/issues>;
+	:repository           [ a :GitRepository; :browse <https://github.com/tobyink/p5-mite> ];
+	:created              2011-12-08;
+	:license              <http://dev.perl.org/licenses/>;
+	:maintainer           cpan:TOBYINK;
+	:developer            cpan:MSCHWERN.
+
+<http://dev.perl.org/licenses/>
+	dc:title  "the same terms as the perl 5 programming language system itself".

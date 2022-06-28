@@ -1,0 +1,28 @@
+# This file provides instructions for packaging.
+
+@prefix : <http://ontologi.es/doap-deps#>.
+
+`Mite`
+	:runtime-requirement    [ :on "perl 5.010001"^^:CpanId ];
+	:runtime-requirement    [ :on "namespace::autoclean 0"^^:CpanId ];
+	:runtime-requirement    [ :on "version 0.77"^^:CpanId ];
+	:runtime-requirement    [ :on "App::Cmd 0.323"^^:CpanId ];
+	:runtime-requirement    [ :on "Import::Into 0"^^:CpanId ];
+	:runtime-requirement    [ :on "Path::Tiny 0.052"^^:CpanId ];
+	:runtime-requirement    [ :on "Types::Path::Tiny 0"^^:CpanId ];
+	:runtime-requirement    [ :on "Types::Standard 1.014000"^^:CpanId ];
+	:runtime-requirement    [ :on "YAML::XS 0.41"^^:CpanId ];
+	:test-requirement       [ :on "Test::Sims 20130412"^^:CpanId ];
+	:test-requirement       [ :on "Test::Most 0.31"^^:CpanId ];
+	:test-requirement       [ :on "Test::Deep 0.110"^^:CpanId ];
+	:test-requirement       [ :on "Test::Compile 0.24"^^:CpanId ];
+	:test-requirement       [ :on "Test::Output 1.02"^^:CpanId ];
+	:test-requirement       [ :on "Test::FailWarnings 0.008"^^:CpanId ];
+	:test-requirement       [ :on "Fennec 2.016"^^:CpanId ];
+	:test-requirement       [ :on "Child 0.010"^^:CpanId ];
+	:test-requirement       [ :on "File::Copy::Recursive 0.38"^^:CpanId ];
+	:test-requirement       [ :on "Capture::Tiny 0.22"^^:CpanId ];
+	:test-requirement       [ :on "Devel::Hide 0.0009"^^:CpanId ];
+	:develop-recommendation [ :on "Dist::Inkt 0.001"^^:CpanId ];
+	.
+

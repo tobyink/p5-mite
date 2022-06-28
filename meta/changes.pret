@@ -1,0 +1,169 @@
+# This file acts as the project's changelog.
+#
+
+# 0.001000  2022-06-28
+#
+#   - Mite is now self-hosting! It no longer requires Moo.
+#   - Changed version numbering scheme.
+#   - Added version numbers to more modules. (Everything except the shim.)
+#
+`Mite 0.001000 cpan:TOBYINK`
+	issued  2022-06-28;
+	changeset [
+		item "Mite is now self-hosting! It no longer requires Moo."^^Change;
+		item "Changed version numbering scheme."^^Packaging;
+		item "Added version numbers to more modules. (Everything except the shim.)"^^Packaging;
+	].
+
+# v0.0.9    2022-06-28
+#
+#   - Don't internally use roles, as the aim is to eventually be able
+#     to have Mite use Mite instead of Moo, and Mite doesn't provide roles.
+#   - Fix minor pod formatting inconsistency.
+#   - Rename the `extends` method in Mite::Class to `superclasses` to avoid
+#     confusion with the exported `extends` function.
+#   - Mite::Class shouldn't accidentally try to use Try::Tiny::XS to
+#     implement strict constructors.
+#   - Require Type::Tiny 1.014000.
+#
+`Mite v0.0.9 cpan:TOBYINK`
+	issued  2022-06-28;
+	changeset [
+		item "Don't internally use roles, as the aim is to eventually be able to have Mite use Mite instead of Moo, and Mite doesn't provide roles."^^Change;
+		item "Fix minor pod formatting inconsistency"^^Documentation;
+		item "Rename the `extends` method in Mite::Class to `superclasses` to avoid confusion with the exported `extends` function"^^Change;
+		item "Mite::Class shouldn't accidentally try to use Try::Tiny::XS to implement strict constructors"^^Bugfix;
+		item "Require Type::Tiny 1.014000"^^Change;
+	].
+
+# v0.0.8    2022-06-24
+#
+#   - Implement trigger for has
+#   - Implement BUILD
+#   - Implement BUILDARGS
+#   - Child classes no longer re-implement accessors for attributes defined
+#     in parent classes, unless they have altered the attribute in some way
+#   - Mite::Shim now copes better with "+" prefix on attribute names.
+#   - has \@names is now supported, like Moose and Moo
+#
+`Mite v0.0.8 cpan:TOBYINK`
+	issued  2022-06-24;
+	changeset [
+		item "trigger for attributes"^^Addition;
+		item "BUILD/BUILDALL"^^Addition;
+		item "BUILDARGS"^^Addition;
+		item "Child classes no longer re-implement accessors for attributes defined in parent classes, unless they have altered the attribute in some way"^^Change;
+		item "Mite::Shim now copes better with + prefix on attribute names"^^Bugfix;
+		item "has \@names is now supported, like Moose and Moo"^^Change;
+	].
+
+# v0.0.7    2022-06-23
+#
+#   - Avoid Mite::Shim and Type::Tiny from appearing in compiled modules
+#     so they don't confuse the CPAN indexer.
+#
+`Mite v0.0.7 cpan:TOBYINK`
+	issued  2022-06-23;
+	changeset [
+		item "Avoid Mite::Shim and Type::Tiny from appearing in compiled modules so they don't confuse the CPAN indexer."^^Change;
+	].
+
+# v0.0.6    2022-06-23
+#
+#   - Support Types::Common::Numeric types
+#   - Support Types::Common::String types
+#   - Implement coerce => 1 for has
+#   - Implement weak_ref => 1 for has
+#   - Clearers, setters and accessors used as setters are now chainable
+#   - Add "perltidy" option in ".mite/config"
+#   - Output accessor code in a stable order instead of hash order
+#   - Allow type => $blessed_type for has. Using it will void your warranty.
+#
+`Mite v0.0.6 cpan:TOBYINK`
+	issued  2022-06-23;
+	changeset [
+		item "Support Types::Common::Numeric types"^^Change;
+		item "Support Types::Common::String types"^^Change;
+		item "coerce for attributes"^^Addition;
+		item "weak_ref for attributes"^^Addition;
+		item "Clearers, setters, and accessors used as setters are now chainable"^^Change;
+		item "perltidy option in .mite/config"^^Addition;
+		item "Output accessor code in a stable order instead of hash order"^^Change;
+		item "Allow type => $blessed_type for has. Using it will void your warranty."^^Change;
+	].
+
+# v0.0.5    2022-06-22
+#
+#   - Bugfix inlining type constraints
+#   - Hide Mite::Shim embedded in Mite projects from CPAN indexer
+#
+`Mite v0.0.5 cpan:TOBYINK`
+	issued  2022-06-22;
+	changeset [
+		item "Fix inlining type constraints"^^Bugfix;
+		item "Hide Mite::Shim embedded in Mite projects from CPAN indexer"^^Change;
+	].
+
+# v0.0.4    2022-06-22
+#
+#   - Implement builder option for has
+#   - Implement lazy option for has
+#   - Implement isa option for has
+#   - Implement is => 'lazy' like Moo
+#
+`Mite v0.0.4 cpan:TOBYINK`
+	issued  2022-06-22;
+	changeset [
+		item "builder for attributes"^^Addition;
+		item "lazy for attributes"^^Addition;
+		item "isa for attributes"^^Addition;
+		item "is => lazy like Moo"^^Addition;
+	].
+
+# v0.0.3    2022-06-21
+#
+#   - Bugfixes
+#   - Implement reader option for has
+#   - Implement writer option for has
+#   - Implement accessor option for has
+#   - Implement predicates
+#   - Implement clearers
+#   - Implement is => 'rwp' like Moo
+#
+`Mite v0.0.3 cpan:TOBYINK`
+	issued  2022-06-21;
+	changeset [
+		item "Bugfixes"^^Bugfix;
+		item "reader for attributes"^^Addition;
+		item "writer for attributes"^^Addition;
+		item "accessor for attributes"^^Addition;
+		item "predicate for attributes"^^Addition;
+		item "clearer for attributes"^^Addition;
+		item "is => rwp like Moo"^^Addition;
+	].
+
+# v0.0.2    2022-06-21
+#
+#   - New maintainer
+#   - Port from Mouse to Moo
+#   - Implement strict constructors
+#   - Implement init_arg for attributes
+#   - Implement required attributes
+#
+`Mite v0.0.2 cpan:TOBYINK`
+	issued  2022-06-21;
+	changeset [
+		item "New maintainer: TOBYINK"^^Packaging;
+		item "Port from Mouse to Moo"^^Change;
+		item "Strict constructors"^^Addition;
+		item "init_arg for attributes"^^Addition;
+		item "required attributes"^^Addition;
+	].
+
+# v0.0.1    2014-07-19
+#
+#   - Initial release
+#
+`Mite v0.0.1 cpan:TOBYINK`
+	issued  2014-07-19;
+	label   "Initial release".
