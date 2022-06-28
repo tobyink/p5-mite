@@ -19,7 +19,6 @@ my $build = Module::Build->new(
         'version'               => '0.77',
         'App::Cmd'              => '0.323',
         'Import::Into'          => '0',
-        'Moo'                   => '2.000',
         'Path::Tiny'            => '0.052',
         'Types::Path::Tiny'     => '0',
         'Types::Standard'       => '1.014000',
