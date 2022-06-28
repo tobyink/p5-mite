@@ -10,7 +10,8 @@ use File::Find;
 use autodie;
 
 {
-    package MY;
+    package # hide from indexer
+        MY;
 
     sub top_targets {
         my $self = shift;
