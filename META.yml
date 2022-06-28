@@ -79,7 +79,6 @@ provides:
 requires:
   App::Cmd: '0.323'
   Import::Into: '0'
-  Moo: '2.000'
   Path::Tiny: '0.052'
   Types::Path::Tiny: '0'
   Types::Standard: '1.014000'
@@ -91,5 +90,5 @@ resources:
   bugtracker: https://github.com/tobyink/p5-mite/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/tobyink/p5-mite
-version: v0.1.0
+version: '0.001000'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
