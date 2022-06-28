@@ -1,0 +1,6 @@
+---
+compiled_to: lib
+project: Mite
+shim: Mite::Miteception::Shim
+source_from: lib
+perltidy: 1
