@@ -264,6 +264,7 @@ sub _compile_bless {
 
 sub _compile_strict_constructor {
     my ( $self, $classvar, $selfvar, $argvar, $metavar ) = @_;
+    local $Type::Tiny::AvoidCallbacks = 1;
     my $check = Enum->of( keys %{ $self->all_attributes } )->inline_check( '$_' );
 
     return sprintf 'my @unknown = grep not( %s ), keys %%{%s}; @unknown and require Carp and Carp::croak("Unexpected keys in constructor: " . join(q[, ], sort @unknown));',
