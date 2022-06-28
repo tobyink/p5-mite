@@ -1,3 +1,7 @@
+use 5.010001;
+use strict;
+use warnings;
+
 package Mite::Shim;
 
 # NOTE: Since the intention is to ship this file with a project, this file

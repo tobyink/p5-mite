@@ -1,7 +1,8 @@
-package Mite::Miteception;
-use v5.10;
+use 5.010001;
 use strict;
 use warnings;
+
+package Mite::Miteception;
 
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.001001';

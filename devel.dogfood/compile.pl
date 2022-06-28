@@ -58,7 +58,7 @@ sub compile {
 	my ( $head, $tail ) = split '##-', $code;
 	
 	my $fake_module = "Fake::$module";
-	substr( $head, 8, 0 ) = 'Fake::';
+	$head =~ s/package /package Fake::/;
 	$head =~ s/use Mite::Miteception/use Mite::Miteception '-Basic'/;
 
 	my $source = Mite::Source->new(

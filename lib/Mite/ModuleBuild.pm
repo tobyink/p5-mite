@@ -1,7 +1,8 @@
-package Mite::ModuleBuild;
+use 5.010001;
 use strict;
 use warnings;
-use feature ':5.10';
+
+package Mite::ModuleBuild;
 
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.001001';

@@ -1,3 +1,7 @@
+use 5.010001;
+use strict;
+use warnings;
+
 package Mite::App::Command::clean;
 use Mite::Miteception;
 extends qw(Mite::App::Command);

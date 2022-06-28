@@ -1,3 +1,7 @@
+use 5.010001;
+use strict;
+use warnings;
+
 package Mite::Class;
 use Mite::Miteception;
 

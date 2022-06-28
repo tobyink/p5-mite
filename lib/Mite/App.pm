@@ -1,8 +1,8 @@
-package Mite::App;
-
-use feature ':5.10';
+use 5.010001;
 use strict;
 use warnings;
+
+package Mite::App;
 
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.001001';
