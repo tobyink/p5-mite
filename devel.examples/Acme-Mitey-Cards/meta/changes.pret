@@ -21,3 +21,12 @@
 			label "Rebuild using Mite v0.0.7.";
 		];
 	].
+
+`Acme-Mitey-Cards 0.004 cpan:TOBYINK`
+	issued  2022-06-28;
+	changeset [
+		item [
+			a dcs:Update;
+			label "Rebuild using Mite 0.001000.";
+		];
+	].
