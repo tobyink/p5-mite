@@ -84,9 +84,13 @@ q[Type check failed in constructor: suit should be InstanceOf["Acme::Mitey::Card
         else { require Carp; Carp::croak("Missing key in constructor: suit") }
 
         # Enforce strict constructor
-        my @unknown =
-          grep
-          not( ( defined and !ref and m{\A(?:(?:deck|face|reverse|suit))\z} ) ),
+        my @unknown = grep not(
+            do {
+
+                package Acme::Mitey::Cards::Mite;
+                ( defined and !ref and m{\A(?:(?:deck|face|reverse|suit))\z} );
+            }
+          ),
           keys %{$args};
         @unknown
           and require Carp
@@ -94,9 +98,13 @@ q[Type check failed in constructor: suit should be InstanceOf["Acme::Mitey::Card
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
 
         # Call BUILD methods
-        $no_build or do { $self->$_($args) for @{ $meta->{BUILD} || [] } };
+        !$no_build and @{ $meta->{BUILD} || [] } and $self->BUILDALL($args);
 
         return $self;
+    }
+
+    sub BUILDALL {
+        $_->(@_) for @{ $Mite::META{ ref( $_[0] ) }{BUILD} || [] };
     }
 
     sub __META__ {

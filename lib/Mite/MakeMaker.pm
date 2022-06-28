@@ -1,5 +1,5 @@
 package Mite::MakeMaker;
-use Mite::Miteception;
+use Mite::Miteception '-Basic';
 
 ##-
 

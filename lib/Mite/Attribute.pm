@@ -154,7 +154,7 @@ sub clone {
     $args{default} = $self->default
         if !exists $args{default} and $self->has_default;
 
-    return $self->new( %args );
+    return ref($self)->new( %args );
 }
 
 sub is_private {

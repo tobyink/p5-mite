@@ -2,7 +2,7 @@
 use v5.34;
 use warnings;
 use FindBin qw($Bin);
-use lib "$Bin/../lib";
+#use lib "$Bin/../lib";
 use Path::Tiny qw(path);
 use Mite::Class;
 use Mite::Source;
@@ -82,7 +82,14 @@ sub compile {
 		local $@;
 		eval("$head; 1") or die($@);
 	};
-	
+
+	# This is bad, but $class->project is undef, so
+	# otherwise it can't find attributes at all.
+	#
+	no warnings 'redefine';
+	local *Mite::Class::all_attributes = sub { shift->attributes };
+
+	local $Type::Tiny::SafePackage = 'package Mite::Miteception;';
 	my $compiled = $class->compile;
 	$compiled =~ s/Fake:://;
 	$compiled =~ s/use Mite::Miteception '-Basic'/use Mite::Miteception/;

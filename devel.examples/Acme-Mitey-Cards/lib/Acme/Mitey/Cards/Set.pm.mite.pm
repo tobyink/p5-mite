@@ -45,7 +45,13 @@ q[Type check failed in constructor: cards should be ArrayRef[InstanceOf["Acme::M
         }
 
         # Enforce strict constructor
-        my @unknown = grep not( ( defined and !ref and m{\A(?:cards)\z} ) ),
+        my @unknown = grep not(
+            do {
+
+                package Acme::Mitey::Cards::Mite;
+                ( defined and !ref and m{\A(?:cards)\z} );
+            }
+          ),
           keys %{$args};
         @unknown
           and require Carp
@@ -53,9 +59,13 @@ q[Type check failed in constructor: cards should be ArrayRef[InstanceOf["Acme::M
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
 
         # Call BUILD methods
-        $no_build or do { $self->$_($args) for @{ $meta->{BUILD} || [] } };
+        !$no_build and @{ $meta->{BUILD} || [] } and $self->BUILDALL($args);
 
         return $self;
+    }
+
+    sub BUILDALL {
+        $_->(@_) for @{ $Mite::META{ ref( $_[0] ) }{BUILD} || [] };
     }
 
     sub __META__ {

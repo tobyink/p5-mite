@@ -116,11 +116,13 @@ q[Type check failed in constructor: original_cards should be ArrayRef[InstanceOf
 
         # Enforce strict constructor
         my @unknown = grep not(
-            (
-                    defined
-                and !ref
-                and m{\A(?:(?:cards|original_cards|reverse))\z}
-            )
+            do {
+
+                package Acme::Mitey::Cards::Mite;
+                (         defined
+                      and !ref
+                      and m{\A(?:(?:cards|original_cards|reverse))\z} );
+            }
           ),
           keys %{$args};
         @unknown
@@ -129,9 +131,13 @@ q[Type check failed in constructor: original_cards should be ArrayRef[InstanceOf
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
 
         # Call BUILD methods
-        $no_build or do { $self->$_($args) for @{ $meta->{BUILD} || [] } };
+        !$no_build and @{ $meta->{BUILD} || [] } and $self->BUILDALL($args);
 
         return $self;
+    }
+
+    sub BUILDALL {
+        $_->(@_) for @{ $Mite::META{ ref( $_[0] ) }{BUILD} || [] };
     }
 
     sub __META__ {

@@ -118,6 +118,7 @@ sub chained_attributes {
 sub all_attributes {
     my $self = shift;
 
+    return $self->attributes unless @{ $self->superclasses || [] };
     return $self->chained_attributes($self->linear_parents);
 }
 

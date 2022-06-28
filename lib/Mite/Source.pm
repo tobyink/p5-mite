@@ -37,7 +37,7 @@ use Mite::Class;
 
 has file =>
   is            => ro,
-  isa           => Path,
+  isa           => Path->no_coercions->plus_coercions(Str, 'Path::Tiny::path($_)'),,
   coerce        => true,
   required      => true;
 

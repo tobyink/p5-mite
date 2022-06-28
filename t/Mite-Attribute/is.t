@@ -11,7 +11,7 @@ tests "bad is" => sub {
             name        => 'foo',
             is          => 'blah'
         );
-    } qr/"blah"/;
+    } qr/type check failed in constructor/i;
 };
 
 done_testing;
