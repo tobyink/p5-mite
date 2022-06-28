@@ -94,3 +94,4 @@ t/Test-Mite/mite_load.t
 t/Test-Mite/pragmas.t
 t/Test-Mite/sims.t
 TODO
+t/Mite-Attribute/handles.t

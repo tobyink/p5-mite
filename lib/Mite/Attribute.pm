@@ -85,6 +85,11 @@ has documentation =>
   is            => rw,
   predicate     => true;
 
+has handles =>
+  is            => rw,
+  isa           => HashRef->of( Str )->plus_coercions( ArrayRef, q{+{ map { $_ => $_ } @$_ }} ),
+  predicate     => true;
+
 ##-
 
 my @method_name_generator = (
@@ -405,6 +410,13 @@ my %code_template;
         }
         return $code;
     },
+    asserter => sub {
+        my $self = shift;
+        my %arg = @_;
+        my $reader = $code_template{reader}->( $self, no_croak => true );
+        return sprintf 'my $object = do { %s }; require Scalar::Util && Scalar::Util::blessed($object) or require Carp && Carp::croak("%s is not a blessed object"); $object',
+            $reader, $self->name;
+    },
     writer => sub {
         my $self = shift;
         my %arg = @_;
@@ -488,7 +500,7 @@ sub compile {
     my %method_name;
 
     for my $property ( keys %code_template ) {
-        my $method_name = $self->$property;
+        my $method_name = $self->can($property) ? $self->$property : undef;
         next unless defined $method_name;
 
         $method_name{$property} = $method_name;
@@ -496,6 +508,11 @@ sub compile {
             $want_xs{$property} = 1;
         }
         $want_pp{$property} = 1;
+    }
+
+    if ( $self->has_handles ) {
+        $method_name{asserter} = sprintf '_assert_blessed_%s', $self->name;
+        $want_pp{asserter} = 1;
     }
 
     # Class::XSAccessor can't do type checks, triggers, or weaken
@@ -535,6 +552,16 @@ sub compile {
     }
 
     $code .= "\n";
+
+    if ( $self->has_handles ) {
+        $code .= sprintf "# Delegated methods for %s\n", $self->name;
+        my $assertion = $method_name{asserter};
+        my %delegated = %{ $self->handles };
+        for my $key ( sort keys %delegated ) {
+            $code .= sprintf 'sub %s { shift->%s->%s( @_ ) }' . "\n",
+                $key, $assertion, $delegated{$key};
+        }
+    }
 
     return $code;
 }

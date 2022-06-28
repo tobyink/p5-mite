@@ -20,6 +20,7 @@ sub new {
     if ( exists($args->{q[coerce]}) ) { do { package Mite::Miteception; !ref $args->{q[coerce]} and (!defined $args->{q[coerce]} or $args->{q[coerce]} eq q() or $args->{q[coerce]} eq '0' or $args->{q[coerce]} eq '1') } or require Carp && Carp::croak(q[Type check failed in constructor: coerce should be Bool]); $self->{q[coerce]} = $args->{q[coerce]};  } else { my $value = do { my $default_value = ""; (!ref $default_value and (!defined $default_value or $default_value eq q() or $default_value eq '0' or $default_value eq '1')) or do { require Carp; Carp::croak(q[Type check failed in default: coerce should be Bool]) }; $default_value }; $self->{q[coerce]} = $value;  }
     if ( exists($args->{q[default]}) ) { do { package Mite::Miteception; !defined($args->{q[default]}) or do { package Mite::Miteception; (do { package Mite::Miteception; defined($args->{q[default]}) and do { ref(\$args->{q[default]}) eq 'SCALAR' or ref(\(my $val = $args->{q[default]})) eq 'SCALAR' } } or do { package Mite::Miteception; !!ref($args->{q[default]}) }) } } or require Carp && Carp::croak(q[Type check failed in constructor: default should be Maybe[Str|Ref]]); $self->{q[default]} = $args->{q[default]};  }
     if ( exists($args->{q[documentation]}) ) { $self->{q[documentation]} = $args->{q[documentation]};  }
+    if ( exists($args->{q[handles]}) ) { (do { package Mite::Miteception; ref($args->{q[handles]}) eq 'HASH' } and do { my $ok = 1; for my $i (values %{$args->{q[handles]}}) { ($ok = 0, last) unless do { package Mite::Miteception; defined($i) and do { ref(\$i) eq 'SCALAR' or ref(\(my $val = $i)) eq 'SCALAR' } } }; $ok }) or require Carp && Carp::croak(q[Type check failed in constructor: handles should be HashRef[Str]]); $self->{q[handles]} = $args->{q[handles]};  }
     if ( exists($args->{q[init_arg]}) ) { do { package Mite::Miteception; (do { package Mite::Miteception; defined($args->{q[init_arg]}) and do { ref(\$args->{q[init_arg]}) eq 'SCALAR' or ref(\(my $val = $args->{q[init_arg]})) eq 'SCALAR' } } or do { package Mite::Miteception; !defined($args->{q[init_arg]}) }) } or require Carp && Carp::croak(q[Type check failed in constructor: init_arg should be Str|Undef]); $self->{q[init_arg]} = $args->{q[init_arg]};  }
     if ( exists($args->{q[is]}) ) { do { package Mite::Miteception; (defined($args->{q[is]}) and !ref($args->{q[is]}) and $args->{q[is]} =~ m{\A(?:(?:bare|lazy|r(?:wp?|o)))\z}) } or require Carp && Carp::croak(q[Type check failed in constructor: is should be Enum["ro","rw","rwp","lazy","bare"]]); $self->{q[is]} = $args->{q[is]};  } else { my $value = do { my $default_value = "bare"; do { package Mite::Miteception; (defined($default_value) and !ref($default_value) and $default_value =~ m{\A(?:(?:bare|lazy|r(?:wp?|o)))\z}) } or do { require Carp; Carp::croak(q[Type check failed in default: is should be Enum["ro","rw","rwp","lazy","bare"]]) }; $default_value }; $self->{q[is]} = $value;  }
     if ( exists($args->{q[isa]}) ) { do { package Mite::Miteception; (do { package Mite::Miteception; defined($args->{q[isa]}) and do { ref(\$args->{q[isa]}) eq 'SCALAR' or ref(\(my $val = $args->{q[isa]})) eq 'SCALAR' } } or (do { package Mite::Miteception; use Scalar::Util (); Scalar::Util::blessed($args->{q[isa]}) })) } or require Carp && Carp::croak(q[Type check failed in constructor: isa should be Str|Object]); $self->{q[isa]} = $args->{q[isa]};  }
@@ -34,7 +35,7 @@ sub new {
     if ( exists($args->{q[writer]}) ) { do { package Mite::Miteception; (((do { package Mite::Miteception; defined($args->{q[writer]}) and do { ref(\$args->{q[writer]}) eq 'SCALAR' or ref(\(my $val = $args->{q[writer]})) eq 'SCALAR' } }) && (do { local $_ = $args->{q[writer]}; length($_) > 0 })) or do { package Mite::Miteception; !defined($args->{q[writer]}) }) } or require Carp && Carp::croak(q[Type check failed in constructor: writer should be __ANON__|Undef]); $self->{q[writer]} = $args->{q[writer]};  }
 
     # Enforce strict constructor
-    my @unknown = grep not( do { package Mite::Miteception; (defined and !ref and m{\A(?:(?:accessor|builder|c(?:l(?:ass|earer)|o(?:deref_default_variable|erce))|d(?:efault|ocumentation)|i(?:nit_arg|sa?)|lazy|name|predicate|re(?:ader|quired)|t(?:rigger|ype)|w(?:eak_ref|riter)))\z}) } ), keys %{$args}; @unknown and require Carp and Carp::croak("Unexpected keys in constructor: " . join(q[, ], sort @unknown));
+    my @unknown = grep not( do { package Mite::Miteception; (defined and !ref and m{\A(?:(?:accessor|builder|c(?:l(?:ass|earer)|o(?:deref_default_variable|erce))|d(?:efault|ocumentation)|handles|i(?:nit_arg|sa?)|lazy|name|predicate|re(?:ader|quired)|t(?:rigger|ype)|w(?:eak_ref|riter)))\z}) } ), keys %{$args}; @unknown and require Carp and Carp::croak("Unexpected keys in constructor: " . join(q[, ], sort @unknown));
 
     # Call BUILD methods
     !$no_build and @{$meta->{BUILD}||[]} and $self->BUILDALL($args);
@@ -117,6 +118,18 @@ else {
     *documentation = sub { @_ > 1 ? do { $_[0]{q[documentation]} = $_[1]; $_[0]; } : ( $_[0]{q[documentation]} ) };
     *has_documentation = sub { exists $_[0]->{q[documentation]} };
 }
+
+# Accessors for handles
+if ( $__XS ) {
+    Class::XSAccessor->import(
+        chained => 1,
+        exists_predicates => { q[has_handles] => q[handles] },
+    );
+}
+else {
+    *has_handles = sub { exists $_[0]->{q[handles]} };
+}
+*handles = sub { @_ > 1 ? do { do { package Mite::Miteception; (ref($_[1]) eq 'HASH') and do { my $ok = 1; for my $i (values %{$_[1]}) { ($ok = 0, last) unless do { package Mite::Miteception; defined($i) and do { ref(\$i) eq 'SCALAR' or ref(\(my $val = $i)) eq 'SCALAR' } } }; $ok } } or require Carp && Carp::croak(q[Type check failed in accessor: value should be HashRef[Str]]); $_[0]{q[handles]} = $_[1]; $_[0]; } : ( $_[0]{q[handles]} ) };
 
 # Accessors for init_arg
 *init_arg = sub { @_ > 1 ? do { do { package Mite::Miteception; (do { package Mite::Miteception; defined($_[1]) and do { ref(\$_[1]) eq 'SCALAR' or ref(\(my $val = $_[1])) eq 'SCALAR' } } or (!defined($_[1]))) } or require Carp && Carp::croak(q[Type check failed in accessor: value should be Str|Undef]); $_[0]{q[init_arg]} = $_[1]; $_[0]; } : do { ( exists($_[0]{q[init_arg]}) ? $_[0]{q[init_arg]} : ( $_[0]{q[init_arg]} = do { my $default_value = do { our $__init_arg_DEFAULT__; $__init_arg_DEFAULT__->($_[0]) }; do { package Mite::Miteception; (do { package Mite::Miteception; defined($default_value) and do { ref(\$default_value) eq 'SCALAR' or ref(\(my $val = $default_value)) eq 'SCALAR' } } or (!defined($default_value))) } or do { require Carp; Carp::croak(q[Type check failed in default: init_arg should be Str|Undef]) }; $default_value } ) ) } };

@@ -113,8 +113,8 @@ else, please read L<Moose> and L<Moose::Manual>.
 =head2 C<has>
 
 Supports C<is>, C<reader>, C<writer>, C<accessor>, C<clearer>, C<predicate>,
-C<init_arg>, C<required>, C<weak_ref>, C<isa>, C<coerce>, C<trigger>,
-C<default>, C<builder>, and C<lazy>.
+C<handles>, C<init_arg>, C<required>, C<weak_ref>, C<isa>, C<coerce>,
+C<trigger>, C<default>, C<builder>, and C<lazy>.
 
 C<isa> should be strings understood by C<dwim_type> from L<Type::Utils>,
 including all the type constraints from L<Types::Standard>,
@@ -123,7 +123,7 @@ L<Type::Tiny> type constraint objects are also supported, but then
 your project will have a dependency on L<Type::Tiny> and the type library,
 which defeats the purpose of using a zero-dependency class builder.
 
-(No support yet for C<handles>.)
+C<handles> must be a hashref of strings or an arrayref of strings.
 
 =head2 C<extends>
 
