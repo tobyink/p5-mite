@@ -37,7 +37,7 @@ sub import {
 	my $caller = caller;
 	*{"$caller\::$_"} = \&{$_} for $class->constant_names;
 
-	return if $arg eq '-Basic';
+	return if ( defined $arg and $arg eq '-Basic' );
 
 	unshift @_, $class;
 	goto \&load_mite_file;
