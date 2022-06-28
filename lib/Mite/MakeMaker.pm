@@ -1,5 +1,5 @@
 package Mite::MakeMaker;
-use Mite::Miteception '-Basic';
+use Mite::Miteception;
 
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.001000';

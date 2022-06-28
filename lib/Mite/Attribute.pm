@@ -77,9 +77,13 @@ has coderef_default_variable =>
   };
 
 has [ 'trigger', 'builder' ] =>
-    is            => rw,
-    isa           => Str->where('length($_) > 0') | CodeRef | Undef,
-    predicate     => true;
+  is            => rw,
+  isa           => Str->where('length($_) > 0') | CodeRef | Undef,
+  predicate     => true;
+
+has documentation =>
+  is            => rw,
+  predicate     => true;
 
 ##-
 
