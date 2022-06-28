@@ -3,6 +3,9 @@ use strict;
 use warnings;
 use feature ':5.10';
 
+our $AUTHORITY = 'cpan:TOBYINK';
+our $VERSION   = '0.001000';
+
 use parent 'Module::Build';
 
 sub _mite {

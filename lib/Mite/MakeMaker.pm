@@ -1,6 +1,9 @@
 package Mite::MakeMaker;
 use Mite::Miteception '-Basic';
 
+our $AUTHORITY = 'cpan:TOBYINK';
+our $VERSION   = '0.001000';
+
 ##-
 
 use File::Find;

@@ -3,6 +3,9 @@ use v5.10;
 use strict;
 use warnings;
 
+our $AUTHORITY = 'cpan:TOBYINK';
+our $VERSION   = '0.001000';
+
 my %constants;
 BEGIN {
 	%constants = (

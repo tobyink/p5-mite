@@ -1,6 +1,9 @@
 package Mite::Source;
 use Mite::Miteception;
 
+our $AUTHORITY = 'cpan:TOBYINK';
+our $VERSION   = '0.001000';
+
 =head1 NAME
 
 Mite::Source - Representing the human written .pm file.

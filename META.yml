@@ -34,34 +34,48 @@ provides:
     version: '0.001000'
   Mite::App:
     file: lib/Mite/App.pm
+    version: '0.001000'
   Mite::App::Command:
     file: lib/Mite/App/Command.pm
+    version: '0.001000'
   Mite::App::Command::clean:
     file: lib/Mite/App/Command/clean.pm
+    version: '0.001000'
   Mite::App::Command::compile:
     file: lib/Mite/App/Command/compile.pm
+    version: '0.001000'
   Mite::App::Command::init:
     file: lib/Mite/App/Command/init.pm
+    version: '0.001000'
   Mite::Attribute:
     file: lib/Mite/Attribute.pm
+    version: '0.001000'
   Mite::Class:
     file: lib/Mite/Class.pm
+    version: '0.001000'
   Mite::Compiled:
     file: lib/Mite/Compiled.pm
+    version: '0.001000'
   Mite::Config:
     file: lib/Mite/Config.pm
+    version: '0.001000'
   Mite::MakeMaker:
     file: lib/Mite/MakeMaker.pm
+    version: '0.001000'
   Mite::Miteception:
     file: lib/Mite/Miteception.pm
+    version: '0.001000'
   Mite::ModuleBuild:
     file: lib/Mite/ModuleBuild.pm
+    version: '0.001000'
   Mite::Project:
     file: lib/Mite/Project.pm
+    version: '0.001000'
   Mite::Shim:
     file: lib/Mite/Shim.pm
   Mite::Source:
     file: lib/Mite/Source.pm
+    version: '0.001000'
 requires:
   App::Cmd: '0.323'
   Import::Into: '0'

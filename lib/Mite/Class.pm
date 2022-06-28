@@ -1,6 +1,9 @@
 package Mite::Class;
 use Mite::Miteception;
 
+our $AUTHORITY = 'cpan:TOBYINK';
+our $VERSION   = '0.001000';
+
 use Path::Tiny;
 use mro;
 

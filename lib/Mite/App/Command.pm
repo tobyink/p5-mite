@@ -2,6 +2,9 @@ package Mite::App::Command;
 use Mite::Miteception;
 extends qw(App::Cmd::Command);
 
+our $AUTHORITY = 'cpan:TOBYINK';
+our $VERSION   = '0.001000';
+
 ##-
 
 sub opt_spec {

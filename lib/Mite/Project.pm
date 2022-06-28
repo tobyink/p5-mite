@@ -1,6 +1,9 @@
 package Mite::Project;
 use Mite::Miteception;
 
+our $AUTHORITY = 'cpan:TOBYINK';
+our $VERSION   = '0.001000';
+
 has sources =>
   is            => ro,
   isa           => HashRef[InstanceOf['Mite::Source']],
