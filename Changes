@@ -4,6 +4,12 @@ Mite
 Creator:      Michael G Schwern (MSCHWERN)
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.001000  2022-06-28
+
+  - Mite is now self-hosting! It no longer requires Moo.
+  - Changed version numbering scheme.
+  - Added version numbers to more modules. (Everything except the shim.)
+
 v0.0.9    2022-06-28
 
   - Don't internally use roles, as the aim is to eventually be able
