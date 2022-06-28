@@ -46,7 +46,7 @@
             "Moo" : "2.000",
             "Path::Tiny" : "0.052",
             "Types::Path::Tiny" : "0",
-            "Types::Standard" : "1.012",
+            "Types::Standard" : "1.014000",
             "YAML::XS" : "0.41",
             "namespace::autoclean" : "0",
             "perl" : "v5.10.1",
@@ -60,7 +60,7 @@
       },
       "Mite" : {
          "file" : "lib/Mite.pm",
-         "version" : "v0.0.8"
+         "version" : "v0.0.9"
       },
       "Mite::App" : {
          "file" : "lib/Mite/App.pm"
@@ -92,23 +92,14 @@
       "Mite::MakeMaker" : {
          "file" : "lib/Mite/MakeMaker.pm"
       },
+      "Mite::Miteception" : {
+         "file" : "lib/Mite/Miteception.pm"
+      },
       "Mite::ModuleBuild" : {
          "file" : "lib/Mite/ModuleBuild.pm"
       },
-      "Mite::MyMoo" : {
-         "file" : "lib/Mite/MyMoo.pm"
-      },
       "Mite::Project" : {
          "file" : "lib/Mite/Project.pm"
-      },
-      "Mite::Role::HasConfig" : {
-         "file" : "lib/Mite/Role/HasConfig.pm"
-      },
-      "Mite::Role::HasDefault" : {
-         "file" : "lib/Mite/Role/HasDefault.pm"
-      },
-      "Mite::Role::HasYAML" : {
-         "file" : "lib/Mite/Role/HasYAML.pm"
       },
       "Mite::Shim" : {
          "file" : "lib/Mite/Shim.pm"
@@ -129,6 +120,6 @@
          "url" : "https://github.com/tobyink/p5-mite"
       }
    },
-   "version" : "v0.0.8",
+   "version" : "v0.0.9",
    "x_serialization_backend" : "JSON::PP version 4.09"
 }
