@@ -139,10 +139,10 @@ jobs:
         working-directory: ./build/
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
-        run: cover -select_re '^blib/lib/' -ignore '*.mite.pm' -report coveralls
+        run: cover -select_re '^blib/lib/' -ignore_re '\.mite\.pm$' -report coveralls
       - name: Codecov.io report
         if: success() && matrix.coverage
         working-directory: ./build/
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-        run: cover -select_re '^blib/lib/' -ignore '*.mite.pm' -report codecov
+        run: cover -select_re '^blib/lib/' -ignore_re '\.mite\.pm$' -report codecov
