@@ -22,7 +22,7 @@ my $build = Module::Build->new(
         'Moo'                   => '2.000',
         'Path::Tiny'            => '0.052',
         'Types::Path::Tiny'     => '0',
-        'Types::Standard'       => '1.012',
+        'Types::Standard'       => '1.014000',
         'YAML::XS'              => '0.41',
     },
 

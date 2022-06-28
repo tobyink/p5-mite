@@ -13,6 +13,7 @@ v0.0.9    2022-06-28
     confusion with the exported `extends` function.
   - Mite::Class shouldn't accidentally try to use Try::Tiny::XS to
     implement strict constructors.
+  - Require Type::Tiny 1.014000.
 
 v0.0.8    2022-06-24
 
