@@ -1,6 +1,6 @@
 package Mite;
 
-use version; our $VERSION = qv("v0.0.8");
+use version; our $VERSION = qv("v0.0.9");
 
 =head1 NAME
 
