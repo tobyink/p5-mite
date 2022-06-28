@@ -39,6 +39,7 @@ jobs:
           name: dist
           path: ./
   build:
+    needs: dist
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
