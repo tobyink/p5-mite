@@ -6,7 +6,7 @@ package Mite::Attribute;
 use Mite::Miteception;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001008';
+our $VERSION   = '0.001009';
 
 has class =>
   is            => rw,
@@ -222,7 +222,8 @@ sub _all_aliases {
     my $self    = shift;
     my $aliases = $self->alias;
     return unless defined $aliases;
-    return map { no warnings; sprintf $_, $self->name }
+    no warnings;
+    return map { sprintf $_, $self->name }
         ref($aliases) ? @{ $aliases } : ( $aliases );
 }
 
