@@ -1,6 +1,12 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.001011 cpan:TOBYINK`
+	issued  2022-06-30;
+	changeset [
+		item "Also set $USES_MITE while Mite is compiling your class."^^Change;
+	].
+
 `Mite 0.001010 cpan:TOBYINK`
 	issued  2022-06-29;
 	changeset [
