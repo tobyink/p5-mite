@@ -215,7 +215,9 @@ your constructor will die if you pass it unknown attributes.
 
 Mite provides a similar feature to L<MooseX::Attribute::Chained>, so
 writer methods, clearer methods, and accessor methods used as writers
-all return C<< $self >>.
+all return C<< $self >>, so they can be chained:
+
+  $object->clear_foo->set_bar( 42 )->set_baz( 99 );
 
 =head2 Method Modifiers
 
