@@ -84,6 +84,8 @@ sub inject_mite_functions {
     my $class  = $source->class_for($package);
 
     no strict 'refs';
+    ${ $package .'::USES_MITE' } = 1;
+
     *{ $package .'::has' } = sub {
         my ( $names, %args ) = @_;
         $names = [$names] unless ref $names;
