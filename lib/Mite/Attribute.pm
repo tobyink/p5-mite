@@ -222,8 +222,7 @@ sub _all_aliases {
     my $self    = shift;
     my $aliases = $self->alias;
     return unless defined $aliases;
-    no warnings 'redundant';
-    return map { sprintf $_, $self->name }
+    return map { no warnings; sprintf $_, $self->name }
         ref($aliases) ? @{ $aliases } : ( $aliases );
 }
 
