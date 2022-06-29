@@ -46,38 +46,121 @@ sub import {
             require $mite_file;
         }
 
-        no strict 'refs';
-        *{ $caller .'::has' } = sub {
-            my $names = shift;
-            $names = [$names] unless ref $names;
-            my %args = @_;
+        $class->_install_exports( $caller, $file );
+    }
+}
+
+sub _install_exports {
+    my ( $class, $caller, $file ) = ( shift, @_ );
+
+    no strict 'refs';
+    *{ $caller .'::has' } = sub {
+        my $names = shift;
+        $names = [$names] unless ref $names;
+        my %args = @_;
+        for my $name ( @$names ) {
+           $name =~ s/^\+//;
+
+           my $default = $args{default};
+           if ( ref $default eq 'CODE' ) {
+               ${$caller .'::__'.$name.'_DEFAULT__'} = $default;
+           }
+
+           my $builder = $args{builder};
+           if ( ref $builder eq 'CODE' ) {
+               *{"$caller\::_build_$name"} = $builder;
+           }
+
+           my $trigger = $args{trigger};
+           if ( ref $trigger eq 'CODE' ) {
+               *{"$caller\::_trigger_$name"} = $trigger;
+           }
+        }
+
+        return;
+    };
+
+    # Method modifiers - these actually happen at runtime.
+    {
+        my $parse_args = sub {
+            my $coderef = pop;
+            my $names   = [ map { ref($_) ? @$_ : $_ } @_ ];
+            ( $names, $coderef );
+        };
+
+        my $get_orig = sub {
+            my $name = shift;
+            \&{ "$caller\::$name" };
+        };
+
+        *{ $caller .'::before' } = sub {
+            my ( $names, $coderef ) = &$parse_args;
             for my $name ( @$names ) {
-               $name =~ s/^\+//;
-
-               my $default = $args{default};
-               if ( ref $default eq 'CODE' ) {
-                   ${$caller .'::__'.$name.'_DEFAULT__'} = $default;
-               }
-
-               my $builder = $args{builder};
-               if ( ref $builder eq 'CODE' ) {
-                   *{"$caller\::_build_$name"} = $builder;
-               }
-
-               my $trigger = $args{trigger};
-               if ( ref $trigger eq 'CODE' ) {
-                   *{"$caller\::_trigger_$name"} = $trigger;
-               }
+                my $orig = $get_orig->($name);
+                local $@;
+                eval <<"BEFORE" or die $@;
+                    package $caller;
+                    no warnings 'redefine';
+                    sub $name {
+                        \$coderef->( \@_ );
+                        \$orig->( \@_ );
+                    }
+                    1;
+BEFORE
             }
-
             return;
         };
 
-        # Inject blank Mite routines
-        for my $name (qw( extends )) {
-            no strict 'refs';
-            *{ $caller .'::'. $name } = sub {};
-        }
+        *{ $caller .'::after' } = sub {
+            my ( $names, $coderef ) = &$parse_args;
+            for my $name ( @$names ) {
+                my $orig = $get_orig->($name);
+                local $@;
+                eval <<"AFTER" or die $@;
+                    package $caller;
+                    no warnings 'redefine';
+                    sub $name {
+                        my \@r;
+                        if ( wantarray ) {
+                            \@r = \$orig->( \@_ );
+                        }
+                        elsif ( defined wantarray ) {
+                            \@r = scalar \$orig->( \@_ );
+                        }
+                        else {
+                            \$orig->( \@_ );
+                            1;
+                        }
+                        \$coderef->( \@_ );
+                        wantarray ? \@r : \$r[0];
+                    }
+                    1;
+AFTER
+            }
+            return;
+        };
+
+        *{ $caller .'::around' } = sub {
+            my ( $names, $coderef ) = &$parse_args;
+            for my $name ( @$names ) {
+                my $orig = $get_orig->($name);
+                local $@;
+                eval <<"AROUND" or die $@;
+                    package $caller;
+                    no warnings 'redefine';
+                    sub $name {
+                        \$coderef->( \$orig, \@_ );
+                    }
+                    1;
+AROUND
+            }
+            return;
+        };
+    }
+
+    # Inject blank Mite routines
+    for my $name (qw( extends )) {
+        *{ $caller .'::'. $name } = sub {};
     }
 }
 

@@ -118,6 +118,21 @@ sub inject_mite_functions {
         return;
     };
 
+    my $parse_args = sub {
+        my $coderef = pop;
+        my $names   = [ map { ref($_) eq 'ARRAY' ? @$_ : $_ } @_ ];
+        ( $names, $coderef );
+    };
+    *{ $package .'::'. $_ } = sub {
+        my ( $names, $coderef ) = &$parse_args;
+        require Carp;
+        CodeRef->check( $coderef )
+            or Carp::croak( "Expected a coderef method modifier" );
+        ArrayRef->of(Str)->check( $names ) && @$names
+            or Carp::croak( "Expected a list of method names to modify" );
+        return;
+    } for qw( before after around );
+
     return;
 }
 

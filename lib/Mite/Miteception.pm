@@ -96,38 +96,7 @@ sub load_mite_file {
 		 require $mite_file;
 	}
 
-	no strict 'refs';
-	*{ $caller .'::has' } = sub {
-		 my $names = shift;
-		 $names = [$names] unless ref $names;
-		 my %args = @_;
-		 for my $name ( @$names ) {
-			 $name =~ s/^\+//;
-
-			 my $default = $args{default};
-			 if ( ref $default eq 'CODE' ) {
-				  ${$caller .'::__'.$name.'_DEFAULT__'} = $default;
-			 }
-
-			 my $builder = $args{builder};
-			 if ( ref $builder eq 'CODE' ) {
-				  *{"$caller\::_build_$name"} = $builder;
-			 }
-
-			 my $trigger = $args{trigger};
-			 if ( ref $trigger eq 'CODE' ) {
-				  *{"$caller\::_trigger_$name"} = $trigger;
-			 }
-		 }
-
-		 return;
-	};
-
-	# Inject blank Mite routines
-	for my $name (qw( extends )) {
-		 no strict 'refs';
-		 *{ $caller .'::'. $name } = sub {};
-	}
+	'Mite::Shim'->_install_exports( $caller, $file );
 }
 
 1;
