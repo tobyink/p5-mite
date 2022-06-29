@@ -211,6 +211,12 @@ and need to support older versions of Perl.
 Mite provides a similar feature to L<MooseX::StrictConstructor>, so
 your constructor will die if you pass it unknown attributes. 
 
+=head2 Chainable Writers
+
+Mite provides a similar feature to L<MooseX::Attribute::Chained>, so
+writer methods, clearer methods, and accessor methods used as writers
+all return C<< $self >>.
+
 =head2 Method Modifiers
 
 Basic versions of the C<before>, C<around>, and C<after> method modifiers
