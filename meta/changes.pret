@@ -1,6 +1,12 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.001003 cpan:TOBYINK`
+	issued  2022-06-29;
+	changeset [
+		item "Fix regexp used to rewrite shim pod"^^Bugfix;
+	].
+
 `Mite 0.001002 cpan:TOBYINK`
 	issued  2022-06-29;
 	changeset [
