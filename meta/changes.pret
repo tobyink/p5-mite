@@ -1,6 +1,13 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.001002 cpan:TOBYINK`
+	issued  2022-06-29;
+	changeset [
+		item "Add stub pod to all modules"^^Documentation;
+		item "Hide the MY package from CPAN indexer"^^Packaging;
+	].
+
 `Mite 0.001001 cpan:TOBYINK`
 	issued  2022-06-29;
 	changeset [
