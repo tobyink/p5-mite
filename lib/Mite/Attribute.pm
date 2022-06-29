@@ -118,9 +118,9 @@ my @method_name_generator = (
 );
 
 sub BUILD {
+    my $self = shift;
 
     croak "Required attribute with no init_arg"
-    my $self = shift;
         if $self->required && !defined $self->init_arg;
 
     if ( $self->is eq 'lazy' ) {
