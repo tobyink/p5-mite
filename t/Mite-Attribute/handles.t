@@ -29,6 +29,14 @@ CODE
 
     is( $object->xyz, 42 );
     is( $object->bar, 42 );
+
+    {
+        my $object = MyTest->new( foo => 42 );
+        local $@;
+        eval { $object->xyz };
+        my $e = $@;
+        like $e, qr/^foo is not a blessed object/;
+    }
 };
 
 done_testing;
