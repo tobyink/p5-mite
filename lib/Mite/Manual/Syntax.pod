@@ -133,6 +133,25 @@ coderef into your class with that name.
 Indicates that the default should be set lazily. Defaults to false
 unless you used C<< is => "lazy" >>.
 
+=item C<alias> B<< Str|ArrayRef[Str] >>
+
+A list of aliases for the attibutes. If the attribute has an init_arg
+(including a default one), this provides alternative initialization
+arguments. If the attribute C<< is => "rw" >>, then these aliases can
+be used as an alias for the accessor; otherwise they are aliases for
+the reader.
+
+The strings can contain "%s" which will be replaced by the attribute
+name, allowing this to work:
+
+    has [ 'foo', 'bar' ] => (
+        is => 'ro',
+        alias => 'get_%s',
+    );
+
+This feature is not supported by Moose, but is analagous to
+L<MooseX::Aliases>.
+
 =item C<documentation> B<Any>
 
 This option is ignored, but you can set it to a documentation string

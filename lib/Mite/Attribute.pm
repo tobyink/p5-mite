@@ -94,6 +94,14 @@ has handles =>
   isa           => HashRef->of( Str )->plus_coercions( ArrayRef, q{+{ map { $_ => $_ } @$_ }} ),
   predicate     => true;
 
+has alias =>
+  is            => rw,
+  isa           => Str|ArrayRef[Str];
+
+has alias_is_for =>
+  is            => 'lazy',
+  init_arg      => undef;
+
 ##-
 
 my @method_name_generator = (
@@ -201,6 +209,23 @@ sub _build_accessor {
 sub _build_predicate { undef; }
 
 sub _build_clearer { undef; }
+
+sub _build_alias_is_for {
+    my $self = shift;
+    return undef unless $self->alias;
+    return $self->accessor ? 'accessor' : $self->reader ? 'reader' : undef
+        $self->is eq rw;
+    $self->reader ? 'reader' : $self->accessor ? 'accessor' : undef;
+}
+
+sub _all_aliases {
+    my $self    = shift;
+    my $aliases = $self->alias;
+    return unless defined $aliases;
+    no warnings 'redundant';
+    return map { sprintf $_, $self->name }
+        ref($aliases) ? @{ $aliases } : ( $aliases );
+}
 
 sub _build_type {
     my $self = shift;
@@ -338,6 +363,11 @@ sub compile_init {
 
     my $code = '';
     if ( defined $init_arg ) {
+        if ( $self->alias ) {
+            my @alias = $self->_all_aliases;
+            $code .= sprintf 'for my $alias ( %s ) { last if exists(%s->{q[%s]}); next if !exists(%s->{$alias}); %s->{q[%s]} = %s->{$alias} } ',
+                join( q[, ], map qq{q[$_]}, @alias ), $argvar, $init_arg, $argvar, $argvar, $init_arg, $argvar;
+        }
         $code .= sprintf 'if ( exists(%s->{q[%s]}) ) { ',
             $argvar, $init_arg;
         if ( my $type = $self->type ) {
@@ -557,6 +587,16 @@ sub compile {
 
     $code .= "\n";
 
+    if ( my $alias_is_for = $self->alias_is_for ) {
+        $code .= sprintf "# Aliases for for %s\n", $self->name;
+        my $alias_target = $self->$alias_is_for;
+        for my $alias ( $self->_all_aliases ) {
+            $code .= sprintf 'sub %s { shift->%s( @_ ) }' . "\n",
+                $alias, $alias_target;
+        }
+        $code .= "\n";
+    }
+
     if ( $self->has_handles ) {
         $code .= sprintf "# Delegated methods for %s\n", $self->name;
         my $assertion = $method_name{asserter};
@@ -565,6 +605,7 @@ sub compile {
             $code .= sprintf 'sub %s { shift->%s->%s( @_ ) }' . "\n",
                 $key, $assertion, $delegated{$key};
         }
+        $code .= "\n";
     }
 
     return $code;

@@ -275,7 +275,7 @@ sub _compile_strict_constructor {
 
     my @allowed =
         grep { defined $_ }
-        map { $_->init_arg }
+        map { ( $_->init_arg, $_->_all_aliases ) }
         values %{ $self->all_attributes };
     my $check = do {
         local $Type::Tiny::AvoidCallbacks = 1;
@@ -386,7 +386,8 @@ sub _compile_init_attributes {
     my @code;
     my $attributes = $self->all_attributes;
     for my $name ( sort keys %$attributes ) {
-        push @code, $attributes->{$name}->compile_init( $selfvar, $argvar );
+        my $code = $attributes->{$name}->compile_init( $selfvar, $argvar );
+        push @code, $code if $code;
     }
 
     return join "\n    ", @code;
