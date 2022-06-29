@@ -6,7 +6,161 @@ Mite::Manual::Syntax - Moose-like syntax supported by Mite
 
 =head1 MANUAL
 
-...
+L<Mite> is a subset of L<Moose>.  These docs will only describe what
+Moose features are implemented or where they differ.  For everything
+else, please read L<Moose> and L<Moose::Manual>.
+
+=head2 C<< has $name => %spec >>
+
+Like C<has> in Moose, this declares an attribute. Not all Moose options
+are supported.
+
+=over
+
+=item C<is> B<< Enum["ro","rw","bare","rwp","lazy"] >>
+
+Supported values for C<is> include "ro", "rw", and "bare" like Moose,
+but also "rwp" and "lazy" like Moo. These are all just shortcuts for
+defining other options.
+
+=item C<reader> B<< Maybe[Str] >> 
+
+The name of the attribute reader method to generate. If set to "1",
+will generate a reader called "get_foo" if your attribute is called
+"foo" and "_get__foo" if your attribute is called "_foo".
+
+If your attribute is defined as C<< is => "ro" >>, C<< is => "rwp" >>,
+or C<< is => "lazy" >> then C<reader> defaults to C<< $name >>.
+
+=item C<writer> B<< Maybe[Str] >> 
+
+The name of the attribute writer method to generate. If set to "1",
+will generate a writer called "set_foo" if your attribute is called
+"foo" and "_set__foo" if your attribute is called "_foo". 
+
+If your attribute is defined as C<< is => "rwp" >>, then C<writer>
+defaults to C<< "_set_$name" >>.
+
+=item C<accessor> B<< Maybe[Str] >>
+
+The name of the dual-purpose attribute reader/writer method to generate.
+If set to "1", will generate a reader called "fo" if your attribute is
+called "foo" and "_foo"if your attribute is called "_foo". 
+
+If your attribute is defined as C<< is => "rw" >>, then C<accessor>
+defaults to C<< $name >>.
+
+=item C<clearer> B<< Maybe[Str] >>
+
+The name of the attribute clearer method to generate. If set to "1",
+will generate a clearer called "clear_foo" if your attribute is called
+"foo" and "_clear__foo" if your attribute is called "_foo".
+
+=item C<predicate> B<< Maybe[Str] >>
+
+The name of the attribute predicate method to generate. If set to "1",
+will generate a predicate called "has_foo" if your attribute is called
+"foo" and "_has__foo" if your attribute is called "_foo".
+
+=item C<handles> B<< HashRef|ArrayRef >>
+
+Delegated methods. Currying and native traits are not supported.
+
+=item C<init_arg> B<< Maybe[Str] >>
+
+The parameter expected to be passed to the constructor to initialize this
+attribute. May be undef if the attribute should not be intitialized in the
+constructor.
+
+Defaults to the attribute's name.
+
+=item C<required> B<Bool>
+
+Indicates whether the attribute is required in the parameter. If the
+attribute has a non-lazy default, this is ignored.
+
+=item C<weak_ref> B<Bool>
+
+Indicates that the attribute should weaken its reference to the
+attribute value.
+
+=item C<isa> B<< Str|TypeTiny >>
+
+A string type name from L<Types::Standard>, L<Types::Common::String>,
+or L<Types::Common::Numeric>, or a blessed L<Type::Tiny> object. If
+using a blessed object, you'll be introducing a dependency for your
+project on whatever type constraint library you're using, so prefer
+string type contraint names.
+
+Any string supported by L<Type::Utils> C<dwim_type> is supported, so
+things like C<< "Int | Enum['small', 'medium', 'large']" >> should work!
+
+=item C<coerce> B<Bool>
+
+Indicates that the attribute should attempt to coerce values to fit
+the type constraint.
+
+=item C<trigger> B<< CodeRef|Maybe[Str] >>
+
+If set to a string, is the name of a method to call whenever a new
+attribute value is set. This is I<not> called when an attribute is
+defaulted. If set to "1", will assume a trigger called "_trigger_foo"
+if your attribute is called "foo" and "_trigger__foo" if your
+attribute is called "_foo".
+
+If set to a coderef, acts like it was set to "1" but installs the
+coderef into your class with that name.
+
+=item C<default> B<< Undef|Str|CodeRef >>
+
+A default value for the attribute, or a coderef called as a method
+to generate that default value.
+
+=item C<builder> B<< Str|CodeRef >>
+
+If set to a string, is the name of a method to call to build the
+default attribute value. If set to "1", will assume a builder called
+"_build_foo" if your attribute is called "foo" and "_build__foo" if your
+attribute is called "_foo".
+
+If you used C<< is => "lazy" >>, this will default to "1".
+
+If set to a coderef, acts like it was set to "1" but installs the
+coderef into your class with that name.
+
+=item C<lazy> B<Bool>
+
+Indicates that the default should be set lazily. Defaults to false
+unless you used C<< is => "lazy" >>.
+
+=back
+
+=head2 C<extends>
+
+Works as in L<Moose>.
+
+The C<< -version >> option is not implemented.
+
+=head2 C<strict>
+
+Mite will turn strict on for you.
+
+=head2 C<warnings>
+
+Mite will turn warnings on for you.
+
+=head2 C<BUILDARGS>
+
+Works as in L<Moose>.
+
+=head2 C<BUILD>
+
+Works as in L<Moose>.
+
+=head2 Strict Constructor
+
+Mite provides a similar feature to L<MooseX::StrictConstructor>, so
+your constructor will die if you pass it unknown attributes. 
 
 =head1 BUGS
 

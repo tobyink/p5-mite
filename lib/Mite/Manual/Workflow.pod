@@ -6,7 +6,53 @@ Mite::Manual::Workflow - how to work with Mite
 
 =head1 MANUAL
 
-...
+=head2 1. Install Mite
+
+Only developers must have Mite installed.  Install it normally from
+CPAN.
+
+Do not declare Mite as a dependency.  It is not needed to install your
+release.
+
+=head2 2. mite init <Your::Project>
+
+Initialize your project.  Tell it your project name.
+
+This will create a F<.mite> directory and a shim file in F<lib>.
+
+=head2 3. Write your code using your mite shim.
+
+Instead of C<use Mite>, you should C<use Your::Project::Mite>.  The
+name of this file will depend on the name of your project.
+
+L<Mite> is a subset of L<Moose>.
+
+=head2 4. C<mite compile> after each change
+
+Mite is "compiled" in that the code must be processed after editing
+before you run it.  This is done by running C<mite compile>.  It will
+create F<.mite.pm> files for each F<.pm> file in F<lib>.
+
+To make development smoother, we provide utility modules to link Mite
+with the normal build process.  See L<Mite::MakeMaker> and
+L<Mite::ModuleBuild> for MakeMaker/F<Makefile.PL> and
+Module::Build/F<Build.PL> development respectively.
+
+=head2 5. Make sure the F<.mite> directory is not in your MANIFEST.
+
+The F<.mite> directory should not be shipped with your distribution.
+Add C<^\.mite$> to your F<MANIFEST.SKIP> file.
+
+=head2 6. Make sure the mite files are in your MANIFEST.
+
+The compiled F<.mite.pm> files must ship with your code, so make sure
+they get picked up in your F<MANIFEST> file.  This should happen when
+you build the F<MANIFEST> normally.
+
+=head2 7. Ship normally
+
+Build and ship your distribution normally.  It contains everything it
+needs.
 
 =head1 BUGS
 
