@@ -146,7 +146,7 @@ for your attribute.
 
 =back
 
-=head2 C<extends>
+=head2 C<< extends( @parents ) >>
 
 Works as in L<Moose>.
 
