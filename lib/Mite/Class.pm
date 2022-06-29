@@ -6,7 +6,7 @@ package Mite::Class;
 use Mite::Miteception;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001009';
+our $VERSION   = '0.001010';
 
 use Path::Tiny;
 use mro;
@@ -210,6 +210,7 @@ sub compile {
 
     my $code = join "\n", '{',
                       $self->_compile_package,
+                      $self->_compile_uses_mite,
                       $self->_compile_pragmas,
                       $self->_compile_extends,
                       $self->_compile_new,
@@ -226,6 +227,12 @@ sub _compile_package {
     my $self = shift;
 
     return "package @{[ $self->name ]};";
+}
+
+sub _compile_uses_mite {
+    my $self = shift;
+
+    return 'our $USES_MITE = 1;';
 }
 
 sub _compile_pragmas {

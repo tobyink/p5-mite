@@ -1,6 +1,13 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.001010 cpan:TOBYINK`
+	issued  2022-06-29;
+	changeset [
+		item "Set a $USES_MITE package variable in all classes built with Mite."^^Addition;
+		item "Document that writers/clearers are chainable."^^Documentation
+	].
+
 `Mite 0.001009 cpan:TOBYINK`
 	issued  2022-06-29;
 	changeset [
