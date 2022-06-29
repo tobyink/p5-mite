@@ -145,15 +145,7 @@ sub BUILD {
                 local $_ = $self->name;
                 $gen->( $_ );
             };
-            no strict 'refs';
-            my $classname;
-            if ( $self->class and $classname = $self->class->name ) {
-                *{"$classname\::$newname"} = $coderef;
-                $self->$property( $newname );
-            }
-            else {
-                croak "Could not install $property => CODEREF as Mite could not determine which class to install it into.";
-            }
+            $self->$property( $newname );
         }
     }
 
