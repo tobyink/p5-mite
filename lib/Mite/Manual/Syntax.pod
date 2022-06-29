@@ -133,6 +133,17 @@ coderef into your class with that name.
 Indicates that the default should be set lazily. Defaults to false
 unless you used C<< is => "lazy" >>.
 
+=item C<documentation> B<Any>
+
+This option is ignored, but you can set it to a documentation string
+for your attribute.
+
+    has name => (
+        is => 'rwp',
+        isa => 'Str',
+        documentation => 'First name and surname',
+    );
+
 =back
 
 =head2 C<extends>
