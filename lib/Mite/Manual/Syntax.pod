@@ -146,6 +146,16 @@ for your attribute.
 
 =back
 
+Multiple attributes can be defined using an arrayref.
+
+    # Defines get_foo, get_bar, set_foo, and set_bar.
+    #
+    has [ 'foo', 'bar' ] => (
+        isa => 'Str',
+        reader => 1,
+        writer => 1,
+    );
+
 =head2 C<< extends( @parents ) >>
 
 Works as in L<Moose>.
