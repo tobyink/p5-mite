@@ -10,17 +10,36 @@ use Mite::Shim;
 has [ 'foo', 'foo2' ] =>
     is => 'rw',
     default => 99;
+has xxx => ( init_arg => 'xxxx', is => 'ro' );
+has yyy => ( init_arg => undef, is => 'ro' );
 1;
 CODE
 
-    my $o = MyTest->new;
+    my $o = MyTest->new( xxxx => 42 );
     is $o->foo, 99;
     is $o->foo2, 99;
+    is $o->xxx, 42;
 
-    local $@;
-    my $o2 = eval { MyTest->new( bar => 66, baz => 33 ); };
-    my $e = $@;
-    like $e, qr/^Unexpected keys in constructor: bar, baz/;
+    {
+        local $@;
+        my $o2 = eval { MyTest->new( bar => 66, baz => 33 ); };
+        my $e = $@;
+        like $e, qr/^Unexpected keys in constructor: bar, baz/;
+    }
+
+    {
+        local $@;
+        my $o2 = eval { MyTest->new( xxx => 1 ); };
+        my $e = $@;
+        like $e, qr/^Unexpected keys in constructor: xxx/;
+    }
+
+    {
+        local $@;
+        my $o2 = eval { MyTest->new( yyy => 1 ); };
+        my $e = $@;
+        like $e, qr/^Unexpected keys in constructor: yyy/;
+    }
 };
 
 tests "all_attributes" => sub {
