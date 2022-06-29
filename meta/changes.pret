@@ -1,6 +1,12 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.001008 cpan:TOBYINK`
+	issued  2022-06-29;
+	changeset [
+		item "Don't explicitly disable warnings with `no warnings 'redundant'` as that category won't work on older Perls"^^Bugfix;
+	].
+
 `Mite 0.001007 cpan:TOBYINK`
 	issued  2022-06-29;
 	changeset [

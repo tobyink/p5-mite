@@ -6,7 +6,7 @@ package Mite::Source;
 use Mite::Miteception;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001007';
+our $VERSION   = '0.001008';
 
 use Mite::Compiled;
 use Mite::Class;
