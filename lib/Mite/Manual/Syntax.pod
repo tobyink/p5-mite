@@ -156,7 +156,7 @@ Multiple attributes can be defined using an arrayref.
         writer => 1,
     );
 
-=head2 C<< extends( @parents ) >>
+=head2 C<< extends @parents >>
 
 Works as in L<Moose>.
 
