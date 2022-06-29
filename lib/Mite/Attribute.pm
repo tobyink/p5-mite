@@ -139,13 +139,7 @@ sub BUILD {
 
     for my $property ( 'builder', 'trigger' ) {
         if ( CodeRef->check( $self->$property ) ) {
-            my $coderef = $self->$property;
-            my $newname = do {
-                my $gen = $method_name_generator[$self->is_private]{$property};
-                local $_ = $self->name;
-                $gen->( $_ );
-            };
-            $self->$property( $newname );
+            $self->$property( 1 );
         }
     }
 
