@@ -109,6 +109,10 @@ Please report any bugs to L<https://github.com/tobyink/p5-mite/issues>.
 
 =head1 SEE ALSO
 
+L<Mite::Manual::Workflow> - how to develop with Mite.
+
+L<Mite::Manual::Syntax> - Moose-like syntax supported by Mite.
+
 L<Moose> is the complete Perl 5 OO module which this is all based on.
 
 L<Moo> is a lighter-weight Moose-compatible module with fewer dependencies.
