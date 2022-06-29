@@ -31,6 +31,11 @@ sub ACTION_clean {
     return $self->SUPER::ACTION_clean;
 }
 
+# This allows users to write
+# my $class = eval { require Mite::ModuleBuild } || 'Module::Build';
+return __PACKAGE__;
+
+__END__
 
 =head1 NAME
 
@@ -74,8 +79,33 @@ C<./Build dist> so all the mite files are picked up.
 The F<.mite> directory should not be shipped with your distribution.
 Add C<^\.mite/> to your F<MANIFEST.SKIP> file.
 
-=cut
+=head1 SEE ALSO
 
-# This allows users to write
-# my $class = eval { require Mite::ModuleBuild } || 'Module::Build';
-return __PACKAGE__;
+L<Mite::MakeMaker>
+
+=head1 BUGS
+
+Please report any bugs to L<https://github.com/tobyink/p5-mite/issues>.
+
+=head1 AUTHOR
+
+Michael G Schwern E<lt>mschwern@cpan.orgE<gt>.
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2011-2014 by Michael G Schwern.
+
+This software is copyright (c) 2022 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut

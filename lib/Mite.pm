@@ -7,6 +7,12 @@ package Mite;
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.001001';
 
+1;
+
+__END__
+
+=pod
+
 =head1 NAME
 
 Mite - Moose-like OO, fast to load, with zero dependencies.
@@ -182,13 +188,35 @@ including roles at compile time.  It must be baked in.
 Use Mite if your project cannot have non-core dependencies or needs to
 load very quickly.
 
-=head1 SEE ALSO
+=head1 BUGS
 
-L<Mouse> is a very fast and rather complete subset of Moose with no
-dependencies.
+Please report any bugs to L<https://github.com/tobyink/p5-mite/issues>.
+
+=head1 SEE ALSO
 
 L<Moose> is the complete Perl 5 OO module which this is all based on.
 
-=cut
+L<Moo> is a lighter-weight Moose-compatible module with fewer dependencies.
 
-1;
+=head1 AUTHOR
+
+Michael G Schwern E<lt>mschwern@cpan.orgE<gt>.
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2011-2014 by Michael G Schwern.
+
+This software is copyright (c) 2022 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut

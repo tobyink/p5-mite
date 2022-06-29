@@ -8,37 +8,6 @@ use Mite::Miteception;
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.001001';
 
-=head1 NAME
-
-Mite::Source - Representing the human written .pm file.
-
-=head1 SYNOPSIS
-
-    use Mite::Source;
-    my $source = Mite::Source->new( file => $pm_filename );
-
-=head1 DESCRIPTION
-
-NO USER SERVICABLE PARTS INSIDE.  This is a private class.
-
-Represents a .pm file, written by a human, which uses Mite.
-
-It is responsible for information about the source file.
-
-* The Mite classes contained in the source.
-* The compiled Mite file associated with it.
-
-It delegates most work to other classes.
-
-This object is necessary because there can be multiple Mite classes in
-one source file.
-
-=head1 SEE ALSO
-
-L<Mite::Class>, L<Mite::Compiled>, L<Mite::Project>
-
-=cut
-
 use Mite::Compiled;
 use Mite::Class;
 
@@ -105,3 +74,59 @@ sub class_for {
 }
 
 1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Mite::Source - Representing the human written .pm file.
+
+=head1 SYNOPSIS
+
+    use Mite::Source;
+    my $source = Mite::Source->new( file => $pm_filename );
+
+=head1 DESCRIPTION
+
+NO USER SERVICABLE PARTS INSIDE.  This is a private class.
+
+Represents a .pm file, written by a human, which uses Mite.
+
+It is responsible for information about the source file.
+
+* The Mite classes contained in the source.
+* The compiled Mite file associated with it.
+
+It delegates most work to other classes.
+
+This object is necessary because there can be multiple Mite classes in
+one source file.
+
+=head1 BUGS
+
+Please report any bugs to L<https://github.com/tobyink/p5-mite/issues>.
+
+=head1 AUTHOR
+
+Michael G Schwern E<lt>mschwern@cpan.orgE<gt>.
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2011-2014 by Michael G Schwern.
+
+This software is copyright (c) 2022 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut

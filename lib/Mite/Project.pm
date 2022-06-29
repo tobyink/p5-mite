@@ -241,6 +241,7 @@ sub add_mite_shim {
     my $src_shim = $self->_find_mite_shim;
     my $code = $src_shim->slurp;
     $code =~ s/package Mite::Shim;/package $shim_package;/;
+    $code =~ s/^Mite::Shim\b/$shim_package/;
     $shim_file->spew( $code );
 
     return $shim_file;
@@ -308,3 +309,42 @@ sub write_default_config {
 }
 
 1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Mite::Project - Representing a whole project.
+
+=head1 DESCRIPTION
+
+NO USER SERVICABLE PARTS INSIDE.  This is a private class.
+
+=head1 BUGS
+
+Please report any bugs to L<https://github.com/tobyink/p5-mite/issues>.
+
+=head1 AUTHOR
+
+Michael G Schwern E<lt>mschwern@cpan.orgE<gt>.
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2011-2014 by Michael G Schwern.
+
+This software is copyright (c) 2022 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut
