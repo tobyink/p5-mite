@@ -1,7 +1,14 @@
 # This file acts as the project's changelog.
 #
 
-`Mite 0.001005 cpan:TOBYINK`
+`Mite 0.001007 cpan:TOBYINK`
+	issued  2022-06-29;
+	changeset [
+		item "alias for attributes"^^Addition;
+		item "Fix changelog"^^Packaging;
+	].
+
+`Mite 0.001006 cpan:TOBYINK`
 	issued  2022-06-29;
 	changeset [
 		item "Method modifiers"^^Addition;
