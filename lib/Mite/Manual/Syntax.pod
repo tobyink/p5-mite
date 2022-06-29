@@ -178,6 +178,15 @@ Works as in L<Moose>.
 
 Works as in L<Moose>.
 
+=head2 C<DEMOLISH>
+
+Works as in L<Moose>.
+
+On Perl older than 5.14, the C<< $in_global_destruction >> argument
+will be undefined unless L<Devel::GlobalDestruction> is installed,
+so add that to your project's dependencies if you are relying on it
+and need to support older versions of Perl.
+
 =head2 Strict Constructor
 
 Mite provides a similar feature to L<MooseX::StrictConstructor>, so

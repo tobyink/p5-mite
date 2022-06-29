@@ -213,7 +213,7 @@ sub compile {
                       $self->_compile_pragmas,
                       $self->_compile_extends,
                       $self->_compile_new,
-                      $self->_compile_buildall_method,
+                      $self->_compile_destroy,
                       $self->_compile_meta_method,
                       $self->_compile_attribute_accessors,
                       '1;',
@@ -292,7 +292,7 @@ sub _compile_new {
 
     return sprintf <<'CODE', $self->_compile_meta(@vars), $self->_compile_bless(@vars), $self->_compile_buildargs(@vars), $self->_compile_init_attributes(@vars), $self->_compile_strict_constructor(@vars), $self->_compile_buildall(@vars, '$no_build');
 sub new {
-    my $class = shift;
+    my $class = ref($_[0]) ? ref(shift) : shift;
     my $meta  = %s;
     my $self  = %s;
     my $args  = %s;
@@ -320,15 +320,34 @@ sub _compile_buildargs {
 
 sub _compile_buildall {
     my ( $self, $classvar, $selfvar, $argvar, $metavar, $nobuildvar ) = @_;
-    return sprintf '!%s and @{%s->{BUILD}||[]} and %s->BUILDALL(%s);',
-        $nobuildvar, $metavar, $selfvar, $argvar;
+    return sprintf 'unless ( %s ) { $_->(%s, %s) for @{ %s->{BUILD} || [] } };',
+        $nobuildvar, $selfvar, $argvar, $metavar;
 }
 
-sub _compile_buildall_method {
-    my $self;
-    return <<'CODE';
-sub BUILDALL {
-    $_->(@_) for @{ $Mite::META{ref($_[0])}{BUILD} || [] };
+sub _compile_destroy {
+    my $self = shift;
+    sprintf <<'CODE', $self->_compile_meta( '$class', '$self' );
+defined ${^GLOBAL_PHASE}
+    or eval { require Devel::GlobalDestruction; 1 }
+    or do   { *Devel::GlobalDestruction::in_global_destruction = sub { undef; } };
+
+sub DESTROY {
+    my $self = shift;
+    my $class = ref( $self ) || $self;
+    my $meta = %s;
+    my $in_global_destruction = defined ${^GLOBAL_PHASE}
+        ? ${^GLOBAL_PHASE} eq 'DESTRUCT'
+        : Devel::GlobalDestruction::in_global_destruction();
+    for my $demolisher ( @{ $meta->{DEMOLISH} || [] } ) {
+        my $e = do {
+            local ( $?, $@ );
+            eval { $demolisher->( $self, $in_global_destruction ) };
+            $@;
+        };
+        no warnings 'misc'; # avoid (in cleanup) warnings
+        die $e if $e;       # rethrow
+    }
+    return;
 }
 CODE
 }
@@ -344,7 +363,7 @@ sub _compile_meta_method {
 sub __META__ {
     no strict 'refs';
     require mro;
-    my $class = shift;
+    my $class = shift; $class = ref($class) || $class;
     my $linear_isa = mro::get_linear_isa( $class );
     return {
         BUILD => [
@@ -353,7 +372,7 @@ sub __META__ {
         ],
         DEMOLISH => [
             map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
-            map { "$_\::DEMOLISH" } reverse @$linear_isa
+            map { "$_\::DEMOLISH" } @$linear_isa
         ],
         HAS_BUILDARGS => $class->can('BUILDARGS'),
     };

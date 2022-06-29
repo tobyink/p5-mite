@@ -5,7 +5,7 @@ use warnings;
 
 
 sub new {
-    my $class = shift;
+    my $class = ref($_[0]) ? ref(shift) : shift;
     my $meta  = ( $Mite::META{$class} ||= $class->__META__ );
     my $self  = bless {}, $class;
     my $args  = $meta->{HAS_BUILDARGS} ? $class->BUILDARGS( @_ ) : { ( @_ == 1 ) ? %{$_[0]} : @_ };
@@ -22,19 +22,38 @@ sub new {
     my @unknown = grep not( do { package Mite::Miteception; (defined and !ref and m{\A(?:(?:attributes|extends|name|parents|source))\z}) } ), keys %{$args}; @unknown and require Carp and Carp::croak("Unexpected keys in constructor: " . join(q[, ], sort @unknown));
 
     # Call BUILD methods
-    !$no_build and @{$meta->{BUILD}||[]} and $self->BUILDALL($args);
+    unless ( $no_build ) { $_->($self, $args) for @{ $meta->{BUILD} || [] } };
 
     return $self;
 }
 
-sub BUILDALL {
-    $_->(@_) for @{ $Mite::META{ref($_[0])}{BUILD} || [] };
+defined ${^GLOBAL_PHASE}
+    or eval { require Devel::GlobalDestruction; 1 }
+    or do   { *Devel::GlobalDestruction::in_global_destruction = sub { undef; } };
+
+sub DESTROY {
+    my $self = shift;
+    my $class = ref( $self ) || $self;
+    my $meta = ( $Mite::META{$class} ||= $class->__META__ );
+    my $in_global_destruction = defined ${^GLOBAL_PHASE}
+        ? ${^GLOBAL_PHASE} eq 'DESTRUCT'
+        : Devel::GlobalDestruction::in_global_destruction();
+    for my $demolisher ( @{ $meta->{DEMOLISH} || [] } ) {
+        my $e = do {
+            local ( $?, $@ );
+            eval { $demolisher->( $self, $in_global_destruction ) };
+            $@;
+        };
+        no warnings 'misc'; # avoid (in cleanup) warnings
+        die $e if $e;       # rethrow
+    }
+    return;
 }
 
 sub __META__ {
     no strict 'refs';
     require mro;
-    my $class = shift;
+    my $class = shift; $class = ref($class) || $class;
     my $linear_isa = mro::get_linear_isa( $class );
     return {
         BUILD => [
@@ -43,7 +62,7 @@ sub __META__ {
         ],
         DEMOLISH => [
             map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
-            map { "$_\::DEMOLISH" } reverse @$linear_isa
+            map { "$_\::DEMOLISH" } @$linear_isa
         ],
         HAS_BUILDARGS => $class->can('BUILDARGS'),
     };
