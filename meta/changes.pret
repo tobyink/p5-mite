@@ -1,6 +1,13 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.001005 cpan:TOBYINK`
+	issued  2022-06-29;
+	changeset [
+		item "Minor improvements"^^Documentation;
+		item "Improve tests for handles"^^Tests;
+	].
+
 `Mite 0.001004 cpan:TOBYINK`
 	issued  2022-06-29;
 	changeset [
