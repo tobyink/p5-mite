@@ -4,6 +4,14 @@
 `Mite 0.001005 cpan:TOBYINK`
 	issued  2022-06-29;
 	changeset [
+		item "Method modifiers"^^Addition;
+		item "DESTROY/DEMOLISH methods"^^Addition;
+		item "The BUILDALL method was removed in favour of inlining it within new"^^Removal;
+	].
+
+`Mite 0.001005 cpan:TOBYINK`
+	issued  2022-06-29;
+	changeset [
 		item "Minor improvements"^^Documentation;
 		item "Improve tests for handles"^^Tests;
 	].

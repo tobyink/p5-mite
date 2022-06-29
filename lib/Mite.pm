@@ -5,7 +5,7 @@ use warnings;
 package Mite;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001005';
+our $VERSION   = '0.001006';
 
 1;
 
