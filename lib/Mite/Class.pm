@@ -52,7 +52,7 @@ has source =>
   is            => rw,
   isa           => InstanceOf['Mite::Source'],
   # avoid a circular dep with Mite::Source
-  weak_ref      => false;
+  weak_ref      => true;
 
 ##-
 
