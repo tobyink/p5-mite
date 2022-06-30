@@ -96,7 +96,9 @@ has handles =>
 
 has alias =>
   is            => rw,
-  isa           => Str|ArrayRef[Str];
+  isa           => ArrayRef->of(Str)->plus_coercions( Str, q{ [$_] }, Undef, q{ [] } ),
+  coerce        => true,
+  default       => sub { [] };
 
 has alias_is_for =>
   is            => 'lazy',
@@ -198,7 +200,7 @@ sub _build_clearer { undef; }
 
 sub _build_alias_is_for {
     my $self = shift;
-    return undef unless $self->alias;
+    return undef unless @{ $self->alias };
     return $self->accessor ? 'accessor' : $self->reader ? 'reader' : undef
         $self->is eq rw;
     $self->reader ? 'reader' : $self->accessor ? 'accessor' : undef;
@@ -207,10 +209,9 @@ sub _build_alias_is_for {
 sub _all_aliases {
     my $self    = shift;
     my $aliases = $self->alias;
-    return unless defined $aliases;
+    return unless @$aliases;
     no warnings;
-    return map { sprintf $_, $self->name }
-        ref($aliases) ? @{ $aliases } : ( $aliases );
+    return map { sprintf $_, $self->name } @$aliases;
 }
 
 sub _build_type {
@@ -349,8 +350,7 @@ sub compile_init {
 
     my $code = '';
     if ( defined $init_arg ) {
-        if ( $self->alias ) {
-            my @alias = $self->_all_aliases;
+        if ( my @alias = $self->_all_aliases ) {
             $code .= sprintf 'for my $alias ( %s ) { last if exists(%s->{q[%s]}); next if !exists(%s->{$alias}); %s->{q[%s]} = %s->{$alias} } ',
                 join( q[, ], map qq{q[$_]}, @alias ), $argvar, $init_arg, $argvar, $argvar, $init_arg, $argvar;
         }

@@ -16,6 +16,12 @@ has last_name =>
     is => 'rwp',
     alias => [ 'family_name', 'surname' ],
     required => 1;
+has age =>
+    is => 'ro',
+    alias => [];
+has height =>
+    is => 'ro',
+    alias => undef;
 1;
 CODE
 
