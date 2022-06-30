@@ -65,4 +65,21 @@ CODE
     like $e, qr/Type check failed in default/;
 };
 
+tests "is => lazy" => sub {
+    mite_load <<'CODE';
+package Baz;
+use Mite::Shim;
+has num => is => 'lazy';
+sub _build_num { 99 }
+1;
+CODE
+
+    my $baz = Baz->new;
+    ok ! exists $baz->{num};
+    is $baz->num, 99;
+    ok exists $baz->{num};
+    ok ! eval { $baz->num(42); 1 };
+};
+
+
 done_testing;
