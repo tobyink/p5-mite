@@ -23,6 +23,8 @@ Supported values for C<is> include "ro", "rw", and "bare" like Moose,
 but also "rwp" and "lazy" like Moo. These are all just shortcuts for
 defining other options.
 
+The default is C<< is => 'bare' >>.
+
 =item C<reader> B<< Maybe[Str] >> 
 
 The name of the attribute reader method to generate. If set to "1",
