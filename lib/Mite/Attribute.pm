@@ -201,9 +201,13 @@ sub _build_clearer { undef; }
 sub _build_alias_is_for {
     my $self = shift;
     return undef unless @{ $self->alias };
-    return $self->accessor ? 'accessor' : $self->reader ? 'reader' : undef
-        if $self->is eq rw;
-    $self->reader ? 'reader' : $self->accessor ? 'accessor' : undef;
+    my @seek_order = $self->is eq rw
+        ? qw( accessor reader writer )
+        : qw( reader accessor writer );
+    for my $sought ( @seek_order ) {
+        return $sought if $self->$sought;
+    }
+    return undef;
 }
 
 sub _all_aliases {
