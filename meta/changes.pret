@@ -1,6 +1,15 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.001013 cpan:TOBYINK`
+	issued  2022-06-30;
+	changeset [
+		item "Minor code cleanups, especially around alias."^^Change;
+		item "Add tests for is=>lazy."^^Tests;
+		item "Documented what the default for is is."^^Documentation;
+		item "Improved documentation for alias."^^Documentation;
+	].
+
 `Mite 0.001012 cpan:TOBYINK`
 	issued  2022-06-30;
 	changeset [
