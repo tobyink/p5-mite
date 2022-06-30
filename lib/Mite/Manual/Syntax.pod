@@ -137,9 +137,8 @@ unless you used C<< is => "lazy" >>.
 
 A list of aliases for the attibutes. If the attribute has an init_arg
 (including a default one), this provides alternative initialization
-arguments. If the attribute C<< is => "rw" >>, then these aliases can
-be used as an alias for the accessor; otherwise they are aliases for
-the reader.
+arguments. If the attribute C<< is => "rw" >>, then these aliases are
+aliases for the accessor; otherwise they are aliases for the reader.
 
 The strings can contain "%s" which will be replaced by the attribute
 name, allowing this to work:
@@ -149,8 +148,19 @@ name, allowing this to work:
         alias => 'get_%s',
     );
 
-This feature is not supported by Moose, but is analagous to
-L<MooseX::Aliases>.
+If you try to create aliases but don't have a reader or accessor,
+then as a last resort the alias will be an alias for the writer.
+
+    # foo can be set using `set_foo` or `whatever`
+    #
+    has foo => (
+        is => 'bare',
+        writer => 1,
+        alias => 'whatever',
+    );
+
+Aliases are not natively supported by Moose, but this feature is
+analagous to L<MooseX::Aliases>.
 
 =item C<documentation> B<Any>
 
