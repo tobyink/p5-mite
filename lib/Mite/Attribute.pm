@@ -6,7 +6,7 @@ package Mite::Attribute;
 use Mite::Miteception;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001011';
+our $VERSION   = '0.001012';
 
 has class =>
   is            => rw,

@@ -1,6 +1,13 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.001012 cpan:TOBYINK`
+	issued  2022-06-30;
+	changeset [
+		item "Minor improvements in whitespace in output files."^^Change;
+		item "Cope with alias=>[] (and also alias=>undef)."^^Bugfix;
+	].
+
 `Mite 0.001011 cpan:TOBYINK`
 	issued  2022-06-30;
 	changeset [
