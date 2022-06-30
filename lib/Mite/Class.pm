@@ -339,9 +339,9 @@ defined ${^GLOBAL_PHASE}
     or do   { *Devel::GlobalDestruction::in_global_destruction = sub { undef; } };
 
 sub DESTROY {
-    my $self = shift;
+    my $self  = shift;
     my $class = ref( $self ) || $self;
-    my $meta = %s;
+    my $meta  = %s;
     my $in_global_destruction = defined ${^GLOBAL_PHASE}
         ? ${^GLOBAL_PHASE} eq 'DESTRUCT'
         : Devel::GlobalDestruction::in_global_destruction();
@@ -370,7 +370,7 @@ sub _compile_meta_method {
 sub __META__ {
     no strict 'refs';
     require mro;
-    my $class = shift; $class = ref($class) || $class;
+    my $class      = shift; $class = ref($class) || $class;
     my $linear_isa = mro::get_linear_isa( $class );
     return {
         BUILD => [

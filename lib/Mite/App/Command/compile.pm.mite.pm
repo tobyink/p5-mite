@@ -1,5 +1,6 @@
 {
 package Mite::App::Command::compile;
+our $USES_MITE = 1;
 use strict;
 use warnings;
 
