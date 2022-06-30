@@ -288,12 +288,6 @@ sub has_simple_default {
     return !ref $self->default;
 }
 
-sub _empty {
-    my $self = shift;
-
-    return ';';
-}
-
 sub _compile_coercion {
     my ( $self, $expression ) = @_;
     if ( $self->coerce and my $type = $self->type ) {
