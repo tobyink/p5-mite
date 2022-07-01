@@ -352,7 +352,7 @@ sub _compile_callback {
     return sprintf <<'CODE', $role_list, $shim;
 # Callback which classes consuming this role will call
 sub __FINALIZE_APPLICATION__ {
-    my ( $me, $target ) = @_;
+    my ( $me, $target, $args ) = @_;
     our ( %%CONSUMERS, @METHOD_MODIFIERS );
 
     # Ensure a given target only consumes this role once.
@@ -367,8 +367,10 @@ sub __FINALIZE_APPLICATION__ {
     }
 
     my @roles = ( %s );
+    my %%nextargs = %%{ $args || {} };
+    ( $nextargs{-indirect} ||= 0 )++;
     for my $role ( @roles ) {
-        $role->__FINALIZE_APPLICATION__( $target );
+        $role->__FINALIZE_APPLICATION__( $target, { %%nextargs } );
     }
 
     my $shim = q[%s];
