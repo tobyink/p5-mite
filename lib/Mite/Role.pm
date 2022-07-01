@@ -208,7 +208,7 @@ sub _compile_composed_methods {
         $code .= sprintf "# Methods from %s\n", $role->name;
         for ( $role->_methods_to_compose ) {
             my ( $name, $dest ) = @$_;
-            $code .= sprintf '*%s = sub { goto \&%s };' . "\n",
+            $code .= sprintf '*%s = \&%s;' . "\n",
                 $name, $dest;
         }
         $code .= "\n";
