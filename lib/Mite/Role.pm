@@ -347,7 +347,7 @@ sub _compile_callback {
     my $self = shift;
 
     my $role_list = join q[, ], map sprintf( 'q[%s]', $_->name ), @{ $self->roles };
-    my $shim = $self->project->config->data->{shim};
+    my $shim = eval { $self->project->config->data->{shim} } || 'Mite::Shim';
 
     return sprintf <<'CODE', $role_list, $shim;
 # Callback which classes consuming this role will call
