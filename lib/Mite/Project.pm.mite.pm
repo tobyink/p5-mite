@@ -66,6 +66,17 @@ sub __META__ {
     };
 }
 
+sub DOES {
+    my ( $self, $role ) = @_;
+    our %DOES;
+    return $DOES{$role} if exists $DOES{$role};
+    return $self->SUPER::DOES( $role );
+}
+
+sub does {
+    shift->DOES( @_ );
+}
+
 my $__XS = !$ENV{MITE_PURE_PERL} && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
 # Accessors for config

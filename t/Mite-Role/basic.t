@@ -86,6 +86,11 @@ CODE
     is $object->get_foo(), 24, 'Method copied from role to class';
     is $object->get_bar(), 'bar', 'Method copied from other role to class';
     is $object->get_baz(), 'baz', 'Native method overrides role';
+
+    ok  $object->does('OurTest1');
+    ok  $object->does('OurTest2');
+    ok  $object->does('OurTest3');
+    ok !$object->does('OurTest4');
 };
 
 done_testing;

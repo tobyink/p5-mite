@@ -106,6 +106,15 @@ sub methods_to_import_from_roles {
         delete $methods{$name};
     }
 
+    # Never propagate
+    delete $methods{$_} for qw(
+        new
+        DESTROY
+        DOES
+        does
+        __META__
+    );
+
     return \%methods;
 }
 
@@ -210,11 +219,21 @@ Sorry.
 ERROR
 }
 
+sub does_list {
+    my $self = shift;
+    return (
+        $self->name,
+        map( $_->does_list, @{ $self->roles } ),
+    );
+}
+
 sub compilation_stages {
     return qw(
         _compile_package
         _compile_uses_mite
         _compile_pragmas
+        _compile_with
+        _compile_does
         _compile_composed_methods
     );
 }
@@ -230,6 +249,46 @@ sub compile {
 
     #::diag $code if main->can('diag');
     return $code;
+}
+
+sub _compile_with {
+    my $self = shift;
+
+    my $roles = [ map $_->name, @{ $self->roles } ];
+    return unless @$roles;
+
+    my $source = $self->source;
+
+    my $require_list = join "\n\t",
+                            map  { "require $_;" }
+                            # Don't require a role from the same source
+                            grep { !$source || !$source->has_class($_) }
+                            @$roles;
+
+    my $does_hash = join ", ", map { "q[$_] => 1" } $self->does_list;
+
+    return <<"END";
+BEGIN {
+    $require_list
+    our \%DOES = ( $does_hash );
+}
+END
+}
+
+sub _compile_does {
+    my $self = shift;
+    return <<'CODE'
+sub DOES {
+    my ( $self, $role ) = @_;
+    our %DOES;
+    return $DOES{$role} if exists $DOES{$role};
+    return $self->SUPER::DOES( $role );
+}
+
+sub does {
+    shift->DOES( @_ );
+}
+CODE
 }
 
 sub _compile_composed_methods {

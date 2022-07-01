@@ -185,9 +185,11 @@ sub compilation_stages {
         _compile_uses_mite
         _compile_pragmas
         _compile_extends
+        _compile_with
         _compile_new
         _compile_destroy
         _compile_meta_method
+        _compile_does
         _compile_attribute_accessors
         _compile_composed_methods
     );
