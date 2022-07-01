@@ -6,58 +6,6 @@ Mite::Manual::Missing - Moose features not supported by Mite
 
 =head1 MANUAL
 
-=head2 Roles
-
-Mite does not offer roles, but here are some ways you can achieve role-like
-results with Mite.
-
-=over
-
-=item 1.
-
-Use L<Exporter> to create a role, and then import methods from it into your
-classes. It's not really what Exporter is for, but it ought to work.
-
-Advantages: only core modules.
-
-Disadvantages: no attributes, nor method modifiers which will apply to the
-consuming class.
-
-=item 2.
-
-Use multiple inheritance. Create your role as a Mite class and inherit from
-it instead.
-
-Advantages: only core modules; allows the "role" to define attributes.
-
-Disadvantages: no method modifiers which will apply to the consuming class,
-and multiple inheritance hierarchies can get complicated.
-
-=item 3.
-
-Delegate instead of composing. Mite supports C<handles>.
-
-Advantages: only core modules.
-
-Disadvantages: not that role-like, but still a way of bundling up
-functionality.
-
-=item 4.
-
-Use L<Role::Tiny>. Role::Tiny roles should work fine with Mite, but you
-would need to add Role::Tiny to your project's list of dependencies.
-
-Advantages: a real implementation of roles, method modifiers which will
-apply to the consuming class.
-
-Disadvantages: a non-core dependency, and no ability to define attributes.
-
-=item 5.
-
-Upgrade to L<Moo> or L<Moose>. 
-
-=back
-
 =head2 Native Attribute Traits
 
 L<Sub::HandlesVia> 0.026 and above should work with Mite classes. You need

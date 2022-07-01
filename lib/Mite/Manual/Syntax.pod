@@ -10,6 +10,16 @@ L<Mite> is a subset of L<Moose>.  These docs will only describe what
 Moose features are implemented or where they differ.  For everything
 else, please read L<Moose> and L<Moose::Manual>.
 
+=head2 C<< import >>
+
+To start a class:
+
+    use Your::Project::Mite;
+
+To start a role:
+
+    use Your::Project::Mite -role;
+
 =head2 C<< has $name => %spec >>
 
 Like C<has> in Moose, this declares an attribute. Not all Moose options
@@ -191,7 +201,19 @@ Multiple attributes can be defined using an arrayref.
 
 Works as in L<Moose>.
 
-The C<< -version >> option is not implemented.
+You cannot use C<extends> from within roles.
+
+Options hashrefs, including the C<< -version >> option are not implemented.
+
+=head2 C<< with @roles >>
+
+Works as in L<Moose>.
+
+Roles must be Mite roles created in your own project. Mite does not support
+using roles from other projects, or using role implementations other than
+Mite.
+
+Options hashrefs, including the C<< -version >> option are not implemented.
 
 =head2 C<strict>
 
