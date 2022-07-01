@@ -72,7 +72,7 @@ sub source_for {
 
 
 # This is the shim Mite.pm uses when compiling.
-sub inject_mite_functions {
+sub inject_mite_class_functions {
     state $sig = sig_named(
         { head => [ Object ], named_to_list => true },
         package => Any,

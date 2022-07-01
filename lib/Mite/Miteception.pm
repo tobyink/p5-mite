@@ -96,7 +96,7 @@ sub load_mite_file {
 		 require $mite_file;
 	}
 
-	'Mite::Shim'->_install_exports( $caller, $file );
+	'Mite::Shim'->_inject_mite_class_functions( $caller, $file );
 }
 
 1;

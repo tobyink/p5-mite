@@ -77,7 +77,7 @@ has coderef_default_variable =>
   lazy          => true,     # else $self->name might not be set
   default       => sub {
       # This must be coordinated with Mite.pm
-      return sprintf '$__%s_DEFAULT__', $_[0]->name;
+      return sprintf '$%s::__%s_DEFAULT__', $_[0]->class->name, $_[0]->name;
   };
 
 has [ 'trigger', 'builder' ] =>
@@ -318,8 +318,8 @@ sub _compile_default {
 
     if ( $self->has_coderef_default ) {
         my $var = $self->coderef_default_variable;
-        return sprintf 'do { our %s; %s->(%s) }',
-          $var, $var, $selfvar;
+        return sprintf 'do { my $method = %s; %s->$method }',
+          $var, $selfvar;
     }
     elsif ( $self->has_simple_default ) {
         require B;

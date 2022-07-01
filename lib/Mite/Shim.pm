@@ -15,16 +15,19 @@ sub _is_compiling {
 }
 
 sub import {
-    my $class = shift;
-    my($caller, $file) = caller;
+    my ( $class, $kind ) = @_;
+    my ( $caller, $file ) = caller;
 
     # Turn on warnings and strict in the caller
     warnings->import;
     strict->import;
 
+    ( $kind = lc( $kind || 'class' ) ) =~ s/\W//g;
+
     if( _is_compiling() ) {
         require Mite::Project;
-        Mite::Project->default->inject_mite_functions(
+        my $method = "inject_mite_$kind\_functions";
+        Mite::Project->default->$method(
             package     => $caller,
             file        => $file,
         );
@@ -46,11 +49,12 @@ sub import {
             require $mite_file;
         }
 
-        $class->_install_exports( $caller, $file );
+        my $method = "_inject_mite_$kind\_functions";
+        $class->$method( $caller, $file );
     }
 }
 
-sub _install_exports {
+sub _inject_mite_class_functions {
     my ( $class, $caller, $file ) = ( shift, @_ );
 
     no strict 'refs';
