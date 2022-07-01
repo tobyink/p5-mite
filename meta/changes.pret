@@ -1,6 +1,12 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.002001 cpan:TOBYINK`
+	issued  2022-07-01;
+	changeset [
+		item "Fix for on-demand loading of roles and parent classes."^^Bugfix;
+	].
+
 `Mite 0.002000 cpan:TOBYINK`
 	issued  2022-07-01;
 	changeset [

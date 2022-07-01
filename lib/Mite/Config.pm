@@ -6,7 +6,7 @@ package Mite::Config;
 use Mite::Miteception;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.002000';
+our $VERSION   = '0.002001';
 
 has mite_dir_name =>
   is            => ro,
