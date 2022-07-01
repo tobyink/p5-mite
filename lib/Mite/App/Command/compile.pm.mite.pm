@@ -1,6 +1,6 @@
 {
 package Mite::App::Command::compile;
-our $USES_MITE = 1;
+our $USES_MITE = q[Mite::Class];
 use strict;
 use warnings;
 
@@ -70,6 +70,18 @@ sub __META__ {
         ],
         HAS_BUILDARGS => $class->can('BUILDARGS'),
     };
+}
+
+sub DOES {
+    my ( $self, $role ) = @_;
+    our %DOES;
+    return $DOES{$role} if exists $DOES{$role};
+    return 1 if $role eq __PACKAGE__;
+    return $self->SUPER::DOES( $role );
+}
+
+sub does {
+    shift->DOES( @_ );
 }
 
 

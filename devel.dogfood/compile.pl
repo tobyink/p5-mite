@@ -43,16 +43,16 @@ sub has {
 
 sub extends {
 	my (@classes) = @_;
-	$class->superclasses(\@classes);
+	$class->superclasses( [ map "Fake::$_", @classes ] );
 	return;
 }
 
-sub compile {
-	my ( $module, $in_file, $out_file ) = @_;
+sub load {
+	my ( $project, $module, $in_file, $out_file ) = @_;
 	$in_file  //= path sprintf 'lib/%s.pm', ( $module =~ s{::}{/}gr );
 	$out_file //= path "$in_file.mite.pm";
 	
-	warn "Compile $module [$in_file -> $out_file]\n";
+	warn "Load $in_file\n";
 	
 	my $code = $in_file->slurp;
 	my ( $head, $tail ) = split '##-', $code;
@@ -63,12 +63,15 @@ sub compile {
 
 	my $source = Mite::Source->new(
 		file => $in_file,
-		project => Mite::Project->default,
+		project => $project,
 	);
+	$project->add_sources( $source );
+	
 	$class = Mite::Class->new(
 		name   => $fake_module,
 		source => $source,
 	);
+	$source->add_classes( $class );
 
 	do {
 		no strict 'refs';
@@ -82,21 +85,25 @@ sub compile {
 		local $@;
 		eval("$head; 1") or die($@);
 	};
+}
 
-	# This is bad, but $class->project is undef, so
-	# otherwise it can't find attributes at all.
-	#
-	no warnings 'redefine';
-	local *Mite::Class::all_attributes = sub { shift->attributes };
+sub compile {
+	my ( $project, $module, $in_file, $out_file ) = @_;
+	$in_file  //= path sprintf 'lib/%s.pm', ( $module =~ s{::}{/}gr );
+	$out_file //= path "$in_file.mite.pm";
 
+	warn "Compile $out_file\n";
+	
+	$class = $project->class( "Fake::$module" );
+	
 	local $Type::Tiny::SafePackage = 'package Mite::Miteception;';
 	my $compiled = $class->compile;
-	$compiled =~ s/Fake:://;
+	$compiled =~ s/Fake:://g;
 	$compiled =~ s/use Mite::Miteception '-Basic'/use Mite::Miteception/;
 	$out_file->spew( $compiled );
 }
 
-compile($_) for qw(
+my @packages = qw(
 	Mite::App::Command
 	Mite::App::Command::clean
 	Mite::App::Command::compile
@@ -107,5 +114,10 @@ compile($_) for qw(
 	Mite::Config
 	Mite::MakeMaker
 	Mite::Project
+	Mite::Role
 	Mite::Source
 );
+
+my $project = Mite::Project->default;
+load($project, $_) for @packages;
+compile($project, $_) for @packages;

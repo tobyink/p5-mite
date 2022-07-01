@@ -4,17 +4,13 @@ use warnings;
 
 package Mite::Class;
 use Mite::Miteception;
+extends qw(Mite::Role);
 
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.001013';
 
 use Path::Tiny;
 use mro;
-
-has attributes =>
-  is            => ro,
-  isa           => HashRef[InstanceOf['Mite::Attribute']],
-  default       => sub { {} };
 
 # Super classes as class names
 has extends =>
@@ -43,29 +39,12 @@ has parents =>
   builder       => '_build_parents',
   clearer       => '_clear_parents';
 
-has name =>
-  is            => ro,
-  isa           => Str,
-  required      => true;
-
-has source =>
-  is            => rw,
-  isa           => InstanceOf['Mite::Source'],
-  # avoid a circular dep with Mite::Source
-  weak_ref      => true;
-
 ##-
 
 sub BUILD {
     my $self = shift;
     $self->_trigger_extends( $self->superclasses )
         if $self->can('_trigger_extends');
-}
-
-sub project {
-    my $self = shift;
-
-    return $self->source->project;
 }
 
 sub class {
@@ -173,75 +152,47 @@ Sorry.
 ERROR
 }
 
-sub add_attributes {
-    state $sig = sig_pos( Object, slurpy ArrayRef[InstanceOf['Mite::Attribute']] );
-    my ( $self, $attributes ) = &$sig;
-
-    for my $attribute (@$attributes) {
-        $self->attributes->{ $attribute->name } = $attribute;
-    }
-
-    return;
-}
-
-sub add_attribute {
-    shift->add_attributes( @_ );
-}
-
-
 sub extend_attribute {
     my ($self, %attr_args) = ( shift, @_ );
 
     my $name = delete $attr_args{name};
+
+    if ( $self->attributes->{$name} ) {
+        return $self->SUPER::extend_attribute( name => $name, %attr_args );
+    }
 
     my $parent_attr = $self->parents_attributes->{$name};
     croak(sprintf <<'ERROR', $name, $self->name) unless $parent_attr;
 Could not find an attribute by the name of '%s' to inherit from in %s
 ERROR
 
+    if ( ref $attr_args{default} ) {
+        $attr_args{_class_for_default} = $self;
+    }
+
     $self->add_attribute($parent_attr->clone(%attr_args));
 
     return;
 }
 
-
-sub compile {
-    my $self = shift;
-
-    my $code = join "\n", '{',
-                      $self->_compile_package,
-                      $self->_compile_uses_mite,
-                      $self->_compile_pragmas,
-                      $self->_compile_extends,
-                      $self->_compile_new,
-                      $self->_compile_destroy,
-                      $self->_compile_meta_method,
-                      $self->_compile_attribute_accessors,
-                      '1;',
-                      '}';
-    #::diag $code;
-    return $code;
+sub methods_to_export {
+    return {};
 }
 
-sub _compile_package {
-    my $self = shift;
-
-    return "package @{[ $self->name ]};";
-}
-
-sub _compile_uses_mite {
-    my $self = shift;
-
-    return 'our $USES_MITE = 1;';
-}
-
-sub _compile_pragmas {
-    my $self = shift;
-
-    return <<'CODE';
-use strict;
-use warnings;
-CODE
+sub compilation_stages {
+    return qw(
+        _compile_package
+        _compile_uses_mite
+        _compile_pragmas
+        _compile_extends
+        _compile_with
+        _compile_new
+        _compile_destroy
+        _compile_meta_method
+        _compile_does
+        _compile_attribute_accessors
+        _compile_composed_methods
+    );
 }
 
 sub _compile_extends {
@@ -271,28 +222,6 @@ BEGIN {
 END
 }
 
-sub _compile_bless {
-    my ( $self, $classvar, $selfvar, $argvar, $metavar ) = @_;
-
-    return "bless {}, $classvar";
-}
-
-sub _compile_strict_constructor {
-    my ( $self, $classvar, $selfvar, $argvar, $metavar ) = @_;
-
-    my @allowed =
-        grep { defined $_ }
-        map { ( $_->init_arg, $_->_all_aliases ) }
-        values %{ $self->all_attributes };
-    my $check = do {
-        local $Type::Tiny::AvoidCallbacks = 1;
-        Enum->of( @allowed )->inline_check( '$_' );
-    };
-
-    return sprintf 'my @unknown = grep not( %s ), keys %%{%s}; @unknown and require Carp and Carp::croak("Unexpected keys in constructor: " . join(q[, ], sort @unknown));',
-        $check, $argvar;
-}
-
 sub _compile_new {
     my $self = shift;
     my @vars = ('$class', '$self', '$args', '$meta');
@@ -317,6 +246,28 @@ sub new {
     return $self;
 }
 CODE
+}
+
+sub _compile_bless {
+    my ( $self, $classvar, $selfvar, $argvar, $metavar ) = @_;
+
+    return "bless {}, $classvar";
+}
+
+sub _compile_strict_constructor {
+    my ( $self, $classvar, $selfvar, $argvar, $metavar ) = @_;
+
+    my @allowed =
+        grep { defined $_ }
+        map { ( $_->init_arg, $_->_all_aliases ) }
+        values %{ $self->all_attributes };
+    my $check = do {
+        local $Type::Tiny::AvoidCallbacks = 1;
+        Enum->of( @allowed )->inline_check( '$_' );
+    };
+
+    return sprintf 'my @unknown = grep not( %s ), keys %%{%s}; @unknown and require Carp and Carp::croak("Unexpected keys in constructor: " . join(q[, ], sort @unknown));',
+        $check, $argvar;
 }
 
 sub _compile_buildargs {
@@ -363,28 +314,6 @@ sub _compile_meta {
     my ( $self, $classvar, $selfvar, $argvar, $metavar ) = @_;
     return sprintf '( $Mite::META{%s} ||= %s->__META__ )',
         $classvar, $classvar;
-}
-
-sub _compile_meta_method {
-    return <<'CODE';
-sub __META__ {
-    no strict 'refs';
-    require mro;
-    my $class      = shift; $class = ref($class) || $class;
-    my $linear_isa = mro::get_linear_isa( $class );
-    return {
-        BUILD => [
-            map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
-            map { "$_\::BUILD" } reverse @$linear_isa
-        ],
-        DEMOLISH => [
-            map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
-            map { "$_\::DEMOLISH" } @$linear_isa
-        ],
-        HAS_BUILDARGS => $class->can('BUILDARGS'),
-    };
-}
-CODE
 }
 
 sub _compile_init_attributes {

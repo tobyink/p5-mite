@@ -1,6 +1,6 @@
 {
 package Mite::Config;
-our $USES_MITE = 1;
+our $USES_MITE = q[Mite::Class];
 use strict;
 use warnings;
 
@@ -69,16 +69,28 @@ sub __META__ {
     };
 }
 
+sub DOES {
+    my ( $self, $role ) = @_;
+    our %DOES;
+    return $DOES{$role} if exists $DOES{$role};
+    return 1 if $role eq __PACKAGE__;
+    return $self->SUPER::DOES( $role );
+}
+
+sub does {
+    shift->DOES( @_ );
+}
+
 my $__XS = !$ENV{MITE_PURE_PERL} && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
 # Accessors for config_file
-*config_file = sub { @_ > 1 ? require Carp && Carp::croak("config_file is a read-only attribute of @{[ref $_[0]]}") : ( exists($_[0]{q[config_file]}) ? $_[0]{q[config_file]} : ( $_[0]{q[config_file]} = do { my $default_value = do { my $to_coerce = do { our $__config_file_DEFAULT__; $__config_file_DEFAULT__->($_[0]) }; ((do { use Scalar::Util (); Scalar::Util::blessed($to_coerce) and $to_coerce->isa(q[Path::Tiny]) })) ? $to_coerce : (do { package Mite::Miteception; defined($to_coerce) and do { ref(\$to_coerce) eq 'SCALAR' or ref(\(my $val = $to_coerce)) eq 'SCALAR' } }) ? scalar(do { local $_ = $to_coerce; Path::Tiny::path($_) }) : $to_coerce }; (do { use Scalar::Util (); Scalar::Util::blessed($default_value) and $default_value->isa(q[Path::Tiny]) }) or do { require Carp; Carp::croak(q[Type check failed in default: config_file should be Path]) }; $default_value } ) ) };
+*config_file = sub { @_ > 1 ? require Carp && Carp::croak("config_file is a read-only attribute of @{[ref $_[0]]}") : ( exists($_[0]{q[config_file]}) ? $_[0]{q[config_file]} : ( $_[0]{q[config_file]} = do { my $default_value = do { my $to_coerce = do { my $method = $Mite::Config::__config_file_DEFAULT__; $_[0]->$method }; ((do { use Scalar::Util (); Scalar::Util::blessed($to_coerce) and $to_coerce->isa(q[Path::Tiny]) })) ? $to_coerce : (do { package Mite::Miteception; defined($to_coerce) and do { ref(\$to_coerce) eq 'SCALAR' or ref(\(my $val = $to_coerce)) eq 'SCALAR' } }) ? scalar(do { local $_ = $to_coerce; Path::Tiny::path($_) }) : $to_coerce }; (do { use Scalar::Util (); Scalar::Util::blessed($default_value) and $default_value->isa(q[Path::Tiny]) }) or do { require Carp; Carp::croak(q[Type check failed in default: config_file should be Path]) }; $default_value } ) ) };
 
 # Accessors for data
-*data = sub { @_ > 1 ? do { (ref($_[1]) eq 'HASH') or require Carp && Carp::croak(q[Type check failed in accessor: value should be HashRef]); $_[0]{q[data]} = $_[1]; $_[0]; } : do { ( exists($_[0]{q[data]}) ? $_[0]{q[data]} : ( $_[0]{q[data]} = do { my $default_value = do { our $__data_DEFAULT__; $__data_DEFAULT__->($_[0]) }; (ref($default_value) eq 'HASH') or do { require Carp; Carp::croak(q[Type check failed in default: data should be HashRef]) }; $default_value } ) ) } };
+*data = sub { @_ > 1 ? do { (ref($_[1]) eq 'HASH') or require Carp && Carp::croak(q[Type check failed in accessor: value should be HashRef]); $_[0]{q[data]} = $_[1]; $_[0]; } : do { ( exists($_[0]{q[data]}) ? $_[0]{q[data]} : ( $_[0]{q[data]} = do { my $default_value = do { my $method = $Mite::Config::__data_DEFAULT__; $_[0]->$method }; (ref($default_value) eq 'HASH') or do { require Carp; Carp::croak(q[Type check failed in default: data should be HashRef]) }; $default_value } ) ) } };
 
 # Accessors for mite_dir
-*mite_dir = sub { @_ > 1 ? require Carp && Carp::croak("mite_dir is a read-only attribute of @{[ref $_[0]]}") : ( exists($_[0]{q[mite_dir]}) ? $_[0]{q[mite_dir]} : ( $_[0]{q[mite_dir]} = do { my $default_value = do { my $to_coerce = do { our $__mite_dir_DEFAULT__; $__mite_dir_DEFAULT__->($_[0]) }; ((do { use Scalar::Util (); Scalar::Util::blessed($to_coerce) and $to_coerce->isa(q[Path::Tiny]) })) ? $to_coerce : (do { package Mite::Miteception; defined($to_coerce) and do { ref(\$to_coerce) eq 'SCALAR' or ref(\(my $val = $to_coerce)) eq 'SCALAR' } }) ? scalar(do { local $_ = $to_coerce; Path::Tiny::path($_) }) : $to_coerce }; (do { use Scalar::Util (); Scalar::Util::blessed($default_value) and $default_value->isa(q[Path::Tiny]) }) or do { require Carp; Carp::croak(q[Type check failed in default: mite_dir should be Path]) }; $default_value } ) ) };
+*mite_dir = sub { @_ > 1 ? require Carp && Carp::croak("mite_dir is a read-only attribute of @{[ref $_[0]]}") : ( exists($_[0]{q[mite_dir]}) ? $_[0]{q[mite_dir]} : ( $_[0]{q[mite_dir]} = do { my $default_value = do { my $to_coerce = do { my $method = $Mite::Config::__mite_dir_DEFAULT__; $_[0]->$method }; ((do { use Scalar::Util (); Scalar::Util::blessed($to_coerce) and $to_coerce->isa(q[Path::Tiny]) })) ? $to_coerce : (do { package Mite::Miteception; defined($to_coerce) and do { ref(\$to_coerce) eq 'SCALAR' or ref(\(my $val = $to_coerce)) eq 'SCALAR' } }) ? scalar(do { local $_ = $to_coerce; Path::Tiny::path($_) }) : $to_coerce }; (do { use Scalar::Util (); Scalar::Util::blessed($default_value) and $default_value->isa(q[Path::Tiny]) }) or do { require Carp; Carp::croak(q[Type check failed in default: mite_dir should be Path]) }; $default_value } ) ) };
 
 # Accessors for mite_dir_name
 if ( $__XS ) {

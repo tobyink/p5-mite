@@ -65,9 +65,10 @@ sub add_classes {
 
 # Create or reuse a class instance for this source give a name
 sub class_for {
-    my ( $self, $name ) = ( shift, @_ );
+    my ( $self, $name, $metaclass ) = ( shift, @_ );
+    $metaclass ||= 'Mite::Class';
 
-    return $self->classes->{$name} ||= Mite::Class->new(
+    return $self->classes->{$name} ||= $metaclass->new(
         name    => $name,
         source  => $self,
     );

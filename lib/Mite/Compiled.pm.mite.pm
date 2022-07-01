@@ -1,6 +1,6 @@
 {
 package Mite::Compiled;
-our $USES_MITE = 1;
+our $USES_MITE = q[Mite::Class];
 use strict;
 use warnings;
 
@@ -66,10 +66,22 @@ sub __META__ {
     };
 }
 
+sub DOES {
+    my ( $self, $role ) = @_;
+    our %DOES;
+    return $DOES{$role} if exists $DOES{$role};
+    return 1 if $role eq __PACKAGE__;
+    return $self->SUPER::DOES( $role );
+}
+
+sub does {
+    shift->DOES( @_ );
+}
+
 my $__XS = !$ENV{MITE_PURE_PERL} && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
 # Accessors for file
-*file = sub { @_ > 1 ? require Carp && Carp::croak("file is a read-only attribute of @{[ref $_[0]]}") : ( exists($_[0]{q[file]}) ? $_[0]{q[file]} : ( $_[0]{q[file]} = do { my $default_value = do { my $to_coerce = do { our $__file_DEFAULT__; $__file_DEFAULT__->($_[0]) }; ((do { use Scalar::Util (); Scalar::Util::blessed($to_coerce) and $to_coerce->isa(q[Path::Tiny]) })) ? $to_coerce : (do { package Mite::Miteception; defined($to_coerce) and do { ref(\$to_coerce) eq 'SCALAR' or ref(\(my $val = $to_coerce)) eq 'SCALAR' } }) ? scalar(do { local $_ = $to_coerce; Path::Tiny::path($_) }) : $to_coerce }; (do { use Scalar::Util (); Scalar::Util::blessed($default_value) and $default_value->isa(q[Path::Tiny]) }) or do { require Carp; Carp::croak(q[Type check failed in default: file should be Path]) }; $default_value } ) ) };
+*file = sub { @_ > 1 ? require Carp && Carp::croak("file is a read-only attribute of @{[ref $_[0]]}") : ( exists($_[0]{q[file]}) ? $_[0]{q[file]} : ( $_[0]{q[file]} = do { my $default_value = do { my $to_coerce = do { my $method = $Mite::Compiled::__file_DEFAULT__; $_[0]->$method }; ((do { use Scalar::Util (); Scalar::Util::blessed($to_coerce) and $to_coerce->isa(q[Path::Tiny]) })) ? $to_coerce : (do { package Mite::Miteception; defined($to_coerce) and do { ref(\$to_coerce) eq 'SCALAR' or ref(\(my $val = $to_coerce)) eq 'SCALAR' } }) ? scalar(do { local $_ = $to_coerce; Path::Tiny::path($_) }) : $to_coerce }; (do { use Scalar::Util (); Scalar::Util::blessed($default_value) and $default_value->isa(q[Path::Tiny]) }) or do { require Carp; Carp::croak(q[Type check failed in default: file should be Path]) }; $default_value } ) ) };
 
 # Accessors for source
 if ( $__XS ) {

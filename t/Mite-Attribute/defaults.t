@@ -72,8 +72,10 @@ tests has_coderef_default => sub {
 
 
 tests coderef_default_variable => sub {
-    my $attr = new_ok $CLASS, [ name => "foo" ];
-    is $attr->coderef_default_variable, '$__foo_DEFAULT__';
+    require Mite::Class;
+    my $mock_class = Mite::Class->new( name => 'Bar' );
+    my $attr = new_ok $CLASS, [ name => "foo", class => $mock_class ];
+    is $attr->coderef_default_variable, '$Bar::__foo_DEFAULT__';
 };
 
 

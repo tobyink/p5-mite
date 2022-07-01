@@ -70,9 +70,14 @@ sub source_for {
     );
 }
 
+my $parse_mm_args = sub {
+    my $coderef = pop;
+    my $names   = [ map { ref($_) eq 'ARRAY' ? @$_ : $_ } @_ ];
+    ( $names, $coderef );
+};
 
 # This is the shim Mite.pm uses when compiling.
-sub inject_mite_functions {
+sub inject_mite_class_functions {
     state $sig = sig_named(
         { head => [ Object ], named_to_list => true },
         package => Any,
@@ -84,7 +89,7 @@ sub inject_mite_functions {
     my $class  = $source->class_for($package);
 
     no strict 'refs';
-    ${ $package .'::USES_MITE' } = 1;
+    ${ $package .'::USES_MITE' } = ref($class);
 
     *{ $package .'::has' } = sub {
         my ( $names, %args ) = @_;
@@ -112,6 +117,10 @@ sub inject_mite_functions {
         return;
     };
 
+    *{ $package .'::with' } = sub {
+        $class->add_roles_by_name( @_ );
+    };
+
     *{ $package .'::extends' } = sub {
         my (@classes) = @_;
 
@@ -120,13 +129,65 @@ sub inject_mite_functions {
         return;
     };
 
-    my $parse_args = sub {
-        my $coderef = pop;
-        my $names   = [ map { ref($_) eq 'ARRAY' ? @$_ : $_ } @_ ];
-        ( $names, $coderef );
-    };
     *{ $package .'::'. $_ } = sub {
-        my ( $names, $coderef ) = &$parse_args;
+        my ( $names, $coderef ) = &$parse_mm_args;
+        require Carp;
+        CodeRef->check( $coderef )
+            or Carp::croak( "Expected a coderef method modifier" );
+        ArrayRef->of(Str)->check( $names ) && @$names
+            or Carp::croak( "Expected a list of method names to modify" );
+        return;
+    } for qw( before after around );
+
+    return;
+}
+
+sub inject_mite_role_functions {
+    state $sig = sig_named(
+        { head => [ Object ], named_to_list => true },
+        package => Any,
+        file => Any,
+    );
+    my ( $self, $package, $file ) = &$sig;
+
+    my $source = $self->source_for($file);
+    my $role   = $source->class_for($package, 'Mite::Role');
+
+    no strict 'refs';
+    ${ $package .'::USES_MITE' } = ref($role);
+
+    *{ $package .'::has' } = sub {
+        my ( $names, %args ) = @_;
+        $names = [$names] unless ref $names;
+
+        for my $name ( @$names ) {
+           if( my $is_extension = $name =~ s{^\+}{} ) {
+               $role->extend_attribute(
+                   class   => $role,
+                   name    => $name,
+                   %args
+               );
+           }
+           else {
+               require Mite::Attribute;
+               my $attribute = Mite::Attribute->new(
+                   class   => $role,
+                   name    => $name,
+                   %args
+               );
+               $role->add_attribute($attribute);
+           }
+        }
+
+        return;
+    };
+
+    *{ $package .'::with' } = sub {
+        $role->add_roles_by_name( @_ );
+    };
+
+    *{ $package .'::'. $_ } = sub {
+        my ( $names, $coderef ) = &$parse_mm_args;
         require Carp;
         CodeRef->check( $coderef )
             or Carp::croak( "Expected a coderef method modifier" );
@@ -255,6 +316,8 @@ sub add_mite_shim {
     $shim_file->parent->mkpath;
 
     my $shim_package = $self->config->data->{shim};
+    return $shim_file if $shim_package eq 'Mite::Shim';
+
     my $src_shim = $self->_find_mite_shim;
     my $code = $src_shim->slurp;
     $code =~ s/package Mite::Shim;/package $shim_package;/;

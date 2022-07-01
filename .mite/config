@@ -1,6 +1,6 @@
 ---
 compiled_to: lib
 project: Mite
-shim: Mite::Miteception::Shim
+shim: Mite::Shim
 source_from: lib
 perltidy: 1
