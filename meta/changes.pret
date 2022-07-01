@@ -1,6 +1,12 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.002002 cpan:TOBYINK`
+	issued  2022-07-01;
+	changeset [
+		item "Change how __FINALIZE_APPLICATION__ gets called for indirect role applications."^^Change;
+	].
+
 `Mite 0.002001 cpan:TOBYINK`
 	issued  2022-07-01;
 	changeset [
