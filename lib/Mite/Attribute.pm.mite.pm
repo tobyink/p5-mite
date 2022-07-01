@@ -216,6 +216,5 @@ else {
 *writer = sub { @_ > 1 ? do { do { package Mite::Miteception; (((do { package Mite::Miteception; defined($_[1]) and do { ref(\$_[1]) eq 'SCALAR' or ref(\(my $val = $_[1])) eq 'SCALAR' } }) && (do { local $_ = $_[1]; length($_) > 0 })) or (!defined($_[1]))) } or require Carp && Carp::croak(q[Type check failed in accessor: value should be __ANON__|Undef]); $_[0]{q[writer]} = $_[1]; $_[0]; } : do { ( exists($_[0]{q[writer]}) ? $_[0]{q[writer]} : ( $_[0]{q[writer]} = do { my $default_value = $_[0]->_build_writer; do { package Mite::Miteception; (((do { package Mite::Miteception; defined($default_value) and do { ref(\$default_value) eq 'SCALAR' or ref(\(my $val = $default_value)) eq 'SCALAR' } }) && (do { local $_ = $default_value; length($_) > 0 })) or (!defined($default_value))) } or do { require Carp; Carp::croak(q[Type check failed in default: writer should be __ANON__|Undef]) }; $default_value } ) ) } };
 
 
-
 1;
 }

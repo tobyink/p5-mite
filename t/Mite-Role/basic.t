@@ -57,17 +57,23 @@ tests "subs" => sub {
     mite_load <<'CODE';
 package OurTest1;
 use Mite::Shim -role;
-has foo => ( is => 'ro' );
+has [qw/ foo bar baz /] => ( is => 'ro' );
 
 sub get_foo { shift->foo }
+sub get_bar { shift->bar }
+sub get_baz { shift->baz }
 
 package OurTest2;
 use Mite::Shim -role;
 with 'OurTest1';
 
+sub get_bar { 'bar' }
+
 package OurTest3;
 use Mite::Shim;
 with 'OurTest2';
+
+sub get_baz { 'baz' }
 
 1;
 CODE
@@ -78,6 +84,8 @@ CODE
 
     my $object = OurTest3->new( foo => 24 );
     is $object->get_foo(), 24, 'Method copied from role to class';
+    is $object->get_bar(), 'bar', 'Method copied from other role to class';
+    is $object->get_baz(), 'baz', 'Native method overrides role';
 };
 
 done_testing;

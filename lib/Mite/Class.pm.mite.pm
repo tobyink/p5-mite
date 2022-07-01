@@ -88,6 +88,5 @@ my $__XS = !$ENV{MITE_PURE_PERL} && eval { require Class::XSAccessor; Class::XSA
 *parents = sub { @_ > 1 ? require Carp && Carp::croak("parents is a read-only attribute of @{[ref $_[0]]}") : ( exists($_[0]{q[parents]}) ? $_[0]{q[parents]} : ( $_[0]{q[parents]} = do { my $default_value = $_[0]->_build_parents; do { package Mite::Miteception; (ref($default_value) eq 'ARRAY') and do { my $ok = 1; for my $i (@{$default_value}) { ($ok = 0, last) unless (do { use Scalar::Util (); Scalar::Util::blessed($i) and $i->isa(q[Mite::Class]) }) }; $ok } } or do { require Carp; Carp::croak(q[Type check failed in default: parents should be ArrayRef[InstanceOf["Mite::Class"]]]) }; $default_value } ) ) };
 
 
-
 1;
 }

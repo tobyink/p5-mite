@@ -175,6 +175,10 @@ ERROR
     return;
 }
 
+sub methods_to_export {
+    return {};
+}
+
 sub compilation_stages {
     return qw(
         _compile_package

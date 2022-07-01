@@ -81,14 +81,46 @@ sub _native_methods {
     return \%methods;
 }
 
-sub _methods_to_compose {
+sub methods_to_import_from_roles {
     my $self = shift;
+
+    my %methods;
+    for my $role ( @{ $self->roles } ) {
+        my %exported = %{ $role->methods_to_export };
+        for my $name ( sort keys %exported ) {
+            if ( defined $methods{$name} and  $methods{$name} ne $exported{$name} ) {
+                require Carp;
+                Carp::croak "Conflict between %s and %s; %s must implement %s\n",
+                    $methods{$name}, $exported{$name}, $self->name, $name;
+            }
+            else {
+                $methods{$name} = $exported{$name};
+            }
+        }
+    }
+
+    # This package provides a native version of these
+    # methods, so don't import.
+    my %native = %{ $self->_native_methods };
+    for my $name ( keys %native ) {
+        delete $methods{$name};
+    }
+
+    return \%methods;
+}
+
+sub methods_to_export {
+    my $self = shift;
+
+    my %methods = %{ $self->methods_to_import_from_roles };
+    my %native  = %{ $self->_native_methods };
     my $package = $self->name;
-    my $native  = $self->_native_methods;
-    return (
-        ( map [ $_ => "$package\::$_" ], sort keys %$native ),
-        ( map $_->_methods_to_compose, @{ $self->roles } )
-    );
+
+    for my $name ( keys %native ) {
+        $methods{$name} = "$package\::$name";
+    }
+
+    return \%methods;
 }
 
 sub project {
@@ -204,14 +236,12 @@ sub _compile_composed_methods {
     my $self = shift;
     my $code = '';
 
-    for my $role ( @{ $self->roles } ) {
-        $code .= sprintf "# Methods from %s\n", $role->name;
-        for ( $role->_methods_to_compose ) {
-            my ( $name, $dest ) = @$_;
-            $code .= sprintf '*%s = \&%s;' . "\n",
-                $name, $dest;
-        }
-        $code .= "\n";
+    my %methods = %{ $self->methods_to_import_from_roles };
+    keys %methods or return;
+
+    $code .= "# Methods from roles\n";
+    for my $name ( sort keys %methods ) {
+        $code .= sprintf '*%s = \&%s;' . "\n", $name, $methods{$name};
     }
 
     return $code;
