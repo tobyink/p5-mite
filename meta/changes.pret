@@ -1,6 +1,13 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.002000 cpan:TOBYINK`
+	issued  2022-07-01;
+	changeset [
+		item "Mite::Manual::Missing is a new pod file that documents features found in Moose/Moo which are not available in Mite."^^Documentation;
+		item "Roles"^^Addition;
+	].
+
 `Mite 0.001013 cpan:TOBYINK`
 	issued  2022-06-30;
 	changeset [
