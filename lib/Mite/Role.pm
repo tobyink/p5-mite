@@ -198,7 +198,7 @@ sub _get_role {
     return $role if $role;
 
     # If not, try to load it
-    require $role_name;
+    eval "require $role_name;";
     $role = $project->class($role_name, 'Mite::Role');
     return $role if $role;
 
