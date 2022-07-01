@@ -31,11 +31,6 @@ has source =>
   # avoid a circular dep with Mite::Source
   weak_ref      => true;
 
-has method_modifiers =>
-  is            => ro,
-  isa           => ArrayRef,
-  builder       => sub { [] };
-
 has roles =>
   is            => ro,
   isa           => ArrayRef,
@@ -113,6 +108,7 @@ sub methods_to_import_from_roles {
         DOES
         does
         __META__
+        __FINALIZE_APPLICATION__
     );
 
     return \%methods;
@@ -136,12 +132,6 @@ sub project {
     my $self = shift;
 
     return $self->source->project;
-}
-
-sub add_method_modifier {
-    my ( $self, $type, $names, $coderef ) = @_;
-    push @{ $self->method_modifiers }, [ $type, $names, $coderef ];
-    return;
 }
 
 sub add_attributes {
@@ -235,6 +225,7 @@ sub compilation_stages {
         _compile_with
         _compile_does
         _compile_composed_methods
+        _compile_callback
     );
 }
 
@@ -282,6 +273,7 @@ sub DOES {
     my ( $self, $role ) = @_;
     our %DOES;
     return $DOES{$role} if exists $DOES{$role};
+    return 1 if $role eq __PACKAGE__;
     return $self->SUPER::DOES( $role );
 }
 
@@ -300,7 +292,9 @@ sub _compile_composed_methods {
 
     $code .= "# Methods from roles\n";
     for my $name ( sort keys %methods ) {
-        $code .= sprintf '*%s = \&%s;' . "\n", $name, $methods{$name};
+        # Use goto to help namespace::autoclean recognize these as
+        # not being imported methods.
+        $code .= sprintf 'sub %s { goto \&%s; }' . "\n", $name, $methods{$name};
     }
 
     return $code;
@@ -345,6 +339,45 @@ sub __META__ {
         ],
         HAS_BUILDARGS => $class->can('BUILDARGS'),
     };
+}
+CODE
+}
+
+sub _compile_callback {
+    my $self = shift;
+
+    my $role_list = join q[, ], map sprintf( 'q[%s]', $_->name ), @{ $self->roles };
+    my $shim = $self->project->config->data->{shim};
+
+    return sprintf <<'CODE', $role_list, $shim;
+# Callback which classes consuming this role will call
+sub __FINALIZE_APPLICATION__ {
+    my ( $me, $target ) = @_;
+    our ( %%CONSUMERS, @METHOD_MODIFIERS );
+
+    # Ensure a given target only consumes this role once.
+    if ( exists $CONSUMERS{$target} ) {
+        return;
+    }
+    $CONSUMERS{$target} = 1;
+
+    my $type = do { no strict 'refs'; ${"$target\::USES_MITE"} };
+    if ( $type ne 'Mite::Class' ) {
+        return;
+    }
+
+    my @roles = ( %s );
+    for my $role ( @roles ) {
+        $role->__FINALIZE_APPLICATION__( $target );
+    }
+
+    my $shim = q[%s];
+    for my $modifier_rule ( @METHOD_MODIFIERS ) {
+        my ( $modification, $names, $coderef ) = @$modifier_rule;
+        $shim->$modification( $target, $names, $coderef );
+    }
+
+    return;
 }
 CODE
 }

@@ -69,6 +69,7 @@ sub DOES {
     my ( $self, $role ) = @_;
     our %DOES;
     return $DOES{$role} if exists $DOES{$role};
+    return 1 if $role eq __PACKAGE__;
     return $self->SUPER::DOES( $role );
 }
 

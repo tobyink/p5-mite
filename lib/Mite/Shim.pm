@@ -88,95 +88,105 @@ sub import {
     }
 }
 
+my $parse_mm_args = sub {
+    my $coderef = pop;
+    my $names   = [ map { ref($_) ? @$_ : $_ } @_ ];
+    ( $names, $coderef );
+};
+
+{
+    my $get_orig = sub {
+        my ( $caller, $name ) = @_;
+        \&{ "$caller\::$name" };
+    };
+
+    sub before {
+        my ( $me, $caller ) = ( shift, shift );
+        my ( $names, $coderef ) = &$parse_mm_args;
+        for my $name ( @$names ) {
+            my $orig = $get_orig->( $caller, $name );
+            local $@;
+            eval <<"BEFORE" or die $@;
+                package $caller;
+                no warnings 'redefine';
+                sub $name {
+                    \$coderef->( \@_ );
+                    \$orig->( \@_ );
+                }
+                1;
+BEFORE
+        }
+        return;
+    }
+
+    sub after {
+        my ( $me, $caller ) = ( shift, shift );
+        my ( $names, $coderef ) = &$parse_mm_args;
+        for my $name ( @$names ) {
+            my $orig = $get_orig->( $caller, $name );
+            local $@;
+            eval <<"AFTER" or die $@;
+                package $caller;
+                no warnings 'redefine';
+                sub $name {
+                    my \@r;
+                    if ( wantarray ) {
+                        \@r = \$orig->( \@_ );
+                    }
+                    elsif ( defined wantarray ) {
+                        \@r = scalar \$orig->( \@_ );
+                    }
+                    else {
+                        \$orig->( \@_ );
+                        1;
+                    }
+                    \$coderef->( \@_ );
+                    wantarray ? \@r : \$r[0];
+                }
+                1;
+AFTER
+        }
+        return;
+    }
+
+    sub around {
+        my ( $me, $caller ) = ( shift, shift );
+        my ( $names, $coderef ) = &$parse_mm_args;
+        for my $name ( @$names ) {
+            my $orig = $get_orig->( $caller, $name );
+            local $@;
+            eval <<"AROUND" or die $@;
+                package $caller;
+                no warnings 'redefine';
+                sub $name {
+                    \$coderef->( \$orig, \@_ );
+                }
+                1;
+AROUND
+        }
+        return;
+    }
+}
+
+
 sub _inject_mite_class_functions {
     my ( $class, $caller, $file ) = ( shift, @_ );
 
     no strict 'refs';
     *{ $caller .'::has' } = $class->_make_has( $caller, $file, 'class' );
-
-    *{ $caller .'::with' } = sub {};
-
-    # Method modifiers - these actually happen at runtime.
-    {
-        my $parse_args = sub {
-            my $coderef = pop;
-            my $names   = [ map { ref($_) ? @$_ : $_ } @_ ];
-            ( $names, $coderef );
-        };
-
-        my $get_orig = sub {
-            my $name = shift;
-            \&{ "$caller\::$name" };
-        };
-
-        *{ $caller .'::before' } = sub {
-            my ( $names, $coderef ) = &$parse_args;
-            for my $name ( @$names ) {
-                my $orig = $get_orig->($name);
-                local $@;
-                eval <<"BEFORE" or die $@;
-                    package $caller;
-                    no warnings 'redefine';
-                    sub $name {
-                        \$coderef->( \@_ );
-                        \$orig->( \@_ );
-                    }
-                    1;
-BEFORE
-            }
+    *{ $caller .'::with' } = sub {
+        while ( @_ ) {
+            my $role = shift;
+            my $args = ref($_[0]) ? shift : undef;
+            $role->__FINALIZE_APPLICATION__( $caller, $args );
+        }
+    };
+    *{ $caller .'::extends'} = sub {};
+    for my $mm ( qw/ before after around / ) {
+        *{"$caller\::$mm"} = sub {
+            $class->$mm( $caller, @_ );
             return;
         };
-
-        *{ $caller .'::after' } = sub {
-            my ( $names, $coderef ) = &$parse_args;
-            for my $name ( @$names ) {
-                my $orig = $get_orig->($name);
-                local $@;
-                eval <<"AFTER" or die $@;
-                    package $caller;
-                    no warnings 'redefine';
-                    sub $name {
-                        my \@r;
-                        if ( wantarray ) {
-                            \@r = \$orig->( \@_ );
-                        }
-                        elsif ( defined wantarray ) {
-                            \@r = scalar \$orig->( \@_ );
-                        }
-                        else {
-                            \$orig->( \@_ );
-                            1;
-                        }
-                        \$coderef->( \@_ );
-                        wantarray ? \@r : \$r[0];
-                    }
-                    1;
-AFTER
-            }
-            return;
-        };
-
-        *{ $caller .'::around' } = sub {
-            my ( $names, $coderef ) = &$parse_args;
-            for my $name ( @$names ) {
-                my $orig = $get_orig->($name);
-                local $@;
-                eval <<"AROUND" or die $@;
-                    package $caller;
-                    no warnings 'redefine';
-                    sub $name {
-                        \$coderef->( \$orig, \@_ );
-                    }
-                    1;
-AROUND
-            }
-            return;
-        };
-    }
-
-    # Inject blank Mite routines
-    for my $name (qw( extends )) {
-        *{ $caller .'::'. $name } = sub {};
     }
 }
 
@@ -185,7 +195,21 @@ sub _inject_mite_role_functions {
 
     no strict 'refs';
     *{ $caller .'::has' } = $class->_make_has( $caller, $file, 'role' );
-    *{ $caller .'::with' } = sub {};
+    *{ $caller .'::with' } = sub {
+        while ( @_ ) {
+            my $role = shift;
+            my $args = ref($_[0]) ? shift : undef;
+            $role->__FINALIZE_APPLICATION__( $caller, $args );
+        }
+    };
+
+    my $MM = \@{"$caller\::METHOD_MODIFIERS"};
+    for my $modifier ( qw/ before after around / ) {
+        *{ $caller .'::'. $modifier } = sub {
+            my ( $names, $coderef ) = &$parse_mm_args;
+            push @$MM, [ $modifier, $names, $coderef ];
+        };
+    }
 }
 
 1;
