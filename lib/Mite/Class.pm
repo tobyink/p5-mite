@@ -141,7 +141,7 @@ sub _get_parent {
     return $parent if $parent;
 
     # If not, try to load it
-    require $parent;
+    eval "require $parent;";
     $parent = $project->class($parent_name);
     return $parent if $parent;
 
