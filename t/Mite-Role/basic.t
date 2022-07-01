@@ -53,4 +53,31 @@ CODE
     is $object->foo, 24, 'Attribute copied from role to class';
 };
 
+tests "subs" => sub {
+    mite_load <<'CODE';
+package OurTest1;
+use Mite::Shim -role;
+has foo => ( is => 'ro' );
+
+sub get_foo { shift->foo }
+
+package OurTest2;
+use Mite::Shim -role;
+with 'OurTest1';
+
+package OurTest3;
+use Mite::Shim;
+with 'OurTest2';
+
+1;
+CODE
+
+    no warnings 'once';
+    is $OurTest1::USES_MITE, 'Mite::Role', '$USES_MITE';
+    ok( OurTest1->can('get_foo'), 'Roles do have methods' );
+
+    my $object = OurTest3->new( foo => 24 );
+    is $object->get_foo(), 24, 'Method copied from role to class';
+};
+
 done_testing;

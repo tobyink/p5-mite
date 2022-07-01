@@ -95,5 +95,6 @@ else {
 *search_for_mite_dir = sub { @_ > 1 ? do { (!ref $_[1] and (!defined $_[1] or $_[1] eq q() or $_[1] eq '0' or $_[1] eq '1')) or require Carp && Carp::croak(q[Type check failed in accessor: value should be Bool]); $_[0]{q[search_for_mite_dir]} = $_[1]; $_[0]; } : ( $_[0]{q[search_for_mite_dir]} ) };
 
 
+
 1;
 }

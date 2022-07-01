@@ -99,5 +99,6 @@ else {
 *project = sub { @_ > 1 ? do { (do { use Scalar::Util (); Scalar::Util::blessed($_[1]) and $_[1]->isa(q[Mite::Project]) }) or require Carp && Carp::croak(q[Type check failed in accessor: value should be InstanceOf["Mite::Project"]]); $_[0]{q[project]} = $_[1]; require Scalar::Util && Scalar::Util::weaken($_[0]{q[project]}); $_[0]; } : ( $_[0]{q[project]} ) };
 
 
+
 1;
 }

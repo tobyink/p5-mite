@@ -119,5 +119,6 @@ else {
 *source = sub { @_ > 1 ? do { (do { use Scalar::Util (); Scalar::Util::blessed($_[1]) and $_[1]->isa(q[Mite::Source]) }) or require Carp && Carp::croak(q[Type check failed in accessor: value should be InstanceOf["Mite::Source"]]); $_[0]{q[source]} = $_[1]; require Scalar::Util && Scalar::Util::weaken($_[0]{q[source]}); $_[0]; } : ( $_[0]{q[source]} ) };
 
 
+
 1;
 }

@@ -11,6 +11,10 @@ our $VERSION   = '0.001013';
 use Path::Tiny;
 use mro;
 
+BEGIN {
+    *_CONSTANTS_DEFLATE = "$]" >= 5.012 && "$]" < 5.020 ? sub(){1} : sub(){0};
+};
+
 has attributes =>
   is            => ro,
   isa           => HashRef[InstanceOf['Mite::Attribute']],
@@ -38,6 +42,54 @@ has roles =>
   builder       => sub { [] };
 
 ##-
+
+sub _all_subs {
+    my $self = shift;
+    my $package = $self->name;
+    no strict 'refs';
+    my $stash = \%{"$package\::"};
+    return {
+        map {;
+          # this is an ugly hack to populate the scalar slot of any globs, to
+          # prevent perl from converting constants back into scalar refs in the
+          # stash when they are used (perl 5.12 - 5.18). scalar slots on their own
+          # aren't detectable through pure perl, so this seems like an acceptable
+          # compromise.
+          ${"${package}::${_}"} = ${"${package}::${_}"}
+            if _CONSTANTS_DEFLATE;
+          $_ => \&{"${package}::${_}"}
+        }
+        grep exists &{"${package}::${_}"},
+        grep !/::\z/,
+        keys %$stash
+    };
+}
+
+sub _native_methods {
+    my $self = shift;
+    my %methods = %{ $self->_all_subs };
+
+    require B;
+    for my $name ( sort keys %methods ) {
+        my $cv        = B::svref_2object( $methods{$name} );
+        my $stashname = eval { $cv->GV->STASH->NAME };
+        $stashname eq $self->name
+            or $stashname eq 'constant'
+            or delete $methods{$name};
+    }
+
+    return \%methods;
+}
+
+sub _methods_to_compose {
+    my $self = shift;
+    my $package = $self->name;
+    my $native  = $self->_native_methods;
+    return (
+        ( map [ $_ => "$package\::$_" ], sort keys %$native ),
+        ( map $_->_methods_to_compose, @{ $self->roles } )
+    );
+}
 
 sub project {
     my $self = shift;
@@ -131,6 +183,7 @@ sub compilation_stages {
         _compile_package
         _compile_uses_mite
         _compile_pragmas
+        _compile_composed_methods
     );
 }
 
@@ -143,7 +196,24 @@ sub compile {
         '1;',
         '}';
 
-    #::diag $code;
+    #::diag $code if main->can('diag');
+    return $code;
+}
+
+sub _compile_composed_methods {
+    my $self = shift;
+    my $code = '';
+
+    for my $role ( @{ $self->roles } ) {
+        $code .= sprintf "# Methods from %s\n", $role->name;
+        for ( $role->_methods_to_compose ) {
+            my ( $name, $dest ) = @$_;
+            $code .= sprintf '*%s = sub { goto \&%s };' . "\n",
+                $name, $dest;
+        }
+        $code .= "\n";
+    }
+
     return $code;
 }
 

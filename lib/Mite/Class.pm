@@ -185,6 +185,7 @@ sub compilation_stages {
         _compile_destroy
         _compile_meta_method
         _compile_attribute_accessors
+        _compile_composed_methods
     );
 }
 
