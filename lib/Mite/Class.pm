@@ -157,10 +157,18 @@ sub extend_attribute {
 
     my $name = delete $attr_args{name};
 
+    if ( $self->attributes->{$name} ) {
+        return $self->SUPER::extend_attribute( name => $name, %attr_args );
+    }
+
     my $parent_attr = $self->parents_attributes->{$name};
     croak(sprintf <<'ERROR', $name, $self->name) unless $parent_attr;
 Could not find an attribute by the name of '%s' to inherit from in %s
 ERROR
+
+    if ( ref $attr_args{default} ) {
+        $attr_args{_class_for_default} = $self;
+    }
 
     $self->add_attribute($parent_attr->clone(%attr_args));
 

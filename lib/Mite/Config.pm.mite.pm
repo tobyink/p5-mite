@@ -1,6 +1,6 @@
 {
 package Mite::Config;
-our $USES_MITE = 1;
+our $USES_MITE = q[Mite::Class];
 use strict;
 use warnings;
 

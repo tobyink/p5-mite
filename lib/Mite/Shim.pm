@@ -14,6 +14,39 @@ sub _is_compiling {
     return $ENV{MITE_COMPILE} ? 1 : 0;
 }
 
+sub _make_has {
+    my ( $class, $caller, $file, $kind ) = @_;
+
+    return sub {
+        my $names = shift;
+        $names = [$names] unless ref $names;
+        my %args = @_;
+        for my $name ( @$names ) {
+           $name =~ s/^\+//;
+
+           my $default = $args{default};
+           if ( ref $default eq 'CODE' ) {
+               no strict 'refs';
+               ${$caller .'::__'.$name.'_DEFAULT__'} = $default;
+           }
+
+           my $builder = $args{builder};
+           if ( ref $builder eq 'CODE' ) {
+               no strict 'refs';
+               *{"$caller\::_build_$name"} = $builder;
+           }
+
+           my $trigger = $args{trigger};
+           if ( ref $trigger eq 'CODE' ) {
+               no strict 'refs';
+               *{"$caller\::_trigger_$name"} = $trigger;
+           }
+        }
+
+        return;
+    };
+}
+
 sub import {
     my ( $class, $kind ) = @_;
     my ( $caller, $file ) = caller;
@@ -22,7 +55,8 @@ sub import {
     warnings->import;
     strict->import;
 
-    ( $kind = lc( $kind || 'class' ) ) =~ s/\W//g;
+    $kind ||= 'class';
+    $kind = ( $kind =~ /role/i ) ? 'role' : 'class';
 
     if( _is_compiling() ) {
         require Mite::Project;
@@ -58,31 +92,9 @@ sub _inject_mite_class_functions {
     my ( $class, $caller, $file ) = ( shift, @_ );
 
     no strict 'refs';
-    *{ $caller .'::has' } = sub {
-        my $names = shift;
-        $names = [$names] unless ref $names;
-        my %args = @_;
-        for my $name ( @$names ) {
-           $name =~ s/^\+//;
+    *{ $caller .'::has' } = $class->_make_has( $caller, $file, 'class' );
 
-           my $default = $args{default};
-           if ( ref $default eq 'CODE' ) {
-               ${$caller .'::__'.$name.'_DEFAULT__'} = $default;
-           }
-
-           my $builder = $args{builder};
-           if ( ref $builder eq 'CODE' ) {
-               *{"$caller\::_build_$name"} = $builder;
-           }
-
-           my $trigger = $args{trigger};
-           if ( ref $trigger eq 'CODE' ) {
-               *{"$caller\::_trigger_$name"} = $trigger;
-           }
-        }
-
-        return;
-    };
+    *{ $caller .'::with' } = sub {};
 
     # Method modifiers - these actually happen at runtime.
     {
@@ -166,6 +178,14 @@ AROUND
     for my $name (qw( extends )) {
         *{ $caller .'::'. $name } = sub {};
     }
+}
+
+sub _inject_mite_role_functions {
+    my ( $class, $caller, $file ) = ( shift, @_ );
+
+    no strict 'refs';
+    *{ $caller .'::has' } = $class->_make_has( $caller, $file, 'role' );
+    *{ $caller .'::with' } = sub {};
 }
 
 1;

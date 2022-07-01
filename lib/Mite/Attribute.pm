@@ -13,6 +13,13 @@ has class =>
   isa           => Object,
   weak_ref      => true;
 
+has _class_for_default =>
+  is            => rw,
+  isa           => Object,
+  weak_ref      => true,
+  lazy          => true,
+  builder       => sub { shift->class };
+
 has name =>
   is            => rw,
   isa           => Str->where('length($_) > 0'),
@@ -77,7 +84,7 @@ has coderef_default_variable =>
   lazy          => true,     # else $self->name might not be set
   default       => sub {
       # This must be coordinated with Mite.pm
-      return sprintf '$%s::__%s_DEFAULT__', $_[0]->class->name, $_[0]->name;
+      return sprintf '$%s::__%s_DEFAULT__', $_[0]->_class_for_default->name, $_[0]->name;
   };
 
 has [ 'trigger', 'builder' ] =>
@@ -159,14 +166,13 @@ sub BUILD {
 sub clone {
     my ( $self, %args ) = ( shift, @_ );
 
-    $args{name} //= $self->name;
-    $args{is}   //= $self->is;
+    my %inherit = %$self;
 
-    # Because undef is a valid default
-    $args{default} = $self->default
-        if !exists $args{default} and $self->has_default;
+    # Lazy attributes should be rebuilt by clone
+    delete $inherit{type} if $args{isa} || $args{type};
+    delete $inherit{coderef_default_variable};
 
-    return ref($self)->new( %args );
+    return ref($self)->new( %inherit, %args );
 }
 
 sub is_private {
