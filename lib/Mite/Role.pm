@@ -369,6 +369,7 @@ sub __FINALIZE_APPLICATION__ {
     my @roles = ( %s );
     my %%nextargs = %%{ $args || {} };
     ( $nextargs{-indirect} ||= 0 )++;
+    die "PANIC!" if $nextargs{-indirect} > 100;
     for my $role ( @roles ) {
         $role->__FINALIZE_APPLICATION__( $target, { %%nextargs } );
     }
