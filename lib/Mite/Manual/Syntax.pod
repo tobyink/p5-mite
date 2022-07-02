@@ -56,8 +56,8 @@ defaults to C<< "_set_$name" >>.
 =item C<accessor> B<< Maybe[Str] >>
 
 The name of the dual-purpose attribute reader/writer method to generate.
-If set to "1", will generate a reader called "fo" if your attribute is
-called "foo" and "_foo"if your attribute is called "_foo". 
+If set to "1", will generate a reader called "foo" if your attribute is
+called "foo" and "_foo" if your attribute is called "_foo". 
 
 If your attribute is defined as C<< is => "rw" >>, then C<accessor>
 defaults to C<< $name >>.
