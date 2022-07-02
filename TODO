@@ -1,3 +1,0 @@
-TODO:
-  - Rewrite test suite to use Test2::V0 instead of Fennec.
-  - Get tests running on Windows on Github Actions.
