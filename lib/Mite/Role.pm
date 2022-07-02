@@ -6,7 +6,7 @@ package Mite::Role;
 use Mite::Miteception;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.002002';
+our $VERSION   = '0.002003';
 
 use Path::Tiny;
 use mro;

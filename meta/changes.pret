@@ -1,6 +1,15 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.002003 cpan:TOBYINK`
+	issued  2022-07-02;
+	changeset [
+		item "Allow attribute defaults to be expressed as a reference to a string of Perl code."^^Addition;
+		item "More efficient implementation of strict constructors."^^Change;
+		item "Removed the TODO file and put the tasks in the issue tracker."^^Packaging;
+		item "Removed some code related to the unimplemented idea of dataref attribtue defaults."^^Removal;
+	].
+
 `Mite 0.002002 cpan:TOBYINK`
 	issued  2022-07-01;
 	changeset [
