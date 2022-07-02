@@ -70,7 +70,7 @@ has coerce =>
 
 has default =>
   is            => rw,
-  isa           => Undef|Str|CodeRef,
+  isa           => Undef|Str|CodeRef|ScalarRef,
   predicate     => 'has_default';
 
 has lazy =>
@@ -268,16 +268,22 @@ sub has_coderef_default {
     # We don't have a default
     return 0 unless $self->has_default;
 
-    return ref $self->default eq 'CODE';
+    return CodeRef->check( $self->default );
+}
+
+sub has_inline_default {
+    my $self = shift;
+
+    # We don't have a default
+    return 0 unless $self->has_default;
+
+    return ScalarRef->check( $self->default );
 }
 
 sub has_simple_default {
     my $self = shift;
 
     return 0 unless $self->has_default;
-
-    # Special case for regular expressions, they do not need to be dumped.
-    return 1 if ref $self->default eq 'Regexp';
 
     return !ref $self->default;
 }
@@ -314,6 +320,9 @@ sub _compile_default {
         my $var = $self->coderef_default_variable;
         return sprintf 'do { my $method = %s; %s->$method }',
           $var, $selfvar;
+    }
+    elsif ( $self->has_inline_default ) {
+        return ${ $self->default };
     }
     elsif ( $self->has_simple_default ) {
         require B;

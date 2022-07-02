@@ -123,10 +123,22 @@ attribute is called "_foo".
 If set to a coderef, acts like it was set to "1" but installs the
 coderef into your class with that name.
 
-=item C<default> B<< Undef|Str|CodeRef >>
+=item C<default> B<< Undef|Str|CodeRef|ScalarRef >>
 
 A default value for the attribute, or a coderef called as a method
 to generate that default value.
+
+Unlike Moose, you can alternatively include an inline string of Perl
+code as a ScalarRef:
+
+    has list => (
+        is => 'ro',
+        isa => 'ArrayRef',
+        default => \ '[]',
+    );
+
+This has performance benefits over using a coderef as it avoids the
+overhead of a sub call.
 
 =item C<builder> B<< Str|CodeRef >>
 

@@ -58,4 +58,19 @@ tests coderef_default_variable => sub {
 };
 
 
+tests "inline code defaults" => sub {
+    mite_load <<'CODE';
+package MyTest;
+use Mite::Shim;
+has list =>
+    is => 'ro',
+    default => \ '[ 1..4 ]';
+1;
+CODE
+
+    my $o = MyTest->new;
+    is_deeply( $o->list, [ 1..4 ] );
+};
+
+
 done_testing;
