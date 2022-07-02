@@ -1,4 +1,4 @@
-use 5.010001;
+use 5.008001;
 use strict;
 use warnings;
 
@@ -10,21 +10,62 @@ package Acme::Mitey::Cards::Mite;
 use strict;
 use warnings;
 
+if ( $] < 5.009005 ) {
+   require MRO::Compat;
+}
+
 sub _is_compiling {
     return $ENV{MITE_COMPILE} ? 1 : 0;
 }
 
+sub _make_has {
+    my ( $class, $caller, $file, $kind ) = @_;
+
+    return sub {
+        my $names = shift;
+        $names = [$names] unless ref $names;
+        my %args = @_;
+        for my $name ( @$names ) {
+           $name =~ s/^\+//;
+
+           my $default = $args{default};
+           if ( ref $default eq 'CODE' ) {
+               no strict 'refs';
+               ${$caller .'::__'.$name.'_DEFAULT__'} = $default;
+           }
+
+           my $builder = $args{builder};
+           if ( ref $builder eq 'CODE' ) {
+               no strict 'refs';
+               *{"$caller\::_build_$name"} = $builder;
+           }
+
+           my $trigger = $args{trigger};
+           if ( ref $trigger eq 'CODE' ) {
+               no strict 'refs';
+               *{"$caller\::_trigger_$name"} = $trigger;
+           }
+        }
+
+        return;
+    };
+}
+
 sub import {
-    my $class = shift;
-    my($caller, $file) = caller;
+    my ( $class, $kind ) = @_;
+    my ( $caller, $file ) = caller;
 
     # Turn on warnings and strict in the caller
     warnings->import;
     strict->import;
 
+    $kind ||= 'class';
+    $kind = ( $kind =~ /role/i ) ? 'role' : 'class';
+
     if( _is_compiling() ) {
         require Mite::Project;
-        Mite::Project->default->inject_mite_functions(
+        my $method = "inject_mite_$kind\_functions";
+        Mite::Project->default->$method(
             package     => $caller,
             file        => $file,
         );
@@ -46,38 +87,132 @@ sub import {
             require $mite_file;
         }
 
-        no strict 'refs';
-        *{ $caller .'::has' } = sub {
-            my $names = shift;
-            $names = [$names] unless ref $names;
-            my %args = @_;
-            for my $name ( @$names ) {
-               $name =~ s/^\+//;
+        my $method = "_inject_mite_$kind\_functions";
+        $class->$method( $caller, $file );
+    }
+}
 
-               my $default = $args{default};
-               if ( ref $default eq 'CODE' ) {
-                   ${$caller .'::__'.$name.'_DEFAULT__'} = $default;
-               }
+my $parse_mm_args = sub {
+    my $coderef = pop;
+    my $names   = [ map { ref($_) ? @$_ : $_ } @_ ];
+    ( $names, $coderef );
+};
 
-               my $builder = $args{builder};
-               if ( ref $builder eq 'CODE' ) {
-                   *{"$caller\::_build_$name"} = $builder;
-               }
+{
+    my $get_orig = sub {
+        my ( $caller, $name ) = @_;
+        \&{ "$caller\::$name" };
+    };
 
-               my $trigger = $args{trigger};
-               if ( ref $trigger eq 'CODE' ) {
-                   *{"$caller\::_trigger_$name"} = $trigger;
-               }
-            }
+    sub before {
+        my ( $me, $caller ) = ( shift, shift );
+        my ( $names, $coderef ) = &$parse_mm_args;
+        for my $name ( @$names ) {
+            my $orig = $get_orig->( $caller, $name );
+            local $@;
+            eval <<"BEFORE" or die $@;
+                package $caller;
+                no warnings 'redefine';
+                sub $name {
+                    \$coderef->( \@_ );
+                    \$orig->( \@_ );
+                }
+                1;
+BEFORE
+        }
+        return;
+    }
 
+    sub after {
+        my ( $me, $caller ) = ( shift, shift );
+        my ( $names, $coderef ) = &$parse_mm_args;
+        for my $name ( @$names ) {
+            my $orig = $get_orig->( $caller, $name );
+            local $@;
+            eval <<"AFTER" or die $@;
+                package $caller;
+                no warnings 'redefine';
+                sub $name {
+                    my \@r;
+                    if ( wantarray ) {
+                        \@r = \$orig->( \@_ );
+                    }
+                    elsif ( defined wantarray ) {
+                        \@r = scalar \$orig->( \@_ );
+                    }
+                    else {
+                        \$orig->( \@_ );
+                        1;
+                    }
+                    \$coderef->( \@_ );
+                    wantarray ? \@r : \$r[0];
+                }
+                1;
+AFTER
+        }
+        return;
+    }
+
+    sub around {
+        my ( $me, $caller ) = ( shift, shift );
+        my ( $names, $coderef ) = &$parse_mm_args;
+        for my $name ( @$names ) {
+            my $orig = $get_orig->( $caller, $name );
+            local $@;
+            eval <<"AROUND" or die $@;
+                package $caller;
+                no warnings 'redefine';
+                sub $name {
+                    \$coderef->( \$orig, \@_ );
+                }
+                1;
+AROUND
+        }
+        return;
+    }
+}
+
+
+sub _inject_mite_class_functions {
+    my ( $class, $caller, $file ) = ( shift, @_ );
+
+    no strict 'refs';
+    *{ $caller .'::has' } = $class->_make_has( $caller, $file, 'class' );
+    *{ $caller .'::with' } = sub {
+        while ( @_ ) {
+            my $role = shift;
+            my $args = ref($_[0]) ? shift : undef;
+            $role->__FINALIZE_APPLICATION__( $caller, $args );
+        }
+    };
+    *{ $caller .'::extends'} = sub {};
+    for my $mm ( qw/ before after around / ) {
+        *{"$caller\::$mm"} = sub {
+            $class->$mm( $caller, @_ );
             return;
         };
+    }
+}
 
-        # Inject blank Mite routines
-        for my $name (qw( extends )) {
-            no strict 'refs';
-            *{ $caller .'::'. $name } = sub {};
+sub _inject_mite_role_functions {
+    my ( $class, $caller, $file ) = ( shift, @_ );
+
+    no strict 'refs';
+    *{ $caller .'::has' } = $class->_make_has( $caller, $file, 'role' );
+    *{ $caller .'::with' } = sub {
+        while ( @_ ) {
+            my $role = shift;
+            my $args = ref($_[0]) ? shift : undef;
+            $role->__FINALIZE_APPLICATION__( $caller, $args );
         }
+    };
+
+    my $MM = \@{"$caller\::METHOD_MODIFIERS"};
+    for my $modifier ( qw/ before after around / ) {
+        *{ $caller .'::'. $modifier } = sub {
+            my ( $names, $coderef ) = &$parse_mm_args;
+            push @$MM, [ $modifier, $names, $coderef ];
+        };
     }
 }
 

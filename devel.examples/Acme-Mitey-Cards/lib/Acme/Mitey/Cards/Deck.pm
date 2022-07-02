@@ -80,7 +80,7 @@ sub discard_jokers {
 sub deal_hand {
 	my ( $self, %args ) = ( shift, @_ );
 
-	my $n = delete( $args{count} ) // 7;
+	my $n = defined( $args{count} ) ? delete( $args{count} ) : 7;
 	croak "Not enough cards" if $n > $self->count;
 
 	my $took = $self->take( $n );
