@@ -3,9 +3,9 @@
 @prefix : <http://ontologi.es/doap-deps#>.
 
 `Acme-Mitey-Cards`
-	:runtime-requirement    [ :on "perl 5.010001"^^:CpanId ];
+	:runtime-requirement    [ :on "perl 5.008001"^^:CpanId ];
 	:test-requirement       [ :on "Test::More 0.96"^^:CpanId ];
-	:develop-requirement    [ :on "Mite v0.0.4"^^:CpanId ];
+	:develop-requirement    [ :on "Mite 0.002004"^^:CpanId ];
 	:develop-recommendation [ :on "Dist::Inkt 0.001"^^:CpanId ];
 	.
 
