@@ -82,7 +82,6 @@
 
     sub __META__ {
         no strict 'refs';
-        require mro;
         my $class = shift;
         $class = ref($class) || $class;
         my $linear_isa = mro::get_linear_isa($class);

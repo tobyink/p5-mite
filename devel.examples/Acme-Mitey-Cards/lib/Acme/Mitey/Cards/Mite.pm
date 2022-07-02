@@ -13,6 +13,9 @@ use warnings;
 if ( $] < 5.009005 ) {
     require MRO::Compat;
 }
+else {
+    require mro;
+}
 
 defined ${^GLOBAL_PHASE}
 or eval { require Devel::GlobalDestruction; 1 }
