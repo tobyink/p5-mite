@@ -1,0 +1,214 @@
+=head1 Mite: an OO compiler for Perl
+
+L<Moose> is great, but it does introduce a slight performance hit to your
+code. In the more than 15 years since it was first released, hardware
+improvements have made this less of a problem than it once was. Even so,
+if performance is a concern for your project, Moose might not be what you
+want. It also has a fairly big collection of non-core dependencies.
+
+L<Moo> is a lighter weight version, minus with meta-object protocol, but
+supporting nearly all of Moose's other features. It loads faster, sometimes
+runs faster, and has fewer dependencies. (And most of the dependencies it
+does have are just modules which used to be part of Moo but were split out
+into separate distributions.)
+
+But what if you could have fast Moose-like object-oriented code without the
+dependencies?
+
+In 2013, Michael Schwern started work on L<Mite> to do just that. It was
+abandoned in 2014, but I've taken it over and expanded the feature set to
+roughly equivalent to Moo.
+
+Mite is an object-oriented programming I<compiler> for Perl. It allows you
+to write familiar Moose-like object-oriented code, then compile that into
+plain Perl with zero non-core dependencies. Your compiled code does not
+even have a dependency on Mite itself! 
+
+=head2 How do I use Mite?
+
+Here's how you could start a project with Mite or port an existing
+Moose/Moo project.
+
+=for highlighter language=Bash
+
+   cd Your-Project/
+   mite init 'Your::Project'
+   mite compile
+
+After you've run those commands, Mite will create a module called
+C<< Your::Project::Mite >>. This module is your project's own little
+gateway to Mite. This module is called the shim.
+
+Now let's write a test case:
+
+=for highlighter language=Perl
+
+   # t/unit/Your-Project-Widget.t
+   use Test2::V0
+      -target => 'Your::Project::Widget';
+   
+   can_ok( $CLASS, 'new' );
+   
+   my $object = $CLASS->new( name => 'Quux' );
+   isa_ok( $object, $CLASS );
+   
+   subtest 'Method `name`' => sub {
+      can_ok( $object, 'name' );
+      is( $object->name, 'Quux', 'expected value' );
+      
+      my $e = dies {
+         $object->name( 'XYZ' );
+      };
+      isnt( $exception, undef, 'read-only attribute' );
+   };
+   
+   subtest 'Method `upper_case_name`' => sub {
+      can_ok( $object, 'upper_case_name' );
+      is( $object->upper_case_name, 'QUUX', 'expected value' );
+   };
+   
+   done_testing;
+
+And a class to implement the functionality:
+
+=for highlighter language=Perl
+
+   # lib/Your/Project/Widget.pm
+   package Your::Project::Widget;
+   use Your::Project::Mite;
+   
+   has name => (
+      is     => 'ro',
+      isa    => 'Str',
+   );
+   
+   sub upper_case_name {
+      my $self = shift;
+      return uc( $self->name );
+   }
+   
+   1;
+
+Run C<< mite compile >> again then run the test case. It should pass.
+
+=head2 How does Mite work?
+
+It's important to understand what Mite is doing behind the scenes.
+
+When you ran C<< mite compile >>, Mite created a file called
+F<lib/Your/Project/Widget.pm.mite.pm>. (Yes, a triple file extension!)
+This file contains your class's C<new> method. It contains the code for
+the accessor.
+
+That file does not contain the code for C<upper_case_name> which is still
+in the original F<lib/Your/Project/Widget.pm>.
+
+When Perl loads C<< Your::Project::Widget >>, it will see this line and
+load the shim:
+
+=for highlighter language=Perl
+
+   use Your::Project::Mite;
+
+The shim just loads F<lib/Your/Project/Widget.pm.mite.pm>, exports a C<has>
+function that does (almost) nothing, and then gets out of the way. This gives
+Perl a working class.
+
+=head2 What features does Mite support?
+
+Most of what Moo supports is supported by Mite. In particular:
+
+=over
+
+=item C<< extends @superclasses >>
+
+Mite classes within your project can inherit from other Mite classes
+within your project, but not from non-Mite classes, and not from Mite
+classes from a different project.
+
+=item C<< with @roles >>
+
+As of version 0.002000, Mite also supports roles. If you want your
+package to be a role instead of a class, just do:
+
+=for highlighter language=Perl
+
+   package Your::Project::Nameable;
+   use Your::Project::Mite -role;
+   has name => (
+      is => 'ro',
+      isa => 'Str',
+   );
+   1;
+
+As with C<extends>, a limitation is that you can only use Mite roles
+from within your own project, not non-Mite roles, nor Mite roles from
+a different project.
+
+(A future development might add support for L<Role::Tiny> roles though.)
+
+=item C<< has $attrname => %spec >>
+
+Attributes are obviously one of the main features people look for in a
+Perl object-oriented programming framework and Mite supports nearly all
+of Moose's features for defining attributes.
+
+This includes C<< is => 'ro' >>, C<< is => 'rw' >>, C<< is => 'bare' >>,
+C<< is => 'rwp' >> (like Moo), and C<< is => 'lazy' >> (like Moo);
+C<required> and C<init_arg> for attribute initialization;
+C<reader>, C<writer>, C<accessor>, C<predicate>, C<clearer>, and C<trigger>;
+C<lazy>, C<default>, and C<builder>; C<weak_ref>; C<isa> and C<coerce> for
+type constraints, including support for any type constraints in
+L<Types::Standard>, L<Types::Common::Numeric>, and L<Types::Common::String>;
+and delegation using C<handles>. It also supports an option which Moose
+doesn't provide: C<alias> for aliasing attributes.
+
+Mite builds in the functionality of L<MooseX::StrictConstructor>, dying
+with an appropriate error message if you pass your class's constructor any
+parameters it wasn't expecting.
+
+=item C<BUILDARGS>, C<BUILD>, and C<DEMOLISH>
+
+Methods you can define to control the life cycle of objects.
+
+=item C<< before $method => sub { ... } >>
+
+=item C<< after $method => sub { ... } >>
+
+=item C<< around $method => sub { ... } >>
+
+Mite classes and roles can define method modifiers.
+
+=back
+
+As long as your needs aren't super-sophisticated (introspection using the MOP,
+runtime application of roles, etc), Mite probably has the features you need
+for even medium to large projects.
+
+Mite itself uses Mite!
+
+=head2 Be honest, what are the drawbacks?
+
+This code still doesn't have a lot of testing "in the wild". Moose and Moo
+have proven track records.
+
+You need to remember to C<< mite compile >> your code after making changes
+before running your test suite or packaging up a release. This can be
+annoyingly easy to forget to do. (Though Mite does also include extensions
+for ExtUtils::MakeMaker and Module::Build to help integrate that into your
+workflow.)
+
+The Mite compiler's scope of only looking at the files within your own project
+limits the ability to create roles which can be composed by third-parties,
+or classes which can easily be extended by third-parties. If you want that,
+Moose or Moo are a better option.
+
+=head2 Okay, I'm interested
+
+If you've read this and you're thinking about porting a Moose or Moo project
+to Mite, feel free to @-mention L<tobyink on Github|https://github.com/tobyink>
+in issue tickets, pull requests, etc if you need any help.
+
+If there are features which you think Mite is missing which
+you'd need to port your project to Mite, file bugs with the
+L<Mite issue tracker|https://github.com/tobyink/p5-mite/issues>.
