@@ -70,7 +70,7 @@ has coerce =>
 
 has default =>
   is            => rw,
-  isa           => Maybe[Str|Ref],
+  isa           => Undef|Str|CodeRef,
   predicate     => 'has_default';
 
 has lazy =>
@@ -260,18 +260,6 @@ sub _build_type {
     }
 
     return $type;
-}
-
-sub has_dataref_default {
-    my $self = shift;
-
-    # We don't have a default
-    return 0 unless $self->has_default;
-
-    # It's not a reference.
-    return 0 if $self->has_simple_default;
-
-    return ref $self->default ne 'CODE';
 }
 
 sub has_coderef_default {

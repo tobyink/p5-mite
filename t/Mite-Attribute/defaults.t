@@ -23,7 +23,6 @@ tests has_simple_default => sub {
         0,
         23,
         "zero",
-        qr/foo/
     );
 
     for my $default (@simple_defaults) {
@@ -31,25 +30,6 @@ tests has_simple_default => sub {
         my $attr = new_ok $CLASS, [ name => "foo", default => $default ];
         ok $attr->has_default;
         ok $attr->has_simple_default;
-        ok !$attr->has_dataref_default;
-        ok !$attr->has_coderef_default;
-    }
-};
-
-
-tests has_dataref_default => sub {
-    my @dataref_defaults = (
-        [],
-        {},
-        \23,
-    );
-
-    for my $default (@dataref_defaults) {
-        note "Default: $default";
-        my $attr = new_ok $CLASS, [ name => "foo", default => $default ];
-        ok $attr->has_default;
-        ok !$attr->has_simple_default;
-        ok $attr->has_dataref_default;
         ok !$attr->has_coderef_default;
     }
 };
@@ -65,7 +45,6 @@ tests has_coderef_default => sub {
         my $attr = new_ok $CLASS, [ name => "foo", default => $default ];
         ok $attr->has_default;
         ok !$attr->has_simple_default;
-        ok !$attr->has_dataref_default;
         ok $attr->has_coderef_default;
     }
 };
