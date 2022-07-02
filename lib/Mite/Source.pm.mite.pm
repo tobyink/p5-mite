@@ -27,10 +27,6 @@ sub new {
     return $self;
 }
 
-defined ${^GLOBAL_PHASE}
-    or eval { require Devel::GlobalDestruction; 1 }
-    or do   { *Devel::GlobalDestruction::in_global_destruction = sub { undef; } };
-
 sub DESTROY {
     my $self  = shift;
     my $class = ref( $self ) || $self;
@@ -52,7 +48,6 @@ sub DESTROY {
 
 sub __META__ {
     no strict 'refs';
-    require mro;
     my $class      = shift; $class = ref($class) || $class;
     my $linear_isa = mro::get_linear_isa( $class );
     return {
