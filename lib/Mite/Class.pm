@@ -263,7 +263,10 @@ sub _compile_strict_constructor {
         values %{ $self->all_attributes };
     my $check = do {
         local $Type::Tiny::AvoidCallbacks = 1;
-        Enum->of( @allowed )->inline_check( '$_' );
+        my $enum = Enum->of( @allowed );
+        $enum->can( '_regexp' )  # not part of official API
+            ? sprintf( '/\\A%s\\z/', $enum->_regexp )
+            : $enum->inline_check( '$_' );
     };
 
     return sprintf 'my @unknown = grep not( %s ), keys %%{%s}; @unknown and require Carp and Carp::croak("Unexpected keys in constructor: " . join(q[, ], sort @unknown));',

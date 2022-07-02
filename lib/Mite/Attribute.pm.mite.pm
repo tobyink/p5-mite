@@ -38,7 +38,7 @@ sub new {
     if ( exists($args->{q[writer]}) ) { do { package Mite::Miteception; (((do { package Mite::Miteception; defined($args->{q[writer]}) and do { ref(\$args->{q[writer]}) eq 'SCALAR' or ref(\(my $val = $args->{q[writer]})) eq 'SCALAR' } }) && (do { local $_ = $args->{q[writer]}; length($_) > 0 })) or do { package Mite::Miteception; !defined($args->{q[writer]}) }) } or require Carp && Carp::croak(q[Type check failed in constructor: writer should be __ANON__|Undef]); $self->{q[writer]} = $args->{q[writer]};  }
 
     # Enforce strict constructor
-    my @unknown = grep not( do { package Mite::Miteception; (defined and !ref and m{\A(?:(?:_class_for_default|a(?:ccessor|lias)|builder|c(?:l(?:ass|earer)|o(?:deref_default_variable|erce))|d(?:efault|ocumentation)|handles|i(?:nit_arg|sa?)|lazy|name|predicate|re(?:ader|quired)|t(?:rigger|ype)|w(?:eak_ref|riter)))\z}) } ), keys %{$args}; @unknown and require Carp and Carp::croak("Unexpected keys in constructor: " . join(q[, ], sort @unknown));
+    my @unknown = grep not( /\A(?:_class_for_default|a(?:ccessor|lias)|builder|c(?:l(?:ass|earer)|o(?:deref_default_variable|erce))|d(?:efault|ocumentation)|handles|i(?:nit_arg|sa?)|lazy|name|predicate|re(?:ader|quired)|t(?:rigger|ype)|w(?:eak_ref|riter))\z/ ), keys %{$args}; @unknown and require Carp and Carp::croak("Unexpected keys in constructor: " . join(q[, ], sort @unknown));
 
     # Call BUILD methods
     unless ( $no_build ) { $_->($self, $args) for @{ $meta->{BUILD} || [] } };

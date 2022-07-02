@@ -19,7 +19,7 @@ sub new {
     if ( exists($args->{q[source]}) ) { (do { use Scalar::Util (); Scalar::Util::blessed($args->{q[source]}) and $args->{q[source]}->isa(q[Mite::Source]) }) or require Carp && Carp::croak(q[Type check failed in constructor: source should be InstanceOf["Mite::Source"]]); $self->{q[source]} = $args->{q[source]};  } require Scalar::Util && Scalar::Util::weaken($self->{q[source]});
 
     # Enforce strict constructor
-    my @unknown = grep not( do { package Mite::Miteception; (defined and !ref and m{\A(?:(?:attributes|name|roles|source))\z}) } ), keys %{$args}; @unknown and require Carp and Carp::croak("Unexpected keys in constructor: " . join(q[, ], sort @unknown));
+    my @unknown = grep not( /\A(?:attributes|name|roles|source)\z/ ), keys %{$args}; @unknown and require Carp and Carp::croak("Unexpected keys in constructor: " . join(q[, ], sort @unknown));
 
     # Call BUILD methods
     unless ( $no_build ) { $_->($self, $args) for @{ $meta->{BUILD} || [] } };

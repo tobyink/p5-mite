@@ -17,7 +17,7 @@ sub new {
     if ( exists($args->{q[sources]}) ) { (do { package Mite::Miteception; ref($args->{q[sources]}) eq 'HASH' } and do { my $ok = 1; for my $i (values %{$args->{q[sources]}}) { ($ok = 0, last) unless (do { use Scalar::Util (); Scalar::Util::blessed($i) and $i->isa(q[Mite::Source]) }) }; $ok }) or require Carp && Carp::croak(q[Type check failed in constructor: sources should be HashRef[InstanceOf["Mite::Source"]]]); $self->{q[sources]} = $args->{q[sources]};  } else { my $value = do { my $default_value = do { my $method = $Mite::Project::__sources_DEFAULT__; $self->$method }; do { package Mite::Miteception; (ref($default_value) eq 'HASH') and do { my $ok = 1; for my $i (values %{$default_value}) { ($ok = 0, last) unless (do { use Scalar::Util (); Scalar::Util::blessed($i) and $i->isa(q[Mite::Source]) }) }; $ok } } or do { require Carp; Carp::croak(q[Type check failed in default: sources should be HashRef[InstanceOf["Mite::Source"]]]) }; $default_value }; $self->{q[sources]} = $value;  }
 
     # Enforce strict constructor
-    my @unknown = grep not( do { package Mite::Miteception; (defined and !ref and m{\A(?:(?:config|sources))\z}) } ), keys %{$args}; @unknown and require Carp and Carp::croak("Unexpected keys in constructor: " . join(q[, ], sort @unknown));
+    my @unknown = grep not( /\A(?:config|sources)\z/ ), keys %{$args}; @unknown and require Carp and Carp::croak("Unexpected keys in constructor: " . join(q[, ], sort @unknown));
 
     # Call BUILD methods
     unless ( $no_build ) { $_->($self, $args) for @{ $meta->{BUILD} || [] } };

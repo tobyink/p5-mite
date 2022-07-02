@@ -20,7 +20,7 @@ sub new {
     if ( exists($args->{q[search_for_mite_dir]}) ) { do { package Mite::Miteception; !ref $args->{q[search_for_mite_dir]} and (!defined $args->{q[search_for_mite_dir]} or $args->{q[search_for_mite_dir]} eq q() or $args->{q[search_for_mite_dir]} eq '0' or $args->{q[search_for_mite_dir]} eq '1') } or require Carp && Carp::croak(q[Type check failed in constructor: search_for_mite_dir should be Bool]); $self->{q[search_for_mite_dir]} = $args->{q[search_for_mite_dir]};  } else { my $value = do { my $default_value = "1"; (!ref $default_value and (!defined $default_value or $default_value eq q() or $default_value eq '0' or $default_value eq '1')) or do { require Carp; Carp::croak(q[Type check failed in default: search_for_mite_dir should be Bool]) }; $default_value }; $self->{q[search_for_mite_dir]} = $value;  }
 
     # Enforce strict constructor
-    my @unknown = grep not( do { package Mite::Miteception; (defined and !ref and m{\A(?:(?:config_file|data|mite_dir(?:_name)?|search_for_mite_dir))\z}) } ), keys %{$args}; @unknown and require Carp and Carp::croak("Unexpected keys in constructor: " . join(q[, ], sort @unknown));
+    my @unknown = grep not( /\A(?:config_file|data|mite_dir(?:_name)?|search_for_mite_dir)\z/ ), keys %{$args}; @unknown and require Carp and Carp::croak("Unexpected keys in constructor: " . join(q[, ], sort @unknown));
 
     # Call BUILD methods
     unless ( $no_build ) { $_->($self, $args) for @{ $meta->{BUILD} || [] } };
