@@ -1,4 +1,4 @@
-use 5.010001;
+use 5.008001;
 use strict;
 use warnings;
 
@@ -9,6 +9,10 @@ package Mite::Shim;
 
 use strict;
 use warnings;
+
+if ( $] < 5.009005 ) {
+   require MRO::Compat;
+}
 
 sub _is_compiling {
     return $ENV{MITE_COMPILE} ? 1 : 0;
