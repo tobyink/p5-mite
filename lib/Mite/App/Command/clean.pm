@@ -7,7 +7,7 @@ use Mite::Miteception;
 extends qw(Mite::App::Command);
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.002003';
+our $VERSION   = '0.002004';
 
 ##-
 

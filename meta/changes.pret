@@ -1,6 +1,15 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.002004 cpan:TOBYINK`
+	issued  2022-07-03;
+	changeset [
+		item "Compiled .mite.pm files no longer require Perl 5.10.1 but should work on Perl 5.8.1+ as long as MRO::Compat is installed."^^Change;
+		item "Mite::Shim will print a warning on Perl older than 5.14 if Devel::GlobalDestruction isn't installed."^^Change;
+		item "More reliable (and tidier) quoting of strings in compiled .mite.pm files."^^Change;
+		item "Fixed a couple of typos in the documentation for `accessor`."^^Documentation;
+	].
+
 `Mite 0.002003 cpan:TOBYINK`
 	issued  2022-07-02;
 	changeset [

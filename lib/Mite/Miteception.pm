@@ -5,7 +5,7 @@ use warnings;
 package Mite::Miteception;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.002003';
+our $VERSION   = '0.002004';
 
 my %constants;
 BEGIN {

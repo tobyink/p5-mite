@@ -5,7 +5,7 @@ use warnings;
 package Mite::App;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.002003';
+our $VERSION   = '0.002004';
 
 use App::Cmd::Setup -app;
 
