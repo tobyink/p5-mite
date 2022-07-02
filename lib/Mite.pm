@@ -113,6 +113,8 @@ L<Mite::Manual::Workflow> - how to develop with Mite.
 
 L<Mite::Manual::Syntax> - Moose-like syntax supported by Mite.
 
+L<Mite::Manual::Missing> - Moose features not supported by Mite.
+
 L<Moose> is the complete Perl 5 OO module which this is all based on.
 
 L<Moo> is a lighter-weight Moose-compatible module with fewer dependencies.
