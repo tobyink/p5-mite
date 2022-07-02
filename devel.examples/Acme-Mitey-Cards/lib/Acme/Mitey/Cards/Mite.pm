@@ -11,8 +11,15 @@ use strict;
 use warnings;
 
 if ( $] < 5.009005 ) {
-   require MRO::Compat;
+    require MRO::Compat;
 }
+
+defined ${^GLOBAL_PHASE}
+or eval { require Devel::GlobalDestruction; 1 }
+or do {
+    warn "WARNING: Devel::GlobalDestruction recommended!\n";
+    *Devel::GlobalDestruction::in_global_destruction = sub { undef; };
+};
 
 sub _is_compiling {
     return $ENV{MITE_COMPILE} ? 1 : 0;

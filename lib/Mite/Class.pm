@@ -289,10 +289,6 @@ sub _compile_buildall {
 sub _compile_destroy {
     my $self = shift;
     sprintf <<'CODE', $self->_compile_meta( '$class', '$self' );
-defined ${^GLOBAL_PHASE}
-    or eval { require Devel::GlobalDestruction; 1 }
-    or do   { *Devel::GlobalDestruction::in_global_destruction = sub { undef; } };
-
 sub DESTROY {
     my $self  = shift;
     my $class = ref( $self ) || $self;
