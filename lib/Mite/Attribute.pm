@@ -113,6 +113,11 @@ has alias_is_for =>
 
 ##-
 
+use B ();
+sub _q          { shift; join q[, ], map B::perlstring($_), @_ }
+sub _q_name     { B::perlstring( shift->name ) }
+sub _q_init_arg { B::perlstring( shift->init_arg ) }
+
 my @method_name_generator = (
     { # public
         reader      => sub { "get_$_" },
@@ -309,8 +314,8 @@ sub _compile_checked_default {
         $default = $self->_compile_coercion( $default );
     }
 
-    return sprintf 'do { my $default_value = %s; %s or do { require Carp; Carp::croak(q[Type check failed in default: %s should be %s]) }; $default_value }',
-        $default, $type->inline_check('$default_value'), $self->name, $type->display_name;
+    return sprintf 'do { my $default_value = %s; %s or do { require Carp; Carp::croak(sprintf "Type check failed in default: %%s should be %%s", %s, %s) }; $default_value }',
+        $default, $type->inline_check('$default_value'), $self->_q($self->name), $self->_q($type->display_name);
 }
 
 sub _compile_default {
@@ -325,8 +330,7 @@ sub _compile_default {
         return ${ $self->default };
     }
     elsif ( $self->has_simple_default ) {
-        require B;
-        return defined( $self->default ) ? B::perlstring( $self->default ) : 'undef';
+        return defined( $self->default ) ? $self->_q( $self->default ) : 'undef';
     }
     elsif ( $self->has_builder ) {
         return sprintf '%s->%s', $selfvar, $self->builder;
@@ -352,28 +356,28 @@ sub compile_init {
     my $code = '';
     if ( defined $init_arg ) {
         if ( my @alias = $self->_all_aliases ) {
-            $code .= sprintf 'for my $alias ( %s ) { last if exists(%s->{q[%s]}); next if !exists(%s->{$alias}); %s->{q[%s]} = %s->{$alias} } ',
-                join( q[, ], map qq{q[$_]}, @alias ), $argvar, $init_arg, $argvar, $argvar, $init_arg, $argvar;
+            $code .= sprintf 'for my $alias ( %s ) { last if exists %s->{%s}; next if !exists %s->{$alias}; %s->{%s} = %s->{$alias} } ',
+                $self->_q( @alias ), $argvar, $self->_q_init_arg, $argvar, $argvar, $self->_q_init_arg, $argvar;
         }
-        $code .= sprintf 'if ( exists(%s->{q[%s]}) ) { ',
-            $argvar, $init_arg;
+        $code .= sprintf 'if ( exists %s->{%s} ) { ',
+            $argvar, $self->_q_init_arg;
         if ( my $type = $self->type ) {
             local $Type::Tiny::AvoidCallbacks = 1;
-            my $valuevar = sprintf '%s->{q[%s]}', $argvar, $init_arg;
+            my $valuevar = sprintf '%s->{%s}', $argvar, $self->_q_init_arg;
             if ( $self->coerce ) {
                 $code .= sprintf 'my $value = %s; ', $self->_compile_coercion( $valuevar );
                 $valuevar = '$value';
             }
-            $code .= sprintf '%s or require Carp && Carp::croak(q[Type check failed in constructor: %s should be %s]); ',
+            $code .= sprintf '%s or require Carp && Carp::croak(sprintf "Type check failed in constructor: %%s should be %%s", %s, %s); ',
                 $type->inline_check( $valuevar ),
-                $self->init_arg,
-                $type->display_name;
-            $code .= sprintf '%s->{q[%s]} = %s; ',
-                $selfvar, $self->name, $valuevar;
+                $self->_q_init_arg,
+                $self->_q( $type->display_name );
+            $code .= sprintf '%s->{%s} = %s; ',
+                $selfvar, $self->_q_name, $valuevar;
         }
         else {
-            $code .= sprintf '%s->{q[%s]} = %s->{q[%s]}; ',
-                $selfvar, $self->name, $argvar, $init_arg;
+            $code .= sprintf '%s->{%s} = %s->{%s}; ',
+                $selfvar, $self->_q_name, $argvar, $self->_q_init_arg;
         }
         $code .= ' }';
     }
@@ -388,8 +392,8 @@ sub compile_init {
         }
         $code .= sprintf 'my $value = %s; ',
             $self->_compile_checked_default( $selfvar );
-        $code .= sprintf '%s->{q[%s]} = %s; ',
-            $selfvar, $self->name, '$value';
+        $code .= sprintf '%s->{%s} = %s; ',
+            $selfvar, $self->_q_name, '$value';
         $code .= ' }';
     }
     elsif ( defined $init_arg
@@ -400,14 +404,14 @@ sub compile_init {
     }
 
     if ( $self->weak_ref ) {
-      $code .= sprintf ' require Scalar::Util && Scalar::Util::weaken(%s->{q[%s]});',
-         $selfvar, $self->name;
+      $code .= sprintf ' require Scalar::Util && Scalar::Util::weaken(%s->{%s});',
+         $selfvar, $self->_q_name;
     }
 
     if ( $self->trigger ) {
         $code .= ' ' . $self->_compile_trigger(
             $selfvar,
-            sprintf( '%s->{q[%s]}', $selfvar, $self->name ),
+            sprintf( '%s->{%s}', $selfvar, $self->_q_name ),
         ) . ';';
     }
 
@@ -419,15 +423,14 @@ my %code_template;
     reader => sub {
         my $self = shift;
         my %arg = @_;
-        my $slot_name = $self->name;
-        my $code = sprintf '$_[0]{q[%s]}', $slot_name;
+        my $code = sprintf '$_[0]{%s}', $self->_q_name;
         if ( $self->lazy ) {
-            $code = sprintf '( exists($_[0]{q[%s]}) ? $_[0]{q[%s]} : ( $_[0]{q[%s]} = %s ) )',
-                $slot_name, $slot_name, $slot_name, $self->_compile_checked_default( '$_[0]' );
+            $code = sprintf '( exists($_[0]{%s}) ? $_[0]{%s} : ( $_[0]{%s} = %s ) )',
+                $self->_q_name, $self->_q_name, $self->_q_name, $self->_compile_checked_default( '$_[0]' );
         }
         unless ( $arg{no_croak} ) {
             $code = sprintf '@_ > 1 ? require Carp && Carp::croak("%s is a read-only attribute of @{[ref $_[0]]}") : %s',
-                $slot_name, $code;
+                $self->name, $code;
         }
         return $code;
     },
@@ -441,11 +444,10 @@ my %code_template;
     writer => sub {
         my $self = shift;
         my %arg = @_;
-        my $slot_name = $self->name;
         my $code = '';
         if ( $self->trigger ) {
-            $code .= sprintf 'my @oldvalue; @oldvalue = $_[0]{q[%s]} if exists $_[0]{q[%s]}; ',
-                $slot_name, $slot_name;
+            $code .= sprintf 'my @oldvalue; @oldvalue = $_[0]{%s} if exists $_[0]{%s}; ',
+                $self->_q_name, $self->_q_name;
         }
         if ( my $type = $self->type ) {
             local $Type::Tiny::AvoidCallbacks = 1;
@@ -454,22 +456,22 @@ my %code_template;
                 $code .= sprintf 'my $value = %s; ', $self->_compile_coercion($valuevar);
                 $valuevar = '$value';
             }
-            $code .= sprintf '%s or require Carp && Carp::croak(q[Type check failed in %s: value should be %s]); $_[0]{q[%s]} = %s;',
-                $type->inline_check($valuevar), $arg{label}//'writer', $type->display_name, $slot_name, $valuevar;
+            $code .= sprintf '%s or require Carp && Carp::croak(sprintf "Type check failed in %%s: value should be %%s", %s, %s); $_[0]{%s} = %s;',
+                $type->inline_check($valuevar), $self->_q( $arg{label} // 'writer' ), $self->_q( $type->display_name ), $self->_q_name, $valuevar;
         }
         else {
-            $code .= sprintf '$_[0]{q[%s]} = $_[1];', $slot_name;
+            $code .= sprintf '$_[0]{%s} = $_[1];', $self->_q_name;
         }
         if ( $self->trigger ) {
             $code .= ' ' . $self->_compile_trigger(
                 '$_[0]',
-                sprintf( '$_[0]{q[%s]}', $self->name ),
+                sprintf( '$_[0]{%s}', $self->_q_name ),
                 '@oldvalue',
             ) . ';';
         }
         if ( $self->weak_ref ) {
-            $code .= sprintf ' require Scalar::Util && Scalar::Util::weaken($_[0]{q[%s]});',
-                $slot_name;
+            $code .= sprintf ' require Scalar::Util && Scalar::Util::weaken($_[0]{%s});',
+                $self->_q_name;
         }
         $code .= ' $_[0];';
         return $code;
@@ -489,15 +491,13 @@ my %code_template;
         sprintf '@_ > 1 ? %s : %s', @parts;
     },
     clearer => sub {
-        my $slot_name = shift->name;
+        my $self = shift;
         my %arg = @_;
-        sprintf 'delete $_[0]->{q[%s]}; $_[0];',
-            $slot_name;
+        sprintf 'delete $_[0]{%s}; $_[0];', $self->_q_name;
     },
     predicate => sub {
-        my $slot_name = shift->name;
-        sprintf 'exists $_[0]->{q[%s]}',
-            $slot_name;
+        my $self = shift;
+        sprintf 'exists $_[0]{%s}', $self->_q_name;
     },
 );
 
@@ -554,7 +554,8 @@ sub compile {
         $code .= "    Class::XSAccessor->import(\n";
         $code .= "        chained => 1,\n";
         for my $property ( sort keys %want_xs ) {
-            $code .= "        $xs_option_name{$property} => { q[$method_name{$property}] => q[$slot_name] },\n";
+            $code .= sprintf "        %s => { %s => %s },\n",
+                $self->_q( $xs_option_name{$property} ), $self->_q( $method_name{$property} ), $self->_q_name;
         }
         $code .= "    );\n";
         $code .= "}\n";
@@ -568,7 +569,7 @@ sub compile {
     }
 
     for my $property ( sort keys %want_pp ) {
-        $code .= sprintf '*%s = sub { %s };' . "\n",
+        $code .= sprintf 'sub %s { %s }' . "\n",
             $method_name{$property}, $code_template{$property}->($self);
     }
 

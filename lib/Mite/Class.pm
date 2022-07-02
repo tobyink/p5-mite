@@ -11,6 +11,7 @@ our $VERSION   = '0.002003';
 
 use Path::Tiny;
 use mro;
+use B ();
 
 # Super classes as class names
 has extends =>
@@ -209,7 +210,7 @@ sub _compile_extends {
                             grep { !$source || !$source->has_class($_) }
                             @$extends;
 
-    my $isa_list     = join ", ", map { "q[$_]" } @$extends;
+    my $isa_list     = join ", ", map B::perlstring($_), @$extends;
 
     return <<"END";
 BEGIN {

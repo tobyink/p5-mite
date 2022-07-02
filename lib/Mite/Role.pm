@@ -9,7 +9,7 @@ our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.002003';
 
 use Path::Tiny;
-use mro;
+use B ();
 
 BEGIN {
     *_CONSTANTS_DEFLATE = "$]" >= 5.012 && "$]" < 5.020 ? sub(){1} : sub(){0};
@@ -256,7 +256,7 @@ sub _compile_with {
                             grep { !$source || !$source->has_class($_) }
                             @$roles;
 
-    my $does_hash = join ", ", map { "q[$_] => 1" } $self->does_list;
+    my $does_hash = join ", ", map sprintf( "%s => 1", B::perlstring($_) ), $self->does_list;
 
     return <<"END";
 BEGIN {
@@ -309,7 +309,7 @@ sub _compile_package {
 sub _compile_uses_mite {
     my $self = shift;
 
-    return sprintf 'our $USES_MITE = q[%s];', ref($self);
+    return sprintf 'our $USES_MITE = %s;', B::perlstring( ref($self) );
 }
 
 sub _compile_pragmas {
@@ -346,8 +346,8 @@ CODE
 sub _compile_callback {
     my $self = shift;
 
-    my $role_list = join q[, ], map sprintf( 'q[%s]', $_->name ), @{ $self->roles };
-    my $shim = eval { $self->project->config->data->{shim} } || 'Mite::Shim';
+    my $role_list = join q[, ], map B::perlstring( $_->name ), @{ $self->roles };
+    my $shim = B::perlstring( eval { $self->project->config->data->{shim} } || 'Mite::Shim' );
 
     return sprintf <<'CODE', $role_list, $shim;
 # Callback which classes consuming this role will call
@@ -374,7 +374,7 @@ sub __FINALIZE_APPLICATION__ {
         $role->__FINALIZE_APPLICATION__( $target, { %%nextargs } );
     }
 
-    my $shim = q[%s];
+    my $shim = %s;
     for my $modifier_rule ( @METHOD_MODIFIERS ) {
         my ( $modification, $names, $coderef ) = @$modifier_rule;
         $shim->$modification( $target, $names, $coderef );

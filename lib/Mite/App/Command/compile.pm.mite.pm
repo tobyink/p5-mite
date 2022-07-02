@@ -1,6 +1,6 @@
 {
 package Mite::App::Command::compile;
-our $USES_MITE = q[Mite::Class];
+our $USES_MITE = "Mite::Class";
 use strict;
 use warnings;
 
@@ -9,7 +9,7 @@ BEGIN {
 
     use mro 'c3';
     our @ISA;
-    push @ISA, q[Mite::App::Command];
+    push @ISA, "Mite::App::Command";
 }
 
 sub new {

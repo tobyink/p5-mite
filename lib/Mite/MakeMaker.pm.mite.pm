@@ -1,6 +1,6 @@
 {
 package Mite::MakeMaker;
-our $USES_MITE = q[Mite::Class];
+our $USES_MITE = "Mite::Class";
 use strict;
 use warnings;
 
