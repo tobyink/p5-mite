@@ -322,13 +322,14 @@ sub _compile_init_attributes {
     my @code;
     my $depth = 1;
     my %depth = map { $_ => $depth++; } $self->linear_isa;
-    my @attributes =
+    my @attributes = do {
+        no warnings;
         sort {
-            no warnings;
             eval { $depth{$b->class->name} <=> $depth{$a->class->name} }
             or $a->_order <=> $b->_order;
         }
         values %{ $self->all_attributes };
+    };
     for my $attr ( @attributes ) {
         my $code = $attr->compile_init( $selfvar, $argvar );
         push @code, $code if $code;
