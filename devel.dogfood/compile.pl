@@ -115,6 +115,7 @@ my @packages = qw(
 	Mite::MakeMaker
 	Mite::Project
 	Mite::Role
+	Mite::Role::Tiny
 	Mite::Source
 );
 

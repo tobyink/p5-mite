@@ -61,6 +61,34 @@ sub _make_has {
     };
 }
 
+sub _make_with {
+    my ( $class, $caller, $file, $kind ) = @_;
+
+    return sub {
+        while ( @_ ) {
+            my $role = shift;
+            my $args = ref($_[0]) ? shift : undef;
+            if ( $INC{'Role/Tiny.pm'} and 'Role::Tiny'->is_role( $role ) ) {
+                $class->_finalize_application_roletiny( $role, $caller, $args );
+            }
+            else {
+                $role->__FINALIZE_APPLICATION__( $caller, $args );
+            }
+        }
+    };
+}
+
+sub _finalize_application_roletiny {
+    my ( $class, $role, $caller, $args ) = @_;
+    my $info = $Role::Tiny::INFO{$role};
+    for ( @{ $info->{modifiers} || [] } ) {
+        my @args = @$_;
+        my $kind = shift @args;
+        $class->$kind( $caller, @args );
+    }
+    return;
+}
+
 sub import {
     my ( $class, $kind ) = @_;
     my ( $caller, $file ) = caller;
@@ -188,14 +216,9 @@ sub _inject_mite_class_functions {
 
     no strict 'refs';
     *{ $caller .'::has' } = $class->_make_has( $caller, $file, 'class' );
-    *{ $caller .'::with' } = sub {
-        while ( @_ ) {
-            my $role = shift;
-            my $args = ref($_[0]) ? shift : undef;
-            $role->__FINALIZE_APPLICATION__( $caller, $args );
-        }
-    };
+    *{ $caller .'::with' } = $class->_make_with( $caller, $file, 'class' );
     *{ $caller .'::extends'} = sub {};
+
     for my $mm ( qw/ before after around / ) {
         *{"$caller\::$mm"} = sub {
             $class->$mm( $caller, @_ );
@@ -209,13 +232,7 @@ sub _inject_mite_role_functions {
 
     no strict 'refs';
     *{ $caller .'::has' } = $class->_make_has( $caller, $file, 'role' );
-    *{ $caller .'::with' } = sub {
-        while ( @_ ) {
-            my $role = shift;
-            my $args = ref($_[0]) ? shift : undef;
-            $role->__FINALIZE_APPLICATION__( $caller, $args );
-        }
-    };
+    *{ $caller .'::with' } = $class->_make_with( $caller, $file, 'role' );
 
     my $MM = \@{"$caller\::METHOD_MODIFIERS"};
     for my $modifier ( qw/ before after around / ) {

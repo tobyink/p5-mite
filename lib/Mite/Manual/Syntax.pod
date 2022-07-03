@@ -221,9 +221,9 @@ Options hashrefs, including the C<< -version >> option are not implemented.
 
 Works as in L<Moose>.
 
-Roles must be Mite roles created in your own project. Mite does not support
-using roles from other projects, or using role implementations other than
-Mite.
+Roles must be Mite roles created in your own project, or Role::Tiny roles.
+Mite does not support using roles from other projects, or using role
+implementations other than Mite and Role::Tiny.
 
 Options hashrefs, including the C<< -version >> option are not implemented.
 

@@ -38,6 +38,10 @@ has roles =>
 
 ##-
 
+sub skip_compiling {
+    return false;
+}
+
 sub _all_subs {
     my $self = shift;
     my $package = $self->name;
@@ -199,13 +203,18 @@ sub _get_role {
 
     # If not, try to load it
     eval "require $role_name;";
-    $role = $project->class($role_name, 'Mite::Role');
+    if ( $INC{'Role/Tiny.pm'} and 'Role::Tiny'->is_role( $role_name ) ) {
+        require Mite::Role::Tiny;
+        $role = 'Mite::Role::Tiny'->inhale( $role_name );
+    }
+    else {
+        $role = $project->class( $role_name, 'Mite::Role' );
+    }
     return $role if $role;
 
     croak <<"ERROR";
-$role_name loaded but is not a Mite role.
-Composing non-Mite roles not yet supported.
-Sorry.
+$role_name loaded but is not a recognized role. Mite roles and Role::Tiny
+roles are the only supported roles. Sorry.
 ERROR
 }
 
