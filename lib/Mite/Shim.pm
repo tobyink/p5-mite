@@ -63,24 +63,13 @@ sub _make_has {
 
 sub _make_with {
     my ( $class, $caller, $file, $kind ) = @_;
-    my ( $cb_before, $cb_after );
 
     return sub {
         while ( @_ ) {
             my $role = shift;
             my $args = ref($_[0]) ? shift : undef;
             if ( $INC{'Role/Tiny.pm'} and 'Role::Tiny'->is_role( $role ) ) {
-                if ( $INC{'Role/Hooks.pm'} ) {
-                    $cb_before ||= \%Role::Hooks::CALLBACKS_BEFORE_APPLY;
-                    $cb_after  ||= \%Role::Hooks::CALLBACKS_AFTER_APPLY;
-                }
-                if ( $cb_before ) {
-                    $_->( $role, $caller ) for @{ $cb_before->{$role} || [] };
-                }
                 $class->_finalize_application_roletiny( $role, $caller, $args );
-                if ( $cb_after ) {
-                    $_->( $role, $caller ) for @{ $cb_after->{$role} || [] };
-                }
             }
             else {
                 $role->__FINALIZE_APPLICATION__( $caller, $args );
@@ -90,15 +79,32 @@ sub _make_with {
     };
 }
 
-sub _finalize_application_roletiny {
-    my ( $class, $role, $caller, $args ) = @_;
-    my $info = $Role::Tiny::INFO{$role};
-    for ( @{ $info->{modifiers} || [] } ) {
-        my @args = @$_;
-        my $kind = shift @args;
-        $class->$kind( $caller, @args );
+{
+    my ( $cb_before, $cb_after );
+    sub _finalize_application_roletiny {
+        my ( $class, $role, $caller, $args ) = @_;
+
+        if ( $INC{'Role/Hooks.pm'} ) {
+            $cb_before ||= \%Role::Hooks::CALLBACKS_BEFORE_APPLY;
+            $cb_after  ||= \%Role::Hooks::CALLBACKS_AFTER_APPLY;
+        }
+        if ( $cb_before ) {
+            $_->( $role, $caller ) for @{ $cb_before->{$role} || [] };
+        }
+
+        my $info = $Role::Tiny::INFO{$role};
+        for ( @{ $info->{modifiers} || [] } ) {
+            my @args = @$_;
+            my $kind = shift @args;
+            $class->$kind( $caller, @args );
+        }
+
+        if ( $cb_after ) {
+            $_->( $role, $caller ) for @{ $cb_after->{$role} || [] };
+        }
+
+        return;
     }
-    return;
 }
 
 sub import {
