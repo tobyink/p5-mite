@@ -4,7 +4,7 @@
 `Mite 0.003001 cpan:TOBYINK`
 	issued  2022-07-03;
 	changeset [
-		item "Attribute initialization in the constructor changed from alphabetical order to delcaration order, with attributes in parent classes initialized before attributes in child classes. Attributes modified with a + sign are treated as a new declaration, so initialized later."^^Change;
+		item "Attribute initialization in the constructor changed from alphabetical order to declaration order, with attributes in parent classes initialized before attributes in child classes. Attributes modified with a + sign are treated as a new declaration, so initialized later."^^Change;
 		item "An error is now thrown if you use `is` when modifying an attribute with a + sign."^^Change;
 	].
 
