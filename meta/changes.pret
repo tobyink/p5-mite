@@ -6,6 +6,7 @@
 	changeset [
 		item "Attribute initialization in the constructor changed from alphabetical order to declaration order, with attributes in parent classes initialized before attributes in child classes. Attributes modified with a + sign are treated as a new declaration, so initialized later."^^Change;
 		item "An error is now thrown if you use `is` when modifying an attribute with a + sign."^^Change;
+		item "Workaround for how Role::Tiny roles are applied to Mite classes affecting Role::Hooks."^^Bugfix;
 	].
 
 `Mite 0.003000 cpan:TOBYINK`
