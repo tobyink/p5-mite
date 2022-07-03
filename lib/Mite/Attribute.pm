@@ -176,6 +176,11 @@ sub BUILD {
 sub clone {
     my ( $self, %args ) = ( shift, @_ );
 
+    if ( exists $args{is} ) {
+        require Carp;
+        Carp::croak( "Cannot use the `is` shortcut when extending an attribute" );
+    }
+
     my %inherit = %$self;
 
     # type will need to be rebuilt
