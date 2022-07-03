@@ -8,7 +8,7 @@ tests "basic test of roles" => sub {
     mite_load <<'CODE';
 package MyTest1;
 use Mite::Shim -role;
-around xyz => sub {
+around [ 'xyz', 'zyx' ] => sub {
     my ( $next, $self, @args ) = @_;
     uc( $self->$next( @args ) );
 };

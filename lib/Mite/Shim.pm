@@ -63,18 +63,30 @@ sub _make_has {
 
 sub _make_with {
     my ( $class, $caller, $file, $kind ) = @_;
+    my ( $cb_before, $cb_after );
 
     return sub {
         while ( @_ ) {
             my $role = shift;
             my $args = ref($_[0]) ? shift : undef;
             if ( $INC{'Role/Tiny.pm'} and 'Role::Tiny'->is_role( $role ) ) {
+                if ( $INC{'Role/Hooks.pm'} ) {
+                    $cb_before ||= \%Role::Hooks::CALLBACKS_BEFORE_APPLY;
+                    $cb_after  ||= \%Role::Hooks::CALLBACKS_AFTER_APPLY;
+                }
+                if ( $cb_before ) {
+                    $_->( $role, $caller ) for @{ $cb_before->{$role} || [] };
+                }
                 $class->_finalize_application_roletiny( $role, $caller, $args );
+                if ( $cb_after ) {
+                    $_->( $role, $caller ) for @{ $cb_after->{$role} || [] };
+                }
             }
             else {
                 $role->__FINALIZE_APPLICATION__( $caller, $args );
             }
         }
+        return;
     };
 }
 
@@ -139,7 +151,12 @@ my $parse_mm_args = sub {
 {
     my $get_orig = sub {
         my ( $caller, $name ) = @_;
-        $caller->can($name);
+
+        my $orig = $caller->can($name);
+        return $orig if $orig;
+
+        require Carp;
+        Carp::croak( "Cannot modify method $name in $caller: no such method" );
     };
 
     sub before {
