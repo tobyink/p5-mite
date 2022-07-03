@@ -139,7 +139,7 @@ my $parse_mm_args = sub {
 {
     my $get_orig = sub {
         my ( $caller, $name ) = @_;
-        \&{ "$caller\::$name" };
+        $caller->can($name);
     };
 
     sub before {
