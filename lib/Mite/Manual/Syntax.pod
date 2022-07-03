@@ -209,6 +209,15 @@ Multiple attributes can be defined using an arrayref.
         writer => 1,
     );
 
+Like in Moose, you can use a plus sign to modify an attribute definition
+from a role or parent class:
+
+    has '+foo' => (
+        default => sub { 'new default' },
+    );
+
+When modifying an attribute, you cannot use C<is>.
+
 =head2 C<< extends @parents >>
 
 Works as in L<Moose>.
