@@ -43,7 +43,7 @@ __END__
 
 =head1 NAME
 
-Mite::Role - Representing a role built with Role::Tiny.
+Mite::Role::Tiny - Representing a role built with Role::Tiny.
 
 =head1 DESCRIPTION
 
