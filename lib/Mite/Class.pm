@@ -320,9 +320,17 @@ sub _compile_init_attributes {
     my ( $self, $classvar, $selfvar, $argvar, $metavar ) = @_;
 
     my @code;
-    my $attributes = $self->all_attributes;
-    for my $name ( sort keys %$attributes ) {
-        my $code = $attributes->{$name}->compile_init( $selfvar, $argvar );
+    my $depth = 1;
+    my %depth = map { $_ => $depth++; } $self->linear_isa;
+    my @attributes =
+        sort {
+            no warnings;
+            eval { $depth{$b->class->name} <=> $depth{$a->class->name} }
+            or $a->_order <=> $b->_order;
+        }
+        values %{ $self->all_attributes };
+    for my $attr ( @attributes ) {
+        my $code = $attr->compile_init( $selfvar, $argvar );
         push @code, $code if $code;
     }
 

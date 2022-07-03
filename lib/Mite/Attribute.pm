@@ -8,6 +8,11 @@ use Mite::Miteception;
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.003000';
 
+has _order =>
+  is            => 'rw',
+  init_arg      => undef,
+  builder       => sub { state $order = 0; $order++ };
+
 has class =>
   is            => rw,
   isa           => Object,
@@ -173,9 +178,12 @@ sub clone {
 
     my %inherit = %$self;
 
-    # Lazy attributes should be rebuilt by clone
+    # type will need to be rebuilt
     delete $inherit{type} if $args{isa} || $args{type};
+
+    # these should not be cloned at all
     delete $inherit{coderef_default_variable};
+    delete $inherit{_order};
 
     return ref($self)->new( %inherit, %args );
 }
@@ -414,6 +422,8 @@ sub compile_init {
             sprintf( '%s->{%s}', $selfvar, $self->_q_name ),
         ) . ';';
     }
+
+    $code = "$code;" if $code !~ /;$/;
 
     return $code;
 }
