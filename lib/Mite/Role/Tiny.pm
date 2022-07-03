@@ -7,7 +7,7 @@ use Mite::Miteception;
 extends qw(Mite::Role);
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.002004';
+our $VERSION   = '0.003000';
 
 sub skip_compiling {
     return true;

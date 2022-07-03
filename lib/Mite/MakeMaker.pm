@@ -6,7 +6,7 @@ package Mite::MakeMaker;
 use Mite::Miteception;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.002004';
+our $VERSION   = '0.003000';
 
 ##-
 

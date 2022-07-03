@@ -1,6 +1,14 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.003000 cpan:TOBYINK`
+	issued  2022-07-03;
+	changeset [
+		item "Mite classes and roles can consume Role::Tiny roles."^^Addition;
+		item "Remove dependency on version.pm."^^Packaging;
+		item "Fix method modifiers applying to inherited methods."^^Bugfix;
+	].
+
 `Mite 0.002004 cpan:TOBYINK`
 	issued  2022-07-03;
 	changeset [
