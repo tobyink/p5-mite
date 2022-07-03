@@ -4,7 +4,8 @@ use lib 't/lib';
 
 use Test::Mite;
 
-tests "basic test of roles" => sub {
+eval { require Role::Tiny; 1 }
+and tests "basic test of roles" => sub {
     mite_load <<'CODE';
 package MyTest;
 use Mite::Shim;
@@ -23,5 +24,7 @@ CODE
     is $object->quux, 'QUUX';
     is $object->quuux, 'QUUUX';
 };
+
+ok 1;
 
 done_testing;
