@@ -20,6 +20,20 @@ To start a role:
 
     use Your::Project::Mite -role;
 
+By default, classes get C<has>, C<extends>, C<with>, C<before>, C<after>,
+and C<around> functions imported into them.
+
+By default, roles get C<has>, C<with>, C<before>, C<after>, and C<around>
+functions imported into them.
+
+You can list additional functions you want to import:
+
+    use Your::Project::Mite -role, qw( true false );
+
+You can suppress importing default functions:
+
+    use Your::Project::Mite -role, qw( !before !after !around );
+
 =head2 C<< has $name => %spec >>
 
 Like C<has> in Moose, this declares an attribute. Not all Moose options
@@ -279,6 +293,39 @@ all return C<< $self >>, so they can be chained:
 Basic versions of the C<before>, C<around>, and C<after> method modifiers
 are provided, but these may run in a different order from Moose if you
 use several modifiers on the same method.
+
+=head2 Booleans
+
+Although they're not imported by default, you can import C<true> and
+C<false> keywords. They can made attribute definites a little prettier:
+
+    use Your::Project::Mite qw( true false );
+    # OR:
+    use Your::Project::Mite qw( -bool );
+    
+    has foo => (
+        is => 'rw',
+        required => true,
+    );
+
+=head2 Constants for "is"
+
+You can export constants called C<ro>, C<rw>, C<rwp>, C<bare>, and C<lazy>.
+Again, these can make attribute definitions prettier:
+
+    use Your::Project::Mite qw( ro rw );
+    # OR:
+    use Your::Project::Mite qw( -is );
+    
+    has foo => ( is => rw, required => true );
+
+=head2 C<param> and C<field> keywords
+
+The C<param> and C<field> keywords are available, like L<MooseX::Extended>.
+
+    use Your::Project::Mite qw( param field !has );
+    
+    param foo => ( isa => 'Str' );
 
 =head1 BUGS
 
