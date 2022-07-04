@@ -107,6 +107,45 @@ sub _inject_mite_functions {
             };
         }
     }
+
+    $class->_inject_utility_functions( $caller, $file, $kind, $arg );
+}
+
+sub _inject_utility_functions {
+    my ( $class, $caller, $file, $kind, $arg ) = ( shift, @_ );
+    my $requested = sub { $arg->{$_[0]} ? 1 : $arg->{'!'.$_[0]} ? 0 : $_[1]; };
+
+    no strict 'refs';
+
+    my $wantbool = $requested->( '-bool' => 0 );
+    *{"$caller\::true"} = sub () { !!1 }
+        if $requested->( true => $wantbool );
+    *{"$caller\::false"} = sub () { !!0 }
+        if $requested->( false => $wantbool );
+
+    my $wantis = $requested->( '-is' => 0 );
+    for my $is ( qw/ ro rw rwp lazy bare / ) {
+        *{"$caller\::$is"} = sub () { $is }
+            if $requested->( $is => $wantis );
+    }
+
+    my $orig_has = $arg->{'-has'};
+    *{"$caller\::param"} = sub {
+        my ( $names, %spec ) = @_;
+        $spec{is} = 'ro' unless exists $spec{is};
+        $spec{required} = !!1 unless exists $spec{required};
+        $orig_has->( $names, %spec );
+    } if $requested->( param => 0 );
+    *{"$caller\::field"} = sub {
+        my ( $names, %spec ) = @_;
+        $spec{is} ||= ( $spec{builder} || exists $spec{default} ) ? 'lazy' : 'rwp';
+        $spec{init_arg} = undef unless exists $spec{init_arg};
+        if ( defined $spec{init_arg} and $spec{init_arg} !~ /^_/ ) {
+            require Carp;
+            Carp::croak( "A defined 'field.init_arg' must begin with an underscore: " . $spec{init_arg} );
+        }
+        $orig_has->( $names, %spec );
+    } if $requested->( field => 0 );
 }
 
 sub _make_has {

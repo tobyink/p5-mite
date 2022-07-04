@@ -94,7 +94,7 @@ sub inject_mite_functions {
     no strict 'refs';
     ${ $package .'::USES_MITE' } = ref( $pkg );
 
-    *{ $package .'::has' } = sub {
+    $arg->{'-has'} = sub {
         my ( $names, %args ) = @_;
         $names = [$names] unless ref $names;
 
@@ -118,7 +118,10 @@ sub inject_mite_functions {
         }
 
         return;
-    } if $requested->( 'has', 1 );
+    };
+
+    *{ $package .'::has' } = $arg->{'-has'}
+        if $requested->( 'has', 1 );
 
     *{ $package .'::with' } = sub {
         $pkg->add_roles_by_name( @_ );
@@ -141,6 +144,9 @@ sub inject_mite_functions {
             return;
         } if $requested->( $modifier, 1 );
     }
+
+    require Mite::Shim;
+    'Mite::Shim'->_inject_utility_functions( $package, $file, $kind, $arg );
 }
 
 sub write_mites {
