@@ -31,8 +31,10 @@ use namespace::autoclean ();
 use feature ();
 
 sub import {
-	my ( $class, $arg ) = ( shift, @_ );
-	for my $import ( $class->to_import( $arg ) ) {
+	my $class = shift;
+	my %arg = map { lc($_) => 1 } @_;
+
+	for my $import ( $class->to_import( \%arg ) ) {
 		my ( $pkg, $args ) = @$import;
 		$pkg->import::into( 1, @{ $args || [] } );
 	}
@@ -41,7 +43,7 @@ sub import {
 	my $caller = caller;
 	*{"$caller\::$_"} = \&{$_} for $class->constant_names;
 
-	return if ( defined $arg and $arg eq '-Basic' );
+	return if $arg{'-basic'};
 
 	unshift @_, $class;
 	goto \&load_mite_file;
@@ -56,7 +58,7 @@ sub to_import {
 	my ( $class, $arg ) = ( shift, @_ );
 	no warnings 'uninitialized';
 	return (
-		( $arg eq '-Basic' ? () : [ 'namespace::autoclean' ] ),
+		( $arg->{'-basic'} ? () : [ 'namespace::autoclean' ] ),
 		[ 'Carp' => [
 			qw( carp croak confess ),
 		] ],
@@ -82,6 +84,7 @@ sub to_import {
 # Stolen bits from Mite::Shim
 sub load_mite_file {
 	my $class = shift;
+	my %arg = map { lc($_) => 1 } @_;
 
 	my ( $caller, $file ) = caller;
 	my $mite_file = $file . ".mite.pm";
@@ -96,7 +99,7 @@ sub load_mite_file {
 		 require $mite_file;
 	}
 
-	'Mite::Shim'->_inject_mite_class_functions( $caller, $file );
+	'Mite::Shim'->_inject_mite_functions( $caller, $file, 'class', \%arg );
 }
 
 1;

@@ -77,19 +77,22 @@ my $parse_mm_args = sub {
 };
 
 # This is the shim Mite.pm uses when compiling.
-sub inject_mite_class_functions {
+sub inject_mite_functions {
     state $sig = sig_named(
         { head => [ Object ], named_to_list => true },
         package => Any,
         file => Any,
+        kind => Str,       { default => 'class' },
+        arg => HashRef,    { default => {}      },
     );
-    my ( $self, $package, $file ) = &$sig;
+    my ( $self, $package, $file, $kind, $arg ) = &$sig;
+    my $requested = sub { $arg->{$_[0]} ? 1 : $arg->{'!'.$_[0]} ? 0 : $_[1]; };
 
-    my $source = $self->source_for($file);
-    my $class  = $source->class_for($package);
+    my $source = $self->source_for( $file );
+    my $pkg    = $source->class_for( $package, $kind eq 'role' ? 'Mite::Role' : 'Mite::Class' );
 
     no strict 'refs';
-    ${ $package .'::USES_MITE' } = ref($class);
+    ${ $package .'::USES_MITE' } = ref( $pkg );
 
     *{ $package .'::has' } = sub {
         my ( $names, %args ) = @_;
@@ -97,8 +100,8 @@ sub inject_mite_class_functions {
 
         for my $name ( @$names ) {
            if( my $is_extension = $name =~ s{^\+}{} ) {
-               $class->extend_attribute(
-                   class   => $class,
+               $pkg->extend_attribute(
+                   class   => $pkg,
                    name    => $name,
                    %args
                );
@@ -106,97 +109,38 @@ sub inject_mite_class_functions {
            else {
                require Mite::Attribute;
                my $attribute = Mite::Attribute->new(
-                   class   => $class,
+                   class   => $pkg,
                    name    => $name,
                    %args
                );
-               $class->add_attribute($attribute);
+               $pkg->add_attribute($attribute);
            }
         }
 
         return;
-    };
+    } if $requested->( 'has', 1 );
 
     *{ $package .'::with' } = sub {
-        $class->add_roles_by_name( @_ );
-    };
+        $pkg->add_roles_by_name( @_ );
+        return;
+    } if $requested->( 'with', 1 );
 
     *{ $package .'::extends' } = sub {
-        my (@classes) = @_;
-
-        $class->superclasses(\@classes);
-
+        $pkg->superclasses( [ @_ ] );
         return;
-    };
+    } if $kind eq 'class' && $requested->( 'extends', 1 );
 
-    *{ $package .'::'. $_ } = sub {
-        my ( $names, $coderef ) = &$parse_mm_args;
-        require Carp;
-        CodeRef->check( $coderef )
-            or Carp::croak( "Expected a coderef method modifier" );
-        ArrayRef->of(Str)->check( $names ) && @$names
-            or Carp::croak( "Expected a list of method names to modify" );
-        return;
-    } for qw( before after around );
-
-    return;
-}
-
-sub inject_mite_role_functions {
-    state $sig = sig_named(
-        { head => [ Object ], named_to_list => true },
-        package => Any,
-        file => Any,
-    );
-    my ( $self, $package, $file ) = &$sig;
-
-    my $source = $self->source_for($file);
-    my $role   = $source->class_for($package, 'Mite::Role');
-
-    no strict 'refs';
-    ${ $package .'::USES_MITE' } = ref($role);
-
-    *{ $package .'::has' } = sub {
-        my ( $names, %args ) = @_;
-        $names = [$names] unless ref $names;
-
-        for my $name ( @$names ) {
-           if( my $is_extension = $name =~ s{^\+}{} ) {
-               $role->extend_attribute(
-                   class   => $role,
-                   name    => $name,
-                   %args
-               );
-           }
-           else {
-               require Mite::Attribute;
-               my $attribute = Mite::Attribute->new(
-                   class   => $role,
-                   name    => $name,
-                   %args
-               );
-               $role->add_attribute($attribute);
-           }
-        }
-
-        return;
-    };
-
-    *{ $package .'::with' } = sub {
-        $role->add_roles_by_name( @_ );
-    };
-
-    *{ $package .'::'. $_ } = sub {
-        my ( $names, $coderef ) = &$parse_mm_args;
-        require Carp;
-        CodeRef->check( $coderef )
-            or Carp::croak( "Expected a coderef method modifier" );
-        ArrayRef->of(Str)->check( $names ) && @$names
-            or Carp::croak( "Expected a list of method names to modify" );
-        return;
-    } for qw( before after around );
-
-    return;
+    for my $modifier ( qw( before after around ) ) {
+        *{ $package .'::'. $modifier } = sub {
+            my ( $names, $coderef ) = &$parse_mm_args;
+            require Carp;
+            CodeRef->check( $coderef )
+                or Carp::croak( "Expected a coderef method modifier" );
+            ArrayRef->of(Str)->check( $names ) && @$names
+                or Carp::croak( "Expected a list of method names to modify" );
+            return;
+        } if $requested->( $modifier, 1 );
+    }
 }
 
 sub write_mites {

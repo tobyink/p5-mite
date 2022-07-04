@@ -59,8 +59,8 @@ sub load {
 	
 	my $fake_module = "Fake::$module";
 	$head =~ s/package /package Fake::/;
-	$head =~ s/use Mite::Miteception/use Mite::Miteception '-Basic'/;
-
+	$head =~ s/use Mite::Miteception/use Mite::Miteception '-Basic',/;
+	
 	my $source = Mite::Source->new(
 		file => $in_file,
 		project => $project,
@@ -99,7 +99,7 @@ sub compile {
 	local $Type::Tiny::SafePackage = 'package Mite::Miteception;';
 	my $compiled = $class->compile;
 	$compiled =~ s/Fake:://g;
-	$compiled =~ s/use Mite::Miteception '-Basic'/use Mite::Miteception/;
+	$compiled =~ s/use Mite::Miteception '-Basic',?/use Mite::Miteception/;
 	$out_file->spew( $compiled );
 }
 
