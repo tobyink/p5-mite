@@ -6,6 +6,16 @@
     use warnings;
 
     BEGIN {
+        *bare  = \&Acme::Mitey::Cards::Mite::bare;
+        *false = \&Acme::Mitey::Cards::Mite::false;
+        *lazy  = \&Acme::Mitey::Cards::Mite::lazy;
+        *ro    = \&Acme::Mitey::Cards::Mite::ro;
+        *rw    = \&Acme::Mitey::Cards::Mite::rw;
+        *rwp   = \&Acme::Mitey::Cards::Mite::rwp;
+        *true  = \&Acme::Mitey::Cards::Mite::true;
+    }
+
+    BEGIN {
         require Acme::Mitey::Cards::Card;
 
         use mro 'c3';
@@ -39,21 +49,6 @@
             $self->{"deck"} = $args->{"deck"};
         }
         require Scalar::Util && Scalar::Util::weaken( $self->{"deck"} );
-        if ( exists $args->{"face"} ) {
-            do {
-
-                package Acme::Mitey::Cards::Mite;
-                (         defined( $args->{"face"} )
-                      and !ref( $args->{"face"} )
-                      and $args->{"face"} =~ m{\A(?:(?:Jack|King|Queen))\z} );
-              }
-              or require Carp
-              && Carp::croak(
-                sprintf "Type check failed in constructor: %s should be %s",
-                "face", "Enum[\"Jack\",\"Queen\",\"King\"]" );
-            $self->{"face"} = $args->{"face"};
-        }
-        else { require Carp; Carp::croak("Missing key in constructor: face") }
         if ( exists $args->{"reverse"} ) {
             do {
 
@@ -84,6 +79,21 @@
             $self->{"suit"} = $args->{"suit"};
         }
         else { require Carp; Carp::croak("Missing key in constructor: suit") }
+        if ( exists $args->{"face"} ) {
+            do {
+
+                package Acme::Mitey::Cards::Mite;
+                (         defined( $args->{"face"} )
+                      and !ref( $args->{"face"} )
+                      and $args->{"face"} =~ m{\A(?:(?:Jack|King|Queen))\z} );
+              }
+              or require Carp
+              && Carp::croak(
+                sprintf "Type check failed in constructor: %s should be %s",
+                "face", "Enum[\"Jack\",\"Queen\",\"King\"]" );
+            $self->{"face"} = $args->{"face"};
+        }
+        else { require Carp; Carp::croak("Missing key in constructor: face") }
 
         # Enforce strict constructor
         my @unknown = grep not(/\A(?:deck|face|reverse|suit)\z/), keys %{$args};

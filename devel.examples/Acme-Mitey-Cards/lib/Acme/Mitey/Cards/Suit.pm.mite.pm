@@ -5,6 +5,16 @@
     use strict;
     use warnings;
 
+    BEGIN {
+        *bare  = \&Acme::Mitey::Cards::Mite::bare;
+        *false = \&Acme::Mitey::Cards::Mite::false;
+        *lazy  = \&Acme::Mitey::Cards::Mite::lazy;
+        *ro    = \&Acme::Mitey::Cards::Mite::ro;
+        *rw    = \&Acme::Mitey::Cards::Mite::rw;
+        *rwp   = \&Acme::Mitey::Cards::Mite::rwp;
+        *true  = \&Acme::Mitey::Cards::Mite::true;
+    }
+
     sub new {
         my $class = ref( $_[0] ) ? ref(shift) : shift;
         my $meta  = ( $Mite::META{$class} ||= $class->__META__ );
@@ -16,6 +26,22 @@
         my $no_build = delete $args->{__no_BUILD__};
 
         # Initialize attributes
+        if ( exists $args->{"name"} ) {
+            do {
+
+                package Acme::Mitey::Cards::Mite;
+                defined( $args->{"name"} ) and do {
+                    ref( \$args->{"name"} ) eq 'SCALAR'
+                      or ref( \( my $val = $args->{"name"} ) ) eq 'SCALAR';
+                }
+              }
+              or require Carp
+              && Carp::croak(
+                sprintf "Type check failed in constructor: %s should be %s",
+                "name", "Str" );
+            $self->{"name"} = $args->{"name"};
+        }
+        else { require Carp; Carp::croak("Missing key in constructor: name") }
         if ( exists $args->{"abbreviation"} ) {
             do {
 
@@ -48,22 +74,6 @@
             $self->{"colour"} = $args->{"colour"};
         }
         else { require Carp; Carp::croak("Missing key in constructor: colour") }
-        if ( exists $args->{"name"} ) {
-            do {
-
-                package Acme::Mitey::Cards::Mite;
-                defined( $args->{"name"} ) and do {
-                    ref( \$args->{"name"} ) eq 'SCALAR'
-                      or ref( \( my $val = $args->{"name"} ) ) eq 'SCALAR';
-                }
-              }
-              or require Carp
-              && Carp::croak(
-                sprintf "Type check failed in constructor: %s should be %s",
-                "name", "Str" );
-            $self->{"name"} = $args->{"name"};
-        }
-        else { require Carp; Carp::croak("Missing key in constructor: name") }
 
         # Enforce strict constructor
         my @unknown = grep not(/\A(?:abbreviation|colour|name)\z/),

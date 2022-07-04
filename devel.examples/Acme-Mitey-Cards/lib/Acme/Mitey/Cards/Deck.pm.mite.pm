@@ -6,6 +6,16 @@
     use warnings;
 
     BEGIN {
+        *bare  = \&Acme::Mitey::Cards::Mite::bare;
+        *false = \&Acme::Mitey::Cards::Mite::false;
+        *lazy  = \&Acme::Mitey::Cards::Mite::lazy;
+        *ro    = \&Acme::Mitey::Cards::Mite::ro;
+        *rw    = \&Acme::Mitey::Cards::Mite::rw;
+        *rwp   = \&Acme::Mitey::Cards::Mite::rwp;
+        *true  = \&Acme::Mitey::Cards::Mite::true;
+    }
+
+    BEGIN {
         require Acme::Mitey::Cards::Set;
 
         use mro 'c3';
@@ -52,35 +62,6 @@
                 "cards", "ArrayRef[InstanceOf[\"Acme::Mitey::Cards::Card\"]]" );
             $self->{"cards"} = $args->{"cards"};
         }
-        if ( exists $args->{"original_cards"} ) {
-            (
-                do {
-
-                    package Acme::Mitey::Cards::Mite;
-                    ref( $args->{"original_cards"} ) eq 'ARRAY';
-                  }
-                  and do {
-                    my $ok = 1;
-                    for my $i ( @{ $args->{"original_cards"} } ) {
-                        ( $ok = 0, last )
-                          unless (
-                            do {
-                                use Scalar::Util ();
-                                Scalar::Util::blessed($i)
-                                  and $i->isa(q[Acme::Mitey::Cards::Card]);
-                            }
-                          );
-                    };
-                    $ok;
-                }
-              )
-              or require Carp && Carp::croak(
-                sprintf "Type check failed in constructor: %s should be %s",
-                "original_cards",
-                "ArrayRef[InstanceOf[\"Acme::Mitey::Cards::Card\"]]"
-              );
-            $self->{"original_cards"} = $args->{"original_cards"};
-        }
         if ( exists $args->{"reverse"} ) {
             do {
 
@@ -117,6 +98,35 @@
                 $default_value;
             };
             $self->{"reverse"} = $value;
+        }
+        if ( exists $args->{"original_cards"} ) {
+            (
+                do {
+
+                    package Acme::Mitey::Cards::Mite;
+                    ref( $args->{"original_cards"} ) eq 'ARRAY';
+                  }
+                  and do {
+                    my $ok = 1;
+                    for my $i ( @{ $args->{"original_cards"} } ) {
+                        ( $ok = 0, last )
+                          unless (
+                            do {
+                                use Scalar::Util ();
+                                Scalar::Util::blessed($i)
+                                  and $i->isa(q[Acme::Mitey::Cards::Card]);
+                            }
+                          );
+                    };
+                    $ok;
+                }
+              )
+              or require Carp && Carp::croak(
+                sprintf "Type check failed in constructor: %s should be %s",
+                "original_cards",
+                "ArrayRef[InstanceOf[\"Acme::Mitey::Cards::Card\"]]"
+              );
+            $self->{"original_cards"} = $args->{"original_cards"};
         }
 
         # Enforce strict constructor

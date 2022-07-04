@@ -6,6 +6,16 @@
     use warnings;
 
     BEGIN {
+        *bare  = \&Acme::Mitey::Cards::Mite::bare;
+        *false = \&Acme::Mitey::Cards::Mite::false;
+        *lazy  = \&Acme::Mitey::Cards::Mite::lazy;
+        *ro    = \&Acme::Mitey::Cards::Mite::ro;
+        *rw    = \&Acme::Mitey::Cards::Mite::rw;
+        *rwp   = \&Acme::Mitey::Cards::Mite::rwp;
+        *true  = \&Acme::Mitey::Cards::Mite::true;
+    }
+
+    BEGIN {
         require Acme::Mitey::Cards::Set;
 
         use mro 'c3';

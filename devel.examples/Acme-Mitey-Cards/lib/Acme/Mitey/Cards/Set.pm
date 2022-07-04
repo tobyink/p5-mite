@@ -3,14 +3,14 @@ package Acme::Mitey::Cards::Set;
 our $VERSION   = '0.006';
 our $AUTHORITY = 'cpan:TOBYINK';
 
-use Acme::Mitey::Cards::Mite;
+use Acme::Mitey::Cards::Mite qw( -bool -is );
 
 use Carp qw( croak );
 use List::Util ();
 
 has cards => (
-	is => 'lazy',
-	isa => 'ArrayRef[InstanceOf["Acme::Mitey::Cards::Card"]]',
+	is       => lazy,
+	isa      => 'ArrayRef[InstanceOf["Acme::Mitey::Cards::Card"]]',
 );
 
 sub _build_cards {

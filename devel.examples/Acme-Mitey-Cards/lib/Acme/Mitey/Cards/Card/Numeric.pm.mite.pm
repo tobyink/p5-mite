@@ -6,6 +6,16 @@
     use warnings;
 
     BEGIN {
+        *bare  = \&Acme::Mitey::Cards::Mite::bare;
+        *false = \&Acme::Mitey::Cards::Mite::false;
+        *lazy  = \&Acme::Mitey::Cards::Mite::lazy;
+        *ro    = \&Acme::Mitey::Cards::Mite::ro;
+        *rw    = \&Acme::Mitey::Cards::Mite::rw;
+        *rwp   = \&Acme::Mitey::Cards::Mite::rwp;
+        *true  = \&Acme::Mitey::Cards::Mite::true;
+    }
+
+    BEGIN {
         require Acme::Mitey::Cards::Card;
 
         use mro 'c3';
@@ -39,20 +49,6 @@
             $self->{"deck"} = $args->{"deck"};
         }
         require Scalar::Util && Scalar::Util::weaken( $self->{"deck"} );
-        if ( exists $args->{"number"} ) {
-            (
-                do {
-                    my $tmp = $args->{"number"};
-                    defined($tmp) and !ref($tmp) and $tmp =~ /\A-?[0-9]+\z/;
-                }
-              )
-              or require Carp
-              && Carp::croak(
-                sprintf "Type check failed in constructor: %s should be %s",
-                "number", "Int" );
-            $self->{"number"} = $args->{"number"};
-        }
-        else { require Carp; Carp::croak("Missing key in constructor: number") }
         if ( exists $args->{"reverse"} ) {
             do {
 
@@ -83,6 +79,20 @@
             $self->{"suit"} = $args->{"suit"};
         }
         else { require Carp; Carp::croak("Missing key in constructor: suit") }
+        if ( exists $args->{"number"} ) {
+            (
+                do {
+                    my $tmp = $args->{"number"};
+                    defined($tmp) and !ref($tmp) and $tmp =~ /\A-?[0-9]+\z/;
+                }
+              )
+              or require Carp
+              && Carp::croak(
+                sprintf "Type check failed in constructor: %s should be %s",
+                "number", "Int" );
+            $self->{"number"} = $args->{"number"};
+        }
+        else { require Carp; Carp::croak("Missing key in constructor: number") }
 
         # Enforce strict constructor
         my @unknown = grep not(/\A(?:deck|number|reverse|suit)\z/),

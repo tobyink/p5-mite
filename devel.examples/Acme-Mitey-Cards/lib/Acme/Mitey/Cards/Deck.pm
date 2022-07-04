@@ -3,7 +3,7 @@ package Acme::Mitey::Cards::Deck;
 our $VERSION   = '0.006';
 our $AUTHORITY = 'cpan:TOBYINK';
 
-use Acme::Mitey::Cards::Mite;
+use Acme::Mitey::Cards::Mite qw( -bool -is );
 extends 'Acme::Mitey::Cards::Set';
 
 use Acme::Mitey::Cards::Suit;
@@ -14,14 +14,14 @@ use Acme::Mitey::Cards::Hand;
 use Carp qw( croak );
 
 has reverse => (
-	is => 'ro',
-	isa => 'Str',
-	default => 'plain',
+	is       => ro,
+	isa      => 'Str',
+	default  => 'plain',
 );
 
 has original_cards => (
-	is => 'lazy',
-	isa => 'ArrayRef[InstanceOf["Acme::Mitey::Cards::Card"]]',
+	is       => lazy,
+	isa      => 'ArrayRef[InstanceOf["Acme::Mitey::Cards::Card"]]',
 );
 
 sub _build_cards {
@@ -38,9 +38,9 @@ sub _build_original_cards {
 	for my $suit ( Acme::Mitey::Cards::Suit->standard_suits ) {
 		for my $number ( 1 .. 10 ) {
 			push @cards, Acme::Mitey::Cards::Card::Numeric->new(
-				suit => $suit,
+				suit   => $suit,
 				number => $number,
-				deck => $self,
+				deck   => $self,
 			);
 		}
 		for my $face ( 'Jack', 'Queen', 'King' ) {
