@@ -1,6 +1,15 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.004000 cpan:TOBYINK`
+	issued  2022-07-04;
+	changeset [
+		item "Support `param` and `field` like MooseX::Extended as an opt-in feature."^^Addition;
+		item "Make the Mite::Shim import method smarter, allowing you to opt-in and opt-out of features."^^Change;
+		item "Provide constants `true` and `false` constants as an opt-in feature."^^Addition;
+		item "Provide constants `ro`, `rw`, `rwp`, `lazy`, and `bare` constants as an opt-in feature."^^Addition;
+	].
+
 `Mite 0.003001 cpan:TOBYINK`
 	issued  2022-07-03;
 	changeset [
