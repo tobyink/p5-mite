@@ -52,3 +52,12 @@
 			label "Now works on Perl 5.8.";
 		];
 	].
+
+`Acme-Mitey-Cards 0.007 cpan:TOBYINK`
+	issued  2022-07-04;
+	changeset [
+		item [
+			a dcs:Update;
+			label "Rebuild using Mite 0.004000, including using some newer features.";
+		];
+	].
