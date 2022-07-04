@@ -81,11 +81,12 @@ sub inject_mite_functions {
     state $sig = sig_named(
         { head => [ Object ], named_to_list => true },
         package => Any,
-        file => Any,
-        kind => Str,       { default => 'class' },
-        arg => HashRef,    { default => {}      },
+        file    => Any,
+        kind    => Str,        { default => 'class' },
+        arg     => HashRef,    { default => {}      },
+        shim    => Str,
     );
-    my ( $self, $package, $file, $kind, $arg ) = &$sig;
+    my ( $self, $package, $file, $kind, $arg, $shim ) = &$sig;
     my $requested = sub { $arg->{$_[0]} ? 1 : $arg->{'!'.$_[0]} ? 0 : $_[1]; };
 
     my $source = $self->source_for( $file );
@@ -94,7 +95,7 @@ sub inject_mite_functions {
     no strict 'refs';
     ${ $package .'::USES_MITE' } = ref( $pkg );
 
-    $arg->{'-has'} = sub {
+    my $has = sub {
         my ( $names, %args ) = @_;
         $names = [$names] unless ref $names;
 
@@ -120,8 +121,26 @@ sub inject_mite_functions {
         return;
     };
 
-    *{ $package .'::has' } = $arg->{'-has'}
+    *{ $package .'::has' } = $has
         if $requested->( 'has', 1 );
+
+    *{"$package\::param"} = sub {
+        my ( $names, %spec ) = @_;
+        $spec{is} = 'ro' unless exists $spec{is};
+        $spec{required} = !!1 unless exists $spec{required};
+        $has->( $names, %spec );
+    } if $requested->( param => 0 );
+
+    *{"$package\::field"} = sub {
+        my ( $names, %spec ) = @_;
+        $spec{is} ||= ( $spec{builder} || exists $spec{default} ) ? 'lazy' : 'rwp';
+        $spec{init_arg} = undef unless exists $spec{init_arg};
+        if ( defined $spec{init_arg} and $spec{init_arg} !~ /^_/ ) {
+            require Carp;
+            Carp::croak( "A defined 'field.init_arg' must begin with an underscore: " . $spec{init_arg} );
+        }
+        $has->( $names, %spec );
+    } if $requested->( field => 0 );
 
     *{ $package .'::with' } = sub {
         $pkg->add_roles_by_name( @_ );
@@ -145,8 +164,18 @@ sub inject_mite_functions {
         } if $requested->( $modifier, 1 );
     }
 
-    require Mite::Shim;
-    'Mite::Shim'->_inject_utility_functions( $package, $file, $kind, $arg );
+    my $want_bool = $requested->( '-bool', 0 );
+    my $want_is   = $requested->( '-is',   0 );
+    for my $f ( qw/ true false / ) {
+        next unless $requested->( $f, $want_bool );
+        *{"$package\::$f"} = \&{"$shim\::$f"};
+        $pkg->constants->{$f} = "$shim\::$f";
+    }
+    for my $f ( qw/ ro rw rwp lazy bare / ) {
+        next unless $requested->( $f, $want_is );
+        *{"$package\::$f"} = \&{"$shim\::$f"};
+        $pkg->constants->{$f} = "$shim\::$f";
+    }
 }
 
 sub write_mites {

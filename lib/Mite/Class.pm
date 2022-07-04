@@ -185,6 +185,7 @@ sub compilation_stages {
         _compile_package
         _compile_uses_mite
         _compile_pragmas
+        _compile_constants
         _compile_extends
         _compile_with
         _compile_new

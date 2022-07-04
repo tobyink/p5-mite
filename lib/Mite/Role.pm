@@ -36,6 +36,11 @@ has roles =>
   isa           => ArrayRef,
   builder       => sub { [] };
 
+has constants =>
+  is            => ro,
+  isa           => HashRef,
+  builder       => sub { {} };
+
 ##-
 
 sub skip_compiling {
@@ -231,6 +236,7 @@ sub compilation_stages {
         _compile_package
         _compile_uses_mite
         _compile_pragmas
+        _compile_constants
         _compile_with
         _compile_does
         _compile_composed_methods
@@ -307,6 +313,21 @@ sub _compile_composed_methods {
     }
 
     return $code;
+}
+
+sub _compile_constants {
+    my $self = shift;
+    my %const = %{ $self->constants }
+        or return;
+
+    return join "\n",
+        'BEGIN {',
+        map(
+            sprintf( '    *%s = \&%s;',  $_, $const{$_} ),
+            sort keys %const
+        ),
+        '};',
+        '';
 }
 
 sub _compile_package {
