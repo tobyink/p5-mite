@@ -1,6 +1,15 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.005000 cpan:TOBYINK`
+	issued  2022-07-05;
+	changeset [
+		item "Restore the separate BUILDALL method which had previously been removed in Mite 0.001006."^^Change;
+		item "Allow classes to extend non-Mite classes."^^Change;
+		item "Roles now have a `requires` keyword, and method modifiers in roles implicitly require the methods they are modifying."^^Change;
+		item "Attribute `isa` options can now refer to types in a project-wide type library."^^Change;
+	].
+
 `Mite 0.004000 cpan:TOBYINK`
 	issued  2022-07-04;
 	changeset [
