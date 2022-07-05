@@ -87,6 +87,7 @@ sub __META__ {
             map { "$_\::DEMOLISH" } @$linear_isa
         ],
         HAS_BUILDARGS => $class->can('BUILDARGS'),
+        HAS_FOREIGNBUILDARGS => $class->can('FOREIGNBUILDARGS'),
     };
 }
 

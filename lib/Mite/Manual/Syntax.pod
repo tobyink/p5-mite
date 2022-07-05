@@ -279,7 +279,11 @@ Mite will turn warnings on for you.
 
 Works as in L<Moose>.
 
-=head2 C<BUILD>
+=head2 C<FOREIGNBUILDARGS>
+
+Works as in L<Moo> and L<MooseX::NonMoose>.
+
+=head2 C<BUILD> / C<BUILDALL>.
 
 Works as in L<Moose>.
 

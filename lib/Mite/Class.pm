@@ -143,15 +143,11 @@ sub _get_parent {
     return $parent if $parent;
 
     # If not, try to load it
-    eval "require $parent;";
+    eval "require $parent_name;";
     $parent = $project->class($parent_name);
     return $parent if $parent;
 
-    croak <<"ERROR";
-$parent loaded but is not a Mite class.
-Extending non-Mite classes not yet supported.
-Sorry.
-ERROR
+    return;
 }
 
 sub extend_attribute {
@@ -255,7 +251,40 @@ CODE
 sub _compile_bless {
     my ( $self, $classvar, $selfvar, $argvar, $metavar ) = @_;
 
-    return "bless {}, $classvar";
+    my $simple_bless = "bless {}, $classvar";
+
+    # Force parents to be loaded
+    $self->parents;
+
+    # First parent with &new
+    my ( $first_isa ) = do {
+        my @isa = $self->linear_isa;
+        shift @isa;
+        no strict 'refs';
+        grep +(defined &{$_.'::new'}), @isa;
+    };
+
+    # If we're not inheriting from anything with a constructor: simple case
+    $first_isa or return $simple_bless;
+
+    # Inheriting from a Mite class in this project: simple case
+    my $first_parent = $self->_get_parent( $first_isa )
+        and return $simple_bless;
+
+    # Inheriting from a Moose/Moo/Mite/Class::Tiny class:
+    #   call buildargs
+    #   set $args->{__no_BUILD__}
+    #   call parent class constructor
+    if ( $first_isa->can( 'BUILDALL' ) ) {
+        return sprintf 'do { my %s = %s; %s->{__no_BUILD__} = 1; %s->SUPER::new( %s ) }',
+            $argvar, $self->_compile_buildargs($classvar, $selfvar, $argvar, $metavar), $argvar, $classvar, $argvar;
+    }
+
+    # Inheriting from some random class
+    #    call FOREIGNBUILDARGS if it exists
+    #    pass return value or @_ to parent class constructor
+    return sprintf '%s->SUPER::new( %s->{HAS_FOREIGNBUILDARGS} ? %s->FOREIGNBUILDARGS( @_ ) : @_ )',
+        $classvar, $metavar, $classvar;
 }
 
 sub _compile_strict_constructor {
