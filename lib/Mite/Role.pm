@@ -37,13 +37,18 @@ has source =>
 
 has roles =>
   is            => ro,
-  isa           => ArrayRef,
+  isa           => ArrayRef[Object],
   builder       => sub { [] };
 
 has constants =>
   is            => ro,
-  isa           => HashRef,
+  isa           => HashRef[Str],
   builder       => sub { {} };
+
+has required_methods =>
+  is            => ro,
+  isa           => ArrayRef[Str],
+  builder       => sub { [] };
 
 ##-
 
@@ -240,6 +245,14 @@ roles are the only supported roles. Sorry.
 ERROR
 }
 
+sub add_required_methods {
+    my $self = shift;
+
+    push @{ $self->required_methods }, @_;
+
+    return;
+}
+
 sub does_list {
     my $self = shift;
     return (
@@ -396,10 +409,24 @@ CODE
 sub _compile_callback {
     my $self = shift;
 
-    my $role_list = join q[, ], map B::perlstring( $_->name ), @{ $self->roles };
-    my $shim = B::perlstring( eval { $self->project->config->data->{shim} } || 'Mite::Shim' );
+    my @required = @{ $self->required_methods };
+    my %uniq; undef $uniq{$_} for @required;
+    @required = sort keys %uniq;
 
-    return sprintf <<'CODE', $role_list, $shim;
+    my $role_list = join q[, ], map B::perlstring( $_->name ), @{ $self->roles };
+    my $shim = B::perlstring(
+        $self->shim_name
+        || eval { $self->project->config->data->{shim} }
+        || 'Mite::Shim'
+    );
+    my $missing_methods = '()';
+    if ( @required ) {
+        require B;
+        $missing_methods = sprintf 'grep( !$target->can($_), %s )',
+            join q[, ], map B::perlstring( $_ ), @required;
+    }
+
+    return sprintf <<'CODE', $missing_methods, $role_list, $shim;
 # Callback which classes consuming this role will call
 sub __FINALIZE_APPLICATION__ {
     my ( $me, $target, $args ) = @_;
@@ -412,9 +439,12 @@ sub __FINALIZE_APPLICATION__ {
     $CONSUMERS{$target} = 1;
 
     my $type = do { no strict 'refs'; ${"$target\::USES_MITE"} };
-    if ( $type ne 'Mite::Class' ) {
-        return;
-    }
+    return if $type ne 'Mite::Class';
+
+    my @missing_methods;
+    @missing_methods = %s
+        and require Carp
+        and Carp::croak( "$me requires $target to implement methods: " . join q[, ], @missing_methods );
 
     my @roles = ( %s );
     my %%nextargs = %%{ $args || {} };

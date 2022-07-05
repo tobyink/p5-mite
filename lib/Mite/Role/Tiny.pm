@@ -21,6 +21,7 @@ sub inhale {
         name => $rolename,
         attributes => {},
         roles => [],
+        required_methods => ( $Role::Tiny::INFO{$rolename}{requires} ||= [] ),
     );
 }
 

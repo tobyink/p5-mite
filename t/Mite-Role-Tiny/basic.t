@@ -13,6 +13,7 @@ with 'Test::RoleTinyRole';
 sub bar { "BAR" }
 sub baz { 'BZZT' }
 sub quuux { 'BZZT' }
+sub boop { 1 }
 1;
 CODE
 

@@ -154,6 +154,11 @@ sub inject_mite_functions {
         return;
     } if $kind eq 'class' && $requested->( 'extends', 1 );
 
+    *{ $package .'::requires' } = sub {
+        $pkg->add_required_methods( @_ );
+        return;
+    } if $kind eq 'role' && $requested->( 'requires', 1 );
+
     for my $modifier ( qw( before after around ) ) {
         *{ $package .'::'. $modifier } = sub {
             my ( $names, $coderef ) = &$parse_mm_args;
@@ -162,6 +167,7 @@ sub inject_mite_functions {
                 or Carp::croak( "Expected a coderef method modifier" );
             ArrayRef->of(Str)->check( $names ) && @$names
                 or Carp::croak( "Expected a list of method names to modify" );
+            $pkg->add_required_methods( @$names );
             return;
         } if $requested->( $modifier, 1 );
     }

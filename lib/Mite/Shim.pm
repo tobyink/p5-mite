@@ -100,6 +100,8 @@ sub _inject_mite_functions {
 
     *{ $caller .'::extends'} = sub {}
         if $kind eq 'class' && $requested->( extends => 1 );
+    *{ $caller .'::requires'} = sub {}
+        if $kind eq 'role' && $requested->( requires => 1 );
 
     my $MM = ( $kind eq 'role' ) ? \@{"$caller\::METHOD_MODIFIERS"} : [];
 
@@ -185,6 +187,8 @@ sub _make_with {
         if ( $cb_before ) {
             $_->( $role, $caller ) for @{ $cb_before->{$role} || [] };
         }
+
+        'Role::Tiny'->_check_requires( $caller, $role );
 
         my $info = $Role::Tiny::INFO{$role};
         for ( @{ $info->{modifiers} || [] } ) {

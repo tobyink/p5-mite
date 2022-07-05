@@ -20,6 +20,9 @@ sub xyz {
     my ( $self, @args ) = @_;
     return join q[, ], @args;
 }
+sub zyx {
+    return 'zzz';
+}
 
 1;
 CODE

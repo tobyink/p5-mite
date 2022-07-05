@@ -23,8 +23,8 @@ To start a role:
 By default, classes get C<has>, C<extends>, C<with>, C<before>, C<after>,
 and C<around> functions imported into them.
 
-By default, roles get C<has>, C<with>, C<before>, C<after>, and C<around>
-functions imported into them.
+By default, roles get C<has>, C<requires>, C<with>, C<before>, C<after>,
+and C<around> functions imported into them.
 
 You can list additional functions you want to import:
 
@@ -250,6 +250,12 @@ Works as in L<Moose>.
 You cannot use C<extends> from within roles.
 
 Options hashrefs, including the C<< -version >> option are not implemented.
+
+=head2 C<< requires @methods >>
+
+Works as in L<Moose>.
+
+You cannot use C<requires> from within classes.
 
 =head2 C<< with @roles >>
 

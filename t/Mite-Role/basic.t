@@ -8,6 +8,7 @@ tests "basic test of roles" => sub {
     mite_load <<'CODE';
 package MyTest1;
 use Mite::Shim -role;
+requires 'bar';
 has foo => ( is => 'ro' );
 
 package MyTest2;
