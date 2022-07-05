@@ -190,6 +190,7 @@ sub compilation_stages {
         _compile_extends
         _compile_with
         _compile_new
+        _compile_buildall_method
         _compile_destroy
         _compile_meta_method
         _compile_does
@@ -284,8 +285,20 @@ sub _compile_buildargs {
 
 sub _compile_buildall {
     my ( $self, $classvar, $selfvar, $argvar, $metavar, $nobuildvar ) = @_;
-    return sprintf 'unless ( %s ) { $_->(%s, %s) for @{ %s->{BUILD} || [] } };',
-        $nobuildvar, $selfvar, $argvar, $metavar;
+    return sprintf '%s->BUILDALL( %s ) if ( ! %s and @{ %s->{BUILD} || [] } );',
+        $selfvar, $argvar, $nobuildvar, $metavar;
+}
+
+sub _compile_buildall_method {
+    my $self = shift;
+
+    return sprintf <<'CODE', $self->_compile_meta( '$class', '$_[0]', '$_[1]', '$meta' ),
+sub BUILDALL {
+    my $class = ref( $_[0] );
+    my $meta  = %s;
+    $_->( @_ ) for @{ $meta->{BUILD} || [] };
+}
+CODE
 }
 
 sub _compile_destroy {

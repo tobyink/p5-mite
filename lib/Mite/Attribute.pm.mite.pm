@@ -43,9 +43,15 @@ sub new {
     my @unknown = grep not( /\A(?:_class_for_default|a(?:ccessor|lias)|builder|c(?:l(?:ass|earer)|o(?:deref_default_variable|erce))|d(?:efault|ocumentation)|handles|i(?:nit_arg|sa?)|lazy|name|predicate|re(?:ader|quired)|t(?:rigger|ype)|w(?:eak_ref|riter))\z/ ), keys %{$args}; @unknown and require Carp and Carp::croak("Unexpected keys in constructor: " . join(q[, ], sort @unknown));
 
     # Call BUILD methods
-    unless ( $no_build ) { $_->($self, $args) for @{ $meta->{BUILD} || [] } };
+    $self->BUILDALL( $args ) if ( ! $no_build and @{ $meta->{BUILD} || [] } );
 
     return $self;
+}
+
+sub BUILDALL {
+    my $class = ref( $_[0] );
+    my $meta  = ( $Mite::META{$class} ||= $class->__META__ );
+    $_->( @_ ) for @{ $meta->{BUILD} || [] };
 }
 
 sub DESTROY {

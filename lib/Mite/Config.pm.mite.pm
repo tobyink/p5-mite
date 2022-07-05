@@ -23,9 +23,15 @@ sub new {
     my @unknown = grep not( /\A(?:config_file|data|mite_dir(?:_name)?|search_for_mite_dir)\z/ ), keys %{$args}; @unknown and require Carp and Carp::croak("Unexpected keys in constructor: " . join(q[, ], sort @unknown));
 
     # Call BUILD methods
-    unless ( $no_build ) { $_->($self, $args) for @{ $meta->{BUILD} || [] } };
+    $self->BUILDALL( $args ) if ( ! $no_build and @{ $meta->{BUILD} || [] } );
 
     return $self;
+}
+
+sub BUILDALL {
+    my $class = ref( $_[0] );
+    my $meta  = ( $Mite::META{$class} ||= $class->__META__ );
+    $_->( @_ ) for @{ $meta->{BUILD} || [] };
 }
 
 sub DESTROY {
