@@ -7,7 +7,7 @@ use Test::Mite;
 tests "param and field" => sub {
     mite_load <<'CODE';
 package MyTest;
-use Mite::Shim qw( param field -bool );
+use Mite::Shim qw( param field -bool -unclean );
 param foo => ();
 field bar => ( builder => true );
 sub _build_bar { 99 }

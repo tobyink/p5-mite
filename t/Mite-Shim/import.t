@@ -7,9 +7,9 @@ use Test::Mite;
 tests "selective import" => sub {
     mite_load <<'CODE';
 package MyTest1;
-use Mite::Shim qw( -bool -is );
+use Mite::Shim qw( -bool -is -unclean );
 package MyTest2;
-use Mite::Shim qw( !has !before !after !around );
+use Mite::Shim qw( !has !before !after !around -unclean );
 1;
 CODE
 

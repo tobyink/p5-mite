@@ -27,7 +27,6 @@ use Scalar::Util ();
 use Types::Standard ();
 use Types::Path::Tiny ();
 use Type::Params ();
-use namespace::autoclean ();
 use feature ();
 
 sub import {
@@ -58,7 +57,6 @@ sub to_import {
 	my ( $class, $arg ) = ( shift, @_ );
 	no warnings 'uninitialized';
 	return (
-		( $arg->{'-basic'} ? () : [ 'namespace::autoclean' ] ),
 		[ 'Carp' => [
 			qw( carp croak confess ),
 		] ],

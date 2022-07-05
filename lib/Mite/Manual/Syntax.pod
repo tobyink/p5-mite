@@ -348,6 +348,22 @@ The C<param> and C<field> keywords are available, like L<MooseX::Extended>.
     
     param foo => ( isa => 'Str' );
 
+=head2 Clean Classes
+
+Mite will automatically import L<namespace::autoclean> into your classes
+if it is installed on the end user's system. If it's not available, your
+classes will quietly be left with imported keywords cluttering up their
+namespace.
+
+To force namespace::autoclean, then just use it manually:
+
+    use Your::Project::Mite;
+    use namespace::autoclean;
+
+To force it to I<not> be used:
+
+    use Your::Project::Mite qw( -unclean );
+
 =head1 BUGS
 
 Please report any bugs to L<https://github.com/tobyink/p5-mite/issues>.

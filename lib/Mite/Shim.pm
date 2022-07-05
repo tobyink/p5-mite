@@ -10,6 +10,12 @@ package Mite::Shim;
 use strict;
 use warnings;
 
+BEGIN {
+    *_HAS_AUTOCLEAN = eval { require namespace::autoclean }
+        ? sub () { !!1 }
+        : sub () { !!0 }
+};
+
 if ( $] < 5.009005 ) {
     require MRO::Compat;
 }
@@ -82,6 +88,10 @@ sub import {
         }
 
         $class->_inject_mite_functions( $caller, $file, $kind, \%arg );
+    }
+
+    if ( _HAS_AUTOCLEAN and not $arg{'-unclean'} ) {
+        'namespace::autoclean'->import( -cleanee => $caller );
     }
 }
 
