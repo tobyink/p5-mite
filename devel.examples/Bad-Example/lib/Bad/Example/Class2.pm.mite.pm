@@ -1,5 +1,5 @@
 {
-package Bad::Example::Class;
+package Bad::Example::Class2;
 our $USES_MITE = "Mite::Class";
 our $MITE_SHIM = "Bad::Example::Mite";
 use strict;
@@ -7,8 +7,8 @@ use warnings;
 
 
 BEGIN {
-    require Bad::Example::Role;
-    our %DOES = ( "Bad::Example::Class" => 1, "Bad::Example::Role" => 1 );
+    require Bad::Example::Role2;
+    our %DOES = ( "Bad::Example::Class2" => 1, "Bad::Example::Role2" => 1 );
 }
 
 sub new {
