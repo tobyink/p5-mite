@@ -1,4 +1,4 @@
-name: Demo (Acme::Mitey::Cards)
+name: Demo Projects
 on:
   - push
   - pull_request
@@ -38,7 +38,8 @@ jobs:
         with:
           name: dist
           path: ./
-  build:
+  build1:
+    name: Acme-Mitey-Cards (perl ${{ matrix.perl }} on ${{ matrix.os }})
     needs: dist
     runs-on: ${{ matrix.os }}
     strategy:
@@ -46,7 +47,6 @@ jobs:
       matrix:
         os: ['ubuntu-latest' ]
         perl: [ '5.36', '5.34', '5.20' ]
-    name: Perl ${{ matrix.perl }} on ${{ matrix.os }}
     steps:
       - name: Get dist artifact
         uses: actions/download-artifact@v2
@@ -86,3 +86,50 @@ jobs:
       - name: Run Acme-Mitey-Cards test suite in PP mode
         run: prove -Msetenv=MITE_PURE_PERL,1 -lr t
         working-directory: devel.examples/Acme-Mitey-Cards
+  build2:
+    name: Bad-Example (perl ${{ matrix.perl }} on ${{ matrix.os }})
+    needs: dist
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['ubuntu-latest' ]
+        perl: [ '5.36', '5.34', '5.20' ]
+    steps:
+      - name: Get dist artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: dist
+      - name: Set up perl
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: ${{ matrix.perl }}
+          multi-thread: ${{ matrix.threaded }}
+          distribution: ${{ ( ( matrix.os == 'strawberry') && 'strawberry' ) || 'default' }}
+      - name: Perl version
+        run: |
+          perl -v
+      - name: Install dependencies
+        run: |
+          cpanm -n App::GhaProve
+          cpanm -n --installdeps ./build
+      - run: cpanm -n setenv
+      - run: cpanm -n Class::XSAccessor
+      - name: Configure
+        working-directory: ./build/
+        run: perl Makefile.PL
+      - name: Make
+        working-directory: ./build/
+        run: perl -MConfig -e'exec $Config{make}'
+      - name: Test suite
+        working-directory: ./build/
+        run: prove -lr t
+      - name: Compile Bad-Example
+        run: perl -I../../build/lib ../../build/bin/mite compile
+        working-directory: devel.examples/Bad-Example
+      - name: Run Bad-Example test suite
+        run: prove -lr t
+        working-directory: devel.examples/Bad-Example
+      - name: Run Bad-Example test suite in PP mode
+        run: prove -Msetenv=MITE_PURE_PERL,1 -lr t
+        working-directory: devel.examples/Bad-Example
