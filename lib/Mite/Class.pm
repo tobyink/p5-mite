@@ -44,6 +44,7 @@ has parents =>
 
 sub BUILD {
     my $self = shift;
+
     $self->_trigger_extends( $self->superclasses )
         if $self->can('_trigger_extends');
 }

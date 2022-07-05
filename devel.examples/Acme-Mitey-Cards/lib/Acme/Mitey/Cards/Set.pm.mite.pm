@@ -2,6 +2,7 @@
 
     package Acme::Mitey::Cards::Set;
     our $USES_MITE = "Mite::Class";
+    our $MITE_SHIM = "Acme::Mitey::Cards::Mite";
     use strict;
     use warnings;
 
@@ -51,7 +52,7 @@
               or require Carp
               && Carp::croak(
                 sprintf "Type check failed in constructor: %s should be %s",
-                "cards", "ArrayRef[InstanceOf[\"Acme::Mitey::Cards::Card\"]]" );
+                "cards", "CardArray" );
             $self->{"cards"} = $args->{"cards"};
         }
 
@@ -156,8 +157,7 @@
                         Carp::croak(
                             sprintf
                               "Type check failed in default: %s should be %s",
-                            "cards",
-                            "ArrayRef[InstanceOf[\"Acme::Mitey::Cards::Card\"]]"
+                            "cards", "CardArray"
                         );
                       };
                     $default_value;

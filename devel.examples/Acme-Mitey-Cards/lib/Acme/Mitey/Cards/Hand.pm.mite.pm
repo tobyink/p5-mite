@@ -2,6 +2,7 @@
 
     package Acme::Mitey::Cards::Hand;
     our $USES_MITE = "Mite::Class";
+    our $MITE_SHIM = "Acme::Mitey::Cards::Mite";
     use strict;
     use warnings;
 
@@ -59,7 +60,7 @@
               or require Carp
               && Carp::croak(
                 sprintf "Type check failed in constructor: %s should be %s",
-                "cards", "ArrayRef[InstanceOf[\"Acme::Mitey::Cards::Card\"]]" );
+                "cards", "CardArray" );
             $self->{"cards"} = $args->{"cards"};
         }
         if ( exists $args->{"owner"} ) {

@@ -15,13 +15,13 @@ use Carp qw( croak );
 
 has reverse => (
 	is       => ro,
-	isa      => 'Str',
+	isa      => 'NonEmptyStr',
 	default  => 'plain',
 );
 
 has original_cards => (
 	is       => lazy,
-	isa      => 'ArrayRef[InstanceOf["Acme::Mitey::Cards::Card"]]',
+	isa      => 'CardArray',
 );
 
 sub _build_cards {

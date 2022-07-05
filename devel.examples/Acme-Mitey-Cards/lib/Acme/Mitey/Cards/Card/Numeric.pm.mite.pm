@@ -2,6 +2,7 @@
 
     package Acme::Mitey::Cards::Card::Numeric;
     our $USES_MITE = "Mite::Class";
+    our $MITE_SHIM = "Acme::Mitey::Cards::Mite";
     use strict;
     use warnings;
 
@@ -45,7 +46,7 @@
               or require Carp
               && Carp::croak(
                 sprintf "Type check failed in constructor: %s should be %s",
-                "deck", "InstanceOf[\"Acme::Mitey::Cards::Deck\"]" );
+                "deck", "Deck" );
             $self->{"deck"} = $args->{"deck"};
         }
         require Scalar::Util && Scalar::Util::weaken( $self->{"deck"} );
@@ -65,32 +66,102 @@
             $self->{"reverse"} = $args->{"reverse"};
         }
         if ( exists $args->{"suit"} ) {
+            my $value = do {
+                my $to_coerce = $args->{"suit"};
+                (
+                    (
+                        do {
+                            use Scalar::Util ();
+                            Scalar::Util::blessed($to_coerce)
+                              and $to_coerce->isa(q[Acme::Mitey::Cards::Suit]);
+                        }
+                    )
+                ) ? $to_coerce : (
+                    do {
+
+                        package Acme::Mitey::Cards::Mite;
+                        defined($to_coerce) and do {
+                            ref( \$to_coerce ) eq 'SCALAR'
+                              or ref( \( my $val = $to_coerce ) ) eq 'SCALAR';
+                        }
+                    }
+                  )
+                  ? scalar(
+                    do {
+                        local $_ = $to_coerce;
+                        do {
+                            my $method = lc($_);
+                            'Acme::Mitey::Cards::Suit'->$method;
+                        }
+                    }
+                  )
+                  : $to_coerce;
+            };
             (
                 do {
                     use Scalar::Util ();
-                    Scalar::Util::blessed( $args->{"suit"} )
-                      and $args->{"suit"}->isa(q[Acme::Mitey::Cards::Suit]);
+                    Scalar::Util::blessed($value)
+                      and $value->isa(q[Acme::Mitey::Cards::Suit]);
                 }
               )
               or require Carp
               && Carp::croak(
                 sprintf "Type check failed in constructor: %s should be %s",
-                "suit", "InstanceOf[\"Acme::Mitey::Cards::Suit\"]" );
-            $self->{"suit"} = $args->{"suit"};
+                "suit", "Suit" );
+            $self->{"suit"} = $value;
         }
         else { require Carp; Carp::croak("Missing key in constructor: suit") }
         if ( exists $args->{"number"} ) {
+            my $value = do {
+                my $to_coerce = $args->{"number"};
+                (
+                    (
+                        do {
+
+                            package Acme::Mitey::Cards::Mite;
+                            (
+                                do {
+                                    my $tmp = $to_coerce;
+                                    defined($tmp)
+                                      and !ref($tmp)
+                                      and $tmp =~ /\A-?[0-9]+\z/;
+                                }
+                            );
+                          }
+                          && ( $to_coerce >= 1 )
+                          && ( $to_coerce <= 10 )
+                    )
+                ) ? $to_coerce : (
+                    do {
+
+                        package Acme::Mitey::Cards::Mite;
+                        (         defined($to_coerce)
+                              and !ref($to_coerce)
+                              and $to_coerce =~ m{\A(?:[Aa])\z} );
+                    }
+                ) ? scalar( do { local $_ = $to_coerce; 1 } ) : $to_coerce;
+            };
             (
                 do {
-                    my $tmp = $args->{"number"};
-                    defined($tmp) and !ref($tmp) and $tmp =~ /\A-?[0-9]+\z/;
-                }
+
+                    package Acme::Mitey::Cards::Mite;
+                    (
+                        do {
+                            my $tmp = $value;
+                            defined($tmp)
+                              and !ref($tmp)
+                              and $tmp =~ /\A-?[0-9]+\z/;
+                        }
+                    );
+                  }
+                  && ( $value >= 1 )
+                  && ( $value <= 10 )
               )
               or require Carp
               && Carp::croak(
                 sprintf "Type check failed in constructor: %s should be %s",
-                "number", "Int" );
-            $self->{"number"} = $args->{"number"};
+                "number", "CardNumber" );
+            $self->{"number"} = $value;
         }
         else { require Carp; Carp::croak("Missing key in constructor: number") }
 

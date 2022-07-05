@@ -2,6 +2,7 @@
 
     package Acme::Mitey::Cards::Card;
     our $USES_MITE = "Mite::Class";
+    our $MITE_SHIM = "Acme::Mitey::Cards::Mite";
     use strict;
     use warnings;
 
@@ -37,7 +38,7 @@
               or require Carp
               && Carp::croak(
                 sprintf "Type check failed in constructor: %s should be %s",
-                "deck", "InstanceOf[\"Acme::Mitey::Cards::Deck\"]" );
+                "deck", "Deck" );
             $self->{"deck"} = $args->{"deck"};
         }
         require Scalar::Util && Scalar::Util::weaken( $self->{"deck"} );

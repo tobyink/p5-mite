@@ -11,7 +11,7 @@ use Carp qw( carp );
 
 has deck => (
 	is       => ro,
-	isa      => 'InstanceOf["Acme::Mitey::Cards::Deck"]',
+	isa      => 'Deck',
 	weak_ref => true,
 );
 

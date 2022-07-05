@@ -2,5 +2,6 @@
 compiled_to: lib
 project: Acme::Mitey::Cards
 shim: Acme::Mitey::Cards::Mite
+types: Acme::Mitey::Cards::Types
 source_from: lib
 perltidy: 1

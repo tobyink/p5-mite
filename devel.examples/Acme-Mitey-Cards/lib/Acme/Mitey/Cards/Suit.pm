@@ -7,7 +7,7 @@ use Acme::Mitey::Cards::Mite qw( -bool -is );
 
 has name => (
 	is       => ro,
-	isa      => 'Str',
+	isa      => 'NonEmptyStr',
 	required => true,
 );
 

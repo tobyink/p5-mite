@@ -2,6 +2,7 @@
 
     package Acme::Mitey::Cards::Deck;
     our $USES_MITE = "Mite::Class";
+    our $MITE_SHIM = "Acme::Mitey::Cards::Mite";
     use strict;
     use warnings;
 
@@ -59,40 +60,56 @@
               or require Carp
               && Carp::croak(
                 sprintf "Type check failed in constructor: %s should be %s",
-                "cards", "ArrayRef[InstanceOf[\"Acme::Mitey::Cards::Card\"]]" );
+                "cards", "CardArray" );
             $self->{"cards"} = $args->{"cards"};
         }
         if ( exists $args->{"reverse"} ) {
-            do {
+            (
+                (
+                    do {
 
-                package Acme::Mitey::Cards::Mite;
-                defined( $args->{"reverse"} ) and do {
-                    ref( \$args->{"reverse"} ) eq 'SCALAR'
-                      or ref( \( my $val = $args->{"reverse"} ) ) eq 'SCALAR';
+                        package Acme::Mitey::Cards::Mite;
+                        defined( $args->{"reverse"} ) and do {
+                            ref( \$args->{"reverse"} ) eq 'SCALAR'
+                              or ref( \( my $val = $args->{"reverse"} ) ) eq
+                              'SCALAR';
+                        }
+                    }
+                )
+                  && do {
+
+                    package Acme::Mitey::Cards::Mite;
+                    length( $args->{"reverse"} ) > 0;
                 }
-              }
+              )
               or require Carp
               && Carp::croak(
                 sprintf "Type check failed in constructor: %s should be %s",
-                "reverse", "Str" );
+                "reverse", "NonEmptyStr" );
             $self->{"reverse"} = $args->{"reverse"};
         }
         else {
             my $value = do {
                 my $default_value = "plain";
-                do {
+                (
+                    (
+                        do {
 
-                    package Acme::Mitey::Cards::Mite;
-                    defined($default_value) and do {
-                        ref( \$default_value ) eq 'SCALAR'
-                          or ref( \( my $val = $default_value ) ) eq 'SCALAR';
-                    }
-                  }
+                            package Acme::Mitey::Cards::Mite;
+                            defined($default_value) and do {
+                                ref( \$default_value ) eq 'SCALAR'
+                                  or ref( \( my $val = $default_value ) ) eq
+                                  'SCALAR';
+                            }
+                        }
+                    )
+                      && ( length($default_value) > 0 )
+                  )
                   or do {
                     require Carp;
                     Carp::croak(
                         sprintf "Type check failed in default: %s should be %s",
-                        "reverse", "Str"
+                        "reverse", "NonEmptyStr"
                     );
                   };
                 $default_value;
@@ -121,11 +138,10 @@
                     $ok;
                 }
               )
-              or require Carp && Carp::croak(
+              or require Carp
+              && Carp::croak(
                 sprintf "Type check failed in constructor: %s should be %s",
-                "original_cards",
-                "ArrayRef[InstanceOf[\"Acme::Mitey::Cards::Card\"]]"
-              );
+                "original_cards", "CardArray" );
             $self->{"original_cards"} = $args->{"original_cards"};
         }
 
@@ -230,8 +246,7 @@
                         Carp::croak(
                             sprintf
                               "Type check failed in default: %s should be %s",
-                            "original_cards",
-                            "ArrayRef[InstanceOf[\"Acme::Mitey::Cards::Card\"]]"
+                            "original_cards", "CardArray"
                         );
                       };
                     $default_value;

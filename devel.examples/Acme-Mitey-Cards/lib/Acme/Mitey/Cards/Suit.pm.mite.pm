@@ -2,6 +2,7 @@
 
     package Acme::Mitey::Cards::Suit;
     our $USES_MITE = "Mite::Class";
+    our $MITE_SHIM = "Acme::Mitey::Cards::Mite";
     use strict;
     use warnings;
 
@@ -27,18 +28,28 @@
 
         # Initialize attributes
         if ( exists $args->{"name"} ) {
-            do {
+            (
+                (
+                    do {
 
-                package Acme::Mitey::Cards::Mite;
-                defined( $args->{"name"} ) and do {
-                    ref( \$args->{"name"} ) eq 'SCALAR'
-                      or ref( \( my $val = $args->{"name"} ) ) eq 'SCALAR';
+                        package Acme::Mitey::Cards::Mite;
+                        defined( $args->{"name"} ) and do {
+                            ref( \$args->{"name"} ) eq 'SCALAR'
+                              or ref( \( my $val = $args->{"name"} ) ) eq
+                              'SCALAR';
+                        }
+                    }
+                )
+                  && do {
+
+                    package Acme::Mitey::Cards::Mite;
+                    length( $args->{"name"} ) > 0;
                 }
-              }
+              )
               or require Carp
               && Carp::croak(
                 sprintf "Type check failed in constructor: %s should be %s",
-                "name", "Str" );
+                "name", "NonEmptyStr" );
             $self->{"name"} = $args->{"name"};
         }
         else { require Carp; Carp::croak("Missing key in constructor: name") }

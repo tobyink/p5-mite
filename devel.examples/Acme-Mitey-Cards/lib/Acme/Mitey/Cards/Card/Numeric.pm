@@ -10,14 +10,16 @@ use Acme::Mitey::Cards::Suit;
 
 has suit => (
 	is       => ro,
-	isa      => 'InstanceOf["Acme::Mitey::Cards::Suit"]',
+	isa      => 'Suit',
 	required => true,
+	coerce   => true,
 );
 
 has number => (
 	is       => ro,
-	isa      => 'Int',
+	isa      => 'CardNumber',
 	required => true,
+	coerce   => true,
 );
 
 sub number_or_a {

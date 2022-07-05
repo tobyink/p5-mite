@@ -15,12 +15,13 @@ sub new {
     # Initialize attributes
     if ( exists $args->{"attributes"} ) { (do { package Mite::Miteception; ref($args->{"attributes"}) eq 'HASH' } and do { my $ok = 1; for my $i (values %{$args->{"attributes"}}) { ($ok = 0, last) unless (do { use Scalar::Util (); Scalar::Util::blessed($i) and $i->isa(q[Mite::Attribute]) }) }; $ok }) or require Carp && Carp::croak(sprintf "Type check failed in constructor: %s should be %s", "attributes", "HashRef[InstanceOf[\"Mite::Attribute\"]]"); $self->{"attributes"} = $args->{"attributes"};  } else { my $value = do { my $default_value = do { my $method = $Mite::Role::__attributes_DEFAULT__; $self->$method }; do { package Mite::Miteception; (ref($default_value) eq 'HASH') and do { my $ok = 1; for my $i (values %{$default_value}) { ($ok = 0, last) unless (do { use Scalar::Util (); Scalar::Util::blessed($i) and $i->isa(q[Mite::Attribute]) }) }; $ok } } or do { require Carp; Carp::croak(sprintf "Type check failed in default: %s should be %s", "attributes", "HashRef[InstanceOf[\"Mite::Attribute\"]]") }; $default_value }; $self->{"attributes"} = $value;  };
     if ( exists $args->{"name"} ) { do { package Mite::Miteception; defined($args->{"name"}) and do { ref(\$args->{"name"}) eq 'SCALAR' or ref(\(my $val = $args->{"name"})) eq 'SCALAR' } } or require Carp && Carp::croak(sprintf "Type check failed in constructor: %s should be %s", "name", "Str"); $self->{"name"} = $args->{"name"};  } else { require Carp; Carp::croak("Missing key in constructor: name") };
+    if ( exists $args->{"shim_name"} ) { do { package Mite::Miteception; defined($args->{"shim_name"}) and do { ref(\$args->{"shim_name"}) eq 'SCALAR' or ref(\(my $val = $args->{"shim_name"})) eq 'SCALAR' } } or require Carp && Carp::croak(sprintf "Type check failed in constructor: %s should be %s", "shim_name", "Str"); $self->{"shim_name"} = $args->{"shim_name"};  };
     if ( exists $args->{"source"} ) { (do { use Scalar::Util (); Scalar::Util::blessed($args->{"source"}) and $args->{"source"}->isa(q[Mite::Source]) }) or require Carp && Carp::croak(sprintf "Type check failed in constructor: %s should be %s", "source", "InstanceOf[\"Mite::Source\"]"); $self->{"source"} = $args->{"source"};  } require Scalar::Util && Scalar::Util::weaken($self->{"source"});
     if ( exists $args->{"roles"} ) { do { package Mite::Miteception; ref($args->{"roles"}) eq 'ARRAY' } or require Carp && Carp::croak(sprintf "Type check failed in constructor: %s should be %s", "roles", "ArrayRef"); $self->{"roles"} = $args->{"roles"};  } else { my $value = do { my $default_value = $self->_build_roles; (ref($default_value) eq 'ARRAY') or do { require Carp; Carp::croak(sprintf "Type check failed in default: %s should be %s", "roles", "ArrayRef") }; $default_value }; $self->{"roles"} = $value;  };
     if ( exists $args->{"constants"} ) { do { package Mite::Miteception; ref($args->{"constants"}) eq 'HASH' } or require Carp && Carp::croak(sprintf "Type check failed in constructor: %s should be %s", "constants", "HashRef"); $self->{"constants"} = $args->{"constants"};  } else { my $value = do { my $default_value = $self->_build_constants; (ref($default_value) eq 'HASH') or do { require Carp; Carp::croak(sprintf "Type check failed in default: %s should be %s", "constants", "HashRef") }; $default_value }; $self->{"constants"} = $value;  };
 
     # Enforce strict constructor
-    my @unknown = grep not( /\A(?:attributes|constants|name|roles|source)\z/ ), keys %{$args}; @unknown and require Carp and Carp::croak("Unexpected keys in constructor: " . join(q[, ], sort @unknown));
+    my @unknown = grep not( /\A(?:attributes|constants|name|roles|s(?:him_name|ource))\z/ ), keys %{$args}; @unknown and require Carp and Carp::croak("Unexpected keys in constructor: " . join(q[, ], sort @unknown));
 
     # Call BUILD methods
     unless ( $no_build ) { $_->($self, $args) for @{ $meta->{BUILD} || [] } };
@@ -121,6 +122,9 @@ if ( $__XS ) {
 else {
     *roles = sub { @_ > 1 ? require Carp && Carp::croak("roles is a read-only attribute of @{[ref $_[0]]}") : $_[0]{"roles"} };
 }
+
+# Accessors for shim_name
+sub shim_name { @_ > 1 ? do { do { package Mite::Miteception; defined($_[1]) and do { ref(\$_[1]) eq 'SCALAR' or ref(\(my $val = $_[1])) eq 'SCALAR' } } or require Carp && Carp::croak(sprintf "Type check failed in %s: value should be %s", "accessor", "Str"); $_[0]{"shim_name"} = $_[1]; $_[0]; } : ( $_[0]{"shim_name"} ) }
 
 # Accessors for source
 sub source { @_ > 1 ? do { (do { use Scalar::Util (); Scalar::Util::blessed($_[1]) and $_[1]->isa(q[Mite::Source]) }) or require Carp && Carp::croak(sprintf "Type check failed in %s: value should be %s", "accessor", "InstanceOf[\"Mite::Source\"]"); $_[0]{"source"} = $_[1]; require Scalar::Util && Scalar::Util::weaken($_[0]{"source"}); $_[0]; } : ( $_[0]{"source"} ) }

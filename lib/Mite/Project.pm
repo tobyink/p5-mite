@@ -91,9 +91,11 @@ sub inject_mite_functions {
 
     my $source = $self->source_for( $file );
     my $pkg    = $source->class_for( $package, $kind eq 'role' ? 'Mite::Role' : 'Mite::Class' );
+    $pkg->shim_name( $shim );
 
     no strict 'refs';
     ${ $package .'::USES_MITE' } = ref( $pkg );
+    ${ $package .'::MITE_SHIM' } = ref( $shim );
 
     my $has = sub {
         my ( $names, %args ) = @_;

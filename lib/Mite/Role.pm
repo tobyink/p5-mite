@@ -25,6 +25,10 @@ has name =>
   isa           => Str,
   required      => true;
 
+has shim_name =>
+  is            => rw,
+  isa           => Str;
+
 has source =>
   is            => rw,
   isa           => InstanceOf['Mite::Source'],
@@ -42,6 +46,19 @@ has constants =>
   builder       => sub { {} };
 
 ##-
+
+sub BUILD {
+    my $self = shift;
+
+    require Type::Registry;
+    my $reg = 'Type::Registry'->for_class( $self->name );
+    $reg->add_types( 'Types::Standard' );
+    $reg->add_types( 'Types::Common::Numeric' );
+    $reg->add_types( 'Types::Common::String' );
+
+    my $library = eval { $self->project->config->data->{types} };
+    $reg->add_types( $library ) if $library;
+}
 
 sub skip_compiling {
     return false;
@@ -339,7 +356,11 @@ sub _compile_package {
 sub _compile_uses_mite {
     my $self = shift;
 
-    return sprintf 'our $USES_MITE = %s;', B::perlstring( ref($self) );
+    my @code = sprintf 'our $USES_MITE = %s;', B::perlstring( ref($self) );
+    if ( $self->shim_name ) {
+        push @code, sprintf 'our $MITE_SHIM = %s;', B::perlstring( $self->shim_name );
+    }
+    join "\n", @code;
 }
 
 sub _compile_pragmas {

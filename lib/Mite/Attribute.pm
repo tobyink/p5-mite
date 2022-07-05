@@ -248,20 +248,11 @@ sub _build_type {
     my $isa = $self->_isa
         or return undef;
 
-    state $type_registry = do {
-        require Type::Registry;
-        my $reg = 'Type::Registry'->for_me;
-        $reg->add_types('Types::Standard');
-        $reg->add_types('Types::Common::Numeric');
-        $reg->add_types('Types::Common::String');
-        $reg;
-    };
-
     require Type::Utils;
     my $type = Type::Utils::dwim_type(
         $isa,
         fallback => [ 'make_class_type' ],
-        for => __PACKAGE__,
+        for      => $self->class->name,
     );
 
     $type
@@ -309,6 +300,7 @@ sub has_simple_default {
 sub _compile_coercion {
     my ( $self, $expression ) = @_;
     if ( $self->coerce and my $type = $self->type ) {
+        local $Type::Tiny::AvoidCallbacks = 1;
         return sprintf 'do { my $to_coerce = %s; %s }',
             $expression, $type->coercion->inline_coercion( '$to_coerce' );
     }

@@ -121,6 +121,17 @@ string type contraint names.
 Any string supported by L<Type::Utils> C<dwim_type> is supported, so
 things like C<< "Int | Enum['small', 'medium', 'large']" >> should work!
 
+If you need custom types, you can add something like this to your
+F<.mite/config>:
+
+    types: Your::Project::Types
+
+The module C<Your::Project::Types> would be a type library constructed with
+L<Type::Library>. It should just contain type constraints and coercions which
+can be inlined, and none of your classes should load it directly (just rely
+on Mite to load it). This way you can use custom types in your project and
+your project will not have a dependency on Type::Library.
+
 =item C<coerce> B<Bool>
 
 Indicates that the attribute should attempt to coerce values to fit

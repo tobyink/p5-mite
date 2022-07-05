@@ -10,13 +10,14 @@ use Acme::Mitey::Cards::Suit;
 
 has suit => (
 	is       => ro,
-	isa      => 'InstanceOf["Acme::Mitey::Cards::Suit"]',
+	isa      => 'Suit',
 	required => true,
+	coerce   => true,
 );
 
 has face => (
 	is       => ro,
-	isa      => 'Enum[ "Jack", "Queen", "King" ]',
+	isa      => 'Character',
 	required => true,
 );
 
