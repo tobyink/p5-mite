@@ -62,17 +62,17 @@ jobs:
       - name: Perl version
         run: |
           perl -v
-      - name: Install dependencies
+      - name: Install Mite dependencies
         run: |
           cpanm -n setenv Class::XSAccessor Perl::Tidy
           cpanm -n --installdeps ./build
-      - name: Configure
+      - name: Configure Mite
         working-directory: ./build/
         run: perl Makefile.PL
-      - name: Make
+      - name: Make Mite
         working-directory: ./build/
         run: perl -MConfig -e'exec $Config{make}'
-      - name: Test suite
+      - name: Run Mite test suite
         working-directory: ./build/
         run: prove -lr t
       - name: Compile ${{ matrix.demo }}
