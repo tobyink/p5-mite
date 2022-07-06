@@ -105,15 +105,15 @@ sub _inject_mite_functions {
     *{"$caller\::param"} = $has if $requested->( param => false );
     *{"$caller\::field"} = $has if $requested->( field => false );
 
-    *{ $caller .'::with' } = $class->_make_with( $caller, $file, $kind )
+    *{"$caller\::with"} = $class->_make_with( $caller, $file, $kind )
         if $requested->( with => true );
 
-    *{ $caller .'::extends'} = sub {}
+    *{"$caller\::extends"} = sub {}
         if $kind eq 'class' && $requested->( extends => true );
-    *{ $caller .'::requires'} = sub {}
+    *{"$caller\::requires"} = sub {}
         if $kind eq 'role' && $requested->( requires => true );
 
-    my $MM = ( $kind eq 'role' ) ? \@{"$caller\::METHOD_MODIFIERS"} : [];
+    my $MM = ( $kind eq 'class' ) ? [] : \@{"$caller\::METHOD_MODIFIERS"};
 
     for my $modifier ( qw/ before after around / ) {
         next unless $requested->( $modifier => true );
