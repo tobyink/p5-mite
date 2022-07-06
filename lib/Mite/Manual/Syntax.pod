@@ -132,6 +132,11 @@ can be inlined, and none of your classes should load it directly (just rely
 on Mite to load it). This way you can use custom types in your project and
 your project will not have a dependency on Type::Library.
 
+=item C<does> B<< Str|TypeTiny >>
+
+Same as C<isa>, but if the type name is unrecognized, assumes it was a
+role name instead of assuming it was a class name.
+
 =item C<coerce> B<Bool>
 
 Indicates that the attribute should attempt to coerce values to fit

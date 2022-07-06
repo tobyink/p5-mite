@@ -60,8 +60,14 @@ has [ 'reader', 'writer', 'accessor', 'clearer', 'predicate' ] =>
 has isa =>
   is            => 'bare',
   isa           => Str|Object,
-  reader        => '_isa',
+  reader        => '_isa', # collision with UNIVERSAL::isa
   init_arg      => 'isa';
+
+has does =>
+  is            => 'bare',
+  isa           => Str|Object,
+  reader        => '_does', # collision with Mite's does method
+  init_arg      => 'does';
 
 has type =>
   is            => 'lazy',
@@ -245,18 +251,33 @@ sub _all_aliases {
 sub _build_type {
     my $self = shift;
 
-    my $isa = $self->_isa
-        or return undef;
+    my ( $fallback, $string );
+    if ( my $isa = $self->_isa ) {
+        $string   = $isa;
+        $fallback = [ 'make_class_type' ];
+    }
+    elsif ( my $does = $self->_does ) {
+        $string   = $does;
+        $fallback = [ 'make_role_type' ];
+    }
+    else {
+        return undef;
+    }
 
-    require Type::Utils;
-    my $type = Type::Utils::dwim_type(
-        $isa,
-        fallback => [ 'make_class_type' ],
-        for      => $self->class->name,
-    );
+    my $type;
+    if ( ref $string ) {
+        $type = $string;
+    }
+    else {
+        require Type::Utils;
+        $type = Type::Utils::dwim_type(
+            $string,
+            fallback => $fallback,
+            for      => $self->class->name,
+        );
 
-    $type
-        or croak sprintf 'Type %s cannot be found', $isa;
+        $type or croak sprintf 'Type %s cannot be found', $string;
+    }
 
     $type->can_be_inlined
         or croak sprintf 'Type %s cannot be inlined', $type->display_name;

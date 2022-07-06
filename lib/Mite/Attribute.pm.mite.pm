@@ -27,6 +27,7 @@ sub new {
     if ( exists $args->{"clearer"} ) { do { package Mite::Miteception; (((do { package Mite::Miteception; defined($args->{"clearer"}) and do { ref(\$args->{"clearer"}) eq 'SCALAR' or ref(\(my $val = $args->{"clearer"})) eq 'SCALAR' } }) && (do { local $_ = $args->{"clearer"}; length($_) > 0 })) or do { package Mite::Miteception; !defined($args->{"clearer"}) }) } or require Carp && Carp::croak(sprintf "Type check failed in constructor: %s should be %s", "clearer", "__ANON__|Undef"); $self->{"clearer"} = $args->{"clearer"};  };
     if ( exists $args->{"predicate"} ) { do { package Mite::Miteception; (((do { package Mite::Miteception; defined($args->{"predicate"}) and do { ref(\$args->{"predicate"}) eq 'SCALAR' or ref(\(my $val = $args->{"predicate"})) eq 'SCALAR' } }) && (do { local $_ = $args->{"predicate"}; length($_) > 0 })) or do { package Mite::Miteception; !defined($args->{"predicate"}) }) } or require Carp && Carp::croak(sprintf "Type check failed in constructor: %s should be %s", "predicate", "__ANON__|Undef"); $self->{"predicate"} = $args->{"predicate"};  };
     if ( exists $args->{"isa"} ) { do { package Mite::Miteception; (do { package Mite::Miteception; defined($args->{"isa"}) and do { ref(\$args->{"isa"}) eq 'SCALAR' or ref(\(my $val = $args->{"isa"})) eq 'SCALAR' } } or (do { package Mite::Miteception; use Scalar::Util (); Scalar::Util::blessed($args->{"isa"}) })) } or require Carp && Carp::croak(sprintf "Type check failed in constructor: %s should be %s", "isa", "Str|Object"); $self->{"isa"} = $args->{"isa"};  };
+    if ( exists $args->{"does"} ) { do { package Mite::Miteception; (do { package Mite::Miteception; defined($args->{"does"}) and do { ref(\$args->{"does"}) eq 'SCALAR' or ref(\(my $val = $args->{"does"})) eq 'SCALAR' } } or (do { package Mite::Miteception; use Scalar::Util (); Scalar::Util::blessed($args->{"does"}) })) } or require Carp && Carp::croak(sprintf "Type check failed in constructor: %s should be %s", "does", "Str|Object"); $self->{"does"} = $args->{"does"};  };
     if ( exists $args->{"type"} ) { do { package Mite::Miteception; ((do { package Mite::Miteception; use Scalar::Util (); Scalar::Util::blessed($args->{"type"}) }) or do { package Mite::Miteception; !defined($args->{"type"}) }) } or require Carp && Carp::croak(sprintf "Type check failed in constructor: %s should be %s", "type", "Object|Undef"); $self->{"type"} = $args->{"type"};  };
     if ( exists $args->{"coerce"} ) { do { package Mite::Miteception; !ref $args->{"coerce"} and (!defined $args->{"coerce"} or $args->{"coerce"} eq q() or $args->{"coerce"} eq '0' or $args->{"coerce"} eq '1') } or require Carp && Carp::croak(sprintf "Type check failed in constructor: %s should be %s", "coerce", "Bool"); $self->{"coerce"} = $args->{"coerce"};  } else { my $value = do { my $default_value = ""; (!ref $default_value and (!defined $default_value or $default_value eq q() or $default_value eq '0' or $default_value eq '1')) or do { require Carp; Carp::croak(sprintf "Type check failed in default: %s should be %s", "coerce", "Bool") }; $default_value }; $self->{"coerce"} = $value;  };
     if ( exists $args->{"default"} ) { do { package Mite::Miteception; (do { package Mite::Miteception; !defined($args->{"default"}) } or do { package Mite::Miteception; defined($args->{"default"}) and do { ref(\$args->{"default"}) eq 'SCALAR' or ref(\(my $val = $args->{"default"})) eq 'SCALAR' } } or do { package Mite::Miteception; ref($args->{"default"}) eq 'CODE' } or do { package Mite::Miteception; ref($args->{"default"}) eq 'SCALAR' or ref($args->{"default"}) eq 'REF' }) } or require Carp && Carp::croak(sprintf "Type check failed in constructor: %s should be %s", "default", "Undef|Str|CodeRef|ScalarRef"); $self->{"default"} = $args->{"default"};  };
@@ -40,7 +41,7 @@ sub new {
     ;
 
     # Enforce strict constructor
-    my @unknown = grep not( /\A(?:_class_for_default|a(?:ccessor|lias)|builder|c(?:l(?:ass|earer)|o(?:deref_default_variable|erce))|d(?:efault|ocumentation)|handles|i(?:nit_arg|sa?)|lazy|name|predicate|re(?:ader|quired)|t(?:rigger|ype)|w(?:eak_ref|riter))\z/ ), keys %{$args}; @unknown and require Carp and Carp::croak("Unexpected keys in constructor: " . join(q[, ], sort @unknown));
+    my @unknown = grep not( /\A(?:_class_for_default|a(?:ccessor|lias)|builder|c(?:l(?:ass|earer)|o(?:deref_default_variable|erce))|d(?:efault|o(?:cumentation|es))|handles|i(?:nit_arg|sa?)|lazy|name|predicate|re(?:ader|quired)|t(?:rigger|ype)|w(?:eak_ref|riter))\z/ ), keys %{$args}; @unknown and require Carp and Carp::croak("Unexpected keys in constructor: " . join(q[, ], sort @unknown));
 
     # Call BUILD methods
     $self->BUILDALL( $args ) if ( ! $no_build and @{ $meta->{BUILD} || [] } );
@@ -175,6 +176,17 @@ if ( $__XS ) {
 else {
     *documentation = sub { @_ > 1 ? do { $_[0]{"documentation"} = $_[1]; $_[0]; } : ( $_[0]{"documentation"} ) };
     *has_documentation = sub { exists $_[0]{"documentation"} };
+}
+
+# Accessors for does
+if ( $__XS ) {
+    Class::XSAccessor->import(
+        chained => 1,
+        "getters" => { "_does" => "does" },
+    );
+}
+else {
+    *_does = sub { @_ > 1 ? require Carp && Carp::croak("does is a read-only attribute of @{[ref $_[0]]}") : $_[0]{"does"} };
 }
 
 # Accessors for handles
