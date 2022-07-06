@@ -1,6 +1,15 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.005001 cpan:TOBYINK`
+	issued  2022-07-06;
+	changeset [
+		item [
+			a dcs:Addition;
+			label "Mite::Shim will now inject namespace::autoclean into your class/role if it is installed and you haven't opted out.";
+		];
+	].
+
 `Mite 0.005000 cpan:TOBYINK`
 	issued  2022-07-05;
 	changeset [
