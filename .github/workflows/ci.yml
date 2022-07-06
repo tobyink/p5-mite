@@ -1,7 +1,13 @@
 name: CI
 on:
-  - push
-  - pull_request
+  push:
+    paths-ignore:
+      - 'devel.examples/**'
+      - 'devel.etc/**'
+  pull_request:
+    paths-ignore:
+      - 'devel.examples/**'
+      - 'devel.etc/**'
 jobs:
   dist:
     name: Make distribution using Dist::Inkt
