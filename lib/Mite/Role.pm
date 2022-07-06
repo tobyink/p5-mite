@@ -40,7 +40,7 @@ has roles =>
   isa           => ArrayRef[Object],
   builder       => sub { [] };
 
-has constants =>
+has imported_functions =>
   is            => ro,
   isa           => HashRef[Str],
   builder       => sub { {} };
@@ -266,7 +266,7 @@ sub compilation_stages {
         _compile_package
         _compile_uses_mite
         _compile_pragmas
-        _compile_constants
+        _compile_imported_functions
         _compile_with
         _compile_does
         _compile_composed_methods
@@ -345,16 +345,15 @@ sub _compile_composed_methods {
     return $code;
 }
 
-sub _compile_constants {
+sub _compile_imported_functions {
     my $self = shift;
-    my %const = %{ $self->constants }
-        or return;
+    my %func = %{ $self->imported_functions } or return;
 
     return join "\n",
         'BEGIN {',
         map(
-            sprintf( '    *%s = \&%s;',  $_, $const{$_} ),
-            sort keys %const
+            sprintf( '    *%s = \&%s;',  $_, $func{$_} ),
+            sort keys %func
         ),
         '};',
         '';

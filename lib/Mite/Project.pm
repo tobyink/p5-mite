@@ -177,12 +177,12 @@ sub inject_mite_functions {
     for my $f ( qw/ true false / ) {
         next unless $requested->( $f, $want_bool );
         *{"$package\::$f"} = \&{"$shim\::$f"};
-        $pkg->constants->{$f} = "$shim\::$f";
+        $pkg->imported_functions->{$f} = "$shim\::$f";
     }
     for my $f ( qw/ ro rw rwp lazy bare / ) {
         next unless $requested->( $f, $want_is );
         *{"$package\::$f"} = \&{"$shim\::$f"};
-        $pkg->constants->{$f} = "$shim\::$f";
+        $pkg->imported_functions->{$f} = "$shim\::$f";
     }
 }
 
