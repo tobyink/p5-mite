@@ -19,7 +19,6 @@ sub rwp   () { 'rwp' }
 sub lazy  () { 'lazy' }
 sub bare  () { 'bare' }
 
-
 BEGIN {
     *_HAS_AUTOCLEAN = eval { require namespace::autoclean }
         ? \&true
