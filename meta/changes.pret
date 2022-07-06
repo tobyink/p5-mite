@@ -5,9 +5,24 @@
 	issued  2022-07-05;
 	changeset [
 		item "Restore the separate BUILDALL method which had previously been removed in Mite 0.001006."^^Change;
-		item "Allow classes to extend non-Mite classes."^^Change;
-		item "Roles now have a `requires` keyword, and method modifiers in roles implicitly require the methods they are modifying."^^Change;
-		item "Attribute `isa` options can now refer to types in a project-wide type library."^^Change;
+		item [
+			a dcs:Change;
+			label "Allow classes to extend non-Mite classes.";
+			seealso <https://github.com/tobyink/p5-mite/issues/16>;
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-mite/issues/16>;
+		];
+		item [
+			a dcs:Addition;
+			label "Roles now have a `requires` keyword, and method modifiers in roles implicitly require the methods they are modifying.";
+			seealso <https://github.com/tobyink/p5-mite/issues/13>;
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-mite/issues/13>;
+		];
+		item [
+			a dcs:Addition;
+			label "Attribute `isa` options can now refer to types in a project-wide type library, without introducing a dependency on Type::Library for your project.";
+			seealso <https://github.com/tobyink/p5-mite/issues/17>;
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-mite/issues/17>;
+		];
 	].
 
 `Mite 0.004000 cpan:TOBYINK`
@@ -30,7 +45,12 @@
 `Mite 0.003000 cpan:TOBYINK`
 	issued  2022-07-03;
 	changeset [
-		item "Mite classes and roles can consume Role::Tiny roles."^^Addition;
+		item [
+			a dcs:Addition;
+			label "Mite classes and roles can consume Role::Tiny roles.";
+			seealso <https://github.com/tobyink/p5-mite/issues/10>;
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-mite/issues/10>;
+		];
 		item "Remove dependency on version.pm."^^Packaging;
 		item "Fix method modifiers applying to inherited methods."^^Bugfix;
 	].
@@ -38,16 +58,31 @@
 `Mite 0.002004 cpan:TOBYINK`
 	issued  2022-07-03;
 	changeset [
-		item "Compiled .mite.pm files no longer require Perl 5.10.1 but should work on Perl 5.8.1+ as long as MRO::Compat is installed."^^Change;
+		item [
+			a dcs:Change;
+			label "Compiled .mite.pm files no longer require Perl 5.10.1 but should work on Perl 5.8.1+ as long as MRO::Compat is installed.";
+			seealso <https://github.com/tobyink/p5-mite/issues/7>;
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-mite/issues/7>;
+		];
 		item "Mite::Shim will print a warning on Perl older than 5.14 if Devel::GlobalDestruction isn't installed."^^Change;
-		item "More reliable (and tidier) quoting of strings in compiled .mite.pm files."^^Change;
+		item [
+			a dcs:Change;
+			label "More reliable (and tidier) quoting of strings in compiled .mite.pm files.";
+			seealso <https://github.com/tobyink/p5-mite/issues/11>;
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-mite/issues/11>;
+		];
 		item "Fixed a couple of typos in the documentation for `accessor`."^^Documentation;
 	].
 
 `Mite 0.002003 cpan:TOBYINK`
 	issued  2022-07-02;
 	changeset [
-		item "Allow attribute defaults to be expressed as a reference to a string of Perl code."^^Addition;
+		item [
+			a dcs:Addition;
+			label "Allow attribute defaults to be expressed as a reference to a string of Perl code.";
+			seealso <https://github.com/tobyink/p5-mite/issues/4>;
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-mite/issues/4>;
+		];
 		item "More efficient implementation of strict constructors."^^Change;
 		item "Removed the TODO file and put the tasks in the issue tracker."^^Packaging;
 		item "Removed some code related to the unimplemented idea of dataref attribtue defaults."^^Removal;
@@ -116,7 +151,12 @@
 `Mite 0.001007 cpan:TOBYINK`
 	issued  2022-06-29;
 	changeset [
-		item "alias for attributes"^^Addition;
+		item [
+			a dcs:Addition;
+			label "alias for attributes";
+			seealso <https://github.com/tobyink/p5-mite/issues/1>;
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-mite/issues/1>;
+		];
 		item "Fix changelog"^^Packaging;
 	].
 
