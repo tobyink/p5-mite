@@ -27,7 +27,12 @@ has name =>
 
 has shim_name =>
   is            => rw,
-  isa           => Str;
+  isa           => Str,
+  lazy          => true,
+  builder       => sub {
+    my $self = shift;
+    eval { $self->project->config->data->{shim} } // 'Mite::Shim'
+  };
 
 has source =>
   is            => rw,

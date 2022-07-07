@@ -144,7 +144,7 @@ else {
 }
 
 # Accessors for shim_name
-sub shim_name { @_ > 1 ? do { do { package Mite::Miteception; defined($_[1]) and do { ref(\$_[1]) eq 'SCALAR' or ref(\(my $val = $_[1])) eq 'SCALAR' } } or Mite::Shim::croak( "Type check failed in %s: value should be %s", "accessor", "Str" ); $_[0]{"shim_name"} = $_[1]; $_[0]; } : ( $_[0]{"shim_name"} ) }
+sub shim_name { @_ > 1 ? do { do { package Mite::Miteception; defined($_[1]) and do { ref(\$_[1]) eq 'SCALAR' or ref(\(my $val = $_[1])) eq 'SCALAR' } } or Mite::Shim::croak( "Type check failed in %s: value should be %s", "accessor", "Str" ); $_[0]{"shim_name"} = $_[1]; $_[0]; } : do { ( exists($_[0]{"shim_name"}) ? $_[0]{"shim_name"} : ( $_[0]{"shim_name"} = do { my $default_value = $_[0]->_build_shim_name; do { package Mite::Miteception; defined($default_value) and do { ref(\$default_value) eq 'SCALAR' or ref(\(my $val = $default_value)) eq 'SCALAR' } } or Mite::Shim::croak( "Type check failed in default: %s should be %s", "shim_name", "Str" ); $default_value } ) ) } }
 
 # Accessors for source
 sub source { @_ > 1 ? do { (do { use Scalar::Util (); Scalar::Util::blessed($_[1]) and $_[1]->isa(q[Mite::Source]) }) or Mite::Shim::croak( "Type check failed in %s: value should be %s", "accessor", "InstanceOf[\"Mite::Source\"]" ); $_[0]{"source"} = $_[1]; require Scalar::Util && Scalar::Util::weaken($_[0]{"source"}); $_[0]; } : ( $_[0]{"source"} ) }
