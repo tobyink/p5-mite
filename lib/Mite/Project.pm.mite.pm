@@ -1,6 +1,7 @@
 {
 package Mite::Project;
 our $USES_MITE = "Mite::Class";
+our $MITE_SHIM = "Mite::Shim";
 use strict;
 use warnings;
 
@@ -13,11 +14,11 @@ sub new {
     my $no_build = delete $args->{__no_BUILD__};
 
     # Initialize attributes
-    if ( exists $args->{"sources"} ) { (do { package Mite::Miteception; ref($args->{"sources"}) eq 'HASH' } and do { my $ok = 1; for my $i (values %{$args->{"sources"}}) { ($ok = 0, last) unless (do { use Scalar::Util (); Scalar::Util::blessed($i) and $i->isa(q[Mite::Source]) }) }; $ok }) or require Carp && Carp::croak(sprintf "Type check failed in constructor: %s should be %s", "sources", "HashRef[InstanceOf[\"Mite::Source\"]]"); $self->{"sources"} = $args->{"sources"};  } else { my $value = do { my $default_value = do { my $method = $Mite::Project::__sources_DEFAULT__; $self->$method }; do { package Mite::Miteception; (ref($default_value) eq 'HASH') and do { my $ok = 1; for my $i (values %{$default_value}) { ($ok = 0, last) unless (do { use Scalar::Util (); Scalar::Util::blessed($i) and $i->isa(q[Mite::Source]) }) }; $ok } } or do { require Carp; Carp::croak(sprintf "Type check failed in default: %s should be %s", "sources", "HashRef[InstanceOf[\"Mite::Source\"]]") }; $default_value }; $self->{"sources"} = $value;  };
-    if ( exists $args->{"config"} ) { (do { use Scalar::Util (); Scalar::Util::blessed($args->{"config"}) and $args->{"config"}->isa(q[Mite::Config]) }) or require Carp && Carp::croak(sprintf "Type check failed in constructor: %s should be %s", "config", "InstanceOf[\"Mite::Config\"]"); $self->{"config"} = $args->{"config"};  };
+    if ( exists $args->{"sources"} ) { (do { package Mite::Miteception; ref($args->{"sources"}) eq 'HASH' } and do { my $ok = 1; for my $i (values %{$args->{"sources"}}) { ($ok = 0, last) unless (do { use Scalar::Util (); Scalar::Util::blessed($i) and $i->isa(q[Mite::Source]) }) }; $ok }) or Mite::Shim::croak( "Type check failed in constructor: %s should be %s", "sources", "HashRef[InstanceOf[\"Mite::Source\"]]" ); $self->{"sources"} = $args->{"sources"};  } else { my $value = do { my $default_value = do { my $method = $Mite::Project::__sources_DEFAULT__; $self->$method }; do { package Mite::Miteception; (ref($default_value) eq 'HASH') and do { my $ok = 1; for my $i (values %{$default_value}) { ($ok = 0, last) unless (do { use Scalar::Util (); Scalar::Util::blessed($i) and $i->isa(q[Mite::Source]) }) }; $ok } } or Mite::Shim::croak( "Type check failed in default: %s should be %s", "sources", "HashRef[InstanceOf[\"Mite::Source\"]]" ); $default_value }; $self->{"sources"} = $value;  };
+    if ( exists $args->{"config"} ) { (do { use Scalar::Util (); Scalar::Util::blessed($args->{"config"}) and $args->{"config"}->isa(q[Mite::Config]) }) or Mite::Shim::croak( "Type check failed in constructor: %s should be %s", "config", "InstanceOf[\"Mite::Config\"]" ); $self->{"config"} = $args->{"config"};  };
 
     # Enforce strict constructor
-    my @unknown = grep not( /\A(?:config|sources)\z/ ), keys %{$args}; @unknown and require Carp and Carp::croak("Unexpected keys in constructor: " . join(q[, ], sort @unknown));
+    my @unknown = grep not( /\A(?:config|sources)\z/ ), keys %{$args}; @unknown and Mite::Shim::croak( "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
 
     # Call BUILD methods
     $self->BUILDALL( $args ) if ( ! $no_build and @{ $meta->{BUILD} || [] } );
@@ -83,7 +84,7 @@ sub does {
 my $__XS = !$ENV{MITE_PURE_PERL} && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
 # Accessors for config
-sub config { @_ > 1 ? require Carp && Carp::croak("config is a read-only attribute of @{[ref $_[0]]}") : ( exists($_[0]{"config"}) ? $_[0]{"config"} : ( $_[0]{"config"} = do { my $default_value = do { my $method = $Mite::Project::__config_DEFAULT__; $_[0]->$method }; (do { use Scalar::Util (); Scalar::Util::blessed($default_value) and $default_value->isa(q[Mite::Config]) }) or do { require Carp; Carp::croak(sprintf "Type check failed in default: %s should be %s", "config", "InstanceOf[\"Mite::Config\"]") }; $default_value } ) ) }
+sub config { @_ > 1 ? Mite::Shim::croak( "config is a read-only attribute of @{[ref $_[0]]}" ) : ( exists($_[0]{"config"}) ? $_[0]{"config"} : ( $_[0]{"config"} = do { my $default_value = do { my $method = $Mite::Project::__config_DEFAULT__; $_[0]->$method }; (do { use Scalar::Util (); Scalar::Util::blessed($default_value) and $default_value->isa(q[Mite::Config]) }) or Mite::Shim::croak( "Type check failed in default: %s should be %s", "config", "InstanceOf[\"Mite::Config\"]" ); $default_value } ) ) }
 
 # Accessors for sources
 if ( $__XS ) {
@@ -93,7 +94,7 @@ if ( $__XS ) {
     );
 }
 else {
-    *sources = sub { @_ > 1 ? require Carp && Carp::croak("sources is a read-only attribute of @{[ref $_[0]]}") : $_[0]{"sources"} };
+    *sources = sub { @_ > 1 ? Mite::Shim::croak( "sources is a read-only attribute of @{[ref $_[0]]}" ) : $_[0]{"sources"} };
 }
 
 

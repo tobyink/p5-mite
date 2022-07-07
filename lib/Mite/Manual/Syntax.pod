@@ -323,7 +323,7 @@ use several modifiers on the same method.
 =head2 Booleans
 
 Although they're not imported by default, you can import C<true> and
-C<false> keywords. They can made attribute definites a little prettier:
+C<false> keywords. They can made attribute definitions a little prettier:
 
     use Your::Project::Mite qw( true false );
     # OR:
@@ -352,6 +352,26 @@ The C<param> and C<field> keywords are available, like L<MooseX::Extended>.
     use Your::Project::Mite qw( param field !has );
     
     param foo => ( isa => 'Str' );
+
+=head2 C<carp>, C<croak>, and C<confess>
+
+These functions can be exported to your class:
+
+    use Your::Project::Mite qw( croak );
+    
+    sub my_method {
+        croak 'Not implemented yet';
+    }
+
+The functions provided are superpowered versions of the ones from L<Carp>.
+If called with multiple arguments, the first is treated as a format string
+for C<sprintf> and the remainder are passed through L<Data::Dumper> if they
+are references.
+
+    sub my_method {
+        my $self = shift;
+        croak '%s does not implement this method', ref( $self );
+    }
 
 =head2 Clean Classes
 

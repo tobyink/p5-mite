@@ -8,6 +8,7 @@
 
     BEGIN {
         *bare  = \&Acme::Mitey::Cards::Mite::bare;
+        *croak = \&Acme::Mitey::Cards::Mite::croak;
         *false = \&Acme::Mitey::Cards::Mite::false;
         *lazy  = \&Acme::Mitey::Cards::Mite::lazy;
         *ro    = \&Acme::Mitey::Cards::Mite::ro;
@@ -57,9 +58,7 @@
                     $ok;
                 }
               )
-              or require Carp
-              && Carp::croak(
-                sprintf "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "cards", "CardArray" );
             $self->{"cards"} = $args->{"cards"};
         }
@@ -82,9 +81,7 @@
                     length( $args->{"reverse"} ) > 0;
                 }
               )
-              or require Carp
-              && Carp::croak(
-                sprintf "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "reverse", "NonEmptyStr" );
             $self->{"reverse"} = $args->{"reverse"};
         }
@@ -105,13 +102,11 @@
                     )
                       && ( length($default_value) > 0 )
                   )
-                  or do {
-                    require Carp;
-                    Carp::croak(
-                        sprintf "Type check failed in default: %s should be %s",
-                        "reverse", "NonEmptyStr"
-                    );
-                  };
+                  or croak(
+                    "Type check failed in default: %s should be %s",
+                    "reverse",
+                    "NonEmptyStr"
+                  );
                 $default_value;
             };
             $self->{"reverse"} = $value;
@@ -138,9 +133,7 @@
                     $ok;
                 }
               )
-              or require Carp
-              && Carp::croak(
-                sprintf "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "original_cards", "CardArray" );
             $self->{"original_cards"} = $args->{"original_cards"};
         }
@@ -149,8 +142,7 @@
         my @unknown = grep not(/\A(?:cards|original_cards|reverse)\z/),
           keys %{$args};
         @unknown
-          and require Carp
-          and Carp::croak(
+          and croak(
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
 
         # Call BUILD methods
@@ -221,9 +213,9 @@
 
     # Accessors for original_cards
     sub original_cards {
-        @_ > 1 ? require Carp
-          && Carp::croak(
-            "original_cards is a read-only attribute of @{[ref $_[0]]}") : (
+        @_ > 1
+          ? croak("original_cards is a read-only attribute of @{[ref $_[0]]}")
+          : (
             exists( $_[0]{"original_cards"} ) ? $_[0]{"original_cards"} : (
                 $_[0]{"original_cards"} = do {
                     my $default_value = $_[0]->_build_original_cards;
@@ -246,18 +238,12 @@
                             $ok;
                         }
                       }
-                      or do {
-                        require Carp;
-                        Carp::croak(
-                            sprintf
-                              "Type check failed in default: %s should be %s",
-                            "original_cards", "CardArray"
-                        );
-                      };
+                      or croak( "Type check failed in default: %s should be %s",
+                        "original_cards", "CardArray" );
                     $default_value;
                 }
             )
-            );
+          );
     }
 
     # Accessors for reverse
@@ -270,8 +256,7 @@
     else {
         *reverse = sub {
             @_ > 1
-              ? require Carp && Carp::croak(
-                "reverse is a read-only attribute of @{[ref $_[0]]}")
+              ? croak("reverse is a read-only attribute of @{[ref $_[0]]}")
               : $_[0]{"reverse"};
         };
     }

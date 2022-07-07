@@ -70,6 +70,7 @@ sub load {
 	$class = Mite::Class->new(
 		name   => $fake_module,
 		source => $source,
+		shim_name => 'Mite::Shim',
 	);
 	$source->add_classes( $class );
 

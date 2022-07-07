@@ -43,9 +43,8 @@
                       and $args->{"deck"}->isa(q[Acme::Mitey::Cards::Deck]);
                 }
               )
-              or require Carp
-              && Carp::croak(
-                sprintf "Type check failed in constructor: %s should be %s",
+              or Acme::Mitey::Cards::Mite::croak(
+                "Type check failed in constructor: %s should be %s",
                 "deck", "Deck" );
             $self->{"deck"} = $args->{"deck"};
         }
@@ -59,9 +58,8 @@
                       or ref( \( my $val = $args->{"reverse"} ) ) eq 'SCALAR';
                 }
               }
-              or require Carp
-              && Carp::croak(
-                sprintf "Type check failed in constructor: %s should be %s",
+              or Acme::Mitey::Cards::Mite::croak(
+                "Type check failed in constructor: %s should be %s",
                 "reverse", "Str" );
             $self->{"reverse"} = $args->{"reverse"};
         }
@@ -69,8 +67,7 @@
         # Enforce strict constructor
         my @unknown = grep not(/\A(?:deck|reverse)\z/), keys %{$args};
         @unknown
-          and require Carp
-          and Carp::croak(
+          and Acme::Mitey::Cards::Mite::croak(
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
 
         # Call BUILD methods

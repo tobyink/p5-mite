@@ -115,9 +115,11 @@ sub methods_to_import_from_roles {
         my %exported = %{ $role->methods_to_export };
         for my $name ( sort keys %exported ) {
             if ( defined $methods{$name} and  $methods{$name} ne $exported{$name} ) {
-                require Carp;
-                Carp::croak "Conflict between %s and %s; %s must implement %s\n",
-                    $methods{$name}, $exported{$name}, $self->name, $name;
+                require Mite::Shim;
+                Mite::Shim::croak(
+                    "Conflict between %s and %s; %s must implement %s\n",
+                    $methods{$name}, $exported{$name}, $self->name, $name,
+                );
             }
             else {
                 $methods{$name} = $exported{$name};
@@ -259,6 +261,18 @@ sub does_list {
         $self->name,
         map( $_->does_list, @{ $self->roles } ),
     );
+}
+
+for my $function ( qw/ carp croak confess / ) {
+    no strict 'refs';
+    *{"_function_for_$function"} = sub {
+        my $self = shift;
+        return $function
+            if $self->imported_functions->{$function};
+        return sprintf '%s::%s', $self->shim_name, $function
+            if $self->shim_name;
+        return "require Carp && Carp::$function";
+    };
 }
 
 sub compilation_stages {
@@ -419,6 +433,7 @@ sub _compile_callback {
         || eval { $self->project->config->data->{shim} }
         || 'Mite::Shim'
     );
+    my $croak = $self->_function_for_croak;
     my $missing_methods = '()';
     if ( @required ) {
         require B;
@@ -426,7 +441,7 @@ sub _compile_callback {
             join q[, ], map B::perlstring( $_ ), @required;
     }
 
-    return sprintf <<'CODE', $missing_methods, $role_list, $shim;
+    return sprintf <<'CODE', $missing_methods, $croak, $role_list, $croak, $shim;
 # Callback which classes consuming this role will call
 sub __FINALIZE_APPLICATION__ {
     my ( $me, $target, $args ) = @_;
@@ -443,13 +458,12 @@ sub __FINALIZE_APPLICATION__ {
 
     my @missing_methods;
     @missing_methods = %s
-        and require Carp
-        and Carp::croak( "$me requires $target to implement methods: " . join q[, ], @missing_methods );
+        and %s( "$me requires $target to implement methods: " . join q[, ], @missing_methods );
 
     my @roles = ( %s );
     my %%nextargs = %%{ $args || {} };
     ( $nextargs{-indirect} ||= 0 )++;
-    die "PANIC!" if $nextargs{-indirect} > 100;
+    %s( "PANIC!" ) if $nextargs{-indirect} > 100;
     for my $role ( @roles ) {
         $role->__FINALIZE_APPLICATION__( $target, { %%nextargs } );
     }

@@ -43,9 +43,8 @@
                       and $args->{"deck"}->isa(q[Acme::Mitey::Cards::Deck]);
                 }
               )
-              or require Carp
-              && Carp::croak(
-                sprintf "Type check failed in constructor: %s should be %s",
+              or Acme::Mitey::Cards::Mite::croak(
+                "Type check failed in constructor: %s should be %s",
                 "deck", "Deck" );
             $self->{"deck"} = $args->{"deck"};
         }
@@ -59,9 +58,8 @@
                       or ref( \( my $val = $args->{"reverse"} ) ) eq 'SCALAR';
                 }
               }
-              or require Carp
-              && Carp::croak(
-                sprintf "Type check failed in constructor: %s should be %s",
+              or Acme::Mitey::Cards::Mite::croak(
+                "Type check failed in constructor: %s should be %s",
                 "reverse", "Str" );
             $self->{"reverse"} = $args->{"reverse"};
         }
@@ -104,13 +102,14 @@
                       and $value->isa(q[Acme::Mitey::Cards::Suit]);
                 }
               )
-              or require Carp
-              && Carp::croak(
-                sprintf "Type check failed in constructor: %s should be %s",
+              or Acme::Mitey::Cards::Mite::croak(
+                "Type check failed in constructor: %s should be %s",
                 "suit", "Suit" );
             $self->{"suit"} = $value;
         }
-        else { require Carp; Carp::croak("Missing key in constructor: suit") }
+        else {
+            Acme::Mitey::Cards::Mite::croak("Missing key in constructor: suit");
+        }
         if ( exists $args->{"number"} ) {
             my $value = do {
                 my $to_coerce = $args->{"number"};
@@ -157,20 +156,21 @@
                   && ( $value >= 1 )
                   && ( $value <= 10 )
               )
-              or require Carp
-              && Carp::croak(
-                sprintf "Type check failed in constructor: %s should be %s",
+              or Acme::Mitey::Cards::Mite::croak(
+                "Type check failed in constructor: %s should be %s",
                 "number", "CardNumber" );
             $self->{"number"} = $value;
         }
-        else { require Carp; Carp::croak("Missing key in constructor: number") }
+        else {
+            Acme::Mitey::Cards::Mite::croak(
+                "Missing key in constructor: number");
+        }
 
         # Enforce strict constructor
         my @unknown = grep not(/\A(?:deck|number|reverse|suit)\z/),
           keys %{$args};
         @unknown
-          and require Carp
-          and Carp::croak(
+          and Acme::Mitey::Cards::Mite::croak(
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
 
         # Call BUILD methods
@@ -249,7 +249,7 @@
     else {
         *number = sub {
             @_ > 1
-              ? require Carp && Carp::croak(
+              ? Acme::Mitey::Cards::Mite::croak(
                 "number is a read-only attribute of @{[ref $_[0]]}")
               : $_[0]{"number"};
         };
@@ -265,8 +265,8 @@
     else {
         *suit = sub {
             @_ > 1
-              ? require Carp
-              && Carp::croak("suit is a read-only attribute of @{[ref $_[0]]}")
+              ? Acme::Mitey::Cards::Mite::croak(
+                "suit is a read-only attribute of @{[ref $_[0]]}")
               : $_[0]{"suit"};
         };
     }

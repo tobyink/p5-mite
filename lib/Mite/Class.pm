@@ -302,8 +302,8 @@ sub _compile_strict_constructor {
             : $enum->inline_check( '$_' );
     };
 
-    return sprintf 'my @unknown = grep not( %s ), keys %%{%s}; @unknown and require Carp and Carp::croak("Unexpected keys in constructor: " . join(q[, ], sort @unknown));',
-        $check, $argvar;
+    return sprintf 'my @unknown = grep not( %s ), keys %%{%s}; @unknown and %s( "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );',
+        $check, $argvar, $self->_function_for_croak;
 }
 
 sub _compile_buildargs {

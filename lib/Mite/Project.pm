@@ -184,6 +184,11 @@ sub inject_mite_functions {
         *{"$package\::$f"} = \&{"$shim\::$f"};
         $pkg->imported_functions->{$f} = "$shim\::$f";
     }
+    for my $f ( qw/ carp croak confess / ) {
+        next unless $requested->( $f, false );
+        *{"$package\::$f"} = \&{"$shim\::$f"};
+        $pkg->imported_functions->{$f} = "$shim\::$f";
+    }
 }
 
 sub write_mites {

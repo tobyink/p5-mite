@@ -3,11 +3,9 @@ package Acme::Mitey::Cards::Card;
 our $VERSION   = '0.008';
 our $AUTHORITY = 'cpan:TOBYINK';
 
-use Acme::Mitey::Cards::Mite qw( -bool -is );
+use Acme::Mitey::Cards::Mite qw( -bool -is carp );
 
 use Acme::Mitey::Cards::Suit;
-
-use Carp qw( carp );
 
 has deck => (
 	is       => ro,

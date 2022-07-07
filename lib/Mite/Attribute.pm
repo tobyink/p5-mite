@@ -110,7 +110,8 @@ has documentation =>
 has handles =>
   is            => rw,
   isa           => HashRef->of( Str )->plus_coercions( ArrayRef, q{+{ map { $_ => $_ } @$_ }} ),
-  predicate     => true;
+  predicate     => true,
+  coerce        => true;
 
 has alias =>
   is            => rw,
@@ -128,6 +129,16 @@ use B ();
 sub _q          { shift; join q[, ], map B::perlstring($_), @_ }
 sub _q_name     { B::perlstring( shift->name ) }
 sub _q_init_arg { B::perlstring( shift->init_arg ) }
+
+for my $function ( qw/ carp croak confess / ) {
+    no strict 'refs';
+    *{"_function_for_$function"} = sub {
+        my $self = shift;
+        return $self->class->${\"_function_for_$function"}
+            if ref $self->class;
+        return "require Carp && Carp::$function";
+    };
+}
 
 my @method_name_generator = (
     { # public
@@ -340,8 +351,8 @@ sub _compile_checked_default {
         $default = $self->_compile_coercion( $default );
     }
 
-    return sprintf 'do { my $default_value = %s; %s or do { require Carp; Carp::croak(sprintf "Type check failed in default: %%s should be %%s", %s, %s) }; $default_value }',
-        $default, $type->inline_check('$default_value'), $self->_q($self->name), $self->_q($type->display_name);
+    return sprintf 'do { my $default_value = %s; %s or %s( "Type check failed in default: %%s should be %%s", %s, %s ); $default_value }',
+        $default, $type->inline_check('$default_value'), $self->_function_for_croak, $self->_q($self->name), $self->_q($type->display_name);
 }
 
 sub _compile_default {
@@ -394,8 +405,9 @@ sub compile_init {
                 $code .= sprintf 'my $value = %s; ', $self->_compile_coercion( $valuevar );
                 $valuevar = '$value';
             }
-            $code .= sprintf '%s or require Carp && Carp::croak(sprintf "Type check failed in constructor: %%s should be %%s", %s, %s); ',
+            $code .= sprintf '%s or %s( "Type check failed in constructor: %%s should be %%s", %s, %s ); ',
                 $type->inline_check( $valuevar ),
+                $self->_function_for_croak,
                 $self->_q_init_arg,
                 $self->_q( $type->display_name );
             $code .= sprintf '%s->{%s} = %s; ',
@@ -425,8 +437,8 @@ sub compile_init {
     elsif ( defined $init_arg
     and $self->required
     and not ($self->has_default || $self->has_builder) ) {
-        $code .= sprintf ' else { require Carp; Carp::croak("Missing key in constructor: %s") }',
-            $init_arg;
+        $code .= sprintf ' else { %s( "Missing key in constructor: %s" ) }',
+            $self->_function_for_croak, $init_arg;
     }
 
     if ( $self->weak_ref ) {
@@ -457,8 +469,8 @@ my %code_template;
                 $self->_q_name, $self->_q_name, $self->_q_name, $self->_compile_checked_default( '$_[0]' );
         }
         unless ( $arg{no_croak} ) {
-            $code = sprintf '@_ > 1 ? require Carp && Carp::croak("%s is a read-only attribute of @{[ref $_[0]]}") : %s',
-                $self->name, $code;
+            $code = sprintf '@_ > 1 ? %s( "%s is a read-only attribute of @{[ref $_[0]]}" ) : %s',
+                $self->_function_for_croak, $self->name, $code;
         }
         return $code;
     },
@@ -466,8 +478,8 @@ my %code_template;
         my $self = shift;
         my %arg = @_;
         my $reader = $code_template{reader}->( $self, no_croak => true );
-        return sprintf 'my $object = do { %s }; require Scalar::Util && Scalar::Util::blessed($object) or require Carp && Carp::croak("%s is not a blessed object"); $object',
-            $reader, $self->name;
+        return sprintf 'my $object = do { %s }; require Scalar::Util && Scalar::Util::blessed($object) or %s( "%s is not a blessed object" ); $object',
+            $reader, $self->_function_for_croak, $self->name;
     },
     writer => sub {
         my $self = shift;
@@ -484,8 +496,8 @@ my %code_template;
                 $code .= sprintf 'my $value = %s; ', $self->_compile_coercion($valuevar);
                 $valuevar = '$value';
             }
-            $code .= sprintf '%s or require Carp && Carp::croak(sprintf "Type check failed in %%s: value should be %%s", %s, %s); $_[0]{%s} = %s;',
-                $type->inline_check($valuevar), $self->_q( $arg{label} // 'writer' ), $self->_q( $type->display_name ), $self->_q_name, $valuevar;
+            $code .= sprintf '%s or %s( "Type check failed in %%s: value should be %%s", %s, %s ); $_[0]{%s} = %s;',
+                $type->inline_check($valuevar), $self->_function_for_croak, $self->_q( $arg{label} // 'writer' ), $self->_q( $type->display_name ), $self->_q_name, $valuevar;
         }
         else {
             $code .= sprintf '$_[0]{%s} = $_[1];', $self->_q_name;

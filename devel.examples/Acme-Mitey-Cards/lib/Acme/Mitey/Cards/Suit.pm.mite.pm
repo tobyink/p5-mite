@@ -46,13 +46,14 @@
                     length( $args->{"name"} ) > 0;
                 }
               )
-              or require Carp
-              && Carp::croak(
-                sprintf "Type check failed in constructor: %s should be %s",
+              or Acme::Mitey::Cards::Mite::croak(
+                "Type check failed in constructor: %s should be %s",
                 "name", "NonEmptyStr" );
             $self->{"name"} = $args->{"name"};
         }
-        else { require Carp; Carp::croak("Missing key in constructor: name") }
+        else {
+            Acme::Mitey::Cards::Mite::croak("Missing key in constructor: name");
+        }
         if ( exists $args->{"abbreviation"} ) {
             do {
 
@@ -63,9 +64,8 @@
                       'SCALAR';
                 }
               }
-              or require Carp
-              && Carp::croak(
-                sprintf "Type check failed in constructor: %s should be %s",
+              or Acme::Mitey::Cards::Mite::croak(
+                "Type check failed in constructor: %s should be %s",
                 "abbreviation", "Str" );
             $self->{"abbreviation"} = $args->{"abbreviation"};
         }
@@ -78,20 +78,21 @@
                       or ref( \( my $val = $args->{"colour"} ) ) eq 'SCALAR';
                 }
               }
-              or require Carp
-              && Carp::croak(
-                sprintf "Type check failed in constructor: %s should be %s",
+              or Acme::Mitey::Cards::Mite::croak(
+                "Type check failed in constructor: %s should be %s",
                 "colour", "Str" );
             $self->{"colour"} = $args->{"colour"};
         }
-        else { require Carp; Carp::croak("Missing key in constructor: colour") }
+        else {
+            Acme::Mitey::Cards::Mite::croak(
+                "Missing key in constructor: colour");
+        }
 
         # Enforce strict constructor
         my @unknown = grep not(/\A(?:abbreviation|colour|name)\z/),
           keys %{$args};
         @unknown
-          and require Carp
-          and Carp::croak(
+          and Acme::Mitey::Cards::Mite::croak(
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
 
         # Call BUILD methods
@@ -162,9 +163,10 @@
 
     # Accessors for abbreviation
     sub abbreviation {
-        @_ > 1 ? require Carp
-          && Carp::croak(
-            "abbreviation is a read-only attribute of @{[ref $_[0]]}") : (
+        @_ > 1
+          ? Acme::Mitey::Cards::Mite::croak(
+            "abbreviation is a read-only attribute of @{[ref $_[0]]}")
+          : (
             exists( $_[0]{"abbreviation"} ) ? $_[0]{"abbreviation"} : (
                 $_[0]{"abbreviation"} = do {
                     my $default_value = $_[0]->_build_abbreviation;
@@ -177,18 +179,13 @@
                               'SCALAR';
                         }
                       }
-                      or do {
-                        require Carp;
-                        Carp::croak(
-                            sprintf
-                              "Type check failed in default: %s should be %s",
-                            "abbreviation", "Str"
-                        );
-                      };
+                      or Acme::Mitey::Cards::Mite::croak(
+                        "Type check failed in default: %s should be %s",
+                        "abbreviation", "Str" );
                     $default_value;
                 }
             )
-            );
+          );
     }
 
     # Accessors for colour
@@ -201,7 +198,7 @@
     else {
         *colour = sub {
             @_ > 1
-              ? require Carp && Carp::croak(
+              ? Acme::Mitey::Cards::Mite::croak(
                 "colour is a read-only attribute of @{[ref $_[0]]}")
               : $_[0]{"colour"};
         };
@@ -217,8 +214,8 @@
     else {
         *name = sub {
             @_ > 1
-              ? require Carp
-              && Carp::croak("name is a read-only attribute of @{[ref $_[0]]}")
+              ? Acme::Mitey::Cards::Mite::croak(
+                "name is a read-only attribute of @{[ref $_[0]]}")
               : $_[0]{"name"};
         };
     }

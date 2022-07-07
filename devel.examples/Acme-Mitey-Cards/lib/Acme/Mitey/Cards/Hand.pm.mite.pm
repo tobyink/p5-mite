@@ -57,9 +57,7 @@
                     $ok;
                 }
               )
-              or require Carp
-              && Carp::croak(
-                sprintf "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "cards", "CardArray" );
             $self->{"cards"} = $args->{"cards"};
         }
@@ -87,9 +85,8 @@
                       )
                 );
               }
-              or require Carp
-              && Carp::croak(
-                sprintf "Type check failed in constructor: %s should be %s",
+              or Acme::Mitey::Cards::Mite::croak(
+                "Type check failed in constructor: %s should be %s",
                 "owner", "Str|Object" );
             $self->{"owner"} = $args->{"owner"};
         }
@@ -97,8 +94,7 @@
         # Enforce strict constructor
         my @unknown = grep not(/\A(?:cards|owner)\z/), keys %{$args};
         @unknown
-          and require Carp
-          and Carp::croak(
+          and Acme::Mitey::Cards::Mite::croak(
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
 
         # Call BUILD methods
@@ -193,9 +189,8 @@
                       )
                 );
               }
-              or require Carp
-              && Carp::croak(
-                sprintf "Type check failed in %s: value should be %s",
+              or Acme::Mitey::Cards::Mite::croak(
+                "Type check failed in %s: value should be %s",
                 "accessor", "Str|Object" );
             $_[0]{"owner"} = $_[1];
             $_[0];

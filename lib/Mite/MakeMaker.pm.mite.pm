@@ -1,6 +1,7 @@
 {
 package Mite::MakeMaker;
 our $USES_MITE = "Mite::Class";
+our $MITE_SHIM = "Mite::Shim";
 use strict;
 use warnings;
 
@@ -16,7 +17,7 @@ sub new {
     
 
     # Enforce strict constructor
-    my @unknown = grep not( do { package Mite::Miteception; defined($_) and do { ref(\$_) eq 'SCALAR' or ref(\(my $val = $_)) eq 'SCALAR' } } ), keys %{$args}; @unknown and require Carp and Carp::croak("Unexpected keys in constructor: " . join(q[, ], sort @unknown));
+    my @unknown = grep not( do { package Mite::Miteception; defined($_) and do { ref(\$_) eq 'SCALAR' or ref(\(my $val = $_)) eq 'SCALAR' } } ), keys %{$args}; @unknown and Mite::Shim::croak( "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
 
     # Call BUILD methods
     $self->BUILDALL( $args ) if ( ! $no_build and @{ $meta->{BUILD} || [] } );

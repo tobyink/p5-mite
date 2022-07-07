@@ -19,6 +19,25 @@ sub rwp   () { 'rwp' }
 sub lazy  () { 'lazy' }
 sub bare  () { 'bare' }
 
+sub _error_handler {
+    my ( $func, $message, @args ) = @_;
+    if ( @args ) {
+        require Data::Dumper;
+        local $Data::Dumper::Terse  = 1;
+        local $Data::Dumper::Indent = 1;
+        $message = sprintf $message, map {
+            ref($_) ? Data::Dumper::Dumper($_) : defined($_) ? $_ : '(undef)'
+        } @args;
+    }
+    my $next = do { no strict 'refs'; require Carp; \&{"Carp::$func"} };
+    @_ = ( $message );
+    goto $next;
+}
+
+sub carp    { unshift @_, 'carp'   ; goto \&_error_handler }
+sub croak   { unshift @_, 'croak'  ; goto \&_error_handler }
+sub confess { unshift @_, 'confess'; goto \&_error_handler }
+
 BEGIN {
     *_HAS_AUTOCLEAN = eval { require namespace::autoclean }
         ? \&true
@@ -35,7 +54,7 @@ else {
 defined ${^GLOBAL_PHASE}
 or eval { require Devel::GlobalDestruction; 1 }
 or do {
-    warn "WARNING: Devel::GlobalDestruction recommended!\n";
+    carp( "WARNING: Devel::GlobalDestruction recommended!" );
     *Devel::GlobalDestruction::in_global_destruction = sub { undef; };
 };
 
@@ -78,8 +97,7 @@ sub import {
         # Changes to this filename must be coordinated with Mite::Compiled
         my $mite_file = $file . ".mite.pm";
         if( !-e $mite_file ) {
-            require Carp;
-            Carp::croak("Compiled Mite file ($mite_file) for $file is missing");
+            croak("Compiled Mite file ($mite_file) for $file is missing");
         }
 
         {
@@ -212,8 +230,7 @@ sub _make_with {
         my $orig = $caller->can($name);
         return $orig if $orig;
 
-        require Carp;
-        Carp::croak( "Cannot modify method $name in $caller: no such method" );
+        croak( "Cannot modify method $name in $caller: no such method" );
     };
 
     sub before {
