@@ -5,7 +5,7 @@ use warnings;
 package Mite::ModuleBuild;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.005001';
+our $VERSION   = '0.005002';
 
 use parent 'Module::Build';
 

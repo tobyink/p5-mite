@@ -1,6 +1,23 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.005002 cpan:TOBYINK`
+	issued  2022-07-07;
+	changeset [
+		item [
+			a dcs:Changes;
+			label "Mite::Shim tidy-ups.";
+		];
+		item [
+			a dcs:Addition;
+			label "does for attributes.";
+		];
+		item [
+			a dcs:Addition;
+			label "Provide carp/croak/confess.";
+		];
+	].
+
 `Mite 0.005001 cpan:TOBYINK`
 	issued  2022-07-06;
 	changeset [
