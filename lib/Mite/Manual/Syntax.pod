@@ -34,6 +34,8 @@ You can suppress importing default functions:
 
     use Your::Project::Mite -role, qw( !before !after !around );
 
+The C<< -all >> flag imports everything possible.
+
 =head2 C<< has $name => %spec >>
 
 Like C<has> in Moose, this declares an attribute. Not all Moose options

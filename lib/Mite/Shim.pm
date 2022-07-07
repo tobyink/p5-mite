@@ -115,7 +115,7 @@ sub import {
 
 sub _inject_mite_functions {
     my ( $class, $caller, $file, $kind, $arg ) = ( shift, @_ );
-    my $requested = sub { $arg->{$_[0]} ? true : $arg->{'!'.$_[0]} ? false : $_[1]; };
+    my $requested = sub { $arg->{$_[0]} ? true : $arg->{'!'.$_[0]} ? false : $arg->{'-all'} ? true : $_[1]; };
 
     no strict 'refs';
     my $has = $class->_make_has( $caller, $file, $kind );

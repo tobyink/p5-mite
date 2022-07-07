@@ -30,4 +30,18 @@ CODE
     is MyTest1::rwp(), 'rwp';
 };
 
+tests "-all" => sub {
+    mite_load <<'CODE';
+package MyTestAll;
+use Mite::Shim qw( -all -unclean );
+1;
+CODE
+
+    for my $func ( qw/ has extends with before after around true false rw ro rwp bare lazy carp croak confess / ) {
+        ok MyTestAll->can( $func ), "MyTestAll can $func";
+    }
+    
+    ok !MyTestAll->can( 'requires' ), "MyTestAll can't with";
+};
+
 done_testing;

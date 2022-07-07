@@ -87,7 +87,7 @@ sub inject_mite_functions {
         shim    => Str,
     );
     my ( $self, $package, $file, $kind, $arg, $shim ) = &$sig;
-    my $requested = sub { $arg->{$_[0]} ? 1 : $arg->{'!'.$_[0]} ? 0 : $_[1]; };
+    my $requested = sub { $arg->{$_[0]} ? 1 : $arg->{'!'.$_[0]} ? 0 : $arg->{'-all'} ? 1 : $_[1]; };
 
     my $source = $self->source_for( $file );
     my $pkg    = $source->class_for( $package, $kind eq 'role' ? 'Mite::Role' : 'Mite::Class' );
