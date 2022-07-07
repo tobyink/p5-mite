@@ -24,7 +24,7 @@ sub _error_handler {
     if ( @args ) {
         require Data::Dumper;
         local $Data::Dumper::Terse  = 1;
-        local $Data::Dumper::Indent = 1;
+        local $Data::Dumper::Indent = 0;
         $message = sprintf $message, map {
             ref($_) ? Data::Dumper::Dumper($_) : defined($_) ? $_ : '(undef)'
         } @args;
