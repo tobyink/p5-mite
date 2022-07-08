@@ -7,27 +7,11 @@ package Mite::Miteception;
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.005002';
 
-my %constants;
-BEGIN {
-	%constants = (
-		rw        => 'rw',
-		rwp       => 'rwp',
-		ro        => 'ro',
-		true      => !!1,
-		false     => !!0,
-	);
-}
-
-use constant \%constants;
-
 use Import::Into;
 use Mite::Shim ();
-use Carp ();
-use Scalar::Util ();
 use Types::Standard ();
 use Types::Path::Tiny ();
 use Type::Params ();
-use feature ();
 
 sub import {
 	my $class = shift;
@@ -41,11 +25,6 @@ sub import {
 	}
 
 	my ( $caller, $file ) = caller;
-
-	if ( not $arg{'-all'} ) {
-		no strict 'refs';
-		*{"$caller\::$_"} = \&{$_} for $class->constant_names;
-	}
 
 	if ( $ENV{MITE_LIMITED_PARSING} ) {
 		require Mite::Project;
@@ -63,35 +42,10 @@ sub import {
 	}
 }
 
-sub constant_names {
-	my $class = shift;
-	return keys %constants;
-}
-
 sub to_import {
 	my ( $class, $arg ) = ( shift, @_ );
 	no warnings 'uninitialized';
-	if ( $arg->{'-all'} ) {
-		return (
-			[ 'Types::Standard' => [
-				qw( -types slurpy ),
-			] ],
-			[ 'Types::Path::Tiny' => [
-				qw( -types ),
-			] ],
-			[ 'Type::Params' => [
-				compile           => { -as => 'sig_pos'   },
-				compile_named_oo  => { -as => 'sig_named' },
-			] ],
-		);
-	}
 	return (
-		[ 'Carp' => [
-			qw( carp croak confess ),
-		] ],
-		[ 'Scalar::Util' => [
-			qw( blessed ),
-		] ],
 		[ 'Types::Standard' => [
 			qw( -types slurpy ),
 		] ],

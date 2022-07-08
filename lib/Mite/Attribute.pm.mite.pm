@@ -6,6 +6,19 @@
     use strict;
     use warnings;
 
+    BEGIN {
+        *bare    = \&Mite::Shim::bare;
+        *blessed = \&Scalar::Util::blessed;
+        *carp    = \&Mite::Shim::carp;
+        *confess = \&Mite::Shim::confess;
+        *croak   = \&Mite::Shim::croak;
+        *false   = \&Mite::Shim::false;
+        *ro      = \&Mite::Shim::ro;
+        *rw      = \&Mite::Shim::rw;
+        *rwp     = \&Mite::Shim::rwp;
+        *true    = \&Mite::Shim::true;
+    }
+
     sub new {
         my $class = ref( $_[0] ) ? ref(shift) : shift;
         my $meta  = ( $Mite::META{$class} ||= $class->__META__ );
@@ -27,8 +40,7 @@
                     Scalar::Util::blessed( $args->{"class"} );
                 }
               )
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "class", "Object" );
             $self->{"class"} = $args->{"class"};
         }
@@ -42,8 +54,7 @@
                     Scalar::Util::blessed( $args->{"_class_for_default"} );
                 }
               )
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "_class_for_default", "Object" );
             $self->{"_class_for_default"} = $args->{"_class_for_default"};
         }
@@ -66,14 +77,14 @@
                     do { local $_ = $args->{"name"}; length($_) > 0 }
                   )
               )
-              or Mite::Shim::croak(
+              or croak(
                 "Type check failed in constructor: %s should be %s",
                 "name",
                 "__ANON__"
               );
             $self->{"name"} = $args->{"name"};
         }
-        else { Mite::Shim::croak("Missing key in constructor: name") }
+        else { croak("Missing key in constructor: name") }
         if ( exists $args->{"init_arg"} ) {
             do {
 
@@ -92,8 +103,7 @@
                       do { package Mite::Shim; !defined( $args->{"init_arg"} ) }
                 );
               }
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "init_arg", "Str|Undef" );
             $self->{"init_arg"} = $args->{"init_arg"};
         }
@@ -107,8 +117,7 @@
                     or $args->{"required"} eq '0'
                     or $args->{"required"} eq '1' );
               }
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "required", "Bool" );
             $self->{"required"} = $args->{"required"};
         }
@@ -122,8 +131,7 @@
                         or $default_value eq '0'
                         or $default_value eq '1' )
                   )
-                  or Mite::Shim::croak(
-                    "Type check failed in default: %s should be %s",
+                  or croak( "Type check failed in default: %s should be %s",
                     "required", "Bool" );
                 $default_value;
             };
@@ -139,8 +147,7 @@
                     or $args->{"weak_ref"} eq '0'
                     or $args->{"weak_ref"} eq '1' );
               }
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "weak_ref", "Bool" );
             $self->{"weak_ref"} = $args->{"weak_ref"};
         }
@@ -154,8 +161,7 @@
                         or $default_value eq '0'
                         or $default_value eq '1' )
                   )
-                  or Mite::Shim::croak(
-                    "Type check failed in default: %s should be %s",
+                  or croak( "Type check failed in default: %s should be %s",
                     "weak_ref", "Bool" );
                 $default_value;
             };
@@ -169,8 +175,7 @@
                       and !ref( $args->{"is"} )
                       and $args->{"is"} =~ m{\A(?:(?:bare|lazy|r(?:wp?|o)))\z} );
               }
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "is", "Enum[\"ro\",\"rw\",\"rwp\",\"lazy\",\"bare\"]" );
             $self->{"is"} = $args->{"is"};
         }
@@ -185,8 +190,7 @@
                           and $default_value =~
                           m{\A(?:(?:bare|lazy|r(?:wp?|o)))\z} );
                   }
-                  or Mite::Shim::croak(
-                    "Type check failed in default: %s should be %s",
+                  or croak( "Type check failed in default: %s should be %s",
                     "is", "Enum[\"ro\",\"rw\",\"rwp\",\"lazy\",\"bare\"]" );
                 $default_value;
             };
@@ -217,8 +221,7 @@
                       do { package Mite::Shim; !defined( $args->{"reader"} ) }
                 );
               }
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "reader", "__ANON__|Undef" );
             $self->{"reader"} = $args->{"reader"};
         }
@@ -247,8 +250,7 @@
                       do { package Mite::Shim; !defined( $args->{"writer"} ) }
                 );
               }
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "writer", "__ANON__|Undef" );
             $self->{"writer"} = $args->{"writer"};
         }
@@ -281,8 +283,7 @@
                       do { package Mite::Shim; !defined( $args->{"accessor"} ) }
                 );
               }
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "accessor", "__ANON__|Undef" );
             $self->{"accessor"} = $args->{"accessor"};
         }
@@ -312,8 +313,7 @@
                       do { package Mite::Shim; !defined( $args->{"clearer"} ) }
                 );
               }
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "clearer", "__ANON__|Undef" );
             $self->{"clearer"} = $args->{"clearer"};
         }
@@ -349,8 +349,7 @@
                     }
                 );
               }
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "predicate", "__ANON__|Undef" );
             $self->{"predicate"} = $args->{"predicate"};
         }
@@ -378,8 +377,7 @@
                       )
                 );
               }
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "isa", "Str|Object" );
             $self->{"isa"} = $args->{"isa"};
         }
@@ -407,8 +405,7 @@
                       )
                 );
               }
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "does", "Str|Object" );
             $self->{"does"} = $args->{"does"};
         }
@@ -427,8 +424,7 @@
                     ) or do { package Mite::Shim; !defined( $args->{"type"} ) }
                 );
               }
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "type", "Object|Undef" );
             $self->{"type"} = $args->{"type"};
         }
@@ -442,8 +438,7 @@
                     or $args->{"coerce"} eq '0'
                     or $args->{"coerce"} eq '1' );
               }
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "coerce", "Bool" );
             $self->{"coerce"} = $args->{"coerce"};
         }
@@ -457,8 +452,7 @@
                         or $default_value eq '0'
                         or $default_value eq '1' )
                   )
-                  or Mite::Shim::croak(
-                    "Type check failed in default: %s should be %s",
+                  or croak( "Type check failed in default: %s should be %s",
                     "coerce", "Bool" );
                 $default_value;
             };
@@ -492,7 +486,7 @@
                     }
                 );
               }
-              or Mite::Shim::croak(
+              or croak(
                 "Type check failed in constructor: %s should be %s",
                 "default",
                 "Undef|Str|CodeRef|ScalarRef"
@@ -509,8 +503,7 @@
                     or $args->{"lazy"} eq '0'
                     or $args->{"lazy"} eq '1' );
               }
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "lazy", "Bool" );
             $self->{"lazy"} = $args->{"lazy"};
         }
@@ -524,8 +517,7 @@
                         or $default_value eq '0'
                         or $default_value eq '1' )
                   )
-                  or Mite::Shim::croak(
-                    "Type check failed in default: %s should be %s",
+                  or croak( "Type check failed in default: %s should be %s",
                     "lazy", "Bool" );
                 $default_value;
             };
@@ -542,8 +534,7 @@
                       eq 'SCALAR';
                 }
               }
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "coderef_default_variable", "Str" );
             $self->{"coderef_default_variable"} =
               $args->{"coderef_default_variable"};
@@ -579,8 +570,7 @@
                       do { package Mite::Shim; !defined( $args->{"trigger"} ) }
                 );
               }
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "trigger", "__ANON__|CodeRef|Undef" );
             $self->{"trigger"} = $args->{"trigger"};
         }
@@ -615,8 +605,7 @@
                       do { package Mite::Shim; !defined( $args->{"builder"} ) }
                 );
               }
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "builder", "__ANON__|CodeRef|Undef" );
             $self->{"builder"} = $args->{"builder"};
         }
@@ -672,8 +661,7 @@
                     $ok;
                 }
               }
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "handles", "HashRef[Str]" );
             $self->{"handles"} = $value;
         }
@@ -732,8 +720,7 @@
                     $ok;
                 }
               }
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "alias", "ArrayRef[Str]" );
             $self->{"alias"} = $value;
         }
@@ -798,8 +785,7 @@
                         $ok;
                     }
                   }
-                  or Mite::Shim::croak(
-                    "Type check failed in default: %s should be %s",
+                  or croak( "Type check failed in default: %s should be %s",
                     "alias", "ArrayRef[Str]" );
                 $default_value;
             };
@@ -811,7 +797,7 @@
 /\A(?:_class_for_default|a(?:ccessor|lias)|builder|c(?:l(?:ass|earer)|o(?:deref_default_variable|erce))|d(?:efault|o(?:cumentation|es))|handles|i(?:nit_arg|sa?)|lazy|name|predicate|re(?:ader|quired)|t(?:rigger|ype)|w(?:eak_ref|riter))\z/
         ), keys %{$args};
         @unknown
-          and Mite::Shim::croak(
+          and croak(
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
 
         # Call BUILD methods
@@ -892,8 +878,7 @@
                     Scalar::Util::blessed( $_[1] );
                 }
               )
-              or
-              Mite::Shim::croak( "Type check failed in %s: value should be %s",
+              or croak( "Type check failed in %s: value should be %s",
                 "accessor", "Object" );
             $_[0]{"_class_for_default"} = $_[1];
             require Scalar::Util
@@ -915,7 +900,7 @@
                                 Scalar::Util::blessed($default_value);
                             }
                           )
-                          or Mite::Shim::croak(
+                          or croak(
                             "Type check failed in default: %s should be %s",
                             "_class_for_default", "Object" );
                         $default_value;
@@ -966,8 +951,7 @@
                       or ( !defined( $_[1] ) )
                 );
               }
-              or
-              Mite::Shim::croak( "Type check failed in %s: value should be %s",
+              or croak( "Type check failed in %s: value should be %s",
                 "accessor", "__ANON__|Undef" );
             $_[0]{"accessor"} = $_[1];
             $_[0];
@@ -1008,7 +992,7 @@
                                   or ( !defined($default_value) )
                             );
                           }
-                          or Mite::Shim::croak(
+                          or croak(
                             "Type check failed in default: %s should be %s",
                             "accessor", "__ANON__|Undef" );
                         $default_value;
@@ -1076,8 +1060,7 @@
                     $ok;
                 }
               }
-              or
-              Mite::Shim::croak( "Type check failed in %s: value should be %s",
+              or croak( "Type check failed in %s: value should be %s",
                 "accessor", "ArrayRef[Str]" );
             $_[0]{"alias"} = $value;
             $_[0];
@@ -1088,8 +1071,7 @@
     # Accessors for alias_is_for
     sub alias_is_for {
         @_ > 1
-          ? Mite::Shim::croak(
-            "alias_is_for is a read-only attribute of @{[ref $_[0]]}")
+          ? croak("alias_is_for is a read-only attribute of @{[ref $_[0]]}")
           : (
             exists( $_[0]{"alias_is_for"} ) ? $_[0]{"alias_is_for"}
             : ( $_[0]{"alias_is_for"} = $_[0]->_build_alias_is_for ) );
@@ -1132,8 +1114,7 @@
                       or ( !defined( $_[1] ) )
                 );
               }
-              or
-              Mite::Shim::croak( "Type check failed in %s: value should be %s",
+              or croak( "Type check failed in %s: value should be %s",
                 "accessor", "__ANON__|CodeRef|Undef" );
             $_[0]{"builder"} = $_[1];
             $_[0];
@@ -1153,8 +1134,7 @@
                     Scalar::Util::blessed( $_[1] );
                 }
               )
-              or
-              Mite::Shim::croak( "Type check failed in %s: value should be %s",
+              or croak( "Type check failed in %s: value should be %s",
                 "accessor", "Object" );
             $_[0]{"class"} = $_[1];
             require Scalar::Util && Scalar::Util::weaken( $_[0]{"class"} );
@@ -1189,8 +1169,7 @@
                       or ( !defined( $_[1] ) )
                 );
               }
-              or
-              Mite::Shim::croak( "Type check failed in %s: value should be %s",
+              or croak( "Type check failed in %s: value should be %s",
                 "accessor", "__ANON__|Undef" );
             $_[0]{"clearer"} = $_[1];
             $_[0];
@@ -1231,7 +1210,7 @@
                                   or ( !defined($default_value) )
                             );
                           }
-                          or Mite::Shim::croak(
+                          or croak(
                             "Type check failed in default: %s should be %s",
                             "clearer", "__ANON__|Undef" );
                         $default_value;
@@ -1253,8 +1232,7 @@
                       or ref( \( my $val = $_[1] ) ) eq 'SCALAR';
                 }
               }
-              or
-              Mite::Shim::croak( "Type check failed in %s: value should be %s",
+              or croak( "Type check failed in %s: value should be %s",
                 "accessor", "Str" );
             $_[0]{"coderef_default_variable"} = $_[1];
             $_[0];
@@ -1279,7 +1257,7 @@
                                   'SCALAR';
                             }
                           }
-                          or Mite::Shim::croak(
+                          or croak(
                             "Type check failed in default: %s should be %s",
                             "coderef_default_variable", "Str" );
                         $default_value;
@@ -1300,8 +1278,7 @@
                     or $_[1] eq '0'
                     or $_[1] eq '1' )
               )
-              or
-              Mite::Shim::croak( "Type check failed in %s: value should be %s",
+              or croak( "Type check failed in %s: value should be %s",
                 "accessor", "Bool" );
             $_[0]{"coerce"} = $_[1];
             $_[0];
@@ -1339,8 +1316,7 @@
                       or ( ref( $_[1] ) eq 'SCALAR' or ref( $_[1] ) eq 'REF' )
                 );
               }
-              or
-              Mite::Shim::croak( "Type check failed in %s: value should be %s",
+              or croak( "Type check failed in %s: value should be %s",
                 "accessor", "Undef|Str|CodeRef|ScalarRef" );
             $_[0]{"default"} = $_[1];
             $_[0];
@@ -1375,8 +1351,7 @@
     else {
         *_does = sub {
             @_ > 1
-              ? Mite::Shim::croak(
-                "does is a read-only attribute of @{[ref $_[0]]}")
+              ? croak("does is a read-only attribute of @{[ref $_[0]]}")
               : $_[0]{"does"};
         };
     }
@@ -1443,8 +1418,7 @@
                     $ok;
                 }
               }
-              or
-              Mite::Shim::croak( "Type check failed in %s: value should be %s",
+              or croak( "Type check failed in %s: value should be %s",
                 "accessor", "HashRef[Str]" );
             $_[0]{"handles"} = $value;
             $_[0];
@@ -1471,8 +1445,7 @@
                       or ( !defined( $_[1] ) )
                 );
               }
-              or
-              Mite::Shim::croak( "Type check failed in %s: value should be %s",
+              or croak( "Type check failed in %s: value should be %s",
                 "accessor", "Str|Undef" );
             $_[0]{"init_arg"} = $_[1];
             $_[0];
@@ -1503,7 +1476,7 @@
                                   or ( !defined($default_value) )
                             );
                           }
-                          or Mite::Shim::croak(
+                          or croak(
                             "Type check failed in default: %s should be %s",
                             "init_arg", "Str|Undef" );
                         $default_value;
@@ -1524,8 +1497,7 @@
                       and !ref( $_[1] )
                       and $_[1] =~ m{\A(?:(?:bare|lazy|r(?:wp?|o)))\z} );
               }
-              or
-              Mite::Shim::croak( "Type check failed in %s: value should be %s",
+              or croak( "Type check failed in %s: value should be %s",
                 "accessor", "Enum[\"ro\",\"rw\",\"rwp\",\"lazy\",\"bare\"]" );
             $_[0]{"is"} = $_[1];
             $_[0];
@@ -1543,8 +1515,7 @@
     else {
         *_isa = sub {
             @_ > 1
-              ? Mite::Shim::croak(
-                "isa is a read-only attribute of @{[ref $_[0]]}")
+              ? croak("isa is a read-only attribute of @{[ref $_[0]]}")
               : $_[0]{"isa"};
         };
     }
@@ -1560,8 +1531,7 @@
                     or $_[1] eq '0'
                     or $_[1] eq '1' )
               )
-              or
-              Mite::Shim::croak( "Type check failed in %s: value should be %s",
+              or croak( "Type check failed in %s: value should be %s",
                 "accessor", "Bool" );
             $_[0]{"lazy"} = $_[1];
             $_[0];
@@ -1588,7 +1558,7 @@
                     do { local $_ = $_[1]; length($_) > 0 }
                   )
               )
-              or Mite::Shim::croak(
+              or croak(
                 "Type check failed in %s: value should be %s",
                 "accessor",
                 "__ANON__"
@@ -1625,8 +1595,7 @@
                       or ( !defined( $_[1] ) )
                 );
               }
-              or
-              Mite::Shim::croak( "Type check failed in %s: value should be %s",
+              or croak( "Type check failed in %s: value should be %s",
                 "accessor", "__ANON__|Undef" );
             $_[0]{"predicate"} = $_[1];
             $_[0];
@@ -1667,7 +1636,7 @@
                                   or ( !defined($default_value) )
                             );
                           }
-                          or Mite::Shim::croak(
+                          or croak(
                             "Type check failed in default: %s should be %s",
                             "predicate", "__ANON__|Undef" );
                         $default_value;
@@ -1703,8 +1672,7 @@
                       or ( !defined( $_[1] ) )
                 );
               }
-              or
-              Mite::Shim::croak( "Type check failed in %s: value should be %s",
+              or croak( "Type check failed in %s: value should be %s",
                 "accessor", "__ANON__|Undef" );
             $_[0]{"reader"} = $_[1];
             $_[0];
@@ -1745,7 +1713,7 @@
                                   or ( !defined($default_value) )
                             );
                           }
-                          or Mite::Shim::croak(
+                          or croak(
                             "Type check failed in default: %s should be %s",
                             "reader", "__ANON__|Undef" );
                         $default_value;
@@ -1766,8 +1734,7 @@
                     or $_[1] eq '0'
                     or $_[1] eq '1' )
               )
-              or
-              Mite::Shim::croak( "Type check failed in %s: value should be %s",
+              or croak( "Type check failed in %s: value should be %s",
                 "accessor", "Bool" );
             $_[0]{"required"} = $_[1];
             $_[0];
@@ -1812,8 +1779,7 @@
                       or ( !defined( $_[1] ) )
                 );
               }
-              or
-              Mite::Shim::croak( "Type check failed in %s: value should be %s",
+              or croak( "Type check failed in %s: value should be %s",
                 "accessor", "__ANON__|CodeRef|Undef" );
             $_[0]{"trigger"} = $_[1];
             $_[0];
@@ -1823,9 +1789,7 @@
 
     # Accessors for type
     sub type {
-        @_ > 1
-          ? Mite::Shim::croak("type is a read-only attribute of @{[ref $_[0]]}")
-          : (
+        @_ > 1 ? croak("type is a read-only attribute of @{[ref $_[0]]}") : (
             exists( $_[0]{"type"} ) ? $_[0]{"type"} : (
                 $_[0]{"type"} = do {
                     my $default_value = $_[0]->_build_type;
@@ -1844,13 +1808,12 @@
                               or ( !defined($default_value) )
                         );
                       }
-                      or Mite::Shim::croak(
-                        "Type check failed in default: %s should be %s",
+                      or croak( "Type check failed in default: %s should be %s",
                         "type", "Object|Undef" );
                     $default_value;
                 }
             )
-          );
+        );
     }
 
     # Accessors for weak_ref
@@ -1864,8 +1827,7 @@
                     or $_[1] eq '0'
                     or $_[1] eq '1' )
               )
-              or
-              Mite::Shim::croak( "Type check failed in %s: value should be %s",
+              or croak( "Type check failed in %s: value should be %s",
                 "accessor", "Bool" );
             $_[0]{"weak_ref"} = $_[1];
             $_[0];
@@ -1899,8 +1861,7 @@
                       or ( !defined( $_[1] ) )
                 );
               }
-              or
-              Mite::Shim::croak( "Type check failed in %s: value should be %s",
+              or croak( "Type check failed in %s: value should be %s",
                 "accessor", "__ANON__|Undef" );
             $_[0]{"writer"} = $_[1];
             $_[0];
@@ -1941,7 +1902,7 @@
                                   or ( !defined($default_value) )
                             );
                           }
-                          or Mite::Shim::croak(
+                          or croak(
                             "Type check failed in default: %s should be %s",
                             "writer", "__ANON__|Undef" );
                         $default_value;

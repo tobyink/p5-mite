@@ -6,6 +6,20 @@
     use strict;
     use warnings;
 
+    BEGIN {
+        *bare    = \&Mite::Shim::bare;
+        *blessed = \&Scalar::Util::blessed;
+        *carp    = \&Mite::Shim::carp;
+        *confess = \&Mite::Shim::confess;
+        *croak   = \&Mite::Shim::croak;
+        *false   = \&Mite::Shim::false;
+        *lazy    = \&Mite::Shim::lazy;
+        *ro      = \&Mite::Shim::ro;
+        *rw      = \&Mite::Shim::rw;
+        *rwp     = \&Mite::Shim::rwp;
+        *true    = \&Mite::Shim::true;
+    }
+
     sub new {
         my $class = ref( $_[0] ) ? ref(shift) : shift;
         my $meta  = ( $Mite::META{$class} ||= $class->__META__ );
@@ -27,8 +41,7 @@
                       'SCALAR';
                 }
               }
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "mite_dir_name", "Str" );
             $self->{"mite_dir_name"} = $args->{"mite_dir_name"};
         }
@@ -43,8 +56,7 @@
                           or ref( \( my $val = $default_value ) ) eq 'SCALAR';
                     }
                   }
-                  or Mite::Shim::croak(
-                    "Type check failed in default: %s should be %s",
+                  or croak( "Type check failed in default: %s should be %s",
                     "mite_dir_name", "Str" );
                 $default_value;
             };
@@ -83,8 +95,7 @@
                       and $value->isa(q[Path::Tiny]);
                 }
               )
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "mite_dir", "Path" );
             $self->{"mite_dir"} = $value;
         }
@@ -121,15 +132,13 @@
                       and $value->isa(q[Path::Tiny]);
                 }
               )
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "config_file", "Path" );
             $self->{"config_file"} = $value;
         }
         if ( exists $args->{"data"} ) {
             do { package Mite::Shim; ref( $args->{"data"} ) eq 'HASH' }
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "data", "HashRef" );
             $self->{"data"} = $args->{"data"};
         }
@@ -143,8 +152,7 @@
                     or $args->{"search_for_mite_dir"} eq '0'
                     or $args->{"search_for_mite_dir"} eq '1' );
               }
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "search_for_mite_dir", "Bool" );
             $self->{"search_for_mite_dir"} = $args->{"search_for_mite_dir"};
         }
@@ -158,8 +166,7 @@
                         or $default_value eq '0'
                         or $default_value eq '1' )
                   )
-                  or Mite::Shim::croak(
-                    "Type check failed in default: %s should be %s",
+                  or croak( "Type check failed in default: %s should be %s",
                     "search_for_mite_dir", "Bool" );
                 $default_value;
             };
@@ -171,7 +178,7 @@
             /\A(?:config_file|data|mite_dir(?:_name)?|search_for_mite_dir)\z/),
           keys %{$args};
         @unknown
-          and Mite::Shim::croak(
+          and croak(
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
 
         # Call BUILD methods
@@ -243,8 +250,7 @@
     # Accessors for config_file
     sub config_file {
         @_ > 1
-          ? Mite::Shim::croak(
-            "config_file is a read-only attribute of @{[ref $_[0]]}")
+          ? croak("config_file is a read-only attribute of @{[ref $_[0]]}")
           : (
             exists( $_[0]{"config_file"} ) ? $_[0]{"config_file"} : (
                 $_[0]{"config_file"} = do {
@@ -285,8 +291,7 @@
                               and $default_value->isa(q[Path::Tiny]);
                         }
                       )
-                      or Mite::Shim::croak(
-                        "Type check failed in default: %s should be %s",
+                      or croak( "Type check failed in default: %s should be %s",
                         "config_file", "Path" );
                     $default_value;
                 }
@@ -299,8 +304,7 @@
         @_ > 1
           ? do {
             ( ref( $_[1] ) eq 'HASH' )
-              or
-              Mite::Shim::croak( "Type check failed in %s: value should be %s",
+              or croak( "Type check failed in %s: value should be %s",
                 "accessor", "HashRef" );
             $_[0]{"data"} = $_[1];
             $_[0];
@@ -315,7 +319,7 @@
                             $_[0]->$method;
                         };
                         ( ref($default_value) eq 'HASH' )
-                          or Mite::Shim::croak(
+                          or croak(
                             "Type check failed in default: %s should be %s",
                             "data", "HashRef" );
                         $default_value;
@@ -328,8 +332,7 @@
     # Accessors for mite_dir
     sub mite_dir {
         @_ > 1
-          ? Mite::Shim::croak(
-            "mite_dir is a read-only attribute of @{[ref $_[0]]}")
+          ? croak("mite_dir is a read-only attribute of @{[ref $_[0]]}")
           : (
             exists( $_[0]{"mite_dir"} ) ? $_[0]{"mite_dir"} : (
                 $_[0]{"mite_dir"} = do {
@@ -370,8 +373,7 @@
                               and $default_value->isa(q[Path::Tiny]);
                         }
                       )
-                      or Mite::Shim::croak(
-                        "Type check failed in default: %s should be %s",
+                      or croak( "Type check failed in default: %s should be %s",
                         "mite_dir", "Path" );
                     $default_value;
                 }
@@ -389,7 +391,7 @@
     else {
         *mite_dir_name = sub {
             @_ > 1
-              ? Mite::Shim::croak(
+              ? croak(
                 "mite_dir_name is a read-only attribute of @{[ref $_[0]]}")
               : $_[0]{"mite_dir_name"};
         };
@@ -406,8 +408,7 @@
                     or $_[1] eq '0'
                     or $_[1] eq '1' )
               )
-              or
-              Mite::Shim::croak( "Type check failed in %s: value should be %s",
+              or croak( "Type check failed in %s: value should be %s",
                 "accessor", "Bool" );
             $_[0]{"search_for_mite_dir"} = $_[1];
             $_[0];

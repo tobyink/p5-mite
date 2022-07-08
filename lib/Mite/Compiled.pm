@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package Mite::Compiled;
-use Mite::Miteception;
+use Mite::Miteception -all;
 
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.005002';

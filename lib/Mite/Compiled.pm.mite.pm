@@ -6,6 +6,20 @@
     use strict;
     use warnings;
 
+    BEGIN {
+        *bare    = \&Mite::Shim::bare;
+        *blessed = \&Scalar::Util::blessed;
+        *carp    = \&Mite::Shim::carp;
+        *confess = \&Mite::Shim::confess;
+        *croak   = \&Mite::Shim::croak;
+        *false   = \&Mite::Shim::false;
+        *lazy    = \&Mite::Shim::lazy;
+        *ro      = \&Mite::Shim::ro;
+        *rw      = \&Mite::Shim::rw;
+        *rwp     = \&Mite::Shim::rwp;
+        *true    = \&Mite::Shim::true;
+    }
+
     sub new {
         my $class = ref( $_[0] ) ? ref(shift) : shift;
         my $meta  = ( $Mite::META{$class} ||= $class->__META__ );
@@ -50,8 +64,7 @@
                       and $value->isa(q[Path::Tiny]);
                 }
               )
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "file", "Path" );
             $self->{"file"} = $value;
         }
@@ -63,18 +76,17 @@
                       and $args->{"source"}->isa(q[Mite::Source]);
                 }
               )
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "source", "InstanceOf[\"Mite::Source\"]" );
             $self->{"source"} = $args->{"source"};
         }
-        else { Mite::Shim::croak("Missing key in constructor: source") }
+        else { croak("Missing key in constructor: source") }
         require Scalar::Util && Scalar::Util::weaken( $self->{"source"} );
 
         # Enforce strict constructor
         my @unknown = grep not(/\A(?:file|source)\z/), keys %{$args};
         @unknown
-          and Mite::Shim::croak(
+          and croak(
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
 
         # Call BUILD methods
@@ -179,8 +191,7 @@
                       and $value->isa(q[Path::Tiny]);
                 }
               )
-              or
-              Mite::Shim::croak( "Type check failed in %s: value should be %s",
+              or croak( "Type check failed in %s: value should be %s",
                 "accessor", "Path" );
             $_[0]{"file"} = $value;
             $_[0];
@@ -229,7 +240,7 @@
                                   and $default_value->isa(q[Path::Tiny]);
                             }
                           )
-                          or Mite::Shim::croak(
+                          or croak(
                             "Type check failed in default: %s should be %s",
                             "file", "Path" );
                         $default_value;
@@ -249,8 +260,7 @@
     else {
         *source = sub {
             @_ > 1
-              ? Mite::Shim::croak(
-                "source is a read-only attribute of @{[ref $_[0]]}")
+              ? croak("source is a read-only attribute of @{[ref $_[0]]}")
               : $_[0]{"source"};
         };
     }

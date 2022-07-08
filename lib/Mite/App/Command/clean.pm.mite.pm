@@ -7,6 +7,20 @@
     use warnings;
 
     BEGIN {
+        *bare    = \&Mite::Shim::bare;
+        *blessed = \&Scalar::Util::blessed;
+        *carp    = \&Mite::Shim::carp;
+        *confess = \&Mite::Shim::confess;
+        *croak   = \&Mite::Shim::croak;
+        *false   = \&Mite::Shim::false;
+        *lazy    = \&Mite::Shim::lazy;
+        *ro      = \&Mite::Shim::ro;
+        *rw      = \&Mite::Shim::rw;
+        *rwp     = \&Mite::Shim::rwp;
+        *true    = \&Mite::Shim::true;
+    }
+
+    BEGIN {
         require Mite::App::Command;
 
         use mro 'c3';
@@ -39,7 +53,7 @@
           ),
           keys %{$args};
         @unknown
-          and Mite::Shim::croak(
+          and croak(
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
 
         # Call BUILD methods

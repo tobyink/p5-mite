@@ -6,6 +6,20 @@
     use strict;
     use warnings;
 
+    BEGIN {
+        *bare    = \&Mite::Shim::bare;
+        *blessed = \&Scalar::Util::blessed;
+        *carp    = \&Mite::Shim::carp;
+        *confess = \&Mite::Shim::confess;
+        *croak   = \&Mite::Shim::croak;
+        *false   = \&Mite::Shim::false;
+        *lazy    = \&Mite::Shim::lazy;
+        *ro      = \&Mite::Shim::ro;
+        *rw      = \&Mite::Shim::rw;
+        *rwp     = \&Mite::Shim::rwp;
+        *true    = \&Mite::Shim::true;
+    }
+
     sub new {
         my $class = ref( $_[0] ) ? ref(shift) : shift;
         my $meta  = ( $Mite::META{$class} ||= $class->__META__ );
@@ -35,7 +49,7 @@
                     $ok;
                 }
               )
-              or Mite::Shim::croak(
+              or croak(
                 "Type check failed in constructor: %s should be %s",
                 "sources",
                 "HashRef[InstanceOf[\"Mite::Source\"]]"
@@ -66,7 +80,7 @@
                         $ok;
                     }
                   }
-                  or Mite::Shim::croak(
+                  or croak(
                     "Type check failed in default: %s should be %s",
                     "sources",
                     "HashRef[InstanceOf[\"Mite::Source\"]]"
@@ -83,8 +97,7 @@
                       and $args->{"config"}->isa(q[Mite::Config]);
                 }
               )
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "config", "InstanceOf[\"Mite::Config\"]" );
             $self->{"config"} = $args->{"config"};
         }
@@ -98,8 +111,7 @@
                     or $args->{"_limited_parsing"} eq '0'
                     or $args->{"_limited_parsing"} eq '1' );
               }
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "_limited_parsing", "Bool" );
             $self->{"_limited_parsing"} = $args->{"_limited_parsing"};
         }
@@ -113,8 +125,7 @@
                         or $default_value eq '0'
                         or $default_value eq '1' )
                   )
-                  or Mite::Shim::croak(
-                    "Type check failed in default: %s should be %s",
+                  or croak( "Type check failed in default: %s should be %s",
                     "_limited_parsing", "Bool" );
                 $default_value;
             };
@@ -131,8 +142,7 @@
                       eq 'SCALAR';
                 }
               }
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "_module_fakeout_namespace", "Str" );
             $self->{"_module_fakeout_namespace"} =
               $args->{"_module_fakeout_namespace"};
@@ -147,8 +157,7 @@
                     or $args->{"debug"} eq '0'
                     or $args->{"debug"} eq '1' );
               }
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "debug", "Bool" );
             $self->{"debug"} = $args->{"debug"};
         }
@@ -162,8 +171,7 @@
                         or $default_value eq '0'
                         or $default_value eq '1' )
                   )
-                  or Mite::Shim::croak(
-                    "Type check failed in default: %s should be %s",
+                  or croak( "Type check failed in default: %s should be %s",
                     "debug", "Bool" );
                 $default_value;
             };
@@ -175,7 +183,7 @@
 /\A(?:_(?:limited_parsing|module_fakeout_namespace)|config|debug|sources)\z/
         ), keys %{$args};
         @unknown
-          and Mite::Shim::croak(
+          and croak(
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
 
         # Call BUILD methods
@@ -255,8 +263,7 @@
                     or $_[1] eq '0'
                     or $_[1] eq '1' )
               )
-              or
-              Mite::Shim::croak( "Type check failed in %s: value should be %s",
+              or croak( "Type check failed in %s: value should be %s",
                 "accessor", "Bool" );
             $_[0]{"_limited_parsing"} = $_[1];
             $_[0];
@@ -289,8 +296,7 @@
                       or ref( \( my $val = $_[1] ) ) eq 'SCALAR';
                 }
               }
-              or
-              Mite::Shim::croak( "Type check failed in %s: value should be %s",
+              or croak( "Type check failed in %s: value should be %s",
                 "accessor", "Str" );
             $_[0]{"_module_fakeout_namespace"} = $_[1];
             $_[0];
@@ -300,10 +306,7 @@
 
     # Accessors for config
     sub config {
-        @_ > 1
-          ? Mite::Shim::croak(
-            "config is a read-only attribute of @{[ref $_[0]]}")
-          : (
+        @_ > 1 ? croak("config is a read-only attribute of @{[ref $_[0]]}") : (
             exists( $_[0]{"config"} ) ? $_[0]{"config"} : (
                 $_[0]{"config"} = do {
                     my $default_value = do {
@@ -318,7 +321,7 @@
                               and $default_value->isa(q[Mite::Config]);
                         }
                       )
-                      or Mite::Shim::croak(
+                      or croak(
                         "Type check failed in default: %s should be %s",
                         "config",
                         "InstanceOf[\"Mite::Config\"]"
@@ -326,7 +329,7 @@
                     $default_value;
                 }
             )
-          );
+        );
     }
 
     # Accessors for debug
@@ -340,8 +343,7 @@
                     or $_[1] eq '0'
                     or $_[1] eq '1' )
               )
-              or
-              Mite::Shim::croak( "Type check failed in %s: value should be %s",
+              or croak( "Type check failed in %s: value should be %s",
                 "accessor", "Bool" );
             $_[0]{"debug"} = $_[1];
             $_[0];
@@ -359,8 +361,7 @@
     else {
         *sources = sub {
             @_ > 1
-              ? Mite::Shim::croak(
-                "sources is a read-only attribute of @{[ref $_[0]]}")
+              ? croak("sources is a read-only attribute of @{[ref $_[0]]}")
               : $_[0]{"sources"};
         };
     }

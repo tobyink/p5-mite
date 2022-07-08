@@ -6,6 +6,20 @@
     use strict;
     use warnings;
 
+    BEGIN {
+        *bare    = \&Mite::Shim::bare;
+        *blessed = \&Scalar::Util::blessed;
+        *carp    = \&Mite::Shim::carp;
+        *confess = \&Mite::Shim::confess;
+        *croak   = \&Mite::Shim::croak;
+        *false   = \&Mite::Shim::false;
+        *lazy    = \&Mite::Shim::lazy;
+        *ro      = \&Mite::Shim::ro;
+        *rw      = \&Mite::Shim::rw;
+        *rwp     = \&Mite::Shim::rwp;
+        *true    = \&Mite::Shim::true;
+    }
+
     sub new {
         my $class = ref( $_[0] ) ? ref(shift) : shift;
         my $meta  = ( $Mite::META{$class} ||= $class->__META__ );
@@ -50,12 +64,11 @@
                       and $value->isa(q[Path::Tiny]);
                 }
               )
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "file", "Path" );
             $self->{"file"} = $value;
         }
-        else { Mite::Shim::croak("Missing key in constructor: file") }
+        else { croak("Missing key in constructor: file") }
         if ( exists $args->{"classes"} ) {
             (
                 do { package Mite::Shim; ref( $args->{"classes"} ) eq 'HASH' }
@@ -74,7 +87,7 @@
                     $ok;
                 }
               )
-              or Mite::Shim::croak(
+              or croak(
                 "Type check failed in constructor: %s should be %s",
                 "classes",
                 "HashRef[InstanceOf[\"Mite::Class\"]]"
@@ -105,7 +118,7 @@
                         $ok;
                     }
                   }
-                  or Mite::Shim::croak(
+                  or croak(
                     "Type check failed in default: %s should be %s",
                     "classes",
                     "HashRef[InstanceOf[\"Mite::Class\"]]"
@@ -122,7 +135,7 @@
                       and $args->{"compiled"}->isa(q[Mite::Compiled]);
                 }
               )
-              or Mite::Shim::croak(
+              or croak(
                 "Type check failed in constructor: %s should be %s",
                 "compiled",
                 "InstanceOf[\"Mite::Compiled\"]"
@@ -137,7 +150,7 @@
                       and $args->{"project"}->isa(q[Mite::Project]);
                 }
               )
-              or Mite::Shim::croak(
+              or croak(
                 "Type check failed in constructor: %s should be %s",
                 "project",
                 "InstanceOf[\"Mite::Project\"]"
@@ -150,7 +163,7 @@
         my @unknown = grep not(/\A(?:c(?:lasses|ompiled)|file|project)\z/),
           keys %{$args};
         @unknown
-          and Mite::Shim::croak(
+          and croak(
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
 
         # Call BUILD methods
@@ -229,8 +242,7 @@
     else {
         *classes = sub {
             @_ > 1
-              ? Mite::Shim::croak(
-                "classes is a read-only attribute of @{[ref $_[0]]}")
+              ? croak("classes is a read-only attribute of @{[ref $_[0]]}")
               : $_[0]{"classes"};
         };
     }
@@ -238,8 +250,7 @@
     # Accessors for compiled
     sub compiled {
         @_ > 1
-          ? Mite::Shim::croak(
-            "compiled is a read-only attribute of @{[ref $_[0]]}")
+          ? croak("compiled is a read-only attribute of @{[ref $_[0]]}")
           : (
             exists( $_[0]{"compiled"} ) ? $_[0]{"compiled"} : (
                 $_[0]{"compiled"} = do {
@@ -255,7 +266,7 @@
                               and $default_value->isa(q[Mite::Compiled]);
                         }
                       )
-                      or Mite::Shim::croak(
+                      or croak(
                         "Type check failed in default: %s should be %s",
                         "compiled",
                         "InstanceOf[\"Mite::Compiled\"]"
@@ -276,8 +287,7 @@
     else {
         *file = sub {
             @_ > 1
-              ? Mite::Shim::croak(
-                "file is a read-only attribute of @{[ref $_[0]]}")
+              ? croak("file is a read-only attribute of @{[ref $_[0]]}")
               : $_[0]{"file"};
         };
     }
@@ -293,8 +303,7 @@
                       and $_[1]->isa(q[Mite::Project]);
                 }
               )
-              or
-              Mite::Shim::croak( "Type check failed in %s: value should be %s",
+              or croak( "Type check failed in %s: value should be %s",
                 "accessor", "InstanceOf[\"Mite::Project\"]" );
             $_[0]{"project"} = $_[1];
             require Scalar::Util && Scalar::Util::weaken( $_[0]{"project"} );

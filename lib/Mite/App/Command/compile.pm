@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package Mite::App::Command::compile;
-use Mite::Miteception;
+use Mite::Miteception -all;
 extends qw(Mite::App::Command);
 
 our $AUTHORITY = 'cpan:TOBYINK';

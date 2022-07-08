@@ -3,13 +3,10 @@ use strict;
 use warnings;
 
 package Mite::Source;
-use Mite::Miteception;
+use Mite::Miteception -all;
 
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.005002';
-
-use Mite::Compiled;
-use Mite::Class;
 
 has file =>
   is            => ro,
@@ -38,6 +35,9 @@ has project =>
   weak_ref      => true;
 
 ##-
+
+use Mite::Compiled;
+use Mite::Class;
 
 sub has_class {
     my ( $self, $name ) = ( shift, @_ );

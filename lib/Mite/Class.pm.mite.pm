@@ -7,6 +7,20 @@
     use warnings;
 
     BEGIN {
+        *bare    = \&Mite::Shim::bare;
+        *blessed = \&Scalar::Util::blessed;
+        *carp    = \&Mite::Shim::carp;
+        *confess = \&Mite::Shim::confess;
+        *croak   = \&Mite::Shim::croak;
+        *false   = \&Mite::Shim::false;
+        *lazy    = \&Mite::Shim::lazy;
+        *ro      = \&Mite::Shim::ro;
+        *rw      = \&Mite::Shim::rw;
+        *rwp     = \&Mite::Shim::rwp;
+        *true    = \&Mite::Shim::true;
+    }
+
+    BEGIN {
         require Mite::Role;
 
         use mro 'c3';
@@ -47,7 +61,7 @@
                     $ok;
                 }
               )
-              or Mite::Shim::croak(
+              or croak(
                 "Type check failed in constructor: %s should be %s",
                 "attributes",
                 "HashRef[InstanceOf[\"Mite::Attribute\"]]"
@@ -78,7 +92,7 @@
                         $ok;
                     }
                   }
-                  or Mite::Shim::croak(
+                  or croak(
                     "Type check failed in default: %s should be %s",
                     "attributes",
                     "HashRef[InstanceOf[\"Mite::Attribute\"]]"
@@ -96,12 +110,11 @@
                       or ref( \( my $val = $args->{"name"} ) ) eq 'SCALAR';
                 }
               }
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "name", "Str" );
             $self->{"name"} = $args->{"name"};
         }
-        else { Mite::Shim::croak("Missing key in constructor: name") }
+        else { croak("Missing key in constructor: name") }
         if ( exists $args->{"shim_name"} ) {
             do {
 
@@ -111,8 +124,7 @@
                       or ref( \( my $val = $args->{"shim_name"} ) ) eq 'SCALAR';
                 }
               }
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "shim_name", "Str" );
             $self->{"shim_name"} = $args->{"shim_name"};
         }
@@ -124,8 +136,7 @@
                       and $args->{"source"}->isa(q[Mite::Source]);
                 }
               )
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "source", "InstanceOf[\"Mite::Source\"]" );
             $self->{"source"} = $args->{"source"};
         }
@@ -149,8 +160,7 @@
                     $ok;
                 }
               )
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "roles", "ArrayRef[Object]" );
             $self->{"roles"} = $args->{"roles"};
         }
@@ -176,8 +186,7 @@
                         $ok;
                     }
                   }
-                  or Mite::Shim::croak(
-                    "Type check failed in default: %s should be %s",
+                  or croak( "Type check failed in default: %s should be %s",
                     "roles", "ArrayRef[Object]" );
                 $default_value;
             };
@@ -205,8 +214,7 @@
                     $ok;
                 }
               )
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "imported_functions", "HashRef[Str]" );
             $self->{"imported_functions"} = $args->{"imported_functions"};
         }
@@ -231,8 +239,7 @@
                         $ok;
                     }
                   }
-                  or Mite::Shim::croak(
-                    "Type check failed in default: %s should be %s",
+                  or croak( "Type check failed in default: %s should be %s",
                     "imported_functions", "HashRef[Str]" );
                 $default_value;
             };
@@ -260,8 +267,7 @@
                     $ok;
                 }
               )
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "required_methods", "ArrayRef[Str]" );
             $self->{"required_methods"} = $args->{"required_methods"};
         }
@@ -286,8 +292,7 @@
                         $ok;
                     }
                   }
-                  or Mite::Shim::croak(
-                    "Type check failed in default: %s should be %s",
+                  or croak( "Type check failed in default: %s should be %s",
                     "required_methods", "ArrayRef[Str]" );
                 $default_value;
             };
@@ -311,8 +316,7 @@
                     $ok;
                 }
               )
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "extends", "ArrayRef[Str]" );
             $self->{"extends"} = $args->{"extends"};
         }
@@ -340,8 +344,7 @@
                         $ok;
                     }
                   }
-                  or Mite::Shim::croak(
-                    "Type check failed in default: %s should be %s",
+                  or croak( "Type check failed in default: %s should be %s",
                     "extends", "ArrayRef[Str]" );
                 $default_value;
             };
@@ -366,7 +369,7 @@
                     $ok;
                 }
               )
-              or Mite::Shim::croak(
+              or croak(
                 "Type check failed in constructor: %s should be %s",
                 "parents",
                 "ArrayRef[InstanceOf[\"Mite::Class\"]]"
@@ -379,7 +382,7 @@
 /\A(?:attributes|extends|imported_functions|name|parents|r(?:equired_methods|oles)|s(?:him_name|ource))\z/
         ), keys %{$args};
         @unknown
-          and Mite::Shim::croak(
+          and croak(
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
 
         # Call BUILD methods
@@ -472,8 +475,7 @@
                     $ok;
                 }
               }
-              or
-              Mite::Shim::croak( "Type check failed in %s: value should be %s",
+              or croak( "Type check failed in %s: value should be %s",
                 "accessor", "ArrayRef[Str]" );
             $_[0]{"extends"} = $_[1];
             $_[0]->_trigger_extends( $_[0]{"extends"}, @oldvalue );
@@ -487,8 +489,7 @@
 
     sub parents {
         @_ > 1
-          ? Mite::Shim::croak(
-            "parents is a read-only attribute of @{[ref $_[0]]}")
+          ? croak("parents is a read-only attribute of @{[ref $_[0]]}")
           : (
             exists( $_[0]{"parents"} ) ? $_[0]{"parents"} : (
                 $_[0]{"parents"} = do {
@@ -511,7 +512,7 @@
                             $ok;
                         }
                       }
-                      or Mite::Shim::croak(
+                      or croak(
                         "Type check failed in default: %s should be %s",
                         "parents",
                         "ArrayRef[InstanceOf[\"Mite::Class\"]]"

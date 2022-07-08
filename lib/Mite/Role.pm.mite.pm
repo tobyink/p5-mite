@@ -6,6 +6,20 @@
     use strict;
     use warnings;
 
+    BEGIN {
+        *bare    = \&Mite::Shim::bare;
+        *blessed = \&Scalar::Util::blessed;
+        *carp    = \&Mite::Shim::carp;
+        *confess = \&Mite::Shim::confess;
+        *croak   = \&Mite::Shim::croak;
+        *false   = \&Mite::Shim::false;
+        *lazy    = \&Mite::Shim::lazy;
+        *ro      = \&Mite::Shim::ro;
+        *rw      = \&Mite::Shim::rw;
+        *rwp     = \&Mite::Shim::rwp;
+        *true    = \&Mite::Shim::true;
+    }
+
     sub new {
         my $class = ref( $_[0] ) ? ref(shift) : shift;
         my $meta  = ( $Mite::META{$class} ||= $class->__META__ );
@@ -39,7 +53,7 @@
                     $ok;
                 }
               )
-              or Mite::Shim::croak(
+              or croak(
                 "Type check failed in constructor: %s should be %s",
                 "attributes",
                 "HashRef[InstanceOf[\"Mite::Attribute\"]]"
@@ -70,7 +84,7 @@
                         $ok;
                     }
                   }
-                  or Mite::Shim::croak(
+                  or croak(
                     "Type check failed in default: %s should be %s",
                     "attributes",
                     "HashRef[InstanceOf[\"Mite::Attribute\"]]"
@@ -88,12 +102,11 @@
                       or ref( \( my $val = $args->{"name"} ) ) eq 'SCALAR';
                 }
               }
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "name", "Str" );
             $self->{"name"} = $args->{"name"};
         }
-        else { Mite::Shim::croak("Missing key in constructor: name") }
+        else { croak("Missing key in constructor: name") }
         if ( exists $args->{"shim_name"} ) {
             do {
 
@@ -103,8 +116,7 @@
                       or ref( \( my $val = $args->{"shim_name"} ) ) eq 'SCALAR';
                 }
               }
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "shim_name", "Str" );
             $self->{"shim_name"} = $args->{"shim_name"};
         }
@@ -116,8 +128,7 @@
                       and $args->{"source"}->isa(q[Mite::Source]);
                 }
               )
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "source", "InstanceOf[\"Mite::Source\"]" );
             $self->{"source"} = $args->{"source"};
         }
@@ -141,8 +152,7 @@
                     $ok;
                 }
               )
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "roles", "ArrayRef[Object]" );
             $self->{"roles"} = $args->{"roles"};
         }
@@ -168,8 +178,7 @@
                         $ok;
                     }
                   }
-                  or Mite::Shim::croak(
-                    "Type check failed in default: %s should be %s",
+                  or croak( "Type check failed in default: %s should be %s",
                     "roles", "ArrayRef[Object]" );
                 $default_value;
             };
@@ -197,8 +206,7 @@
                     $ok;
                 }
               )
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "imported_functions", "HashRef[Str]" );
             $self->{"imported_functions"} = $args->{"imported_functions"};
         }
@@ -223,8 +231,7 @@
                         $ok;
                     }
                   }
-                  or Mite::Shim::croak(
-                    "Type check failed in default: %s should be %s",
+                  or croak( "Type check failed in default: %s should be %s",
                     "imported_functions", "HashRef[Str]" );
                 $default_value;
             };
@@ -252,8 +259,7 @@
                     $ok;
                 }
               )
-              or Mite::Shim::croak(
-                "Type check failed in constructor: %s should be %s",
+              or croak( "Type check failed in constructor: %s should be %s",
                 "required_methods", "ArrayRef[Str]" );
             $self->{"required_methods"} = $args->{"required_methods"};
         }
@@ -278,8 +284,7 @@
                         $ok;
                     }
                   }
-                  or Mite::Shim::croak(
-                    "Type check failed in default: %s should be %s",
+                  or croak( "Type check failed in default: %s should be %s",
                     "required_methods", "ArrayRef[Str]" );
                 $default_value;
             };
@@ -291,7 +296,7 @@
 /\A(?:attributes|imported_functions|name|r(?:equired_methods|oles)|s(?:him_name|ource))\z/
         ), keys %{$args};
         @unknown
-          and Mite::Shim::croak(
+          and croak(
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
 
         # Call BUILD methods
@@ -370,8 +375,7 @@
     else {
         *attributes = sub {
             @_ > 1
-              ? Mite::Shim::croak(
-                "attributes is a read-only attribute of @{[ref $_[0]]}")
+              ? croak("attributes is a read-only attribute of @{[ref $_[0]]}")
               : $_[0]{"attributes"};
         };
     }
@@ -386,7 +390,7 @@
     else {
         *imported_functions = sub {
             @_ > 1
-              ? Mite::Shim::croak(
+              ? croak(
                 "imported_functions is a read-only attribute of @{[ref $_[0]]}")
               : $_[0]{"imported_functions"};
         };
@@ -402,8 +406,7 @@
     else {
         *name = sub {
             @_ > 1
-              ? Mite::Shim::croak(
-                "name is a read-only attribute of @{[ref $_[0]]}")
+              ? croak("name is a read-only attribute of @{[ref $_[0]]}")
               : $_[0]{"name"};
         };
     }
@@ -418,7 +421,7 @@
     else {
         *required_methods = sub {
             @_ > 1
-              ? Mite::Shim::croak(
+              ? croak(
                 "required_methods is a read-only attribute of @{[ref $_[0]]}")
               : $_[0]{"required_methods"};
         };
@@ -434,8 +437,7 @@
     else {
         *roles = sub {
             @_ > 1
-              ? Mite::Shim::croak(
-                "roles is a read-only attribute of @{[ref $_[0]]}")
+              ? croak("roles is a read-only attribute of @{[ref $_[0]]}")
               : $_[0]{"roles"};
         };
     }
@@ -452,8 +454,7 @@
                       or ref( \( my $val = $_[1] ) ) eq 'SCALAR';
                 }
               }
-              or
-              Mite::Shim::croak( "Type check failed in %s: value should be %s",
+              or croak( "Type check failed in %s: value should be %s",
                 "accessor", "Str" );
             $_[0]{"shim_name"} = $_[1];
             $_[0];
@@ -472,7 +473,7 @@
                                   'SCALAR';
                             }
                           }
-                          or Mite::Shim::croak(
+                          or croak(
                             "Type check failed in default: %s should be %s",
                             "shim_name", "Str" );
                         $default_value;
@@ -493,8 +494,7 @@
                       and $_[1]->isa(q[Mite::Source]);
                 }
               )
-              or
-              Mite::Shim::croak( "Type check failed in %s: value should be %s",
+              or croak( "Type check failed in %s: value should be %s",
                 "accessor", "InstanceOf[\"Mite::Source\"]" );
             $_[0]{"source"} = $_[1];
             require Scalar::Util && Scalar::Util::weaken( $_[0]{"source"} );
