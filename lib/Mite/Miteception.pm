@@ -40,11 +40,12 @@ sub import {
 		$pkg->import::into( 1, @{ $args || [] } );
 	}
 
-	no strict 'refs';
 	my ( $caller, $file ) = caller;
-	*{"$caller\::$_"} = \&{$_} for $class->constant_names;
 
-	return if $arg{'-basic'};
+	if ( not $arg{'-all'} ) {
+		no strict 'refs';
+		*{"$caller\::$_"} = \&{$_} for $class->constant_names;
+	}
 
 	if ( $ENV{MITE_LIMITED_PARSING} ) {
 		require Mite::Project;
@@ -70,6 +71,20 @@ sub constant_names {
 sub to_import {
 	my ( $class, $arg ) = ( shift, @_ );
 	no warnings 'uninitialized';
+	if ( $arg->{'-all'} ) {
+		return (
+			[ 'Types::Standard' => [
+				qw( -types slurpy ),
+			] ],
+			[ 'Types::Path::Tiny' => [
+				qw( -types ),
+			] ],
+			[ 'Type::Params' => [
+				compile           => { -as => 'sig_pos'   },
+				compile_named_oo  => { -as => 'sig_named' },
+			] ],
+		);
+	}
 	return (
 		[ 'Carp' => [
 			qw( carp croak confess ),
@@ -86,9 +101,6 @@ sub to_import {
 		[ 'Type::Params' => [
 			compile           => { -as => 'sig_pos'   },
 			compile_named_oo  => { -as => 'sig_named' },
-		] ],
-		[ 'feature' => [
-			':5.10',
 		] ],
 	);
 }
