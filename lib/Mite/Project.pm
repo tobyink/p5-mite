@@ -189,6 +189,11 @@ sub inject_mite_functions {
         *{"$package\::$f"} = \&{"$shim\::$f"};
         $pkg->imported_functions->{$f} = "$shim\::$f";
     }
+    if ( $requested->( blessed => true ) ) {
+        require Scalar::Util;
+        *{"$package\::blessed"} = \&Scalar::Util::blessed;
+        $pkg->imported_functions->{blessed} = "Scalar::Util::blessed";
+    }
 }
 
 sub write_mites {

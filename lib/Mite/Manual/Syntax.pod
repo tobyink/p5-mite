@@ -375,6 +375,12 @@ are references.
         croak '%s does not implement this method', ref( $self );
     }
 
+=head2 C<blessed>
+
+C<blessed> from L<Scalar::Util> can also be imported.
+
+    use Your::Project::Mite qw( blessed );
+
 =head2 Clean Classes
 
 Mite will automatically import L<namespace::autoclean> into your classes
