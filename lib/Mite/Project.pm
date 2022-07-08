@@ -80,17 +80,19 @@ my $parse_mm_args = sub {
 sub inject_mite_functions {
     state $sig = sig_named(
         { head => [ Object ], named_to_list => true },
-        package => Any,
-        file    => Any,
-        kind    => Str,        { default => 'class' },
-        arg     => HashRef,    { default => {}      },
-        shim    => Str,
+        package   => Any,
+        file      => Any,
+        kind      => Str,        { default => 'class' },
+        arg       => HashRef,    { default => {}      },
+        shim      => Str,
+        x_source  => Optional[Object],
+        x_pkg     => Optional[Object],
     );
-    my ( $self, $package, $file, $kind, $arg, $shim ) = &$sig;
+    my ( $self, $package, $file, $kind, $arg, $shim, $source, $pkg, $moresubs ) = &$sig;
     my $requested = sub { $arg->{$_[0]} ? 1 : $arg->{'!'.$_[0]} ? 0 : $arg->{'-all'} ? 1 : $_[1]; };
 
-    my $source = $self->source_for( $file );
-    my $pkg    = $source->class_for( $package, $kind eq 'role' ? 'Mite::Role' : 'Mite::Class' );
+    $source //= $self->source_for( $file );
+    $pkg    //= $source->class_for( $package, $kind eq 'role' ? 'Mite::Role' : 'Mite::Class' );
     $pkg->shim_name( $shim );
 
     no strict 'refs';
@@ -189,10 +191,17 @@ sub inject_mite_functions {
         *{"$package\::$f"} = \&{"$shim\::$f"};
         $pkg->imported_functions->{$f} = "$shim\::$f";
     }
-    if ( $requested->( blessed => true ) ) {
+    if ( $requested->( blessed => false ) ) {
         require Scalar::Util;
         *{"$package\::blessed"} = \&Scalar::Util::blessed;
         $pkg->imported_functions->{blessed} = "Scalar::Util::blessed";
+    }
+
+    if ( our %MORE_SUBS ) {
+        no warnings 'redefine';
+        for my $f ( keys %MORE_SUBS ) {
+            *{"$package\::$f"} = $MORE_SUBS{$f};
+        }
     }
 }
 

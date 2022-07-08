@@ -11,42 +11,6 @@ use Data::Dumper;
 
 our $class;
 
-sub has {
-	my ( $names, %args ) = @_;
-	$names = [$names] unless ref $names;
-	
-	if ( ref($args{isa}) ) {
-		$args{type} = delete $args{isa};
-	}
-	
-	for my $name ( @$names ) {
-		if( my $is_extension = $name =~ s{^\+}{} ) {
-			$class->extend_attribute(
-					class   => $class,
-					name    => $name,
-					%args
-			);
-		}
-		else {
-			require Mite::Attribute;
-			my $attribute = Mite::Attribute->new(
-					class   => $class,
-					name    => $name,
-					%args
-			);
-			$class->add_attribute($attribute);
-		}
-	}
-
-	return;
-}
-
-sub extends {
-	my (@classes) = @_;
-	$class->superclasses( [ map "Fake::$_", @classes ] );
-	return;
-}
-
 sub load {
 	my ( $project, $module, $in_file, $out_file ) = @_;
 	$in_file  //= path sprintf 'lib/%s.pm', ( $module =~ s{::}{/}gr );
@@ -74,13 +38,21 @@ sub load {
 	);
 	$source->add_classes( $class );
 
-	do {
-		no strict 'refs';
-		*{"$fake_module\::has"} = \&has;
-		*{"$fake_module\::extends"} = \&extends;
-		$fake_module->can('has') or die;
-		$fake_module->can('extends') or die;
-	};
+	local %Mite::Project::MORE_SUBS;
+	%Mite::Project::MORE_SUBS = (
+		extends => sub {
+			my (@classes) = @_;
+			$class->superclasses( [ map "Fake::$_", @classes ] );
+			return;
+		},
+	);
+	$project->inject_mite_functions(
+		package    => $fake_module,
+		file       => $in_file,
+		shim       => 'Mite::Shim',
+		x_source   => $source,
+		x_pkg      => $class,
+	);
 
 	do {
 		local $@;
