@@ -23,6 +23,21 @@ has config =>
       return $config;
   };
 
+has _limited_parsing =>
+  is            => rw,
+  isa           => Bool,
+  default       => false;
+
+has _module_fakeout_namespace =>
+  is            => rw,
+  isa           => Str,
+  predicate     => true;
+
+has debug =>
+  is            => rw,
+  isa           => Bool,
+  default       => false;
+
 ##-
 
 use Mite::Source;
@@ -91,8 +106,20 @@ sub inject_mite_functions {
     my ( $self, $package, $file, $kind, $arg, $shim, $source, $pkg, $moresubs ) = &$sig;
     my $requested = sub { $arg->{$_[0]} ? 1 : $arg->{'!'.$_[0]} ? 0 : $arg->{'-all'} ? 1 : $_[1]; };
 
-    $source //= $self->source_for( $file );
-    $pkg    //= $source->class_for( $package, $kind eq 'role' ? 'Mite::Role' : 'Mite::Class' );
+    my $fake_ns = $self->can('_module_fakeout_namespace') && $self->_module_fakeout_namespace;
+    if ( defined( $fake_ns ) and not $package =~ /^\Q$fake_ns/ ) {
+        $package = "$fake_ns\::$package";
+    }
+
+    warn "Inject functions into: $package\n" if $self->debug;
+
+    $source //= $self->source_for(
+        Path::Tiny::path( $ENV{MITE_LIMITED_PARSING} // $file )
+    );
+    $pkg    //= $source->class_for(
+        $package,
+        $kind eq 'role' ? 'Mite::Role' : 'Mite::Class',
+    );
     $pkg->shim_name( $shim );
 
     no strict 'refs';
@@ -147,12 +174,20 @@ sub inject_mite_functions {
     } if $requested->( field => 0 );
 
     *{ $package .'::with' } = sub {
-        $pkg->add_roles_by_name( @_ );
+        $pkg->add_roles_by_name(
+            defined( $fake_ns )
+                ? ( map "$fake_ns\::$_", @_ )
+                : @_
+        );
         return;
     } if $requested->( 'with', 1 );
 
     *{ $package .'::extends' } = sub {
-        $pkg->superclasses( [ @_ ] );
+        $pkg->superclasses(
+            defined( $fake_ns )
+                ? [ map "$fake_ns\::$_", @_ ]
+                : [ @_ ]
+        );
         return;
     } if $kind eq 'class' && $requested->( 'extends', 1 );
 
@@ -209,7 +244,10 @@ sub write_mites {
     my $self = shift;
 
     for my $source (values %{$self->sources}) {
-        $source->compiled->write;
+        warn "Write file: ${\ $source->compiled->file }\n" if $self->debug;
+        $source->compiled->write(
+            module_fakeout_namespace => $self->_module_fakeout_namespace,
+        );
     }
 
     return;
@@ -223,9 +261,39 @@ sub load_files {
     local @INC = @INC;
     unshift @INC, $inc_dir if defined $inc_dir;
     for my $file (@$files) {
-        my $pm_file = Path::Tiny::path($file)->relative($inc_dir);
-        require $pm_file;
+        $self->_load_file( $file, $inc_dir );
     }
+
+    return;
+}
+
+sub _load_file {
+    my ( $self, $file, $inc_dir ) = @_;
+
+    warn "Load file: $file\n" if $self->debug;
+
+    $file = Path::Tiny::path($file);
+
+    if ( $self->_limited_parsing ) {
+        my $code = $file->slurp;
+        my ( $head, $tail ) = split '##-', $code;
+
+        if ( $self->_has__module_fakeout_namespace ) {
+            my $ns = $self->_module_fakeout_namespace;
+            $head =~ s/package /package $ns\::/;
+        }
+
+        do {
+            local $@;
+            local $ENV{MITE_LIMITED_PARSING} = "$file";
+            eval("$head; 1") or do die($@);
+        };
+
+        return;
+    }
+
+    my $pm_file = $file->relative($inc_dir);
+    require $pm_file;
 
     return;
 }

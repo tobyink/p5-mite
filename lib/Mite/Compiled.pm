@@ -13,7 +13,7 @@ use Path::Tiny;
 # Don't load Mite::Source else it will go circular
 
 has file =>
-  is            => ro,
+  is            => rw,
   isa           => Path->no_coercions->plus_coercions(Str, 'Path::Tiny::path($_)'),
   coerce        => true,
   lazy          => true,
@@ -63,9 +63,15 @@ sub compile {
 }
 
 sub write {
-    my $self = shift;
+    my ( $self, %opts ) = @_;
 
-    return $self->file->spew_utf8($self->compile);
+    my $code = $self->compile;
+    if ( defined $opts{module_fakeout_namespace} ) {
+        my $ns = $opts{module_fakeout_namespace};
+        $code =~ s/$ns\:://g;
+    }
+
+    return $self->file->spew_utf8($code);
 }
 
 sub remove {

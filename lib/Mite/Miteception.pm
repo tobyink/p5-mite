@@ -33,19 +33,33 @@ sub import {
 	my $class = shift;
 	my %arg = map { lc($_) => 1 } @_;
 
+	my $kind = $arg{'-role'} ? 'role' : 'class';
+
 	for my $import ( $class->to_import( \%arg ) ) {
 		my ( $pkg, $args ) = @$import;
 		$pkg->import::into( 1, @{ $args || [] } );
 	}
 
 	no strict 'refs';
-	my $caller = caller;
+	my ( $caller, $file ) = caller;
 	*{"$caller\::$_"} = \&{$_} for $class->constant_names;
 
 	return if $arg{'-basic'};
 
-	unshift @_, $class;
-	goto \&load_mite_file;
+	if ( $ENV{MITE_LIMITED_PARSING} ) {
+		require Mite::Project;
+		Mite::Project->default->inject_mite_functions(
+			 package     => $caller,
+			 file        => $file,
+			 arg         => \%arg,
+			 kind        => $kind,
+			 shim        => 'Mite::Shim',
+		);
+	}
+	else {
+		unshift @_, $class;
+		goto \&load_mite_file;
+	}
 }
 
 sub constant_names {
