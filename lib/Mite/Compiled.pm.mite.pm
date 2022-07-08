@@ -86,6 +86,8 @@
           or croak "Type check failed in constructor: %s should be %s",
           "source", "InstanceOf[\"Mite::Source\"]";
         $self->{"source"} = $args->{"source"};
+        require Scalar::Util && Scalar::Util::weaken( $self->{"source"} )
+          if exists $self->{"source"};
 
         # Enforce strict constructor
         my @unknown = grep not(/\A(?:file|source)\z/), keys %{$args};
