@@ -476,9 +476,13 @@ my %code_template;
     asserter => sub {
         my $self = shift;
         my %arg = @_;
-        my $reader = $code_template{reader}->( $self, no_croak => true );
-        return sprintf 'my $object = do { %s }; require Scalar::Util && Scalar::Util::blessed($object) or %s( "%s is not a blessed object" ); $object',
-            $reader, $self->_function_for_croak, $self->name;
+        my $reader  = $code_template{reader}->( $self, no_croak => true );
+        my $blessed = 'require Scalar::Util && Scalar::Util::blessed';
+        if ( $self->class and $self->class->imported_functions->{blessed} ) {
+           $blessed = 'blessed';
+        }
+        return sprintf 'my $object = do { %s }; %s($object) or %s( "%s is not a blessed object" ); $object',
+            $reader, $blessed, $self->_function_for_croak, $self->name;
     },
     writer => sub {
         my $self = shift;
