@@ -6,7 +6,7 @@ package Mite::Compiled;
 use Mite::Miteception -all;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.005003';
+our $VERSION   = '0.005004';
 
 use Path::Tiny;
 

@@ -1,6 +1,19 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.005004 cpan:TOBYINK`
+	issued  2022-07-08;
+	changeset [
+		item [
+			a dcs:Changes;
+			label "More concise attribute initialization code in constructors; this mostly makes a difference to attributes with a type check/coercion that have both an init_arg and an eager default/builder.";
+		];
+		item [
+			a dcs:Changes;
+			label "Support %s in attribute reader/writer/etc method names as a placeholder for the attribute's name.";
+		];
+	].
+
 `Mite 0.005003 cpan:TOBYINK`
 	issued  2022-07-07;
 	changeset [
