@@ -35,7 +35,7 @@
           : { ( @_ == 1 ) ? %{ $_[0] } : @_ };
         my $no_build = delete $args->{__no_BUILD__};
 
-        # Initialize attributes
+        # Attribute: cards
         if ( exists $args->{"cards"} ) {
             (
                 do {
@@ -58,59 +58,36 @@
                     $ok;
                 }
               )
-              or croak( "Type check failed in constructor: %s should be %s",
-                "cards", "CardArray" );
+              or Acme::Mitey::Cards::Mite::croak
+              "Type check failed in constructor: %s should be %s", "cards",
+              "CardArray";
             $self->{"cards"} = $args->{"cards"};
         }
-        if ( exists $args->{"reverse"} ) {
+
+        # Attribute: reverse
+        do {
+            my $value =
+              exists( $args->{"reverse"} ) ? $args->{"reverse"} : "plain";
             (
                 (
                     do {
 
                         package Acme::Mitey::Cards::Mite;
-                        defined( $args->{"reverse"} ) and do {
-                            ref( \$args->{"reverse"} ) eq 'SCALAR'
-                              or ref( \( my $val = $args->{"reverse"} ) ) eq
-                              'SCALAR';
+                        defined($value) and do {
+                            ref( \$value ) eq 'SCALAR'
+                              or ref( \( my $val = $value ) ) eq 'SCALAR';
                         }
                     }
                 )
-                  && do {
-
-                    package Acme::Mitey::Cards::Mite;
-                    length( $args->{"reverse"} ) > 0;
-                }
+                  && ( length($value) > 0 )
               )
-              or croak( "Type check failed in constructor: %s should be %s",
-                "reverse", "NonEmptyStr" );
-            $self->{"reverse"} = $args->{"reverse"};
-        }
-        else {
-            my $value = do {
-                my $default_value = "plain";
-                (
-                    (
-                        do {
-
-                            package Acme::Mitey::Cards::Mite;
-                            defined($default_value) and do {
-                                ref( \$default_value ) eq 'SCALAR'
-                                  or ref( \( my $val = $default_value ) ) eq
-                                  'SCALAR';
-                            }
-                        }
-                    )
-                      && ( length($default_value) > 0 )
-                  )
-                  or croak(
-                    "Type check failed in default: %s should be %s",
-                    "reverse",
-                    "NonEmptyStr"
-                  );
-                $default_value;
-            };
+              or Acme::Mitey::Cards::Mite::croak
+              "Type check failed in constructor: %s should be %s", "reverse",
+              "NonEmptyStr";
             $self->{"reverse"} = $value;
-        }
+        };
+
+        # Attribute: original_cards
         if ( exists $args->{"original_cards"} ) {
             (
                 do {
@@ -133,8 +110,9 @@
                     $ok;
                 }
               )
-              or croak( "Type check failed in constructor: %s should be %s",
-                "original_cards", "CardArray" );
+              or Acme::Mitey::Cards::Mite::croak
+              "Type check failed in constructor: %s should be %s",
+              "original_cards", "CardArray";
             $self->{"original_cards"} = $args->{"original_cards"};
         }
 
@@ -214,7 +192,8 @@
     # Accessors for original_cards
     sub original_cards {
         @_ > 1
-          ? croak("original_cards is a read-only attribute of @{[ref $_[0]]}")
+          ? Acme::Mitey::Cards::Mite::croak(
+            "original_cards is a read-only attribute of @{[ref $_[0]]}")
           : (
             exists( $_[0]{"original_cards"} ) ? $_[0]{"original_cards"} : (
                 $_[0]{"original_cards"} = do {
@@ -238,7 +217,8 @@
                             $ok;
                         }
                       }
-                      or croak( "Type check failed in default: %s should be %s",
+                      or Acme::Mitey::Cards::Mite::croak(
+                        "Type check failed in default: %s should be %s",
                         "original_cards", "CardArray" );
                     $default_value;
                 }
@@ -256,7 +236,8 @@
     else {
         *reverse = sub {
             @_ > 1
-              ? croak("reverse is a read-only attribute of @{[ref $_[0]]}")
+              ? Acme::Mitey::Cards::Mite::croak(
+                "reverse is a read-only attribute of @{[ref $_[0]]}")
               : $_[0]{"reverse"};
         };
     }

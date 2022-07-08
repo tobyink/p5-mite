@@ -273,7 +273,7 @@ for my $function ( qw/ carp croak confess / ) {
             if $self->imported_functions->{$function};
         return sprintf '%s::%s', $self->shim_name, $function
             if $self->shim_name;
-        return "require Carp && Carp::$function";
+        $function eq 'carp' ? 'warn sprintf' : 'die sprintf';
     };
 }
 

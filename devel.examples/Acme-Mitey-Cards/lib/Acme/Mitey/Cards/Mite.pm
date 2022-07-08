@@ -2,13 +2,10 @@ use 5.008001;
 use strict;
 use warnings;
 
-package Acme::Mitey::Cards::Mite;
-
 # NOTE: Since the intention is to ship this file with a project, this file
 # cannot have any non-core dependencies.
 
-use strict;
-use warnings;
+package Acme::Mitey::Cards::Mite;
 
 # Constants
 sub true  () { !!1 }
@@ -65,7 +62,7 @@ my $parse_mm_args = sub {
 };
 
 sub _is_compiling {
-    return $ENV{MITE_COMPILE} ? true : false;
+    return !! $ENV{MITE_COMPILE};
 }
 
 sub import {
@@ -90,14 +87,10 @@ sub import {
         );
     }
     else {
-        # Work around Test::Compile's tendency to 'use' modules.
-        # Mite.pm won't stand for that.
-        return if $ENV{TEST_COMPILE};
-
         # Changes to this filename must be coordinated with Mite::Compiled
         my $mite_file = $file . ".mite.pm";
         if( !-e $mite_file ) {
-            croak("Compiled Mite file ($mite_file) for $file is missing");
+            croak "Compiled Mite file ($mite_file) for $file is missing";
         }
 
         {
@@ -227,10 +220,10 @@ sub _make_with {
     my $get_orig = sub {
         my ( $caller, $name ) = @_;
 
-        my $orig = $caller->can($name);
+        my $orig = $caller->can( $name );
         return $orig if $orig;
 
-        croak( "Cannot modify method $name in $caller: no such method" );
+        croak "Cannot modify method $name in $caller: no such method";
     };
 
     sub before {

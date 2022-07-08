@@ -1190,6 +1190,38 @@
           : ( $_[0]{"coerce"} );
     }
 
+    # Accessors for compiling_class
+    if ($__XS) {
+        Class::XSAccessor->import(
+            chained             => 1,
+            "exists_predicates" =>
+              { "has_compiling_class" => "compiling_class" },
+        );
+    }
+    else {
+        *has_compiling_class = sub { exists $_[0]{"compiling_class"} };
+    }
+
+    sub compiling_class {
+        @_ > 1
+          ? do {
+            (
+                do {
+
+                    package Mite::Shim;
+                    use Scalar::Util ();
+                    Scalar::Util::blessed( $_[1] );
+                }
+              )
+              or croak( "Type check failed in %s: value should be %s",
+                "accessor", "Object" );
+            $_[0]{"compiling_class"} = $_[1];
+            $_[0];
+          }
+          : ( $_[0]{"compiling_class"} );
+    }
+    sub clear_compiling_class { delete $_[0]{"compiling_class"}; $_[0]; }
+
     # Accessors for default
     if ($__XS) {
         Class::XSAccessor->import(

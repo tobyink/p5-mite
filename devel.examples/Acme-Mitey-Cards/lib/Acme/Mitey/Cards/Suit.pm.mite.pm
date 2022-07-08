@@ -26,34 +26,32 @@
           : { ( @_ == 1 ) ? %{ $_[0] } : @_ };
         my $no_build = delete $args->{__no_BUILD__};
 
-        # Initialize attributes
-        if ( exists $args->{"name"} ) {
+        # Attribute: name
+        Acme::Mitey::Cards::Mite::croak "Missing key in constructor: name"
+          unless exists $args->{"name"};
+        (
             (
-                (
-                    do {
-
-                        package Acme::Mitey::Cards::Mite;
-                        defined( $args->{"name"} ) and do {
-                            ref( \$args->{"name"} ) eq 'SCALAR'
-                              or ref( \( my $val = $args->{"name"} ) ) eq
-                              'SCALAR';
-                        }
-                    }
-                )
-                  && do {
+                do {
 
                     package Acme::Mitey::Cards::Mite;
-                    length( $args->{"name"} ) > 0;
+                    defined( $args->{"name"} ) and do {
+                        ref( \$args->{"name"} ) eq 'SCALAR'
+                          or ref( \( my $val = $args->{"name"} ) ) eq 'SCALAR';
+                    }
                 }
-              )
-              or Acme::Mitey::Cards::Mite::croak(
-                "Type check failed in constructor: %s should be %s",
-                "name", "NonEmptyStr" );
-            $self->{"name"} = $args->{"name"};
-        }
-        else {
-            Acme::Mitey::Cards::Mite::croak("Missing key in constructor: name");
-        }
+            )
+              && do {
+
+                package Acme::Mitey::Cards::Mite;
+                length( $args->{"name"} ) > 0;
+            }
+          )
+          or Acme::Mitey::Cards::Mite::croak
+          "Type check failed in constructor: %s should be %s", "name",
+          "NonEmptyStr";
+        $self->{"name"} = $args->{"name"};
+
+        # Attribute: abbreviation
         if ( exists $args->{"abbreviation"} ) {
             do {
 
@@ -64,29 +62,26 @@
                       'SCALAR';
                 }
               }
-              or Acme::Mitey::Cards::Mite::croak(
-                "Type check failed in constructor: %s should be %s",
-                "abbreviation", "Str" );
+              or Acme::Mitey::Cards::Mite::croak
+              "Type check failed in constructor: %s should be %s",
+              "abbreviation", "Str";
             $self->{"abbreviation"} = $args->{"abbreviation"};
         }
-        if ( exists $args->{"colour"} ) {
-            do {
 
-                package Acme::Mitey::Cards::Mite;
-                defined( $args->{"colour"} ) and do {
-                    ref( \$args->{"colour"} ) eq 'SCALAR'
-                      or ref( \( my $val = $args->{"colour"} ) ) eq 'SCALAR';
-                }
-              }
-              or Acme::Mitey::Cards::Mite::croak(
-                "Type check failed in constructor: %s should be %s",
-                "colour", "Str" );
-            $self->{"colour"} = $args->{"colour"};
-        }
-        else {
-            Acme::Mitey::Cards::Mite::croak(
-                "Missing key in constructor: colour");
-        }
+        # Attribute: colour
+        Acme::Mitey::Cards::Mite::croak "Missing key in constructor: colour"
+          unless exists $args->{"colour"};
+        do {
+
+            package Acme::Mitey::Cards::Mite;
+            defined( $args->{"colour"} ) and do {
+                ref( \$args->{"colour"} ) eq 'SCALAR'
+                  or ref( \( my $val = $args->{"colour"} ) ) eq 'SCALAR';
+            }
+          }
+          or Acme::Mitey::Cards::Mite::croak
+          "Type check failed in constructor: %s should be %s", "colour", "Str";
+        $self->{"colour"} = $args->{"colour"};
 
         # Enforce strict constructor
         my @unknown = grep not(/\A(?:abbreviation|colour|name)\z/),

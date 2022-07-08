@@ -34,7 +34,7 @@
           : { ( @_ == 1 ) ? %{ $_[0] } : @_ };
         my $no_build = delete $args->{__no_BUILD__};
 
-        # Initialize attributes
+        # Attribute: cards
         if ( exists $args->{"cards"} ) {
             (
                 do {
@@ -57,10 +57,13 @@
                     $ok;
                 }
               )
-              or croak( "Type check failed in constructor: %s should be %s",
-                "cards", "CardArray" );
+              or Acme::Mitey::Cards::Mite::croak
+              "Type check failed in constructor: %s should be %s", "cards",
+              "CardArray";
             $self->{"cards"} = $args->{"cards"};
         }
+
+        # Attribute: owner
         if ( exists $args->{"owner"} ) {
             do {
 
@@ -85,9 +88,9 @@
                       )
                 );
               }
-              or Acme::Mitey::Cards::Mite::croak(
-                "Type check failed in constructor: %s should be %s",
-                "owner", "Str|Object" );
+              or Acme::Mitey::Cards::Mite::croak
+              "Type check failed in constructor: %s should be %s", "owner",
+              "Str|Object";
             $self->{"owner"} = $args->{"owner"};
         }
 

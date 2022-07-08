@@ -27,7 +27,7 @@
           : { ( @_ == 1 ) ? %{ $_[0] } : @_ };
         my $no_build = delete $args->{__no_BUILD__};
 
-        # Initialize attributes
+        # Attribute: cards
         if ( exists $args->{"cards"} ) {
             (
                 do {
@@ -50,8 +50,9 @@
                     $ok;
                 }
               )
-              or croak( "Type check failed in constructor: %s should be %s",
-                "cards", "CardArray" );
+              or Acme::Mitey::Cards::Mite::croak
+              "Type check failed in constructor: %s should be %s", "cards",
+              "CardArray";
             $self->{"cards"} = $args->{"cards"};
         }
 
@@ -129,7 +130,10 @@
 
     # Accessors for cards
     sub cards {
-        @_ > 1 ? croak("cards is a read-only attribute of @{[ref $_[0]]}") : (
+        @_ > 1
+          ? Acme::Mitey::Cards::Mite::croak(
+            "cards is a read-only attribute of @{[ref $_[0]]}")
+          : (
             exists( $_[0]{"cards"} ) ? $_[0]{"cards"} : (
                 $_[0]{"cards"} = do {
                     my $default_value = $_[0]->_build_cards;
@@ -152,12 +156,13 @@
                             $ok;
                         }
                       }
-                      or croak( "Type check failed in default: %s should be %s",
+                      or Acme::Mitey::Cards::Mite::croak(
+                        "Type check failed in default: %s should be %s",
                         "cards", "CardArray" );
                     $default_value;
                 }
             )
-        );
+          );
     }
 
     1;

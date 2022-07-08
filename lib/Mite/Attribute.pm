@@ -18,6 +18,13 @@ has class =>
   isa           => Object,
   weak_ref      => true;
 
+has compiling_class =>
+  init_arg      => undef,
+  is            => rw,
+  isa           => Object,
+  clearer       => true,
+  predicate     => true;
+
 has _class_for_default =>
   is            => rw,
   isa           => Object,
@@ -132,9 +139,11 @@ for my $function ( qw/ carp croak confess / ) {
     no strict 'refs';
     *{"_function_for_$function"} = sub {
         my $self = shift;
-        return $self->class->${\"_function_for_$function"}
-            if ref $self->class;
-        return "require Carp && Carp::$function";
+        return $self->compiling_class->${\"_function_for_$function"}
+            if $self->has_compiling_class;
+        my $shim = eval { $self->class->shim_name };
+        return "$shim\::$function" if $shim;
+        $function eq 'carp' ? 'warn sprintf' : 'die sprintf';
     };
 }
 

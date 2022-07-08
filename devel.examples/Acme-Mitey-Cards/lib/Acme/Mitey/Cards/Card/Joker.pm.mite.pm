@@ -34,7 +34,7 @@
           : { ( @_ == 1 ) ? %{ $_[0] } : @_ };
         my $no_build = delete $args->{__no_BUILD__};
 
-        # Initialize attributes
+        # Attribute: deck
         if ( exists $args->{"deck"} ) {
             (
                 do {
@@ -43,12 +43,15 @@
                       and $args->{"deck"}->isa(q[Acme::Mitey::Cards::Deck]);
                 }
               )
-              or Acme::Mitey::Cards::Mite::croak(
-                "Type check failed in constructor: %s should be %s",
-                "deck", "Deck" );
+              or Acme::Mitey::Cards::Mite::croak
+              "Type check failed in constructor: %s should be %s", "deck",
+              "Deck";
             $self->{"deck"} = $args->{"deck"};
         }
-        require Scalar::Util && Scalar::Util::weaken( $self->{"deck"} );
+        require Scalar::Util && Scalar::Util::weaken( $self->{"deck"} )
+          if exists $self->{"deck"};
+
+        # Attribute: reverse
         if ( exists $args->{"reverse"} ) {
             do {
 
@@ -58,9 +61,9 @@
                       or ref( \( my $val = $args->{"reverse"} ) ) eq 'SCALAR';
                 }
               }
-              or Acme::Mitey::Cards::Mite::croak(
-                "Type check failed in constructor: %s should be %s",
-                "reverse", "Str" );
+              or Acme::Mitey::Cards::Mite::croak
+              "Type check failed in constructor: %s should be %s", "reverse",
+              "Str";
             $self->{"reverse"} = $args->{"reverse"};
         }
 

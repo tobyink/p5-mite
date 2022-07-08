@@ -34,7 +34,7 @@
           : { ( @_ == 1 ) ? %{ $_[0] } : @_ };
         my $no_build = delete $args->{__no_BUILD__};
 
-        # Initialize attributes
+        # Attribute: deck
         if ( exists $args->{"deck"} ) {
             (
                 do {
@@ -43,12 +43,15 @@
                       and $args->{"deck"}->isa(q[Acme::Mitey::Cards::Deck]);
                 }
               )
-              or Acme::Mitey::Cards::Mite::croak(
-                "Type check failed in constructor: %s should be %s",
-                "deck", "Deck" );
+              or Acme::Mitey::Cards::Mite::croak
+              "Type check failed in constructor: %s should be %s", "deck",
+              "Deck";
             $self->{"deck"} = $args->{"deck"};
         }
-        require Scalar::Util && Scalar::Util::weaken( $self->{"deck"} );
+        require Scalar::Util && Scalar::Util::weaken( $self->{"deck"} )
+          if exists $self->{"deck"};
+
+        # Attribute: reverse
         if ( exists $args->{"reverse"} ) {
             do {
 
@@ -58,13 +61,17 @@
                       or ref( \( my $val = $args->{"reverse"} ) ) eq 'SCALAR';
                 }
               }
-              or Acme::Mitey::Cards::Mite::croak(
-                "Type check failed in constructor: %s should be %s",
-                "reverse", "Str" );
+              or Acme::Mitey::Cards::Mite::croak
+              "Type check failed in constructor: %s should be %s", "reverse",
+              "Str";
             $self->{"reverse"} = $args->{"reverse"};
         }
-        if ( exists $args->{"suit"} ) {
-            my $value = do {
+
+        # Attribute: suit
+        Acme::Mitey::Cards::Mite::croak "Missing key in constructor: suit"
+          unless exists $args->{"suit"};
+        do {
+            my $coerced_value = do {
                 my $to_coerce = $args->{"suit"};
                 (
                     (
@@ -98,20 +105,21 @@
             (
                 do {
                     use Scalar::Util ();
-                    Scalar::Util::blessed($value)
-                      and $value->isa(q[Acme::Mitey::Cards::Suit]);
+                    Scalar::Util::blessed($coerced_value)
+                      and $coerced_value->isa(q[Acme::Mitey::Cards::Suit]);
                 }
               )
-              or Acme::Mitey::Cards::Mite::croak(
-                "Type check failed in constructor: %s should be %s",
-                "suit", "Suit" );
-            $self->{"suit"} = $value;
-        }
-        else {
-            Acme::Mitey::Cards::Mite::croak("Missing key in constructor: suit");
-        }
-        if ( exists $args->{"number"} ) {
-            my $value = do {
+              or Acme::Mitey::Cards::Mite::croak
+              "Type check failed in constructor: %s should be %s", "suit",
+              "Suit";
+            $self->{"suit"} = $coerced_value;
+        };
+
+        # Attribute: number
+        Acme::Mitey::Cards::Mite::croak "Missing key in constructor: number"
+          unless exists $args->{"number"};
+        do {
+            my $coerced_value = do {
                 my $to_coerce = $args->{"number"};
                 (
                     (
@@ -146,25 +154,21 @@
                     package Acme::Mitey::Cards::Mite;
                     (
                         do {
-                            my $tmp = $value;
+                            my $tmp = $coerced_value;
                             defined($tmp)
                               and !ref($tmp)
                               and $tmp =~ /\A-?[0-9]+\z/;
                         }
                     );
                   }
-                  && ( $value >= 1 )
-                  && ( $value <= 10 )
+                  && ( $coerced_value >= 1 )
+                  && ( $coerced_value <= 10 )
               )
-              or Acme::Mitey::Cards::Mite::croak(
-                "Type check failed in constructor: %s should be %s",
-                "number", "CardNumber" );
-            $self->{"number"} = $value;
-        }
-        else {
-            Acme::Mitey::Cards::Mite::croak(
-                "Missing key in constructor: number");
-        }
+              or Acme::Mitey::Cards::Mite::croak
+              "Type check failed in constructor: %s should be %s", "number",
+              "CardNumber";
+            $self->{"number"} = $coerced_value;
+        };
 
         # Enforce strict constructor
         my @unknown = grep not(/\A(?:deck|number|reverse|suit)\z/),
