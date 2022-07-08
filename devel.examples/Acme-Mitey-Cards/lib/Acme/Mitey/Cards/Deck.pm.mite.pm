@@ -58,9 +58,8 @@
                     $ok;
                 }
               )
-              or Acme::Mitey::Cards::Mite::croak
-              "Type check failed in constructor: %s should be %s", "cards",
-              "CardArray";
+              or croak "Type check failed in constructor: %s should be %s",
+              "cards", "CardArray";
             $self->{"cards"} = $args->{"cards"};
         }
 
@@ -81,9 +80,8 @@
                 )
                   && ( length($value) > 0 )
               )
-              or Acme::Mitey::Cards::Mite::croak
-              "Type check failed in constructor: %s should be %s", "reverse",
-              "NonEmptyStr";
+              or croak "Type check failed in constructor: %s should be %s",
+              "reverse", "NonEmptyStr";
             $self->{"reverse"} = $value;
         };
 
@@ -110,8 +108,7 @@
                     $ok;
                 }
               )
-              or Acme::Mitey::Cards::Mite::croak
-              "Type check failed in constructor: %s should be %s",
+              or croak "Type check failed in constructor: %s should be %s",
               "original_cards", "CardArray";
             $self->{"original_cards"} = $args->{"original_cards"};
         }
@@ -192,8 +189,7 @@
     # Accessors for original_cards
     sub original_cards {
         @_ > 1
-          ? Acme::Mitey::Cards::Mite::croak(
-            "original_cards is a read-only attribute of @{[ref $_[0]]}")
+          ? croak("original_cards is a read-only attribute of @{[ref $_[0]]}")
           : (
             exists( $_[0]{"original_cards"} ) ? $_[0]{"original_cards"} : (
                 $_[0]{"original_cards"} = do {
@@ -217,8 +213,7 @@
                             $ok;
                         }
                       }
-                      or Acme::Mitey::Cards::Mite::croak(
-                        "Type check failed in default: %s should be %s",
+                      or croak( "Type check failed in default: %s should be %s",
                         "original_cards", "CardArray" );
                     $default_value;
                 }
@@ -236,8 +231,7 @@
     else {
         *reverse = sub {
             @_ > 1
-              ? Acme::Mitey::Cards::Mite::croak(
-                "reverse is a read-only attribute of @{[ref $_[0]]}")
+              ? croak("reverse is a read-only attribute of @{[ref $_[0]]}")
               : $_[0]{"reverse"};
         };
     }
