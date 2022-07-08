@@ -120,11 +120,8 @@ sub methods_to_import_from_roles {
         my %exported = %{ $role->methods_to_export };
         for my $name ( sort keys %exported ) {
             if ( defined $methods{$name} and  $methods{$name} ne $exported{$name} ) {
-                require Mite::Shim;
-                Mite::Shim::croak(
-                    "Conflict between %s and %s; %s must implement %s\n",
-                    $methods{$name}, $exported{$name}, $self->name, $name,
-                );
+                croak "Conflict between %s and %s; %s must implement %s\n",
+                    $methods{$name}, $exported{$name}, $self->name, $name;
             }
             else {
                 $methods{$name} = $exported{$name};
@@ -193,7 +190,7 @@ sub extend_attribute {
     my $name = delete $attr_args{name};
 
     my $attr = $self->attributes->{$name};
-    croak(sprintf <<'ERROR', $name, $self->name) unless $attr;
+    croak <<'ERROR', $name, $self->name unless $attr;
 Could not find an attribute by the name of '%s' to extend in %s
 ERROR
 
@@ -246,8 +243,8 @@ sub _get_role {
     }
     return $role if $role;
 
-    croak <<"ERROR";
-$role_name loaded but is not a recognized role. Mite roles and Role::Tiny
+    croak <<"ERROR", $role_name;
+%s loaded but is not a recognized role. Mite roles and Role::Tiny
 roles are the only supported roles. Sorry.
 ERROR
 }

@@ -9,7 +9,7 @@ our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.005002';
 
 has _order =>
-  is            => 'rw',
+  is            => rw,
   init_arg      => undef,
   builder       => sub { state $order = 0; $order++ };
 
@@ -48,8 +48,8 @@ has weak_ref =>
 
 has is =>
   is            => rw,
-  isa           => Enum[ ro, rw, rwp, 'lazy', 'bare' ],
-  default       => 'bare';
+  isa           => Enum[ ro, rw, rwp, 'lazy', bare ],
+  default       => bare;
 
 has [ 'reader', 'writer', 'accessor', 'clearer', 'predicate' ] =>
   is            => rw,
@@ -58,13 +58,13 @@ has [ 'reader', 'writer', 'accessor', 'clearer', 'predicate' ] =>
   lazy          => true;
 
 has isa =>
-  is            => 'bare',
+  is            => bare,
   isa           => Str|Object,
   reader        => '_isa', # collision with UNIVERSAL::isa
   init_arg      => 'isa';
 
 has does =>
-  is            => 'bare',
+  is            => bare,
   isa           => Str|Object,
   reader        => '_does', # collision with Mite's does method
   init_arg      => 'does';
@@ -75,7 +75,7 @@ has type =>
   builder       => true;
 
 has coerce =>
-  is            => 'rw',
+  is            => rw,
   isa           => Bool,
   default       => false;
 
@@ -169,19 +169,19 @@ sub BUILD {
 
     if ( $self->is eq 'lazy' ) {
         $self->lazy( true );
-        $self->builder( 1 ) unless $self->has_builder;
-        $self->is( 'ro' );
+        $self->builder( true ) unless $self->has_builder;
+        $self->is( ro );
     }
 
     for my $property ( 'builder', 'trigger' ) {
         if ( CodeRef->check( $self->$property ) ) {
-            $self->$property( 1 );
+            $self->$property( true );
         }
     }
 
     for my $property ( 'reader', 'writer', 'accessor', 'clearer', 'predicate', 'builder', 'trigger' ) {
         my $name = $self->$property;
-        if ( defined $name and $name eq 1 ) {
+        if ( defined $name and $name eq true ) {
             my $gen = $method_name_generator[$self->is_private]{$property};
             local $_ = $self->name;
             my $newname = $gen->( $_ );
@@ -194,8 +194,7 @@ sub clone {
     my ( $self, %args ) = ( shift, @_ );
 
     if ( exists $args{is} ) {
-        require Carp;
-        Carp::croak( "Cannot use the `is` shortcut when extending an attribute" );
+        croak "Cannot use the `is` shortcut when extending an attribute";
     }
 
     my %inherit = %$self;
@@ -211,26 +210,26 @@ sub clone {
 }
 
 sub is_private {
-    ( shift->name =~ /^_/ ) ? 1 : 0;
+    0+!! ( shift->name =~ /^_/ );
 }
 
 sub _build_reader {
     my $self = shift;
-    ( $self->is eq 'ro' || $self->is eq 'rwp' )
+    ( $self->is eq ro or $self->is eq rwp )
         ? $self->name
         : undef;
 }
 
 sub _build_writer {
     my $self = shift;
-    $self->is eq 'rwp'
+    $self->is eq rwp
         ? sprintf( '_set_%s', $self->name )
         : undef;
 }
 
 sub _build_accessor {
     my $self = shift;
-    $self->is eq 'rw'
+    $self->is eq rw
         ? $self->name
         : undef;
 }
@@ -287,17 +286,17 @@ sub _build_type {
             for      => $self->class->name,
         );
 
-        $type or croak sprintf 'Type %s cannot be found', $string;
+        $type or croak 'Type %s cannot be found', $string;
     }
 
     $type->can_be_inlined
-        or croak sprintf 'Type %s cannot be inlined', $type->display_name;
+        or croak 'Type %s cannot be inlined', $type->display_name;
 
     if ( $self->coerce ) {
         $type->has_coercion
-            or carp sprintf 'Type %s has no coercions', $type->display_name;
+            or carp 'Type %s has no coercions', $type->display_name;
         $type->coercion->can_be_inlined
-            or carp sprintf 'Coercion to type %s cannot be inlined', $type->display_name;
+            or carp 'Coercion to type %s cannot be inlined', $type->display_name;
     }
 
     return $type;

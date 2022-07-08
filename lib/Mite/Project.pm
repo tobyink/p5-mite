@@ -157,18 +157,17 @@ sub inject_mite_functions {
 
     *{"$package\::param"} = sub {
         my ( $names, %spec ) = @_;
-        $spec{is} = 'ro' unless exists $spec{is};
-        $spec{required} = !!1 unless exists $spec{required};
+        $spec{is} = ro unless exists $spec{is};
+        $spec{required} = true unless exists $spec{required};
         $has->( $names, %spec );
     } if $requested->( param => 0 );
 
     *{"$package\::field"} = sub {
         my ( $names, %spec ) = @_;
-        $spec{is} ||= ( $spec{builder} || exists $spec{default} ) ? 'lazy' : 'rwp';
+        $spec{is} ||= ( $spec{builder} || exists $spec{default} ) ? lazy : rwp;
         $spec{init_arg} = undef unless exists $spec{init_arg};
         if ( defined $spec{init_arg} and $spec{init_arg} !~ /^_/ ) {
-            require Carp;
-            Carp::croak( "A defined 'field.init_arg' must begin with an underscore: " . $spec{init_arg} );
+            croak "A defined 'field.init_arg' must begin with an underscore: %s ", $spec{init_arg};
         }
         $has->( $names, %spec );
     } if $requested->( field => 0 );
@@ -199,11 +198,10 @@ sub inject_mite_functions {
     for my $modifier ( qw( before after around ) ) {
         *{ $package .'::'. $modifier } = sub {
             my ( $names, $coderef ) = &$parse_mm_args;
-            require Carp;
             CodeRef->check( $coderef )
-                or Carp::croak( "Expected a coderef method modifier" );
+                or croak "Expected a coderef method modifier";
             ArrayRef->of(Str)->check( $names ) && @$names
-                or Carp::croak( "Expected a list of method names to modify" );
+                or croak "Expected a list of method names to modify";
             $pkg->add_required_methods( @$names );
             return;
         } if $requested->( $modifier, 1 );

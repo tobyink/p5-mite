@@ -15,7 +15,7 @@ use B ();
 
 # Super classes as class names
 has extends =>
-  is            => 'bare',
+  is            => bare,
   accessor      => 'superclasses',
   isa           => ArrayRef[Str],
   default       => sub { [] },
@@ -160,7 +160,7 @@ sub extend_attribute {
     }
 
     my $parent_attr = $self->parents_attributes->{$name};
-    croak(sprintf <<'ERROR', $name, $self->name) unless $parent_attr;
+    croak <<'ERROR', $name, $self->name unless $parent_attr;
 Could not find an attribute by the name of '%s' to inherit from in %s
 ERROR
 
