@@ -12,6 +12,10 @@
 			a dcs:Changes;
 			label "Support %s in attribute reader/writer/etc method names as a placeholder for the attribute's name.";
 		];
+		item [
+			a dcs:Changes;
+			label "Attributes are now aware of which class/role they're currently being compiled into, in case they need to reach out to it for any information.";
+		];
 	].
 
 `Mite 0.005003 cpan:TOBYINK`
