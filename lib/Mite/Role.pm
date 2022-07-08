@@ -367,6 +367,7 @@ sub _compile_imported_functions {
 
     return join "\n",
         'BEGIN {',
+        ( $func{blessed} ? '    require Scalar::Util;' : () ),
         map(
             sprintf( '    *%s = \&%s;',  $_, $func{$_} ),
             sort keys %func

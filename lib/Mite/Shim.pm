@@ -150,8 +150,6 @@ sub _inject_mite_functions {
             };
         }
     }
-
-    require Scalar::Util if $requested->( blessed => true );
 }
 
 sub _make_has {

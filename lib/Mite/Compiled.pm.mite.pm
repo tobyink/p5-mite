@@ -7,6 +7,7 @@
     use warnings;
 
     BEGIN {
+        require Scalar::Util;
         *bare    = \&Mite::Shim::bare;
         *blessed = \&Scalar::Util::blessed;
         *carp    = \&Mite::Shim::carp;
