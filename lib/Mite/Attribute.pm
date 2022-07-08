@@ -408,7 +408,7 @@ sub compile_init {
             $postamble = "}; $postamble";
         }
         elsif ( $self->required and not $self->lazy ) {
-            $code .= sprintf '%s "Missing key in constructor: %s" unless exists %s; ',
+            push @code, sprintf '%s "Missing key in constructor: %s" unless exists %s; ',
                 $self->_function_for_croak, $init_arg, $valuevar;
         }
         else {
