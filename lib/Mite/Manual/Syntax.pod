@@ -60,6 +60,15 @@ will generate a reader called "get_foo" if your attribute is called
 If your attribute is defined as C<< is => "ro" >>, C<< is => "rwp" >>,
 or C<< is => "lazy" >> then C<reader> defaults to C<< $name >>.
 
+If your reader contains "%s" this will be replaced by the name of the
+attribute. This allows:
+
+    # readers called "fetch_foo" and "fetch_bar"
+    has [ 'foo', 'bar' ] => (
+        required => true,
+        reader   => 'fetch_%s',
+    );
+
 =item C<writer> B<< Maybe[Str] >> 
 
 The name of the attribute writer method to generate. If set to "1",
@@ -68,6 +77,9 @@ will generate a writer called "set_foo" if your attribute is called
 
 If your attribute is defined as C<< is => "rwp" >>, then C<writer>
 defaults to C<< "_set_$name" >>.
+
+If your writer contains "%s" this will be replaced by the name of the
+attribute.
 
 =item C<accessor> B<< Maybe[Str] >>
 
@@ -78,11 +90,17 @@ called "foo" and "_foo" if your attribute is called "_foo".
 If your attribute is defined as C<< is => "rw" >>, then C<accessor>
 defaults to C<< $name >>.
 
+If your accessor contains "%s" this will be replaced by the name of the
+attribute.
+
 =item C<clearer> B<< Maybe[Str] >>
 
 The name of the attribute clearer method to generate. If set to "1",
 will generate a clearer called "clear_foo" if your attribute is called
 "foo" and "_clear__foo" if your attribute is called "_foo".
+
+If your clearer contains "%s" this will be replaced by the name of the
+attribute.
 
 =item C<predicate> B<< Maybe[Str] >>
 
@@ -90,9 +108,26 @@ The name of the attribute predicate method to generate. If set to "1",
 will generate a predicate called "has_foo" if your attribute is called
 "foo" and "_has__foo" if your attribute is called "_foo".
 
+If your predicate contains "%s" this will be replaced by the name of the
+attribute.
+
 =item C<handles> B<< HashRef|ArrayRef >>
 
 Delegated methods. Currying and native traits are not supported.
+
+If your handles hashref keys contain "%s", they will be replaced by
+the name of the attribute.
+
+    # $this->user_agent_get is a shortcut for $this->user_agent->get
+    #
+    has user_agent => (
+        required => true,
+        isa      => 'Object',
+        handles  => {
+            '%s_get'  => 'get',
+            '%s_post' => 'post',
+        },
+    );
 
 =item C<init_arg> B<< Maybe[Str] >>
 
@@ -101,6 +136,9 @@ attribute. May be undef if the attribute should not be intitialized in the
 constructor.
 
 Defaults to the attribute's name.
+
+If your init_arg contains "%s" this will be replaced by the name of the
+attribute.
 
 =item C<required> B<Bool>
 
@@ -155,6 +193,9 @@ attribute is called "_foo".
 If set to a coderef, acts like it was set to "1" but installs the
 coderef into your class with that name.
 
+If your trigger method name contains "%s" this will be replaced by
+the name of the attribute.
+
 =item C<default> B<< Undef|Str|CodeRef|ScalarRef >>
 
 A default value for the attribute, or a coderef called as a method
@@ -183,6 +224,9 @@ If you used C<< is => "lazy" >>, this will default to "1".
 
 If set to a coderef, acts like it was set to "1" but installs the
 coderef into your class with that name.
+
+If your builder method name contains "%s" this will be replaced by
+the name of the attribute.
 
 =item C<lazy> B<Bool>
 

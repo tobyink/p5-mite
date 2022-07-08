@@ -60,14 +60,12 @@ has [ 'reader', 'writer', 'accessor', 'clearer', 'predicate' ] =>
 has isa =>
   is            => bare,
   isa           => Str|Object,
-  reader        => '_isa', # collision with UNIVERSAL::isa
-  init_arg      => 'isa';
+  reader        => '_%s'; # collision with UNIVERSAL::isa
 
 has does =>
   is            => bare,
   isa           => Str|Object,
-  reader        => '_does', # collision with Mite's does method
-  init_arg      => 'does';
+  reader        => '_%s'; # collision with Mite's does method
 
 has type =>
   is            => 'lazy',
@@ -82,7 +80,7 @@ has coerce =>
 has default =>
   is            => rw,
   isa           => Undef|Str|CodeRef|ScalarRef,
-  predicate     => 'has_default';
+  predicate     => true;
 
 has lazy =>
   is            => rw,
@@ -128,7 +126,7 @@ has alias_is_for =>
 use B ();
 sub _q          { shift; join q[, ], map B::perlstring($_), @_ }
 sub _q_name     { B::perlstring( shift->name ) }
-sub _q_init_arg { B::perlstring( shift->init_arg ) }
+sub _q_init_arg { my $self = shift; B::perlstring( $self->_expand_name( $self->init_arg ) ) }
 
 for my $function ( qw/ carp croak confess / ) {
     no strict 'refs';
@@ -190,6 +188,21 @@ sub BUILD {
     }
 }
 
+sub _expand_name {
+    my ( $self, $name ) = @_;
+
+    return undef unless defined $name;
+    return $name unless $name =~ /\%/;
+
+    my %tokens = (
+        's' => $self->name,
+        '%' => '%',
+    );
+
+    $name =~ s/%(.)/$tokens{$1}/eg;
+    return $name;
+}
+
 sub clone {
     my ( $self, %args ) = ( shift, @_ );
 
@@ -215,23 +228,17 @@ sub is_private {
 
 sub _build_reader {
     my $self = shift;
-    ( $self->is eq ro or $self->is eq rwp )
-        ? $self->name
-        : undef;
+    ( $self->is eq ro or $self->is eq rwp ) ? '%s' : undef;
 }
 
 sub _build_writer {
     my $self = shift;
-    $self->is eq rwp
-        ? sprintf( '_set_%s', $self->name )
-        : undef;
+    ( $self->is eq rwp ) ? '_set_%s' : undef;
 }
 
 sub _build_accessor {
     my $self = shift;
-    $self->is eq rw
-        ? $self->name
-        : undef;
+    ( $self->is eq rw ) ? '%s' : undef;
 }
 
 sub _build_predicate { undef; }
@@ -254,8 +261,7 @@ sub _all_aliases {
     my $self    = shift;
     my $aliases = $self->alias;
     return unless @$aliases;
-    no warnings;
-    return map { sprintf $_, $self->name } @$aliases;
+    map $self->_expand_name($_), @$aliases;
 }
 
 sub _build_type {
@@ -369,7 +375,7 @@ sub _compile_default {
         return defined( $self->default ) ? $self->_q( $self->default ) : 'undef';
     }
     elsif ( $self->has_builder ) {
-        return sprintf '%s->%s', $selfvar, $self->builder;
+        return sprintf '%s->%s', $selfvar, $self->_expand_name( $self->builder );
     }
 
     # should never get here
@@ -378,7 +384,7 @@ sub _compile_default {
 
 sub _compile_trigger {
     my ( $self, $selfvar, @args ) = @_;
-    my $method_name = $self->trigger;
+    my $method_name = $self->_expand_name( $self->trigger );
 
     return sprintf '%s->%s( %s )',
         $selfvar, $method_name, join( q{, }, @args );
@@ -387,7 +393,7 @@ sub _compile_trigger {
 sub compile_init {
     my ( $self, $selfvar, $argvar ) = @_;
 
-    my $init_arg = $self->init_arg;
+    my $init_arg = $self->_expand_name( $self->init_arg );
 
     my @code;
     if ( defined $init_arg ) {
@@ -577,7 +583,7 @@ sub compile {
         my $method_name = $self->can($property) ? $self->$property : undef;
         next unless defined $method_name;
 
-        $method_name{$property} = $method_name;
+        $method_name{$property} = $self->_expand_name( $method_name );
         if ( $xs_option_name{$property} ) {
             $want_xs{$property} = 1;
         }
@@ -630,7 +636,7 @@ sub compile {
 
     if ( my $alias_is_for = $self->alias_is_for ) {
         $code .= sprintf "# Aliases for for %s\n", $self->name;
-        my $alias_target = $self->$alias_is_for;
+        my $alias_target = $self->_expand_name( $self->$alias_is_for );
         for my $alias ( $self->_all_aliases ) {
             $code .= sprintf 'sub %s { shift->%s( @_ ) }' . "\n",
                 $alias, $alias_target;
@@ -644,7 +650,7 @@ sub compile {
         my %delegated = %{ $self->handles };
         for my $key ( sort keys %delegated ) {
             $code .= sprintf 'sub %s { shift->%s->%s( @_ ) }' . "\n",
-                $key, $assertion, $delegated{$key};
+                $self->_expand_name( $key ), $assertion, $delegated{$key};
         }
         $code .= "\n";
     }
