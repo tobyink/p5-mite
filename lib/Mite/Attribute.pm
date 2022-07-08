@@ -389,72 +389,82 @@ sub compile_init {
 
     my $init_arg = $self->init_arg;
 
-    my $code = '';
+    my @code;
     if ( defined $init_arg ) {
+
         if ( my @alias = $self->_all_aliases ) {
-            $code .= sprintf 'for my $alias ( %s ) { last if exists %s->{%s}; next if !exists %s->{$alias}; %s->{%s} = %s->{$alias} } ',
+            push @code, sprintf 'for my $alias ( %s ) { last if exists %s->{%s}; next if !exists %s->{$alias}; %s->{%s} = %s->{$alias} } ',
                 $self->_q( @alias ), $argvar, $self->_q_init_arg, $argvar, $argvar, $self->_q_init_arg, $argvar;
         }
-        $code .= sprintf 'if ( exists %s->{%s} ) { ',
-            $argvar, $self->_q_init_arg;
+
+        my $code;
+        my $valuevar = sprintf '%s->{%s}', $argvar, $self->_q_init_arg;
+        my $postamble = '';
+
+        if ( $self->has_default || $self->has_builder and not $self->lazy ) {
+            $code .= sprintf 'do { my $value = exists( %s ) ? %s : %s; ',
+                $valuevar, $valuevar, $self->_compile_default( $selfvar );
+            $valuevar = '$value';
+            $postamble = "}; $postamble";
+        }
+        elsif ( $self->required and not $self->lazy ) {
+            $code .= sprintf '%s "Missing key in constructor: %s" unless exists %s; ',
+                $self->_function_for_croak, $init_arg, $valuevar;
+        }
+        else {
+            my $trigger_code = $self->trigger
+                ? $self->_compile_trigger(
+                    $selfvar,
+                    sprintf( '%s->{%s}', $selfvar, $self->_q_name ),
+                ) . '; '
+                : '';
+
+            $code .= sprintf 'if ( exists %s->{%s} ) { ',
+                $argvar, $self->_q_init_arg;
+            $postamble = "$trigger_code} $postamble";
+        }
+
         if ( my $type = $self->type ) {
             local $Type::Tiny::AvoidCallbacks = 1;
-            my $valuevar = sprintf '%s->{%s}', $argvar, $self->_q_init_arg;
+            
             if ( $self->coerce ) {
-                $code .= sprintf 'my $value = %s; ', $self->_compile_coercion( $valuevar );
-                $valuevar = '$value';
+                $code .= sprintf 'do { my $coerced_value = %s; ', $self->_compile_coercion( $valuevar );
+                $valuevar = '$coerced_value';
+                $postamble = "}; $postamble";
             }
-            $code .= sprintf '%s or %s( "Type check failed in constructor: %%s should be %%s", %s, %s ); ',
+
+            $code .= sprintf '%s or %s "Type check failed in constructor: %%s should be %%s", %s, %s; ',
                 $type->inline_check( $valuevar ),
                 $self->_function_for_croak,
                 $self->_q_init_arg,
                 $self->_q( $type->display_name );
+
             $code .= sprintf '%s->{%s} = %s; ',
                 $selfvar, $self->_q_name, $valuevar;
         }
         else {
-            $code .= sprintf '%s->{%s} = %s->{%s}; ',
-                $selfvar, $self->_q_name, $argvar, $self->_q_init_arg;
+            $code .= sprintf '%s->{%s} = %s; ',
+                $selfvar, $self->_q_name, $valuevar;
         }
-        $code .= ' }';
+        
+        $code .= $postamble;
+        push @code, $code;
     }
-
-    if ( $self->has_default || $self->has_builder
-    and not $self->lazy ) {
-        if ( $code ) {
-            $code .= ' else { ';
-        }
-        else {
-            $code .= 'do { ';
-        }
-        $code .= sprintf 'my $value = %s; ',
-            $self->_compile_checked_default( $selfvar );
-        $code .= sprintf '%s->{%s} = %s; ',
-            $selfvar, $self->_q_name, '$value';
-        $code .= ' }';
-    }
-    elsif ( defined $init_arg
-    and $self->required
-    and not ($self->has_default || $self->has_builder) ) {
-        $code .= sprintf ' else { %s( "Missing key in constructor: %s" ) }',
-            $self->_function_for_croak, $init_arg;
+    elsif ( $self->has_default || $self->has_builder and not $self->lazy ) {
+        push @code, sprintf '%s->{%s} = %s; ',
+            $selfvar, $self->_q_name, $self->_compile_checked_default( $selfvar );
     }
 
     if ( $self->weak_ref ) {
-      $code .= sprintf ' require Scalar::Util && Scalar::Util::weaken(%s->{%s});',
-         $selfvar, $self->_q_name;
+        push @code, sprintf 'require Scalar::Util && Scalar::Util::weaken(%s->{%s}) if exists %s->{%s};',
+            $selfvar, $self->_q_name, $selfvar, $self->_q_name;
     }
 
-    if ( $self->trigger ) {
-        $code .= ' ' . $self->_compile_trigger(
-            $selfvar,
-            sprintf( '%s->{%s}', $selfvar, $self->_q_name ),
-        ) . ';';
+    for ( @code ) {
+        $_ = "$_;" unless /;\s*$/;
     }
 
-    $code = "$code;" if $code !~ /;$/;
-
-    return $code;
+    return @code;
 }
 
 my %code_template;

@@ -30,8 +30,7 @@ has _limited_parsing =>
 
 has _module_fakeout_namespace =>
   is            => rw,
-  isa           => Str,
-  predicate     => true;
+  isa           => Str | Undef;
 
 has debug =>
   is            => rw,
@@ -276,7 +275,7 @@ sub _load_file {
         my $code = $file->slurp;
         my ( $head, $tail ) = split '##-', $code;
 
-        if ( $self->_has__module_fakeout_namespace ) {
+        if ( defined $self->_module_fakeout_namespace ) {
             my $ns = $self->_module_fakeout_namespace;
             $head =~ s/package /package $ns\::/;
         }

@@ -31,13 +31,18 @@
           : { ( @_ == 1 ) ? %{ $_[0] } : @_ };
         my $no_build = delete $args->{__no_BUILD__};
 
-        # Initialize attributes
-        if ( exists $args->{"sources"} ) {
-            (
-                do { package Mite::Shim; ref( $args->{"sources"} ) eq 'HASH' }
-                  and do {
+        # Attribute: sources
+        do {
+            my $value = exists( $args->{"sources"} ) ? $args->{"sources"} : do {
+                my $method = $Mite::Project::__sources_DEFAULT__;
+                $self->$method;
+            };
+            do {
+
+                package Mite::Shim;
+                ( ref($value) eq 'HASH' ) and do {
                     my $ok = 1;
-                    for my $i ( values %{ $args->{"sources"} } ) {
+                    for my $i ( values %{$value} ) {
                         ( $ok = 0, last )
                           unless (
                             do {
@@ -49,47 +54,13 @@
                     };
                     $ok;
                 }
-              )
-              or croak(
-                "Type check failed in constructor: %s should be %s",
-                "sources",
-                "HashRef[InstanceOf[\"Mite::Source\"]]"
-              );
-            $self->{"sources"} = $args->{"sources"};
-        }
-        else {
-            my $value = do {
-                my $default_value = do {
-                    my $method = $Mite::Project::__sources_DEFAULT__;
-                    $self->$method;
-                };
-                do {
-
-                    package Mite::Shim;
-                    ( ref($default_value) eq 'HASH' ) and do {
-                        my $ok = 1;
-                        for my $i ( values %{$default_value} ) {
-                            ( $ok = 0, last )
-                              unless (
-                                do {
-                                    use Scalar::Util ();
-                                    Scalar::Util::blessed($i)
-                                      and $i->isa(q[Mite::Source]);
-                                }
-                              );
-                        };
-                        $ok;
-                    }
-                  }
-                  or croak(
-                    "Type check failed in default: %s should be %s",
-                    "sources",
-                    "HashRef[InstanceOf[\"Mite::Source\"]]"
-                  );
-                $default_value;
-            };
+              }
+              or croak "Type check failed in constructor: %s should be %s",
+              "sources", "HashRef[InstanceOf[\"Mite::Source\"]]";
             $self->{"sources"} = $value;
-        }
+        };
+
+        # Attribute: config
         if ( exists $args->{"config"} ) {
             (
                 do {
@@ -98,86 +69,76 @@
                       and $args->{"config"}->isa(q[Mite::Config]);
                 }
               )
-              or croak( "Type check failed in constructor: %s should be %s",
-                "config", "InstanceOf[\"Mite::Config\"]" );
+              or croak "Type check failed in constructor: %s should be %s",
+              "config", "InstanceOf[\"Mite::Config\"]";
             $self->{"config"} = $args->{"config"};
         }
-        if ( exists $args->{"_limited_parsing"} ) {
-            do {
 
-                package Mite::Shim;
-                !ref $args->{"_limited_parsing"}
-                  and (!defined $args->{"_limited_parsing"}
-                    or $args->{"_limited_parsing"} eq q()
-                    or $args->{"_limited_parsing"} eq '0'
-                    or $args->{"_limited_parsing"} eq '1' );
-              }
-              or croak( "Type check failed in constructor: %s should be %s",
-                "_limited_parsing", "Bool" );
-            $self->{"_limited_parsing"} = $args->{"_limited_parsing"};
-        }
-        else {
-            my $value = do {
-                my $default_value = "";
-                (
-                    !ref $default_value
-                      and (!defined $default_value
-                        or $default_value eq q()
-                        or $default_value eq '0'
-                        or $default_value eq '1' )
-                  )
-                  or croak( "Type check failed in default: %s should be %s",
-                    "_limited_parsing", "Bool" );
-                $default_value;
-            };
+        # Attribute: _limited_parsing
+        do {
+            my $value =
+              exists( $args->{"_limited_parsing"} )
+              ? $args->{"_limited_parsing"}
+              : "";
+            (
+                !ref $value
+                  and (!defined $value
+                    or $value eq q()
+                    or $value eq '0'
+                    or $value eq '1' )
+              )
+              or croak "Type check failed in constructor: %s should be %s",
+              "_limited_parsing", "Bool";
             $self->{"_limited_parsing"} = $value;
-        }
+        };
+
+        # Attribute: _module_fakeout_namespace
         if ( exists $args->{"_module_fakeout_namespace"} ) {
             do {
 
                 package Mite::Shim;
-                defined( $args->{"_module_fakeout_namespace"} ) and do {
-                    ref( \$args->{"_module_fakeout_namespace"} ) eq 'SCALAR'
-                      or
-                      ref( \( my $val = $args->{"_module_fakeout_namespace"} ) )
-                      eq 'SCALAR';
-                }
+                (
+                    do {
+
+                        package Mite::Shim;
+                        defined( $args->{"_module_fakeout_namespace"} ) and do {
+                            ref( \$args->{"_module_fakeout_namespace"} ) eq
+                              'SCALAR'
+                              or ref(
+                                \(
+                                    my $val =
+                                      $args->{"_module_fakeout_namespace"}
+                                )
+                              ) eq 'SCALAR';
+                        }
+                      }
+                      or do {
+
+                        package Mite::Shim;
+                        !defined( $args->{"_module_fakeout_namespace"} );
+                    }
+                );
               }
-              or croak( "Type check failed in constructor: %s should be %s",
-                "_module_fakeout_namespace", "Str" );
+              or croak "Type check failed in constructor: %s should be %s",
+              "_module_fakeout_namespace", "Str|Undef";
             $self->{"_module_fakeout_namespace"} =
               $args->{"_module_fakeout_namespace"};
         }
-        if ( exists $args->{"debug"} ) {
-            do {
 
-                package Mite::Shim;
-                !ref $args->{"debug"}
-                  and (!defined $args->{"debug"}
-                    or $args->{"debug"} eq q()
-                    or $args->{"debug"} eq '0'
-                    or $args->{"debug"} eq '1' );
-              }
-              or croak( "Type check failed in constructor: %s should be %s",
-                "debug", "Bool" );
-            $self->{"debug"} = $args->{"debug"};
-        }
-        else {
-            my $value = do {
-                my $default_value = "";
-                (
-                    !ref $default_value
-                      and (!defined $default_value
-                        or $default_value eq q()
-                        or $default_value eq '0'
-                        or $default_value eq '1' )
-                  )
-                  or croak( "Type check failed in default: %s should be %s",
-                    "debug", "Bool" );
-                $default_value;
-            };
+        # Attribute: debug
+        do {
+            my $value = exists( $args->{"debug"} ) ? $args->{"debug"} : "";
+            (
+                !ref $value
+                  and (!defined $value
+                    or $value eq q()
+                    or $value eq '0'
+                    or $value eq '1' )
+              )
+              or croak "Type check failed in constructor: %s should be %s",
+              "debug", "Bool";
             $self->{"debug"} = $value;
-        }
+        };
 
         # Enforce strict constructor
         my @unknown = grep not(
@@ -273,32 +234,26 @@
     }
 
     # Accessors for _module_fakeout_namespace
-    if ($__XS) {
-        Class::XSAccessor->import(
-            chained             => 1,
-            "exists_predicates" => {
-                "_has__module_fakeout_namespace" => "_module_fakeout_namespace"
-            },
-        );
-    }
-    else {
-        *_has__module_fakeout_namespace =
-          sub { exists $_[0]{"_module_fakeout_namespace"} };
-    }
-
     sub _module_fakeout_namespace {
         @_ > 1
           ? do {
             do {
 
                 package Mite::Shim;
-                defined( $_[1] ) and do {
-                    ref( \$_[1] ) eq 'SCALAR'
-                      or ref( \( my $val = $_[1] ) ) eq 'SCALAR';
-                }
+                (
+                    do {
+
+                        package Mite::Shim;
+                        defined( $_[1] ) and do {
+                            ref( \$_[1] ) eq 'SCALAR'
+                              or ref( \( my $val = $_[1] ) ) eq 'SCALAR';
+                        }
+                      }
+                      or ( !defined( $_[1] ) )
+                );
               }
               or croak( "Type check failed in %s: value should be %s",
-                "accessor", "Str" );
+                "accessor", "Str|Undef" );
             $_[0]{"_module_fakeout_namespace"} = $_[1];
             $_[0];
           }

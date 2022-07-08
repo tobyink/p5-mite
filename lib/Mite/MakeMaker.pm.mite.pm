@@ -31,8 +31,6 @@
           : { ( @_ == 1 ) ? %{ $_[0] } : @_ };
         my $no_build = delete $args->{__no_BUILD__};
 
-        # Initialize attributes
-
         # Enforce strict constructor
         my @unknown = grep not(
             do {

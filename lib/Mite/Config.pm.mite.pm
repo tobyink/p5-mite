@@ -31,148 +31,134 @@
           : { ( @_ == 1 ) ? %{ $_[0] } : @_ };
         my $no_build = delete $args->{__no_BUILD__};
 
-        # Initialize attributes
-        if ( exists $args->{"mite_dir_name"} ) {
+        # Attribute: mite_dir_name
+        do {
+            my $value =
+              exists( $args->{"mite_dir_name"} )
+              ? $args->{"mite_dir_name"}
+              : ".mite";
             do {
 
                 package Mite::Shim;
-                defined( $args->{"mite_dir_name"} ) and do {
-                    ref( \$args->{"mite_dir_name"} ) eq 'SCALAR'
-                      or ref( \( my $val = $args->{"mite_dir_name"} ) ) eq
-                      'SCALAR';
+                defined($value) and do {
+                    ref( \$value ) eq 'SCALAR'
+                      or ref( \( my $val = $value ) ) eq 'SCALAR';
                 }
               }
-              or croak( "Type check failed in constructor: %s should be %s",
-                "mite_dir_name", "Str" );
-            $self->{"mite_dir_name"} = $args->{"mite_dir_name"};
-        }
-        else {
-            my $value = do {
-                my $default_value = ".mite";
-                do {
-
-                    package Mite::Shim;
-                    defined($default_value) and do {
-                        ref( \$default_value ) eq 'SCALAR'
-                          or ref( \( my $val = $default_value ) ) eq 'SCALAR';
-                    }
-                  }
-                  or croak( "Type check failed in default: %s should be %s",
-                    "mite_dir_name", "Str" );
-                $default_value;
-            };
+              or croak "Type check failed in constructor: %s should be %s",
+              "mite_dir_name", "Str";
             $self->{"mite_dir_name"} = $value;
-        }
+        };
+
+        # Attribute: mite_dir
         if ( exists $args->{"mite_dir"} ) {
-            my $value = do {
-                my $to_coerce = $args->{"mite_dir"};
-                (
+            do {
+                my $coerced_value = do {
+                    my $to_coerce = $args->{"mite_dir"};
                     (
+                        (
+                            do {
+                                use Scalar::Util ();
+                                Scalar::Util::blessed($to_coerce)
+                                  and $to_coerce->isa(q[Path::Tiny]);
+                            }
+                        )
+                    ) ? $to_coerce : (
                         do {
-                            use Scalar::Util ();
-                            Scalar::Util::blessed($to_coerce)
-                              and $to_coerce->isa(q[Path::Tiny]);
-                        }
-                    )
-                ) ? $to_coerce : (
-                    do {
 
-                        package Mite::Shim;
-                        defined($to_coerce) and do {
-                            ref( \$to_coerce ) eq 'SCALAR'
-                              or ref( \( my $val = $to_coerce ) ) eq 'SCALAR';
+                            package Mite::Shim;
+                            defined($to_coerce) and do {
+                                ref( \$to_coerce ) eq 'SCALAR'
+                                  or ref( \( my $val = $to_coerce ) ) eq
+                                  'SCALAR';
+                            }
                         }
+                      )
+                      ? scalar(
+                        do { local $_ = $to_coerce; Path::Tiny::path($_) }
+                      )
+                      : $to_coerce;
+                };
+                (
+                    do {
+                        use Scalar::Util ();
+                        Scalar::Util::blessed($coerced_value)
+                          and $coerced_value->isa(q[Path::Tiny]);
                     }
                   )
-                  ? scalar(
-                    do { local $_ = $to_coerce; Path::Tiny::path($_) }
-                  )
-                  : $to_coerce;
+                  or croak "Type check failed in constructor: %s should be %s",
+                  "mite_dir", "Path";
+                $self->{"mite_dir"} = $coerced_value;
             };
-            (
-                do {
-                    use Scalar::Util ();
-                    Scalar::Util::blessed($value)
-                      and $value->isa(q[Path::Tiny]);
-                }
-              )
-              or croak( "Type check failed in constructor: %s should be %s",
-                "mite_dir", "Path" );
-            $self->{"mite_dir"} = $value;
         }
+
+        # Attribute: config_file
         if ( exists $args->{"config_file"} ) {
-            my $value = do {
-                my $to_coerce = $args->{"config_file"};
-                (
+            do {
+                my $coerced_value = do {
+                    my $to_coerce = $args->{"config_file"};
                     (
+                        (
+                            do {
+                                use Scalar::Util ();
+                                Scalar::Util::blessed($to_coerce)
+                                  and $to_coerce->isa(q[Path::Tiny]);
+                            }
+                        )
+                    ) ? $to_coerce : (
                         do {
-                            use Scalar::Util ();
-                            Scalar::Util::blessed($to_coerce)
-                              and $to_coerce->isa(q[Path::Tiny]);
-                        }
-                    )
-                ) ? $to_coerce : (
-                    do {
 
-                        package Mite::Shim;
-                        defined($to_coerce) and do {
-                            ref( \$to_coerce ) eq 'SCALAR'
-                              or ref( \( my $val = $to_coerce ) ) eq 'SCALAR';
+                            package Mite::Shim;
+                            defined($to_coerce) and do {
+                                ref( \$to_coerce ) eq 'SCALAR'
+                                  or ref( \( my $val = $to_coerce ) ) eq
+                                  'SCALAR';
+                            }
                         }
+                      )
+                      ? scalar(
+                        do { local $_ = $to_coerce; Path::Tiny::path($_) }
+                      )
+                      : $to_coerce;
+                };
+                (
+                    do {
+                        use Scalar::Util ();
+                        Scalar::Util::blessed($coerced_value)
+                          and $coerced_value->isa(q[Path::Tiny]);
                     }
                   )
-                  ? scalar(
-                    do { local $_ = $to_coerce; Path::Tiny::path($_) }
-                  )
-                  : $to_coerce;
+                  or croak "Type check failed in constructor: %s should be %s",
+                  "config_file", "Path";
+                $self->{"config_file"} = $coerced_value;
             };
-            (
-                do {
-                    use Scalar::Util ();
-                    Scalar::Util::blessed($value)
-                      and $value->isa(q[Path::Tiny]);
-                }
-              )
-              or croak( "Type check failed in constructor: %s should be %s",
-                "config_file", "Path" );
-            $self->{"config_file"} = $value;
         }
+
+        # Attribute: data
         if ( exists $args->{"data"} ) {
             do { package Mite::Shim; ref( $args->{"data"} ) eq 'HASH' }
-              or croak( "Type check failed in constructor: %s should be %s",
-                "data", "HashRef" );
+              or croak "Type check failed in constructor: %s should be %s",
+              "data", "HashRef";
             $self->{"data"} = $args->{"data"};
         }
-        if ( exists $args->{"search_for_mite_dir"} ) {
-            do {
 
-                package Mite::Shim;
-                !ref $args->{"search_for_mite_dir"}
-                  and (!defined $args->{"search_for_mite_dir"}
-                    or $args->{"search_for_mite_dir"} eq q()
-                    or $args->{"search_for_mite_dir"} eq '0'
-                    or $args->{"search_for_mite_dir"} eq '1' );
-              }
-              or croak( "Type check failed in constructor: %s should be %s",
-                "search_for_mite_dir", "Bool" );
-            $self->{"search_for_mite_dir"} = $args->{"search_for_mite_dir"};
-        }
-        else {
-            my $value = do {
-                my $default_value = "1";
-                (
-                    !ref $default_value
-                      and (!defined $default_value
-                        or $default_value eq q()
-                        or $default_value eq '0'
-                        or $default_value eq '1' )
-                  )
-                  or croak( "Type check failed in default: %s should be %s",
-                    "search_for_mite_dir", "Bool" );
-                $default_value;
-            };
+        # Attribute: search_for_mite_dir
+        do {
+            my $value =
+              exists( $args->{"search_for_mite_dir"} )
+              ? $args->{"search_for_mite_dir"}
+              : "1";
+            (
+                !ref $value
+                  and (!defined $value
+                    or $value eq q()
+                    or $value eq '0'
+                    or $value eq '1' )
+              )
+              or croak "Type check failed in constructor: %s should be %s",
+              "search_for_mite_dir", "Bool";
             $self->{"search_for_mite_dir"} = $value;
-        }
+        };
 
         # Enforce strict constructor
         my @unknown = grep not(

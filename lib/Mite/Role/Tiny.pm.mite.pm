@@ -39,17 +39,19 @@
           : { ( @_ == 1 ) ? %{ $_[0] } : @_ };
         my $no_build = delete $args->{__no_BUILD__};
 
-        # Initialize attributes
-        if ( exists $args->{"attributes"} ) {
-            (
-                do {
+        # Attribute: attributes
+        do {
+            my $value =
+              exists( $args->{"attributes"} ) ? $args->{"attributes"} : do {
+                my $method = $Mite::Role::__attributes_DEFAULT__;
+                $self->$method;
+              };
+            do {
 
-                    package Mite::Shim;
-                    ref( $args->{"attributes"} ) eq 'HASH';
-                  }
-                  and do {
+                package Mite::Shim;
+                ( ref($value) eq 'HASH' ) and do {
                     my $ok = 1;
-                    for my $i ( values %{ $args->{"attributes"} } ) {
+                    for my $i ( values %{$value} ) {
                         ( $ok = 0, last )
                           unless (
                             do {
@@ -61,61 +63,27 @@
                     };
                     $ok;
                 }
-              )
-              or croak(
-                "Type check failed in constructor: %s should be %s",
-                "attributes",
-                "HashRef[InstanceOf[\"Mite::Attribute\"]]"
-              );
-            $self->{"attributes"} = $args->{"attributes"};
-        }
-        else {
-            my $value = do {
-                my $default_value = do {
-                    my $method = $Mite::Role::__attributes_DEFAULT__;
-                    $self->$method;
-                };
-                do {
-
-                    package Mite::Shim;
-                    ( ref($default_value) eq 'HASH' ) and do {
-                        my $ok = 1;
-                        for my $i ( values %{$default_value} ) {
-                            ( $ok = 0, last )
-                              unless (
-                                do {
-                                    use Scalar::Util ();
-                                    Scalar::Util::blessed($i)
-                                      and $i->isa(q[Mite::Attribute]);
-                                }
-                              );
-                        };
-                        $ok;
-                    }
-                  }
-                  or croak(
-                    "Type check failed in default: %s should be %s",
-                    "attributes",
-                    "HashRef[InstanceOf[\"Mite::Attribute\"]]"
-                  );
-                $default_value;
-            };
-            $self->{"attributes"} = $value;
-        }
-        if ( exists $args->{"name"} ) {
-            do {
-
-                package Mite::Shim;
-                defined( $args->{"name"} ) and do {
-                    ref( \$args->{"name"} ) eq 'SCALAR'
-                      or ref( \( my $val = $args->{"name"} ) ) eq 'SCALAR';
-                }
               }
-              or croak( "Type check failed in constructor: %s should be %s",
-                "name", "Str" );
-            $self->{"name"} = $args->{"name"};
-        }
-        else { croak("Missing key in constructor: name") }
+              or croak "Type check failed in constructor: %s should be %s",
+              "attributes", "HashRef[InstanceOf[\"Mite::Attribute\"]]";
+            $self->{"attributes"} = $value;
+        };
+
+        # Attribute: name
+        croak "Missing key in constructor: name" unless exists $args->{"name"};
+        do {
+
+            package Mite::Shim;
+            defined( $args->{"name"} ) and do {
+                ref( \$args->{"name"} ) eq 'SCALAR'
+                  or ref( \( my $val = $args->{"name"} ) ) eq 'SCALAR';
+            }
+          }
+          or croak "Type check failed in constructor: %s should be %s", "name",
+          "Str";
+        $self->{"name"} = $args->{"name"};
+
+        # Attribute: shim_name
         if ( exists $args->{"shim_name"} ) {
             do {
 
@@ -125,10 +93,12 @@
                       or ref( \( my $val = $args->{"shim_name"} ) ) eq 'SCALAR';
                 }
               }
-              or croak( "Type check failed in constructor: %s should be %s",
-                "shim_name", "Str" );
+              or croak "Type check failed in constructor: %s should be %s",
+              "shim_name", "Str";
             $self->{"shim_name"} = $args->{"shim_name"};
         }
+
+        # Attribute: source
         if ( exists $args->{"source"} ) {
             (
                 do {
@@ -137,17 +107,25 @@
                       and $args->{"source"}->isa(q[Mite::Source]);
                 }
               )
-              or croak( "Type check failed in constructor: %s should be %s",
-                "source", "InstanceOf[\"Mite::Source\"]" );
+              or croak "Type check failed in constructor: %s should be %s",
+              "source", "InstanceOf[\"Mite::Source\"]";
             $self->{"source"} = $args->{"source"};
         }
-        require Scalar::Util && Scalar::Util::weaken( $self->{"source"} );
-        if ( exists $args->{"roles"} ) {
-            (
-                do { package Mite::Shim; ref( $args->{"roles"} ) eq 'ARRAY' }
-                  and do {
+        require Scalar::Util && Scalar::Util::weaken( $self->{"source"} )
+          if exists $self->{"source"};
+
+        # Attribute: roles
+        do {
+            my $value =
+              exists( $args->{"roles"} )
+              ? $args->{"roles"}
+              : $self->_build_roles;
+            do {
+
+                package Mite::Shim;
+                ( ref($value) eq 'ARRAY' ) and do {
                     my $ok = 1;
-                    for my $i ( @{ $args->{"roles"} } ) {
+                    for my $i ( @{$value} ) {
                         ( $ok = 0, last )
                           unless (
                             do {
@@ -160,49 +138,24 @@
                     };
                     $ok;
                 }
-              )
-              or croak( "Type check failed in constructor: %s should be %s",
-                "roles", "ArrayRef[Object]" );
-            $self->{"roles"} = $args->{"roles"};
-        }
-        else {
-            my $value = do {
-                my $default_value = $self->_build_roles;
-                do {
-
-                    package Mite::Shim;
-                    ( ref($default_value) eq 'ARRAY' ) and do {
-                        my $ok = 1;
-                        for my $i ( @{$default_value} ) {
-                            ( $ok = 0, last )
-                              unless (
-                                do {
-
-                                    package Mite::Shim;
-                                    use Scalar::Util ();
-                                    Scalar::Util::blessed($i);
-                                }
-                              );
-                        };
-                        $ok;
-                    }
-                  }
-                  or croak( "Type check failed in default: %s should be %s",
-                    "roles", "ArrayRef[Object]" );
-                $default_value;
-            };
+              }
+              or croak "Type check failed in constructor: %s should be %s",
+              "roles", "ArrayRef[Object]";
             $self->{"roles"} = $value;
-        }
-        if ( exists $args->{"imported_functions"} ) {
-            (
-                do {
+        };
 
-                    package Mite::Shim;
-                    ref( $args->{"imported_functions"} ) eq 'HASH';
-                  }
-                  and do {
+        # Attribute: imported_functions
+        do {
+            my $value =
+              exists( $args->{"imported_functions"} )
+              ? $args->{"imported_functions"}
+              : $self->_build_imported_functions;
+            do {
+
+                package Mite::Shim;
+                ( ref($value) eq 'HASH' ) and do {
                     my $ok = 1;
-                    for my $i ( values %{ $args->{"imported_functions"} } ) {
+                    for my $i ( values %{$value} ) {
                         ( $ok = 0, last ) unless do {
 
                             package Mite::Shim;
@@ -214,48 +167,24 @@
                     };
                     $ok;
                 }
-              )
-              or croak( "Type check failed in constructor: %s should be %s",
-                "imported_functions", "HashRef[Str]" );
-            $self->{"imported_functions"} = $args->{"imported_functions"};
-        }
-        else {
-            my $value = do {
-                my $default_value = $self->_build_imported_functions;
-                do {
-
-                    package Mite::Shim;
-                    ( ref($default_value) eq 'HASH' ) and do {
-                        my $ok = 1;
-                        for my $i ( values %{$default_value} ) {
-                            ( $ok = 0, last ) unless do {
-
-                                package Mite::Shim;
-                                defined($i) and do {
-                                    ref( \$i ) eq 'SCALAR'
-                                      or ref( \( my $val = $i ) ) eq 'SCALAR';
-                                }
-                            }
-                        };
-                        $ok;
-                    }
-                  }
-                  or croak( "Type check failed in default: %s should be %s",
-                    "imported_functions", "HashRef[Str]" );
-                $default_value;
-            };
+              }
+              or croak "Type check failed in constructor: %s should be %s",
+              "imported_functions", "HashRef[Str]";
             $self->{"imported_functions"} = $value;
-        }
-        if ( exists $args->{"required_methods"} ) {
-            (
-                do {
+        };
 
-                    package Mite::Shim;
-                    ref( $args->{"required_methods"} ) eq 'ARRAY';
-                  }
-                  and do {
+        # Attribute: required_methods
+        do {
+            my $value =
+              exists( $args->{"required_methods"} )
+              ? $args->{"required_methods"}
+              : $self->_build_required_methods;
+            do {
+
+                package Mite::Shim;
+                ( ref($value) eq 'ARRAY' ) and do {
                     my $ok = 1;
-                    for my $i ( @{ $args->{"required_methods"} } ) {
+                    for my $i ( @{$value} ) {
                         ( $ok = 0, last ) unless do {
 
                             package Mite::Shim;
@@ -267,38 +196,11 @@
                     };
                     $ok;
                 }
-              )
-              or croak( "Type check failed in constructor: %s should be %s",
-                "required_methods", "ArrayRef[Str]" );
-            $self->{"required_methods"} = $args->{"required_methods"};
-        }
-        else {
-            my $value = do {
-                my $default_value = $self->_build_required_methods;
-                do {
-
-                    package Mite::Shim;
-                    ( ref($default_value) eq 'ARRAY' ) and do {
-                        my $ok = 1;
-                        for my $i ( @{$default_value} ) {
-                            ( $ok = 0, last ) unless do {
-
-                                package Mite::Shim;
-                                defined($i) and do {
-                                    ref( \$i ) eq 'SCALAR'
-                                      or ref( \( my $val = $i ) ) eq 'SCALAR';
-                                }
-                            }
-                        };
-                        $ok;
-                    }
-                  }
-                  or croak( "Type check failed in default: %s should be %s",
-                    "required_methods", "ArrayRef[Str]" );
-                $default_value;
-            };
+              }
+              or croak "Type check failed in constructor: %s should be %s",
+              "required_methods", "ArrayRef[Str]";
             $self->{"required_methods"} = $value;
-        }
+        };
 
         # Enforce strict constructor
         my @unknown = grep not(

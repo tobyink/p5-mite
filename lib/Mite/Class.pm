@@ -234,7 +234,6 @@ sub new {
     my $args  = %s;
     my $no_build = delete $args->{__no_BUILD__};
 
-    # Initialize attributes
     %s
 
     # Enforce strict constructor
@@ -375,11 +374,15 @@ sub _compile_init_attributes {
         values %{ $self->all_attributes };
     };
     for my $attr ( @attributes ) {
-        my $code = $attr->compile_init( $selfvar, $argvar );
-        push @code, $code if $code;
+        my @lines = grep !!$_, $attr->compile_init( $selfvar, $argvar );
+        if ( @lines ) {
+            push @code, "# Attribute: " . $attr->name;
+            push @code, @lines;
+            push @code, '';
+        }
     }
 
-    return join "\n    ", @code;
+    return join "\n", map { /\S/ ? "    $_" : '' } @code;
 }
 
 sub _compile_attribute_accessors {

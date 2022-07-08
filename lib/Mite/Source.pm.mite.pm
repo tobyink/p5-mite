@@ -31,9 +31,10 @@
           : { ( @_ == 1 ) ? %{ $_[0] } : @_ };
         my $no_build = delete $args->{__no_BUILD__};
 
-        # Initialize attributes
-        if ( exists $args->{"file"} ) {
-            my $value = do {
+        # Attribute: file
+        croak "Missing key in constructor: file" unless exists $args->{"file"};
+        do {
+            my $coerced_value = do {
                 my $to_coerce = $args->{"file"};
                 (
                     (
@@ -61,21 +62,27 @@
             (
                 do {
                     use Scalar::Util ();
-                    Scalar::Util::blessed($value)
-                      and $value->isa(q[Path::Tiny]);
+                    Scalar::Util::blessed($coerced_value)
+                      and $coerced_value->isa(q[Path::Tiny]);
                 }
               )
-              or croak( "Type check failed in constructor: %s should be %s",
-                "file", "Path" );
-            $self->{"file"} = $value;
-        }
-        else { croak("Missing key in constructor: file") }
-        if ( exists $args->{"classes"} ) {
-            (
-                do { package Mite::Shim; ref( $args->{"classes"} ) eq 'HASH' }
-                  and do {
+              or croak "Type check failed in constructor: %s should be %s",
+              "file", "Path";
+            $self->{"file"} = $coerced_value;
+        };
+
+        # Attribute: classes
+        do {
+            my $value = exists( $args->{"classes"} ) ? $args->{"classes"} : do {
+                my $method = $Mite::Source::__classes_DEFAULT__;
+                $self->$method;
+            };
+            do {
+
+                package Mite::Shim;
+                ( ref($value) eq 'HASH' ) and do {
                     my $ok = 1;
-                    for my $i ( values %{ $args->{"classes"} } ) {
+                    for my $i ( values %{$value} ) {
                         ( $ok = 0, last )
                           unless (
                             do {
@@ -87,47 +94,13 @@
                     };
                     $ok;
                 }
-              )
-              or croak(
-                "Type check failed in constructor: %s should be %s",
-                "classes",
-                "HashRef[InstanceOf[\"Mite::Class\"]]"
-              );
-            $self->{"classes"} = $args->{"classes"};
-        }
-        else {
-            my $value = do {
-                my $default_value = do {
-                    my $method = $Mite::Source::__classes_DEFAULT__;
-                    $self->$method;
-                };
-                do {
-
-                    package Mite::Shim;
-                    ( ref($default_value) eq 'HASH' ) and do {
-                        my $ok = 1;
-                        for my $i ( values %{$default_value} ) {
-                            ( $ok = 0, last )
-                              unless (
-                                do {
-                                    use Scalar::Util ();
-                                    Scalar::Util::blessed($i)
-                                      and $i->isa(q[Mite::Class]);
-                                }
-                              );
-                        };
-                        $ok;
-                    }
-                  }
-                  or croak(
-                    "Type check failed in default: %s should be %s",
-                    "classes",
-                    "HashRef[InstanceOf[\"Mite::Class\"]]"
-                  );
-                $default_value;
-            };
+              }
+              or croak "Type check failed in constructor: %s should be %s",
+              "classes", "HashRef[InstanceOf[\"Mite::Class\"]]";
             $self->{"classes"} = $value;
-        }
+        };
+
+        # Attribute: compiled
         if ( exists $args->{"compiled"} ) {
             (
                 do {
@@ -136,13 +109,12 @@
                       and $args->{"compiled"}->isa(q[Mite::Compiled]);
                 }
               )
-              or croak(
-                "Type check failed in constructor: %s should be %s",
-                "compiled",
-                "InstanceOf[\"Mite::Compiled\"]"
-              );
+              or croak "Type check failed in constructor: %s should be %s",
+              "compiled", "InstanceOf[\"Mite::Compiled\"]";
             $self->{"compiled"} = $args->{"compiled"};
         }
+
+        # Attribute: project
         if ( exists $args->{"project"} ) {
             (
                 do {
@@ -151,14 +123,12 @@
                       and $args->{"project"}->isa(q[Mite::Project]);
                 }
               )
-              or croak(
-                "Type check failed in constructor: %s should be %s",
-                "project",
-                "InstanceOf[\"Mite::Project\"]"
-              );
+              or croak "Type check failed in constructor: %s should be %s",
+              "project", "InstanceOf[\"Mite::Project\"]";
             $self->{"project"} = $args->{"project"};
         }
-        require Scalar::Util && Scalar::Util::weaken( $self->{"project"} );
+        require Scalar::Util && Scalar::Util::weaken( $self->{"project"} )
+          if exists $self->{"project"};
 
         # Enforce strict constructor
         my @unknown = grep not(/\A(?:c(?:lasses|ompiled)|file|project)\z/),

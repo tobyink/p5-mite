@@ -31,58 +31,61 @@
           : { ( @_ == 1 ) ? %{ $_[0] } : @_ };
         my $no_build = delete $args->{__no_BUILD__};
 
-        # Initialize attributes
+        # Attribute: file
         if ( exists $args->{"file"} ) {
-            my $value = do {
-                my $to_coerce = $args->{"file"};
-                (
+            do {
+                my $coerced_value = do {
+                    my $to_coerce = $args->{"file"};
                     (
+                        (
+                            do {
+                                use Scalar::Util ();
+                                Scalar::Util::blessed($to_coerce)
+                                  and $to_coerce->isa(q[Path::Tiny]);
+                            }
+                        )
+                    ) ? $to_coerce : (
                         do {
-                            use Scalar::Util ();
-                            Scalar::Util::blessed($to_coerce)
-                              and $to_coerce->isa(q[Path::Tiny]);
-                        }
-                    )
-                ) ? $to_coerce : (
-                    do {
 
-                        package Mite::Shim;
-                        defined($to_coerce) and do {
-                            ref( \$to_coerce ) eq 'SCALAR'
-                              or ref( \( my $val = $to_coerce ) ) eq 'SCALAR';
+                            package Mite::Shim;
+                            defined($to_coerce) and do {
+                                ref( \$to_coerce ) eq 'SCALAR'
+                                  or ref( \( my $val = $to_coerce ) ) eq
+                                  'SCALAR';
+                            }
                         }
+                      )
+                      ? scalar(
+                        do { local $_ = $to_coerce; Path::Tiny::path($_) }
+                      )
+                      : $to_coerce;
+                };
+                (
+                    do {
+                        use Scalar::Util ();
+                        Scalar::Util::blessed($coerced_value)
+                          and $coerced_value->isa(q[Path::Tiny]);
                     }
                   )
-                  ? scalar(
-                    do { local $_ = $to_coerce; Path::Tiny::path($_) }
-                  )
-                  : $to_coerce;
+                  or croak "Type check failed in constructor: %s should be %s",
+                  "file", "Path";
+                $self->{"file"} = $coerced_value;
             };
-            (
-                do {
-                    use Scalar::Util ();
-                    Scalar::Util::blessed($value)
-                      and $value->isa(q[Path::Tiny]);
-                }
-              )
-              or croak( "Type check failed in constructor: %s should be %s",
-                "file", "Path" );
-            $self->{"file"} = $value;
         }
-        if ( exists $args->{"source"} ) {
-            (
-                do {
-                    use Scalar::Util ();
-                    Scalar::Util::blessed( $args->{"source"} )
-                      and $args->{"source"}->isa(q[Mite::Source]);
-                }
-              )
-              or croak( "Type check failed in constructor: %s should be %s",
-                "source", "InstanceOf[\"Mite::Source\"]" );
-            $self->{"source"} = $args->{"source"};
-        }
-        else { croak("Missing key in constructor: source") }
-        require Scalar::Util && Scalar::Util::weaken( $self->{"source"} );
+
+        # Attribute: source
+        croak "Missing key in constructor: source"
+          unless exists $args->{"source"};
+        (
+            do {
+                use Scalar::Util ();
+                Scalar::Util::blessed( $args->{"source"} )
+                  and $args->{"source"}->isa(q[Mite::Source]);
+            }
+          )
+          or croak "Type check failed in constructor: %s should be %s",
+          "source", "InstanceOf[\"Mite::Source\"]";
+        $self->{"source"} = $args->{"source"};
 
         # Enforce strict constructor
         my @unknown = grep not(/\A(?:file|source)\z/), keys %{$args};
