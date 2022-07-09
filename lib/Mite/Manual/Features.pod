@@ -1,0 +1,106 @@
+=pod
+
+=head1 NAME
+
+Mite::Manual::Features - other features provided by Mite
+
+=head1 MANUAL
+
+=head2 Class Methods
+
+Your class can or will provide the following methods:
+
+=head3 C<< new( %attributes ) >> or C<< new( \%attributes ) >>
+
+Constructor for your class. It takes some arguments and returns an
+object.
+
+Mite generates this for you.
+
+Mite automatically provides a similar feature to L<MooseX::StrictConstructor>,
+so your constructor will die if you pass it unknown attributes. 
+
+=head3 C<BUILDARGS>
+
+Works as in L<Moose> and allows your constructor to be called with something
+other than a hash of attributes. Mite does not generate this for you.
+
+=head3 C<FOREIGNBUILDARGS>
+
+Works as in L<Moo> and L<MooseX::NonMoose>. Mite does not generate this for
+you.
+
+=head3 C<BUILD> / C<BUILDALL>.
+
+Works as in L<Moose>. Mite generates C<BUILDALL> for you.
+
+=head3 C<DEMOLISH> / C<DESTROY>
+
+Works as in L<Moose>. Mite generates C<DESTROY> for you.
+
+On Perl older than 5.14, the C<< $in_global_destruction >> argument
+will be undefined unless L<Devel::GlobalDestruction> is installed,
+so add that to your project's dependencies if you are relying on it
+and need to support older versions of Perl.
+
+=head3 C<DOES> / C<does>
+
+C<DOES> allows you to check if your class/object performs a particular
+role. See L<UNIVERSAL>.
+
+C<does> is just an alias.
+
+If you want to fake support for a role:
+
+    $Your::Project::SomeClass::DOES{'Your::Project::SomeRole'} = 1;
+
+=head2 C<strict>
+
+Mite will turn strict on for you.
+
+=head2 C<warnings>
+
+Mite will turn warnings on for you.
+
+=head2 Clean Classes
+
+Mite will automatically import L<namespace::autoclean> into your classes
+if it is installed on the end user's system. If it's not available, your
+classes will quietly be left with imported keywords cluttering up their
+namespace.
+
+To force namespace::autoclean, then just use it manually:
+
+    use Your::Project::Mite;
+    use namespace::autoclean;
+
+To force it to I<not> be used:
+
+    use Your::Project::Mite qw( -unclean );
+
+=head1 BUGS
+
+Please report any bugs to L<https://github.com/tobyink/p5-mite/issues>.
+
+=head1 AUTHOR
+
+Michael G Schwern E<lt>mschwern@cpan.orgE<gt>.
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2011-2014 by Michael G Schwern.
+
+This software is copyright (c) 2022 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut

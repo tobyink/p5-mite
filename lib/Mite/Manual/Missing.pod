@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Mite::Manual::Missing - Moose features not supported by Mite
+Mite::Manual::Missing - major Moose features not supported by Mite
 
 =head1 MANUAL
 

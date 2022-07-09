@@ -1,0 +1,381 @@
+=pod
+
+=head1 NAME
+
+Mite::Manual::Attributes - options for defining attributes with Mite
+
+=head1 SYNOPSIS
+
+    has myattr => (
+        alias         => [ 'my_attr' ],
+        is            => 'bare',       # or ro/rw/rwp/lazy
+        init_arg      => 'myattr',
+        required      => true,
+        reader        => 'get_myattr',
+        writer        => 'set_myattr',
+        accessor      => 'access_myattr',
+        clearer       => 'clear_myattr',
+        predicate     => 'has_myattr',
+        lvalue        => 'myattr',
+        local_writer  => 'locally_set_myattr',
+        # default     => sub { shift->_build_myattr },
+        builder       => '_build_myattr',
+        lazy          => false,
+        isa           => 'Object',
+        coerce        => false,
+        handles       => { quux => 'quuux' },
+        trigger       => '_trigger_myattr',
+    );
+
+=head1 MANUAL
+
+Like C<has> in Moose, this declares an attribute.
+
+Multiple attributes can be defined using an arrayref.
+
+    # Defines get_foo, get_bar, set_foo, and set_bar.
+    #
+    has [ 'foo', 'bar' ] => (
+        isa => 'Str',
+        reader => 1,
+        writer => 1,
+    );
+
+Like in Moose, you can use a plus sign to modify an attribute definition
+from a role or parent class:
+
+    has '+foo' => (
+        default => sub { 'new default' },
+    );
+
+When modifying an attribute, you cannot use the C<is> option.
+
+The following options are supported.
+
+=head2 C<is> B<< Enum["ro","rw","bare","rwp","lazy"] >>
+
+Supported values for C<is> include "ro", "rw", and "bare" like Moose,
+but also "rwp" and "lazy" like Moo. These are all just shortcuts for
+defining other options.
+
+The default is C<< is => 'bare' >>.
+
+=head2 C<reader> B<< Maybe[Str] >> 
+
+The name of the attribute reader method to generate. If set to "1",
+will generate a reader called "get_foo" if your attribute is called
+"foo" and "_get__foo" if your attribute is called "_foo".
+
+If your attribute is defined as C<< is => "ro" >>, C<< is => "rwp" >>,
+or C<< is => "lazy" >> then C<reader> defaults to C<< $name >>.
+
+If your reader contains "%s" this will be replaced by the name of the
+attribute. This allows:
+
+    # readers called "fetch_foo" and "fetch_bar"
+    has [ 'foo', 'bar' ] => (
+        required => true,
+        reader   => 'fetch_%s',
+    );
+
+=head2 C<writer> B<< Maybe[Str] >> 
+
+The name of the attribute writer method to generate. If set to "1",
+will generate a writer called "set_foo" if your attribute is called
+"foo" and "_set__foo" if your attribute is called "_foo". 
+
+If your attribute is defined as C<< is => "rwp" >>, then C<writer>
+defaults to C<< "_set_$name" >>.
+
+If your writer contains "%s" this will be replaced by the name of the
+attribute.
+
+Mite provides a similar feature to L<MooseX::Attribute::Chained>, so
+writer methods return C<< $self >>, allowing them to be chained:
+
+    $object->set_bar( 42 )->set_baz( 99 );
+
+=head2 C<accessor> B<< Maybe[Str] >>
+
+The name of the dual-purpose attribute reader/writer method to generate.
+If set to "1", will generate a reader called "foo" if your attribute is
+called "foo" and "_foo" if your attribute is called "_foo". 
+
+If your attribute is defined as C<< is => "rw" >>, then C<accessor>
+defaults to C<< $name >>.
+
+If your accessor contains "%s" this will be replaced by the name of the
+attribute.
+
+Mite provides a similar feature to L<MooseX::Attribute::Chained>, so
+accessor methods called as writers return C<< $self >>, allowing them
+to be chained:
+
+    $object->bar( 42 )->baz( 99 );
+
+=head2 C<clearer> B<< Maybe[Str] >>
+
+The name of the attribute clearer method to generate. If set to "1",
+will generate a clearer called "clear_foo" if your attribute is called
+"foo" and "_clear__foo" if your attribute is called "_foo".
+
+If your clearer contains "%s" this will be replaced by the name of the
+attribute.
+
+Mite provides a similar feature to L<MooseX::Attribute::Chained>, so
+clearer methods return C<< $self >>, allowing them to be chained:
+
+    $object->clear_foo->clear_bar->clear_baz;
+
+=head2 C<predicate> B<< Maybe[Str] >>
+
+The name of the attribute predicate method to generate. If set to "1",
+will generate a predicate called "has_foo" if your attribute is called
+"foo" and "_has__foo" if your attribute is called "_foo".
+
+If your predicate contains "%s" this will be replaced by the name of the
+attribute.
+
+=head2 C<lvalue> B<< Maybe[Str] >>
+
+The name of the dual-purpose lvalue reader/writer method to generate.
+If set to "1", will generate a reader called "foo" if your attribute is
+called "foo" and "_foo" if your attribute is called "_foo".
+
+If your accessor contains "%s" this will be replaced by the name of the
+attribute.
+
+lvalue accessors are used like this:
+
+    my $object = MyClass->new( myattr => 99 );
+    say $object->myattr;   # ==> 99
+    $object->myattr = 66;  # set new value
+    say $object->myattr;   # ==> 66
+
+An attribute cannot have an lvalue accessor if it has a lazy builder/default,
+uses a type contraint or coercions, has a trigger, or uses weak_ref.
+
+This is roughly (but not exactly) the same functionality as
+L<MooseX::LvalueAttribute>.
+
+=head2 C<local_writer> B<< Maybe[Str] >> 
+
+The name of the locally scoped writer method to generate. These work like
+this:
+
+    my $object = Your::Project::SomeClass->new( foo => 99 );
+    say $object->foo;      # ==> 99
+    do {
+        my $guard = $object->locally_set_foo( 66 );
+        say $object->foo;  # ==> 66
+    };
+    say $object->foo;      # ==> 99
+
+When the C<< $guard >> goes out of scope, the old value will be restored.
+The C<< $guard >> object also has three methods: C<restore> to restore the
+old value immediately, C<dismiss> to dismiss the old value and keep the
+new value, and C<peek> to peek at the old value.
+
+If the local writer is called with no parameter, it acts as a local clearer.
+
+If set to "1", will generate a local writer called "locally_set_foo" if your
+attribute is called "foo" and "_locally_set__foo" if your attribute is
+called "_foo". 
+
+If your local writer contains "%s" this will be replaced by the name of the
+attribute.
+
+This is vaguely inspired by L<MooseX::LocalAttribute>.
+
+=head2 C<handles> B<< HashRef|ArrayRef >>
+
+Delegated methods. Currying and native traits are not supported.
+
+If your handles hashref keys contain "%s", they will be replaced by
+the name of the attribute.
+
+    # $this->user_agent_get is a shortcut for $this->user_agent->get
+    #
+    has user_agent => (
+        required => true,
+        isa      => 'Object',
+        handles  => {
+            '%s_get'  => 'get',
+            '%s_post' => 'post',
+        },
+    );
+
+=head2 C<init_arg> B<< Maybe[Str] >>
+
+The parameter expected to be passed to the constructor to initialize this
+attribute. May be undef if the attribute should not be intitialized in the
+constructor.
+
+Defaults to the attribute's name.
+
+If your init_arg contains "%s" this will be replaced by the name of the
+attribute.
+
+=head2 C<required> B<Bool>
+
+Indicates whether the attribute is required in the parameter. If the
+attribute has a non-lazy default, this is ignored.
+
+=head2 C<alias> B<< Str|ArrayRef[Str] >>
+
+A list of aliases for the attibutes. If the attribute has an init_arg
+(including a default one), this provides alternative initialization
+arguments. If the attribute C<< is => "rw" >>, then these aliases are
+aliases for the accessor; otherwise they are aliases for the reader.
+
+The strings can contain "%s" which will be replaced by the attribute
+name, allowing this to work:
+
+    has [ 'foo', 'bar' ] => (
+        is => 'ro',
+        alias => 'get_%s',
+    );
+
+If you try to create aliases but don't have a reader or accessor,
+then as a last resort the alias will be an alias for the writer.
+
+    # foo can be set using `set_foo` or `whatever`
+    #
+    has foo => (
+        is => 'bare',
+        writer => 1,
+        alias => 'whatever',
+    );
+
+Aliases are not natively supported by Moose, but this feature is
+analagous to L<MooseX::Aliases>.
+
+=head2 C<isa> B<< Str|TypeTiny >>
+
+A string type name from L<Types::Standard>, L<Types::Common::String>,
+or L<Types::Common::Numeric>, or a blessed L<Type::Tiny> object. If
+using a blessed object, you'll be introducing a dependency for your
+project on whatever type constraint library you're using, so prefer
+string type contraint names.
+
+Any string supported by L<Type::Utils> C<dwim_type> is supported, so
+things like C<< "Int | Enum['small', 'medium', 'large']" >> should work!
+
+If you need custom types, you can add something like this to your
+F<.mite/config>:
+
+    types: Your::Project::Types
+
+The module C<Your::Project::Types> would be a type library constructed with
+L<Type::Library>. It should just contain type constraints and coercions which
+can be inlined, and none of your classes should load it directly (just rely
+on Mite to load it). This way you can use custom types in your project and
+your project will not have a dependency on Type::Library.
+
+=head2 C<does> B<< Str|TypeTiny >>
+
+Same as C<isa>, but if the type name is unrecognized, assumes it was a
+role name instead of assuming it was a class name.
+
+=head2 C<coerce> B<Bool>
+
+Indicates that the attribute should attempt to coerce values to fit
+the type constraint.
+
+=head2 C<trigger> B<< CodeRef|Maybe[Str] >>
+
+If set to a string, is the name of a method to call whenever a new
+attribute value is set. This is I<not> called when an attribute is
+defaulted. If set to "1", will assume a trigger called "_trigger_foo"
+if your attribute is called "foo" and "_trigger__foo" if your
+attribute is called "_foo".
+
+If set to a coderef, acts like it was set to "1" but installs the
+coderef into your class with that name.
+
+If your trigger method name contains "%s" this will be replaced by
+the name of the attribute.
+
+=head2 C<weak_ref> B<Bool>
+
+Indicates that the attribute should weaken its reference to the
+attribute value.
+
+=head2 C<default> B<< Undef|Str|CodeRef|ScalarRef >>
+
+A default value for the attribute, or a coderef called as a method
+to generate that default value.
+
+Unlike Moose, you can alternatively include an inline string of Perl
+code as a ScalarRef:
+
+    has list => (
+        is => 'ro',
+        isa => 'ArrayRef',
+        default => \ '[]',
+    );
+
+This has performance benefits over using a coderef as it avoids the
+overhead of a sub call.
+
+=head2 C<builder> B<< Str|CodeRef >>
+
+If set to a string, is the name of a method to call to build the
+default attribute value. If set to "1", will assume a builder called
+"_build_foo" if your attribute is called "foo" and "_build__foo" if your
+attribute is called "_foo".
+
+If you used C<< is => "lazy" >>, this will default to "1".
+
+If set to a coderef, acts like it was set to "1" but installs the
+coderef into your class with that name.
+
+If your builder method name contains "%s" this will be replaced by
+the name of the attribute.
+
+=head2 C<lazy> B<Bool>
+
+Indicates that the default should be set lazily. Defaults to false
+unless you used C<< is => "lazy" >>.
+
+An eager (non-lazy) default or builder is applied by the constructor
+when the object is constructed. A lazy default or builder is applied
+by the reader/accessor if and when the attribute is accessed.
+
+=head2 C<documentation> B<Any>
+
+This option is ignored, but you can set it to a documentation string
+for your attribute.
+
+    has name => (
+        is => 'rwp',
+        isa => 'Str',
+        documentation => 'First name and surname',
+    );
+
+=head1 BUGS
+
+Please report any bugs to L<https://github.com/tobyink/p5-mite/issues>.
+
+=head1 AUTHOR
+
+Michael G Schwern E<lt>mschwern@cpan.orgE<gt>.
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2011-2014 by Michael G Schwern.
+
+This software is copyright (c) 2022 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut

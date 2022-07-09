@@ -1,0 +1,172 @@
+=pod
+
+=head1 NAME
+
+Mite::Manual::Keywords - functions exported by Mite
+
+=head1 MANUAL
+
+To start a class:
+
+    use Your::Project::Mite;
+
+If you need to provide additional options:
+
+    use Your::Project::Mite qw( some options );
+
+To start a role:
+
+    use Your::Project::Mite -role;
+
+Or with additional options:
+
+    use Your::Project::Mite qw( -role some options );
+
+Options which look like words are requesting the import of a keyword of
+that name. For example, this imports a keyword called C<lazy>:
+
+    use Your::Project::Mite qw( lazy );
+
+Options which start with an exclamation mark are the negation of that.
+For example to unrequest C<lazy>:
+
+    use Your::Project::Mite qw( !lazy );
+
+Options starting with a hyphen are either a bundle of keywords, or
+are a pragma which affect your class as a whole.
+
+By default, classes get the C<has>, C<extends>, C<with>, C<before>, C<after>,
+and C<around> keywords imported into them.
+
+By default, roles get C<has>, C<requires>, C<with>, C<before>, C<after>,
+and C<around> keywords imported into them.
+
+The C<< -all >> flag imports everything possible.
+
+=head2 C<< has $name => %spec >>
+
+Like C<has> in Moose, this declares one or more attributes. See
+L<Mite::Manual::Attributes> for further details.
+
+=head2 C<< extends @parents >>
+
+Declares the parent classes for your class.
+
+You cannot use C<extends> from within roles.
+
+Options hashrefs, including the C<< -version >> option supported by Moose
+are not implemented.
+
+Multiple inheritance is supported if you're inheriting from Mite classes
+within your project. Single inheritance is supported if you're inheriting
+from a "foreign" class, as long as it uses a blessed hashref. (Multiple
+inheritance may in some cases work.)
+
+=head2 C<< requires @methods >>
+
+Works as in L<Moose>.
+
+You cannot use C<requires> from within classes.
+
+=head2 C<< with @roles >>
+
+Works as in L<Moose>.
+
+Roles must be Mite roles created in your own project, or Role::Tiny roles.
+Mite does not support using roles from other projects, or using role
+implementations other than Mite and Role::Tiny.
+
+Options hashrefs, including the C<< -version >> option are not implemented.
+
+=head2 C<param> and C<field> keywords
+
+The C<param> and C<field> keywords are available, like L<MooseX::Extended>.
+These act as an alternative to C<has>.
+
+    use Your::Project::Mite qw( param field !has );
+    
+    param foo => ( isa => 'Str' );
+
+=head2 Method Modifiers
+
+Basic versions of the C<before>, C<around>, and C<after> method modifiers
+are provided, but these may run in a different order from Moose if you
+use several modifiers on the same method.
+
+=head2 Boolean constants
+
+Although they're not imported by default, you can import C<true> and
+C<false> keywords. They can made attribute definitions a little prettier:
+
+    use Your::Project::Mite qw( true false );
+    # OR:
+    use Your::Project::Mite qw( -bool );
+    
+    has foo => (
+        is => 'rw',
+        required => true,
+    );
+
+=head2 Constants for "is"
+
+You can export constants called C<ro>, C<rw>, C<rwp>, C<bare>, and C<lazy>.
+Again, these can make attribute definitions prettier:
+
+    use Your::Project::Mite qw( ro rw -bool );
+    # OR:
+    use Your::Project::Mite qw( -is -bool );
+    
+    has foo => ( is => rw, required => true );
+
+=head2 C<carp>, C<croak>, and C<confess>
+
+These functions can be exported to your class:
+
+    use Your::Project::Mite qw( croak );
+    
+    sub my_method {
+        croak 'Not implemented yet';
+    }
+
+The functions provided are superpowered versions of the ones from L<Carp>.
+If called with multiple arguments, the first is treated as a format string
+for C<sprintf> and the remainder are passed through L<Data::Dumper> if they
+are references.
+
+    sub my_method {
+        my $self = shift;
+        croak '%s does not implement this method', ref( $self );
+    }
+
+=head2 C<blessed>
+
+C<blessed> from L<Scalar::Util> can also be imported.
+
+    use Your::Project::Mite qw( blessed );
+
+=head1 BUGS
+
+Please report any bugs to L<https://github.com/tobyink/p5-mite/issues>.
+
+=head1 AUTHOR
+
+Michael G Schwern E<lt>mschwern@cpan.orgE<gt>.
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2011-2014 by Michael G Schwern.
+
+This software is copyright (c) 2022 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut
