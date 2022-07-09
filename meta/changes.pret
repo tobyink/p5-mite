@@ -8,6 +8,10 @@
 			a dcs:Bugfix;
 			label "Eliminate some 'used only once' warnings from compiled mite.pm files.";
 		];
+		item [
+			a dcs:Addition;
+			label "Make the guard function from the Mite shim exportable.";
+		];
 	].
 
 `Mite 0.006000 cpan:TOBYINK`
