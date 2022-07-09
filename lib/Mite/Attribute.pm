@@ -58,7 +58,7 @@ has is =>
   isa           => Enum[ ro, rw, rwp, 'lazy', bare ],
   default       => bare;
 
-has [ 'reader', 'writer', 'accessor', 'clearer', 'predicate' ] =>
+has [ 'reader', 'writer', 'accessor', 'clearer', 'predicate', 'lvalue' ] =>
   is            => rw,
   isa           => Str->where('length($_) > 0') | Undef,
   builder       => true,
@@ -152,6 +152,7 @@ my @method_name_generator = (
         reader      => sub { "get_$_" },
         writer      => sub { "set_$_" },
         accessor    => sub { $_ },
+        lvalue      => sub { $_ },
         clearer     => sub { "clear_$_" },
         predicate   => sub { "has_$_" },
         builder     => sub { "_build_$_" },
@@ -161,6 +162,7 @@ my @method_name_generator = (
         reader      => sub { "_get_$_" },
         writer      => sub { "_set_$_" },
         accessor    => sub { $_ },
+        lvalue      => sub { $_ },
         clearer     => sub { "_clear_$_" },
         predicate   => sub { "_has_$_" },
         builder     => sub { "_build_$_" },
@@ -186,13 +188,32 @@ sub BUILD {
         }
     }
 
-    for my $property ( 'reader', 'writer', 'accessor', 'clearer', 'predicate', 'builder', 'trigger' ) {
+    for my $property ( 'reader', 'writer', 'accessor', 'clearer', 'predicate', 'builder', 'trigger', 'lvalue' ) {
         my $name = $self->$property;
         if ( defined $name and $name eq true ) {
             my $gen = $method_name_generator[$self->is_private]{$property};
             local $_ = $self->name;
             my $newname = $gen->( $_ );
             $self->$property( $newname );
+        }
+    }
+
+    if ( defined $self->lvalue ) {
+        if ( $self->lazy ) {
+            require Mite::Shim;
+            Mite::Shim::croak( 'Attributes with lazy defaults cannot have an lvalue accessor' );
+        }
+        elsif ( $self->trigger ) {
+            require Mite::Shim;
+            Mite::Shim::croak( 'Attributes with triggers cannot have an lvalue accessor' );
+        }
+        elsif ( $self->weak_ref ) {
+            require Mite::Shim;
+            Mite::Shim::croak( 'Attributes with weak_ref cannot have an lvalue accessor' );
+        }
+        elsif ( $self->type or $self->coerce ) {
+            require Mite::Shim;
+            Mite::Shim::croak( 'Attributes with type constraints or coercions cannot have an lvalue accessor' );
         }
     }
 }
@@ -254,12 +275,14 @@ sub _build_predicate { undef; }
 
 sub _build_clearer { undef; }
 
+sub _build_lvalue { undef; }
+
 sub _build_alias_is_for {
     my $self = shift;
     return undef unless @{ $self->alias };
     my @seek_order = $self->is eq rw
-        ? qw( accessor reader writer )
-        : qw( reader accessor writer );
+        ? qw( accessor reader lvalue writer )
+        : qw( reader accessor lvalue writer );
     for my $sought ( @seek_order ) {
         return $sought if $self->$sought;
     }
@@ -567,6 +590,14 @@ my %code_template;
         my $self = shift;
         sprintf 'exists $_[0]{%s}', $self->_q_name;
     },
+    lvalue => sub {
+        my $self = shift;
+        sprintf '$_[0]{%s}', $self->_q_name;
+    },
+);
+
+my %code_attr = (
+    lvalue => ' :lvalue',
 );
 
 sub compile {
@@ -582,6 +613,7 @@ sub compile {
         writer    => 'setters',
         accessor  => 'accessors',
         predicate => 'exists_predicates',
+        lvalue    => 'lvalue_accessors',
     );
 
     my %want_xs;
@@ -629,16 +661,16 @@ sub compile {
         $code .= "}\n";
         $code .= "else {\n";
         for my $property ( sort keys %want_xs ) {
-            $code .= sprintf '    *%s = sub { %s };' . "\n",
-                $method_name{$property}, $code_template{$property}->($self);
+            $code .= sprintf '    *%s = sub%s { %s };' . "\n",
+                $method_name{$property}, $code_attr{$property} || '', $code_template{$property}->($self);
             delete $want_pp{$property};
         }
         $code .= "}\n";
     }
 
     for my $property ( sort keys %want_pp ) {
-        $code .= sprintf 'sub %s { %s }' . "\n",
-            $method_name{$property}, $code_template{$property}->($self);
+        $code .= sprintf 'sub %s%s { %s }' . "\n",
+            $method_name{$property}, $code_attr{$property} || '', $code_template{$property}->($self);
     }
 
     $code .= "\n";

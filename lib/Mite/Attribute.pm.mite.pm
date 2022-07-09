@@ -327,6 +327,37 @@
             $self->{"predicate"} = $args->{"predicate"};
         }
 
+        # Attribute: lvalue
+        if ( exists $args->{"lvalue"} ) {
+            do {
+
+                package Mite::Shim;
+                (
+                    (
+                        (
+                            do {
+
+                                package Mite::Shim;
+                                defined( $args->{"lvalue"} ) and do {
+                                    ref( \$args->{"lvalue"} ) eq 'SCALAR'
+                                      or ref( \( my $val = $args->{"lvalue"} ) )
+                                      eq 'SCALAR';
+                                }
+                            }
+                        )
+                          && (
+                            do { local $_ = $args->{"lvalue"}; length($_) > 0 }
+                          )
+                    )
+                      or
+                      do { package Mite::Shim; !defined( $args->{"lvalue"} ) }
+                );
+              }
+              or croak "Type check failed in constructor: %s should be %s",
+              "lvalue", "__ANON__|Undef";
+            $self->{"lvalue"} = $args->{"lvalue"};
+        }
+
         # Attribute: isa
         if ( exists $args->{"isa"} ) {
             do {
@@ -698,7 +729,7 @@
 
         # Enforce strict constructor
         my @unknown = grep not(
-/\A(?:_class_for_default|a(?:ccessor|lias)|builder|c(?:l(?:ass|earer)|o(?:deref_default_variable|erce))|d(?:efault|o(?:cumentation|es))|handles|i(?:nit_arg|sa?)|lazy|name|predicate|re(?:ader|quired)|t(?:rigger|ype)|w(?:eak_ref|riter))\z/
+/\A(?:_class_for_default|a(?:ccessor|lias)|builder|c(?:l(?:ass|earer)|o(?:deref_default_variable|erce))|d(?:efault|o(?:cumentation|es))|handles|i(?:nit_arg|sa?)|l(?:azy|value)|name|predicate|re(?:ader|quired)|t(?:rigger|ype)|w(?:eak_ref|riter))\z/
         ), keys %{$args};
         @unknown
           and croak(
@@ -1473,6 +1504,83 @@
             $_[0];
           }
           : ( $_[0]{"lazy"} );
+    }
+
+    # Accessors for lvalue
+    sub lvalue {
+        @_ > 1
+          ? do {
+            do {
+
+                package Mite::Shim;
+                (
+                    (
+                        (
+                            do {
+
+                                package Mite::Shim;
+                                defined( $_[1] ) and do {
+                                    ref( \$_[1] ) eq 'SCALAR'
+                                      or ref( \( my $val = $_[1] ) ) eq 'SCALAR';
+                                }
+                            }
+                        )
+                          && (
+                            do { local $_ = $_[1]; length($_) > 0 }
+                          )
+                    )
+                      or ( !defined( $_[1] ) )
+                );
+              }
+              or croak( "Type check failed in %s: value should be %s",
+                "accessor", "__ANON__|Undef" );
+            $_[0]{"lvalue"} = $_[1];
+            $_[0];
+          }
+          : do {
+            (
+                exists( $_[0]{"lvalue"} ) ? $_[0]{"lvalue"} : (
+                    $_[0]{"lvalue"} = do {
+                        my $default_value = $_[0]->_build_lvalue;
+                        do {
+
+                            package Mite::Shim;
+                            (
+                                (
+                                    (
+                                        do {
+
+                                            package Mite::Shim;
+                                            defined($default_value) and do {
+                                                ref( \$default_value ) eq
+                                                  'SCALAR'
+                                                  or ref(
+                                                    \(
+                                                        my $val =
+                                                          $default_value
+                                                    )
+                                                  ) eq 'SCALAR';
+                                            }
+                                        }
+                                    )
+                                      && (
+                                        do {
+                                            local $_ = $default_value;
+                                            length($_) > 0;
+                                        }
+                                      )
+                                )
+                                  or ( !defined($default_value) )
+                            );
+                          }
+                          or croak(
+                            "Type check failed in default: %s should be %s",
+                            "lvalue", "__ANON__|Undef" );
+                        $default_value;
+                    }
+                )
+            )
+        }
     }
 
     # Accessors for name
