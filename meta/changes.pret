@@ -1,6 +1,23 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.006000 cpan:TOBYINK`
+	issued  2022-07-09;
+	changeset [
+		item [
+			a dcs:Documentation;
+			label "Split the long Mite::Manual::Syntax pod into three smaller documents: Mite::Manual::Keywords, Mite::Manual::Attributes, and Mite::Manual::Features.";
+		];
+		item [
+			a dcs:Addition;
+			label "local_writer option for attributes.";
+		];
+		item [
+			a dcs:Addition;
+			label "lvalue option for attributes.";
+		];
+	].
+
 `Mite 0.005004 cpan:TOBYINK`
 	issued  2022-07-08;
 	changeset [
