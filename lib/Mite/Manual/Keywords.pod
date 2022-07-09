@@ -152,7 +152,7 @@ A function similar to C<guard> from L<Scope::Guard> can be imported.
     
     # Says "Hello world"
     do {
-        my $guard = sub { print "world\n" };
+        my $guard = guard { print "world\n" };
         print "Hello ";
     };
 
