@@ -358,6 +358,44 @@
             $self->{"lvalue"} = $args->{"lvalue"};
         }
 
+        # Attribute: local_writer
+        if ( exists $args->{"local_writer"} ) {
+            do {
+
+                package Mite::Shim;
+                (
+                    (
+                        (
+                            do {
+
+                                package Mite::Shim;
+                                defined( $args->{"local_writer"} ) and do {
+                                    ref( \$args->{"local_writer"} ) eq 'SCALAR'
+                                      or ref(
+                                        \( my $val = $args->{"local_writer"} ) )
+                                      eq 'SCALAR';
+                                }
+                            }
+                        )
+                          && (
+                            do {
+                                local $_ = $args->{"local_writer"};
+                                length($_) > 0;
+                            }
+                          )
+                    )
+                      or do {
+
+                        package Mite::Shim;
+                        !defined( $args->{"local_writer"} );
+                    }
+                );
+              }
+              or croak "Type check failed in constructor: %s should be %s",
+              "local_writer", "__ANON__|Undef";
+            $self->{"local_writer"} = $args->{"local_writer"};
+        }
+
         # Attribute: isa
         if ( exists $args->{"isa"} ) {
             do {
@@ -729,7 +767,7 @@
 
         # Enforce strict constructor
         my @unknown = grep not(
-/\A(?:_class_for_default|a(?:ccessor|lias)|builder|c(?:l(?:ass|earer)|o(?:deref_default_variable|erce))|d(?:efault|o(?:cumentation|es))|handles|i(?:nit_arg|sa?)|l(?:azy|value)|name|predicate|re(?:ader|quired)|t(?:rigger|ype)|w(?:eak_ref|riter))\z/
+/\A(?:_class_for_default|a(?:ccessor|lias)|builder|c(?:l(?:ass|earer)|o(?:deref_default_variable|erce))|d(?:efault|o(?:cumentation|es))|handles|i(?:nit_arg|sa?)|l(?:azy|ocal_writer|value)|name|predicate|re(?:ader|quired)|t(?:rigger|ype)|w(?:eak_ref|riter))\z/
         ), keys %{$args};
         @unknown
           and croak(
@@ -1504,6 +1542,83 @@
             $_[0];
           }
           : ( $_[0]{"lazy"} );
+    }
+
+    # Accessors for local_writer
+    sub local_writer {
+        @_ > 1
+          ? do {
+            do {
+
+                package Mite::Shim;
+                (
+                    (
+                        (
+                            do {
+
+                                package Mite::Shim;
+                                defined( $_[1] ) and do {
+                                    ref( \$_[1] ) eq 'SCALAR'
+                                      or ref( \( my $val = $_[1] ) ) eq 'SCALAR';
+                                }
+                            }
+                        )
+                          && (
+                            do { local $_ = $_[1]; length($_) > 0 }
+                          )
+                    )
+                      or ( !defined( $_[1] ) )
+                );
+              }
+              or croak( "Type check failed in %s: value should be %s",
+                "accessor", "__ANON__|Undef" );
+            $_[0]{"local_writer"} = $_[1];
+            $_[0];
+          }
+          : do {
+            (
+                exists( $_[0]{"local_writer"} ) ? $_[0]{"local_writer"} : (
+                    $_[0]{"local_writer"} = do {
+                        my $default_value = $_[0]->_build_local_writer;
+                        do {
+
+                            package Mite::Shim;
+                            (
+                                (
+                                    (
+                                        do {
+
+                                            package Mite::Shim;
+                                            defined($default_value) and do {
+                                                ref( \$default_value ) eq
+                                                  'SCALAR'
+                                                  or ref(
+                                                    \(
+                                                        my $val =
+                                                          $default_value
+                                                    )
+                                                  ) eq 'SCALAR';
+                                            }
+                                        }
+                                    )
+                                      && (
+                                        do {
+                                            local $_ = $default_value;
+                                            length($_) > 0;
+                                        }
+                                      )
+                                )
+                                  or ( !defined($default_value) )
+                            );
+                          }
+                          or croak(
+                            "Type check failed in default: %s should be %s",
+                            "local_writer", "__ANON__|Undef" );
+                        $default_value;
+                    }
+                )
+            )
+        }
     }
 
     # Accessors for lvalue

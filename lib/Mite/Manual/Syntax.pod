@@ -112,6 +112,33 @@ lvalue accessors are used like this:
 An attribute cannot have an lvalue accessor if it has a lazy builder/default,
 uses a type contraint or coercions, has a trigger, or uses weak_ref.
 
+=item C<local_writer> B<< Maybe[Str] >> 
+
+The name of the locally scoped writer method to generate. These work like
+this:
+
+    my $object = Your::Project::SomeClass->new( foo => 99 );
+    say $object->foo;      # ==> 99
+    do {
+        my $guard = $object->locally_set_foo( 66 );
+        say $object->foo;  # ==> 66
+    };
+    say $object->foo;      # ==> 99
+
+When the C<< $guard >> goes out of scope, the old value will be restored.
+The C<< $guard >> object also has three methods: C<restore> to restore the
+old value immediately, C<dismiss> to dismiss the old value and keep the
+new value, and C<peek> to peek at the old value.
+
+If the local writer is called with no parameter, it acts as a local clearer.
+
+If set to "1", will generate a writer called "locally_set_foo" if your
+attribute is called "foo" and "_locally_set__foo" if your attribute is
+called "_foo". 
+
+If your writer contains "%s" this will be replaced by the name of the
+attribute.
+
 =item C<clearer> B<< Maybe[Str] >>
 
 The name of the attribute clearer method to generate. If set to "1",

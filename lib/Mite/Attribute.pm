@@ -58,7 +58,7 @@ has is =>
   isa           => Enum[ ro, rw, rwp, 'lazy', bare ],
   default       => bare;
 
-has [ 'reader', 'writer', 'accessor', 'clearer', 'predicate', 'lvalue' ] =>
+has [ 'reader', 'writer', 'accessor', 'clearer', 'predicate', 'lvalue', 'local_writer' ] =>
   is            => rw,
   isa           => Str->where('length($_) > 0') | Undef,
   builder       => true,
@@ -149,24 +149,26 @@ for my $function ( qw/ carp croak confess / ) {
 
 my @method_name_generator = (
     { # public
-        reader      => sub { "get_$_" },
-        writer      => sub { "set_$_" },
-        accessor    => sub { $_ },
-        lvalue      => sub { $_ },
-        clearer     => sub { "clear_$_" },
-        predicate   => sub { "has_$_" },
-        builder     => sub { "_build_$_" },
-        trigger     => sub { "_trigger_$_" },
+        reader        => sub { "get_$_" },
+        writer        => sub { "set_$_" },
+        accessor      => sub { $_ },
+        lvalue        => sub { $_ },
+        clearer       => sub { "clear_$_" },
+        predicate     => sub { "has_$_" },
+        builder       => sub { "_build_$_" },
+        trigger       => sub { "_trigger_$_" },
+        local_writer  => sub { "locally_set_$_" },
     },
     { # private
-        reader      => sub { "_get_$_" },
-        writer      => sub { "_set_$_" },
-        accessor    => sub { $_ },
-        lvalue      => sub { $_ },
-        clearer     => sub { "_clear_$_" },
-        predicate   => sub { "_has_$_" },
-        builder     => sub { "_build_$_" },
-        trigger     => sub { "_trigger_$_" },
+        reader        => sub { "_get_$_" },
+        writer        => sub { "_set_$_" },
+        accessor      => sub { $_ },
+        lvalue        => sub { $_ },
+        clearer       => sub { "_clear_$_" },
+        predicate     => sub { "_has_$_" },
+        builder       => sub { "_build_$_" },
+        trigger       => sub { "_trigger_$_" },
+        local_writer  => sub { "_locally_set_$_" },
     },
 );
 
@@ -188,7 +190,7 @@ sub BUILD {
         }
     }
 
-    for my $property ( 'reader', 'writer', 'accessor', 'clearer', 'predicate', 'builder', 'trigger', 'lvalue' ) {
+    for my $property ( 'reader', 'writer', 'accessor', 'clearer', 'predicate', 'builder', 'trigger', 'lvalue', 'local_writer' ) {
         my $name = $self->$property;
         if ( defined $name and $name eq true ) {
             my $gen = $method_name_generator[$self->is_private]{$property};
@@ -276,6 +278,8 @@ sub _build_predicate { undef; }
 sub _build_clearer { undef; }
 
 sub _build_lvalue { undef; }
+
+sub _build_local_writer { undef; }
 
 sub _build_alias_is_for {
     my $self = shift;
@@ -593,6 +597,40 @@ my %code_template;
     lvalue => sub {
         my $self = shift;
         sprintf '$_[0]{%s}', $self->_q_name;
+    },
+    local_writer => sub {
+        my $self = shift;
+
+        my $CROAK = $self->_function_for_croak;
+        my $GET = $self->reader ? $self->_q( $self->_expand_name( $self->reader ) )
+            : $self->accessor ? $self->_q( $self->_expand_name( $self->accessor ) )
+            : sprintf( 'sub { %s }', $code_template{reader}->( $self, no_croak => true ) );
+        my $SET = $self->writer ? $self->_q( $self->_expand_name( $self->writer ) )
+            : $self->accessor ? $self->_q( $self->_expand_name( $self->accessor ) )
+            : sprintf( 'sub { %s }', $code_template{writer}->( $self, label => 'local writer' ) );
+        my $HAS = $self->predicate ? $self->_q( $self->_expand_name( $self->predicate ) )
+            : sprintf( 'sub { %s }', $code_template{predicate}->( $self ) );
+        my $CLEAR = $self->clearer ? $self->_q( $self->_expand_name( $self->clearer ) )
+            : sprintf( 'sub { %s }', $code_template{clearer}->( $self ) );
+        my $SHIM = eval { $self->compiling_class->shim_name }
+            || eval { $self->class->shim_name }
+            || 'Scope::Guard';
+
+        return sprintf <<'CODE', $CROAK, $GET, $SET, $HAS, $CLEAR, $SHIM;
+
+    defined wantarray or %s( "This method cannot be called invoid context" );
+    my $get = %s;
+    my $set = %s;
+    my $has = %s;
+    my $clear = %s;
+    my $old = undef;
+    my ( $self, $new ) = @_;
+    my $restorer = $self->$has
+        ? do { $old = $self->$get; sub { $self->$set( $old ) } }
+        : sub { $self->$clear };
+    @_ == 2 ? $self->$set( $new ) : $self->$clear;
+    &%s::guard( $restorer, $old );
+CODE
     },
 );
 
