@@ -14,6 +14,7 @@
         *confess = \&Mite::Shim::confess;
         *croak   = \&Mite::Shim::croak;
         *false   = \&Mite::Shim::false;
+        *guard   = \&Mite::Shim::guard;
         *ro      = \&Mite::Shim::ro;
         *rw      = \&Mite::Shim::rw;
         *rwp     = \&Mite::Shim::rwp;
@@ -807,6 +808,7 @@
 
     sub __META__ {
         no strict 'refs';
+        no warnings 'once';
         my $class = shift;
         $class = ref($class) || $class;
         my $linear_isa = mro::get_linear_isa($class);
