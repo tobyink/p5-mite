@@ -14,7 +14,7 @@ has foo =>
     local_writer => 1;
 
 package MyTest2;
-use Mite::Shim;
+use Mite::Shim qw( guard );
 extends 'MyTest';
 has '+foo' => predicate => 1;
 1;

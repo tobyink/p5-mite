@@ -144,6 +144,18 @@ C<blessed> from L<Scalar::Util> can also be imported.
 
     use Your::Project::Mite qw( blessed );
 
+=head2 C<guard>
+
+A function similar to C<guard> from L<Scope::Guard> can be imported.
+
+    use Your::Project::Mite qw( guard );
+    
+    # Says "Hello world"
+    do {
+        my $guard = sub { print "world\n" };
+        print "Hello ";
+    };
+
 =head1 BUGS
 
 Please report any bugs to L<https://github.com/tobyink/p5-mite/issues>.

@@ -612,11 +612,11 @@ my %code_template;
             : sprintf( 'sub { %s }', $code_template{predicate}->( $self ) );
         my $CLEAR = $self->clearer ? $self->_q( $self->_expand_name( $self->clearer ) )
             : sprintf( 'sub { %s }', $code_template{clearer}->( $self ) );
-        my $SHIM = eval { $self->compiling_class->shim_name }
-            || eval { $self->class->shim_name }
-            || 'Scope::Guard';
+        my $GUARD_NS = $self->compiling_class->imported_functions->{guard} ? ''
+            : ( eval { $self->compiling_class->shim_name } || eval { $self->class->shim_name } || die() );
+        $GUARD_NS .= '::' if $GUARD_NS;
 
-        return sprintf <<'CODE', $CROAK, $GET, $SET, $HAS, $CLEAR, $SHIM;
+        return sprintf <<'CODE', $CROAK, $GET, $SET, $HAS, $CLEAR, $GUARD_NS;
 
     defined wantarray or %s( "This method cannot be called invoid context" );
     my $get = %s;
@@ -629,7 +629,7 @@ my %code_template;
         ? do { $old = $self->$get; sub { $self->$set( $old ) } }
         : sub { $self->$clear };
     @_ == 2 ? $self->$set( $new ) : $self->$clear;
-    &%s::guard( $restorer, $old );
+    &%sguard( $restorer, $old );
 CODE
     },
 );
