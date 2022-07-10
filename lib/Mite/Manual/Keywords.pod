@@ -48,6 +48,22 @@ The C<< -all >> flag imports everything possible.
 Like C<has> in Moose, this declares one or more attributes. See
 L<Mite::Manual::Attributes> for further details.
 
+Mite supports the shortcut found in L<Mojo::Base> and L<Object::Simple>:
+
+    has $name => $default;
+
+In these cases, if C<$default> is a coderef, the attribute will use it as
+a I<builder> and assume the attribute C<< is => 'lazy' >>, and otherwise
+will treat C<$default> as a I<default> and assume the attribute
+C<< is => 'ro' >>.
+
+If additional options are needed that can be provided, but by that point
+it's probably better to abandon the shortcut syntax.
+
+    has myattr => sub {
+        return {};
+    }, is => 'rwp', isa => 'HashRef';
+
 =head2 C<< extends @parents >>
 
 Declares the parent classes for your class.

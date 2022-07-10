@@ -126,15 +126,21 @@ sub inject_mite_functions {
     ${ $package .'::MITE_SHIM' } = ref( $shim );
 
     my $has = sub {
-        my ( $names, %args ) = @_;
-        $names = [$names] unless ref $names;
+        my $names = shift;
+        if ( @_ % 2 ) {
+            my $default = shift;
+            unshift @_, ( 'CODE' eq ref( $default ) )
+                ? ( is => lazy, builder => $default )
+                : ( is => ro, default => $default );
+        }
+        my %spec = @_;
 
-        for my $name ( @$names ) {
+        for my $name ( ref($names) ? @$names : $names ) {
            if( my $is_extension = $name =~ s{^\+}{} ) {
                $pkg->extend_attribute(
                    class   => $pkg,
                    name    => $name,
-                   %args
+                   %spec
                );
            }
            else {
@@ -142,7 +148,7 @@ sub inject_mite_functions {
                my $attribute = Mite::Attribute->new(
                    class   => $pkg,
                    name    => $name,
-                   %args
+                   %spec
                );
                $pkg->add_attribute($attribute);
            }
