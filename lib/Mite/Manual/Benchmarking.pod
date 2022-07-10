@@ -18,7 +18,7 @@ Here are the results, in seconds:
 
     Toolkit:   Mite
     Load time: 0.2665
-    Run time:  00.0082
+    Run time:  0.0082
     
     Toolkit:   Moo
     Load time: 0.1684
