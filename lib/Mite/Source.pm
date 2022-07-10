@@ -82,7 +82,7 @@ __END__
 
 =head1 NAME
 
-Mite::Source - Representing the human written .pm file.
+Mite::Source - a human-written perl module within a project
 
 =head1 SYNOPSIS
 

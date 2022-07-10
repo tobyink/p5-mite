@@ -478,7 +478,7 @@ __END__
 
 =head1 NAME
 
-Mite::Project - Representing a whole project.
+Mite::Project - a whole project
 
 =head1 DESCRIPTION
 

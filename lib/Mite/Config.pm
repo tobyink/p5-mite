@@ -114,7 +114,7 @@ __END__
 
 =head1 NAME
 
-Mite::Config - Configuration file for a project.
+Mite::Config - configuration file for a project
 
 =head1 DESCRIPTION
 

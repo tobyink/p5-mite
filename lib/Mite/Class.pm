@@ -411,7 +411,7 @@ __END__
 
 =head1 NAME
 
-Mite::Class - Representing a class within a project.
+Mite::Class - a class within a project
 
 =head1 DESCRIPTION
 

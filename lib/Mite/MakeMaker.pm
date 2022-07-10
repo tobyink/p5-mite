@@ -87,7 +87,7 @@ __END__
 
 =head1 NAME
 
-Mite::MakeMaker - Use in your Makefile.PL when developing with Mite
+Mite::MakeMaker - use in your Makefile.PL when developing with Mite
 
 =head1 SYNOPSIS
 

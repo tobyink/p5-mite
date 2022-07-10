@@ -745,7 +745,7 @@ __END__
 
 =head1 NAME
 
-Mite::Attribute - Representing an attribute in a class.
+Mite::Attribute - an attribute in a class or role
 
 =head1 DESCRIPTION
 

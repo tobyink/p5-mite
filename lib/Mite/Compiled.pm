@@ -102,7 +102,7 @@ __END__
 
 =head1 NAME
 
-Mite::Compiled - The extra class file written by Mite.
+Mite::Compiled - the extra compiled module file written by Mite
 
 =head1 SYNOPSIS
 

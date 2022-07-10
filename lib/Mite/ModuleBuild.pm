@@ -39,7 +39,7 @@ __END__
 
 =head1 NAME
 
-Mite::ModuleBuild - Use in your Build.PL when developing with Mite
+Mite::ModuleBuild - use in your Build.PL when developing with Mite
 
 =head1 SYNOPSIS
 

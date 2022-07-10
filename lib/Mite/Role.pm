@@ -491,7 +491,7 @@ __END__
 
 =head1 NAME
 
-Mite::Role - Representing a role within a project.
+Mite::Role - a role within a project
 
 =head1 DESCRIPTION
 
