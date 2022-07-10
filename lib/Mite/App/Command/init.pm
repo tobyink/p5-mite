@@ -32,7 +32,7 @@ sub execute {
 
     printf "Initialized mite in %s\n", $self->config->mite_dir;
 
-    return;
+    return 0;
 }
 
 1;
