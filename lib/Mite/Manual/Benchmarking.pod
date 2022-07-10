@@ -1,0 +1,74 @@
+=pod
+
+=head1 NAME
+
+Mite::Manual::Benchmarking - comparing Mite with Moose, Moo, and Mouse
+
+=head1 MANUAL
+
+The relative performance of L<Moose>, L<Moo>, L<Mouse>, and Mite will vary
+depending on your project.
+
+However, as a general test I created 500 simple test classes, each with a
+couple of attributes with defaults and builders, and a method, then a script
+which loaded all the classes, instantiated an object of each, and called
+the method.
+
+Here are the results, in seconds:
+
+    Toolkit:   Mite
+    Load time: 0.2665
+    Run time:  00.0082
+    
+    Toolkit:   Moo
+    Load time: 0.1684
+    Run time:  0.0945
+    
+    Toolkit:   Moose
+    Load time: 0.7862
+    Run time:  0.0089
+    
+    Toolkit:   Mouse
+    Load time: 0.0718
+    Run time:  0.0045
+    
+    Toolkit:   Mouse (MOUSE_PUREPERL=1)
+    Load time: 0.1186
+    Run time:  0.0348
+
+Mite is one of the slowest at load time, probably because each class requires
+loading two files instead of one. Only Moose is slower.
+
+However, once it's running, Mite beats both Moo and the pure Perl version of
+Mouse, and runs at about the same speed as Moose. Only the XS version of Mouse
+runs significantly faster.
+
+For most applications, running speed is likely to be more important than
+loading speed, especially as projects with this many classes are not common!
+
+=head1 BUGS
+
+Please report any bugs to L<https://github.com/tobyink/p5-mite/issues>.
+
+=head1 AUTHOR
+
+Michael G Schwern E<lt>mschwern@cpan.orgE<gt>.
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2011-2014 by Michael G Schwern.
+
+This software is copyright (c) 2022 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut
