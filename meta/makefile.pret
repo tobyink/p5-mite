@@ -6,7 +6,7 @@
 	:runtime-requirement    [ :on "perl 5.010001"^^:CpanId ];
 	:runtime-requirement    [ :on "namespace::autoclean 0"^^:CpanId ];
 	:runtime-requirement    [ :on "Getopt::Kingpin 0.10"^^:CpanId ];
-	:runtime-requirement    [ :on "Module::Pluggable"^^:CpanId ];
+	:runtime-requirement    [ :on "Module::Pluggable 5.2"^^:CpanId ];
 	:runtime-requirement    [ :on "Import::Into 0"^^:CpanId ];
 	:runtime-requirement    [ :on "Path::Tiny 0.052"^^:CpanId ];
 	:runtime-requirement    [ :on "Types::Path::Tiny 0"^^:CpanId ];
