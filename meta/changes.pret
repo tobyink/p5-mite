@@ -1,6 +1,15 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.006003 cpan:TOBYINK`
+	issued  2022-07-10;
+	changeset [
+		item [
+			a dcs:Documentation;
+			label "Correct abstracts for some modules";
+		];
+	].
+
 `Mite 0.006002 cpan:TOBYINK`
 	issued  2022-07-10;
 	changeset [
