@@ -70,10 +70,6 @@ sub BUILD {
     $reg->add_types( $library ) if $library;
 }
 
-sub skip_compiling {
-    return false;
-}
-
 sub _all_subs {
     my $self = shift;
     my $package = $self->name;
