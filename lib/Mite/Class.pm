@@ -374,14 +374,13 @@ sub _compile_init_attributes {
         values %{ $self->all_attributes };
     };
     for my $attr ( @attributes ) {
-        $attr->compiling_class( $self );
+        my $guard = $attr->locally_set_compiling_class( $self );
         my @lines = grep !!$_, $attr->compile_init( $selfvar, $argvar );
         if ( @lines ) {
             push @code, sprintf "# Attribute: %s", $attr->name;
             push @code, @lines;
             push @code, '';
         }
-        $attr->clear_compiling_class;
     }
 
     return join "\n", map { /\S/ ? "    $_" : '' } @code;
@@ -395,9 +394,8 @@ sub _compile_attribute_accessors {
 
     my $code = 'my $__XS = !$ENV{MITE_PURE_PERL} && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };' . "\n\n";
     for my $name ( sort keys %$attributes ) {
-        $attributes->{$name}->compiling_class( $self );
+        my $guard = $attributes->{$name}->locally_set_compiling_class( $self );
         $code .= $attributes->{$name}->compile( xs_condition => '$__XS' );
-        $attributes->{$name}->clear_compiling_class;
     }
 
     return $code;

@@ -22,8 +22,7 @@ has compiling_class =>
   init_arg      => undef,
   is            => rw,
   isa           => Object,
-  clearer       => true,
-  predicate     => true;
+  local_writer  => true;
 
 has _class_for_default =>
   is            => rw,
@@ -140,7 +139,7 @@ for my $function ( qw/ carp croak confess / ) {
     *{"_function_for_$function"} = sub {
         my $self = shift;
         return $self->compiling_class->${\"_function_for_$function"}
-            if $self->has_compiling_class;
+            if defined $self->compiling_class;
         my $shim = eval { $self->class->shim_name };
         return "$shim\::$function" if $shim;
         $function eq 'carp' ? 'warn sprintf' : 'die sprintf';

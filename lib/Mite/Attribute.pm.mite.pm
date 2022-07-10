@@ -1262,17 +1262,6 @@
     }
 
     # Accessors for compiling_class
-    if ($__XS) {
-        Class::XSAccessor->import(
-            chained             => 1,
-            "exists_predicates" =>
-              { "has_compiling_class" => "compiling_class" },
-        );
-    }
-    else {
-        *has_compiling_class = sub { exists $_[0]{"compiling_class"} };
-    }
-
     sub compiling_class {
         @_ > 1
           ? do {
@@ -1291,7 +1280,25 @@
           }
           : ( $_[0]{"compiling_class"} );
     }
-    sub clear_compiling_class { delete $_[0]{"compiling_class"}; $_[0]; }
+
+    sub locally_set_compiling_class {
+        defined wantarray
+          or croak("This method cannot be called invoid context");
+        my $get   = "compiling_class";
+        my $set   = "compiling_class";
+        my $has   = sub { exists $_[0]{"compiling_class"} };
+        my $clear = sub { delete $_[0]{"compiling_class"}; $_[0]; };
+        my $old   = undef;
+        my ( $self, $new ) = @_;
+        my $restorer = $self->$has
+          ? do {
+            $old = $self->$get;
+            sub { $self->$set($old) }
+          }
+          : sub { $self->$clear };
+        @_ == 2 ? $self->$set($new) : $self->$clear;
+        &guard( $restorer, $old );
+    }
 
     # Accessors for default
     if ($__XS) {
