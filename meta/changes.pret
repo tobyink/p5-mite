@@ -1,6 +1,23 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.006002 cpan:TOBYINK`
+	issued  2022-07-10;
+	changeset [
+		item [
+			a dcs:Change;
+			label "The Mite development tool now uses Getopt::Kingpin and Module::Pluggable instead of App::Cmd, as recent versions of App::Cmd dropped support for Perl older than 5.20, limiting the versions of Perl the Mite development tool could run under. The Mite development tool now runs on Perl 5.10.1 or above, and projects compiled with it run on Perl 5.8.1 and above.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Fix minor typo in documentation for guard keyword.";
+		];
+		item [
+			a dcs:Bugfix;
+			label "Fix various minor bugs which were causing warnings on older Perls.";
+		];
+	].
+
 `Mite 0.006001 cpan:TOBYINK`
 	issued  2022-07-09;
 	changeset [

@@ -6,7 +6,7 @@ package Mite::Source;
 use Mite::Miteception -all;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.006001';
+our $VERSION   = '0.006002';
 
 has file =>
   is            => ro,
