@@ -231,8 +231,7 @@
         my @args = @_;
         return run_in_child(sub {
             require Mite::App;
-            my $app = Mite::App->new;
-            $app->execute_command( $app->prepare_command(@args) );
+            Mite::App->run( \@args );
         });
     }
 

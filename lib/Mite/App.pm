@@ -97,7 +97,7 @@ sub run {
         ? $self->commands->{ $parsed->name }
         : $self->commands->{ $self->_default_command };
 
-    exit( $command->execute );
+    return $command->execute;
 }
 
 1;

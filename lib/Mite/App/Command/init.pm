@@ -28,7 +28,7 @@ sub execute {
     my $self = shift;
 
     my $project_name = $self->kingpin_command->args->get( 'project' );
-    $self->project->init_project($project_name);
+    $self->project->init_project( $project_name->value );
 
     printf "Initialized mite in %s\n", $self->config->mite_dir;
 
