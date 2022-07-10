@@ -44,7 +44,7 @@ __END__
 
 =head1 NAME
 
-Mite::Role::Tiny - Representing a role built with Role::Tiny.
+Mite::Role::Tiny - a role within a project, but using Role::Tiny
 
 =head1 DESCRIPTION
 
