@@ -108,7 +108,7 @@ __END__
 
 =head1 NAME
 
-Mite::App - glue between Mite and App::Cmd.
+Mite::App - guts for bin/mite
 
 =head1 DESCRIPTION
 

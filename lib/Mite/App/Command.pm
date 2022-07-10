@@ -80,7 +80,7 @@ __END__
 
 =head1 NAME
 
-Mite::App::Command - glue between Mite and App::Cmd::Command.
+Mite::App::Command - base class for subcommands for bin/mite
 
 =head1 DESCRIPTION
 
