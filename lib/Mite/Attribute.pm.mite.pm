@@ -1283,7 +1283,7 @@
 
     sub locally_set_compiling_class {
         defined wantarray
-          or croak("This method cannot be called invoid context");
+          or croak("This method cannot be called in void context");
         my $get   = "compiling_class";
         my $set   = "compiling_class";
         my $has   = sub { exists $_[0]{"compiling_class"} };
