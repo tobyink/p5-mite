@@ -55,6 +55,16 @@ or do {
     *Devel::GlobalDestruction::in_global_destruction = sub { undef; };
 };
 
+{
+    no strict 'refs';
+    my $GUARD_PACKAGE = __PACKAGE__ . '::Guard';
+    *{"$GUARD_PACKAGE\::DESTROY"} = sub { $_[0][1]->() unless $_[0][0] };
+    *{"$GUARD_PACKAGE\::restore"} = sub { $_[0]->DESTROY; $_[0][0] = 1 };
+    *{"$GUARD_PACKAGE\::dismiss"} = sub {                 $_[0][0] = 1 };
+    *{"$GUARD_PACKAGE\::peek"}    = sub { $_[0][2] };
+    *guard = sub (&) { bless [ 0, @_ ] => $GUARD_PACKAGE };
+}
+
 my $parse_mm_args = sub {
     my $coderef = pop;
     my $names   = [ map { ref($_) ? @$_ : $_ } @_ ];
