@@ -18,11 +18,10 @@ sub new {
     my $args  = $meta->{HAS_BUILDARGS} ? $class->BUILDARGS( @_ ) : { ( @_ == 1 ) ? %{$_[0]} : @_ };
     my $no_build = delete $args->{__no_BUILD__};
 
-    # Initialize attributes
     
 
     # Enforce strict constructor
-    my @unknown = grep not( do { package Bad::Example::Mite; defined($_) and do { ref(\$_) eq 'SCALAR' or ref(\(my $val = $_)) eq 'SCALAR' } } ), keys %{$args}; @unknown and require Carp and Carp::croak("Unexpected keys in constructor: " . join(q[, ], sort @unknown));
+    my @unknown = grep not( do { package Bad::Example::Mite; defined($_) and do { ref(\$_) eq 'SCALAR' or ref(\(my $val = $_)) eq 'SCALAR' } } ), keys %{$args}; @unknown and Bad::Example::Mite::croak( "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
 
     # Call BUILD methods
     $self->BUILDALL( $args ) if ( ! $no_build and @{ $meta->{BUILD} || [] } );
@@ -57,6 +56,7 @@ sub DESTROY {
 
 sub __META__ {
     no strict 'refs';
+    no warnings 'once';
     my $class      = shift; $class = ref($class) || $class;
     my $linear_isa = mro::get_linear_isa( $class );
     return {

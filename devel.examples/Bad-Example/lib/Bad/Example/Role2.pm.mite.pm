@@ -33,13 +33,12 @@ sub __FINALIZE_APPLICATION__ {
 
     my @missing_methods;
     @missing_methods = grep( !$target->can($_), "missing" )
-        and require Carp
-        and Carp::croak( "$me requires $target to implement methods: " . join q[, ], @missing_methods );
+        and Bad::Example::Mite::croak( "$me requires $target to implement methods: " . join q[, ], @missing_methods );
 
     my @roles = (  );
     my %nextargs = %{ $args || {} };
     ( $nextargs{-indirect} ||= 0 )++;
-    die "PANIC!" if $nextargs{-indirect} > 100;
+    Bad::Example::Mite::croak( "PANIC!" ) if $nextargs{-indirect} > 100;
     for my $role ( @roles ) {
         $role->__FINALIZE_APPLICATION__( $target, { %nextargs } );
     }
