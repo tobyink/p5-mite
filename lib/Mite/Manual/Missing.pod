@@ -32,6 +32,61 @@ to make sure the Mite shim is loaded I<before> Sub::HandlesVia.
 
 Upgrade to L<Moose> if you need this.
 
+=head2 Run-Time Class/Role Building
+
+Your constructor, destructor, and accessors are build on the developer's
+machine when C<< mite compile >> is run, rather than at run-time on the
+end user's machine like L<Moose>, L<Mouse>, and L<Moo> do. Role application
+is mostly performed during C<< mite compile >> too, with the exception of
+applying method modifiers, and checking that C<requires> is satisfied,
+which happens at run-time.
+
+This means any run-time logic used to construct your classes and roles
+is unlikely to work. As an example:
+
+    package Your::Project::SomeClass;
+    use Your::Project::Mite;
+    
+    if ( $ENV{YOUR_PROJECT_DEBUG} ) {
+        with 'Your::Project::Trait::Verbose';
+    }
+    
+    ...;
+    
+    1;
+
+Best case scenario, this will work, but it's the value of C<YOUR_PROJECT_DEBUG>
+on the developer's machine when they run C<< mite compile >> which is honoured,
+and becomes hard-coded into the generated class. Worst case scenario, things
+break in interesting and unusual ways.
+
+Logic which is guaranteed to run the same on both the developer's machine
+and the end user's machine should be fine. For example, this should be fine:
+
+    for my $attr ( qw( foo bar baz ) ) {
+        has $attr => (
+            reader => "get_$attr",
+            writer => "set_$attr",
+        );
+    }
+
+However Mite provides a lot of shortcuts which Moose doesn't, so you're less
+likely to need that sort of logic anyway. You could just write:
+
+    has [ qw( foo bar baz ) ] => (
+        reader => 'get_%s',
+        writer => 'set_%s',
+    );
+
+Or even:
+
+    has [ qw( foo bar baz ) ] => (
+        reader => true,
+        writer => true,
+    );
+
+And it will work the same!
+
 =head1 BUGS
 
 Please report any bugs to L<https://github.com/tobyink/p5-mite/issues>.
