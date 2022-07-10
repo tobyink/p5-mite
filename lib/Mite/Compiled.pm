@@ -57,7 +57,7 @@ sub compile {
             );
         }
         !$flag;
-    } and length($tidied) and ( $code = $tidied );
+    } and defined($tidied) and length($tidied) and ($code = $tidied);
 
     return $code;
 }
