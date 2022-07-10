@@ -11,7 +11,7 @@ use Mite::Shim;
 extends 'B::Deparse';
 sub FOREIGNBUILDARGS {
     my $class = shift;
-    my %args = ( @_ == 1 ) ? %%{$_[0]} : @_;
+    my %args = ( @_ == 1 ) ? %{$_[0]} : @_;
     $args{use_dumper} ? ( '-d' ) : ();
 }
 
