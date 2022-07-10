@@ -617,7 +617,7 @@ my %code_template;
 
         return sprintf <<'CODE', $CROAK, $GET, $SET, $HAS, $CLEAR, $GUARD_NS;
 
-    defined wantarray or %s( "This method cannot be called invoid context" );
+    defined wantarray or %s( "This method cannot be called in void context" );
     my $get = %s;
     my $set = %s;
     my $has = %s;
