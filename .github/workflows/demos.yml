@@ -50,7 +50,7 @@ jobs:
       fail-fast: false
       matrix:
         os: ['ubuntu-latest' ]
-        perl: [ '5.36', '5.34', '5.20' ]
+        perl: [ '5.10.1', '5.12', '5.34', '5.36' ]
         demo: [ 'Acme-Mitey-Cards', 'Bad-Example' ]
     steps:
       - name: Get dist artifact
