@@ -7,7 +7,7 @@ use Test::Output;
 tests "help" => sub {
     stdout_like {
         mite_command "help";
-    } qr/Available commands/;
+    } qr/Commands/;
 
     ok !$INC{"Mite/App.pm"}, "does not pollute the current process";
 };
@@ -15,7 +15,7 @@ tests "help" => sub {
 tests "can capture message on failure" => sub {
     stderr_like {
         ok !eval { mite_command("init"); };
-    } qr{Usage: };
+    } qr{required arg 'project' not provided}i;
 };
 
 done_testing;
