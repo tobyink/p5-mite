@@ -234,7 +234,7 @@ sub new {
     my $args  = %s;
     my $no_build = delete $args->{__no_BUILD__};
 
-    %s
+%s
 
     # Enforce strict constructor
     %s
