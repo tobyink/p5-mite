@@ -8,8 +8,10 @@ Mite::Manual::Missing - major Moose features not supported by Mite
 
 =head2 Native Attribute Traits
 
-L<Sub::HandlesVia> 0.026 and above should work with Mite classes. You need
-to make sure the Mite shim is loaded I<before> Sub::HandlesVia.
+Mite doesn't support native attribute traits (i.e. delegating to non-objects).
+However, you can accomplish this by using L<Sub::HandlesVia> 0.026 or above.
+You need to make sure the Mite shim is loaded I<before> Sub::HandlesVia, and
+this will add an extra dependency to your project.
 
     package Your::Project::Class;
     use Your::Project::Mite;
@@ -86,6 +88,9 @@ Or even:
     );
 
 And it will work the same!
+
+If you do need to be able to construct your classes and roles at run time,
+switch to L<Moose> or L<Moo>.
 
 =head1 BUGS
 
