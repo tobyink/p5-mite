@@ -119,6 +119,8 @@ L<Mite::Manual::Features> - other features provided by Mite.
 
 L<Mite::Manual::Missing> - major Moose features not supported by Mite.
 
+L<Mite::Manual::Benchmarking> - comparing Mite with Moose, Moo, and Mouse.
+
 L<https://metacpan.org/dist/Acme-Mitey-Cards> - demo project.
 
 L<Moose> is the complete Perl 5 OO module which this is all based on.
