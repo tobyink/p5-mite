@@ -1,6 +1,19 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.006006 cpan:TOBYINK`
+	issued  2022-07-10;
+	changeset [
+		item [
+			a dcs:Documentation;
+			label "Include benchmarking results.";
+		];
+		item [
+			a dcs:Bugfix;
+			label "Eliminate warning from `mite init`.";
+		];
+	].
+
 `Mite 0.006005 cpan:TOBYINK`
 	issued  2022-07-10;
 	changeset [

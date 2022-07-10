@@ -6,7 +6,7 @@ package Mite::App::Command;
 use Mite::Miteception -all;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.006005';
+our $VERSION   = '0.006006';
 
 has app => (
     is => ro,
