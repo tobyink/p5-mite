@@ -1,6 +1,19 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.006004 cpan:TOBYINK`
+	issued  2022-07-10;
+	changeset [
+		item [
+			a dcs:Documentation;
+			label "Change abstracts for some modules";
+		];
+		item [
+			a dcs:Addition;
+			label "Support `has $name => $default;` syntax like Mojo::Base and Object::Simple.";
+		];
+	].
+
 `Mite 0.006003 cpan:TOBYINK`
 	issued  2022-07-10;
 	changeset [
