@@ -110,7 +110,7 @@ sub inject_mite_functions {
         $package = "$fake_ns\::$package";
     }
 
-    warn "Inject functions into: $package\n" if $self->debug;
+    warn "Gather: $package\n" if $self->debug;
 
     $source //= $self->source_for(
         Path::Tiny::path( $ENV{MITE_LIMITED_PARSING} // $file )
@@ -241,7 +241,7 @@ sub write_mites {
     my $self = shift;
 
     for my $source (values %{$self->sources}) {
-        warn "Write file: ${\ $source->compiled->file }\n" if $self->debug;
+        warn "Write mite: ${\ $source->compiled->file }\n" if $self->debug;
         $source->compiled->write(
             module_fakeout_namespace => $self->_module_fakeout_namespace,
         );
@@ -267,7 +267,7 @@ sub load_files {
 sub _load_file {
     my ( $self, $file, $inc_dir ) = @_;
 
-    warn "Load file: $file\n" if $self->debug;
+    warn "Load module: $file\n" if $self->debug;
 
     $file = Path::Tiny::path($file);
 
@@ -340,6 +340,7 @@ sub clean_mites {
     $dir //= $self->config->data->{compiled_to};
 
     for my $file ($self->find_mites($dir)) {
+        warn "Clean mite: $file\n" if $self->debug;
         Path::Tiny::path($file)->remove;
     }
 
@@ -348,7 +349,7 @@ sub clean_mites {
 
 sub clean_shim {
     my $self = shift;
-
+    warn "Clean shim: ${\ $self->_project_shim_file }\n" if $self->debug;
     return $self->_project_shim_file->remove;
 }
 
@@ -371,6 +372,8 @@ sub _recurse_directory {
 sub init_project {
     my ( $self, $project_name ) = ( shift, @_ );
 
+    warn "Init\n" if $self->debug;
+
     $self->config->make_mite_dir;
 
     $self->write_default_config(
@@ -385,6 +388,8 @@ sub add_mite_shim {
 
     my $shim_file = $self->_project_shim_file;
     $shim_file->parent->mkpath;
+
+    warn "Write shim: $shim_file\n" if $self->debug;
 
     my $shim_package = $self->config->data->{shim};
     return $shim_file if $shim_package eq 'Mite::Shim';

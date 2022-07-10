@@ -11,30 +11,26 @@ our $VERSION   = '0.006001';
 
 ##-
 
-sub usage_desc {
-    return "%c init %o <project name>";
-}
-
 sub abstract {
-    return "Begin using mite with your project";
+    return "Begin using mite with your project.";
 }
 
-sub validate_args {
-    my ( $self, $opts, $args ) = ( shift, @_ );
+around _build_kingpin_command => sub {
+    my ( $next, $self, @args ) = @_;
 
-    $self->usage_error("init needs the name of your project") unless @$args;
-}
+    my $command = $self->$next( @args );
+    $command->arg( 'project', 'Project name.' )->required->string;
+
+    return $command;
+};
 
 sub execute {
-    my ( $self, $opts, $args ) = ( shift, @_ );
+    my $self = shift;
 
-    my $project_name = shift @$args;
+    my $project_name = $self->kingpin_command->args->get( 'project' );
+    $self->project->init_project($project_name);
 
-    require Mite::Project;
-    my $project = Mite::Project->default;
-    $project->init_project($project_name);
-
-    say sprintf "Initialized mite in %s", $project->config->mite_dir;
+    printf "Initialized mite in %s\n", $self->config->mite_dir;
 
     return;
 }

@@ -40,18 +40,39 @@
           : { ( @_ == 1 ) ? %{ $_[0] } : @_ };
         my $no_build = delete $args->{__no_BUILD__};
 
-        # Enforce strict constructor
-        my @unknown = grep not(
+        # Attribute: app
+        croak "Missing key in constructor: app" unless exists $args->{"app"};
+        (
             do {
 
                 package Mite::Shim;
-                defined($_) and do {
-                    ref( \$_ ) eq 'SCALAR'
-                      or ref( \( my $val = $_ ) ) eq 'SCALAR';
-                }
+                use Scalar::Util ();
+                Scalar::Util::blessed( $args->{"app"} );
             }
-          ),
-          keys %{$args};
+          )
+          or croak "Type check failed in constructor: %s should be %s", "app",
+          "Object";
+        $self->{"app"} = $args->{"app"};
+        require Scalar::Util && Scalar::Util::weaken( $self->{"app"} )
+          if exists $self->{"app"};
+
+        # Attribute: kingpin_command
+        if ( exists $args->{"kingpin_command"} ) {
+            (
+                do {
+
+                    package Mite::Shim;
+                    use Scalar::Util ();
+                    Scalar::Util::blessed( $args->{"kingpin_command"} );
+                }
+              )
+              or croak "Type check failed in constructor: %s should be %s",
+              "kingpin_command", "Object";
+            $self->{"kingpin_command"} = $args->{"kingpin_command"};
+        }
+
+        # Enforce strict constructor
+        my @unknown = grep not(/\A(?:app|kingpin_command)\z/), keys %{$args};
         @unknown
           and croak(
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );

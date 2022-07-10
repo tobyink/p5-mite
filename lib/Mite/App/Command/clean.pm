@@ -12,20 +12,19 @@ our $VERSION   = '0.006001';
 ##-
 
 sub abstract {
-    return "Remove compiled mite files";
+    return "Remove compiled mite files.";
 }
 
 sub execute {
-    my ( $self, $opts, $args ) = ( shift, @_ );
+    my $self = shift;
 
-    return if $self->should_exit_quietly($opts); 
+    return 0 if $self->should_exit_quietly; 
 
-    require Mite::Project;
-    my $project = Mite::Project->default;
+    my $project = $self->project;
     $project->clean_mites;
     $project->clean_shim;
 
-    return;
+    return 0;
 }
 
 1;

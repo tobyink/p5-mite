@@ -4,54 +4,73 @@ use warnings;
 
 package Mite::App::Command;
 use Mite::Miteception -all;
-extends qw(App::Cmd::Command);
 
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.006001';
 
+has app => (
+    is => ro,
+    isa => Object,
+    required => true,
+    weak_ref => true,
+    handles => [ 'config', 'project', 'kingpin' ],
+);
+
+has kingpin_command => (
+    is => lazy,
+    isa => Object,
+);
+
 ##-
 
-sub opt_spec {
-    my ($class, $app) = (shift, @_);
+sub command_name {
+   my $self = shift;
+   my $class = ref($self) || $self;
 
-    return(
-      [ "search-mite-dir!" => "only look for .mite/ in the current directory",
-        { default => 1 } ],
-      [ "exit-if-no-mite-dir!" => "exit quietly if a .mite dir cannot be found",
-        { default => 0 } ],
-      $class->options($app)
-    );
+   my ( $part ) = ( $class =~ /::(\w+)$/ );
+
+   return $part;
 }
 
+sub abstract {
+    return '???';
+}
 
-sub options {
-    my ($class, $app) = (shift, @_);
+sub BUILD {
+    my ( $self, $app ) = @_;
+
+    my $name = $self->command_name;
+    $self->app->commands->{$name} = $self;
+
+    $self->kingpin_command; # force build
 
     return;
 }
 
+sub _build_kingpin_command {
+    my ( $self ) = @_;
+
+    return $self->kingpin->command( $self->command_name, $self->abstract );
+}
 
 sub should_exit_quietly {
-    my ($self, $opts) = (shift, @_);
+    my $self = shift;
 
     my $config = $self->config;
 
-    return unless $opts->{exit_if_no_mite_dir};
-    return 1 if !$opts->{search_mite_dir} && !$config->dir_has_mite(".");
-    return 1 if !$config->find_mite_dir;
+    return false
+        unless $self->app->get_flag_value( 'exit-if-no-mite-dir' );
+
+    return true
+        if !$self->app->get_flag_value( 'search-mite-dir' )
+        && !$config->dir_has_mite(".");
+
+    return true
+        if !$config->find_mite_dir;
+
+    return false;
 }
 
-
-sub project {
-    require Mite::Project;
-    return Mite::Project->default;
-}
-
-sub config {
-    my $self = shift;
-
-    return $self->project->config;
-}
 
 1;
 

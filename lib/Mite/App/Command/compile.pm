@@ -12,27 +12,20 @@ our $VERSION   = '0.006001';
 ##-
 
 sub abstract {
-    return "Make your code ready to run";
+    return "Make your code ready to run.";
 }
 
 sub execute {
-    my ( $self, $opts, $args ) = ( shift, @_ );
+    my $self = shift;
 
-    return if $self->should_exit_quietly($opts);
+    return 0 if $self->should_exit_quietly;
 
-    my $config = Mite::Config->new(
-        search_for_mite_dir => $opts->{search_mite_dir}
-    );
-    my $project = Mite::Project->new(
-        config => $config
-    );
-    Mite::Project->set_default( $project );
-
+    my $project = $self->project;
     $project->add_mite_shim;
     $project->load_directory;
     $project->write_mites;
 
-    return;
+    return 0;
 }
 
 1;

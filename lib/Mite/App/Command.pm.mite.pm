@@ -22,14 +22,6 @@
         *true    = \&Mite::Shim::true;
     }
 
-    BEGIN {
-        require App::Cmd::Command;
-
-        use mro 'c3';
-        our @ISA;
-        push @ISA, "App::Cmd::Command";
-    }
-
     sub new {
         my $class = ref( $_[0] ) ? ref(shift) : shift;
         my $meta  = ( $Mite::META{$class} ||= $class->__META__ );
@@ -40,18 +32,39 @@
           : { ( @_ == 1 ) ? %{ $_[0] } : @_ };
         my $no_build = delete $args->{__no_BUILD__};
 
-        # Enforce strict constructor
-        my @unknown = grep not(
+        # Attribute: app
+        croak "Missing key in constructor: app" unless exists $args->{"app"};
+        (
             do {
 
                 package Mite::Shim;
-                defined($_) and do {
-                    ref( \$_ ) eq 'SCALAR'
-                      or ref( \( my $val = $_ ) ) eq 'SCALAR';
-                }
+                use Scalar::Util ();
+                Scalar::Util::blessed( $args->{"app"} );
             }
-          ),
-          keys %{$args};
+          )
+          or croak "Type check failed in constructor: %s should be %s", "app",
+          "Object";
+        $self->{"app"} = $args->{"app"};
+        require Scalar::Util && Scalar::Util::weaken( $self->{"app"} )
+          if exists $self->{"app"};
+
+        # Attribute: kingpin_command
+        if ( exists $args->{"kingpin_command"} ) {
+            (
+                do {
+
+                    package Mite::Shim;
+                    use Scalar::Util ();
+                    Scalar::Util::blessed( $args->{"kingpin_command"} );
+                }
+              )
+              or croak "Type check failed in constructor: %s should be %s",
+              "kingpin_command", "Object";
+            $self->{"kingpin_command"} = $args->{"kingpin_command"};
+        }
+
+        # Enforce strict constructor
+        my @unknown = grep not(/\A(?:app|kingpin_command)\z/), keys %{$args};
         @unknown
           and croak(
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
@@ -118,6 +131,59 @@
 
     sub does {
         shift->DOES(@_);
+    }
+
+    my $__XS = !$ENV{MITE_PURE_PERL}
+      && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
+
+    # Accessors for app
+    if ($__XS) {
+        Class::XSAccessor->import(
+            chained   => 1,
+            "getters" => { "app" => "app" },
+        );
+    }
+    else {
+        *app = sub {
+            @_ > 1
+              ? croak("app is a read-only attribute of @{[ref $_[0]]}")
+              : $_[0]{"app"};
+        };
+    }
+
+    sub _assert_blessed_app {
+        my $object = do { $_[0]{"app"} };
+        blessed($object) or croak("app is not a blessed object");
+        $object;
+    }
+
+    # Delegated methods for app
+    sub config  { shift->_assert_blessed_app->config(@_) }
+    sub kingpin { shift->_assert_blessed_app->kingpin(@_) }
+    sub project { shift->_assert_blessed_app->project(@_) }
+
+    # Accessors for kingpin_command
+    sub kingpin_command {
+        @_ > 1
+          ? croak("kingpin_command is a read-only attribute of @{[ref $_[0]]}")
+          : (
+            exists( $_[0]{"kingpin_command"} ) ? $_[0]{"kingpin_command"} : (
+                $_[0]{"kingpin_command"} = do {
+                    my $default_value = $_[0]->_build_kingpin_command;
+                    (
+                        do {
+
+                            package Mite::Shim;
+                            use Scalar::Util ();
+                            Scalar::Util::blessed($default_value);
+                        }
+                      )
+                      or croak( "Type check failed in default: %s should be %s",
+                        "kingpin_command", "Object" );
+                    $default_value;
+                }
+            )
+          );
     }
 
     1;
