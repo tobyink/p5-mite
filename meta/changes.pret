@@ -16,6 +16,10 @@
 			a dcs:Bugfix;
 			label "Fix various minor bugs which were causing warnings on older Perls.";
 		];
+		item [
+			a dcs:Addition;
+			label "New `mite preview FILENAME` command to preview the Perl code Mite will generate for a file.";
+		];
 	].
 
 `Mite 0.006001 cpan:TOBYINK`
