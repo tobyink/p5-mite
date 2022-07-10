@@ -48,7 +48,7 @@ __END__
 
 =head1 NAME
 
-Mite::App::Command - provides the "compile" command
+Mite::App::Command - provides the "preview" command
 
 =head1 DESCRIPTION
 
