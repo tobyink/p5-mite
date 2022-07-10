@@ -27,6 +27,14 @@ Mite::Manual::Attributes - options for defining attributes with Mite
         trigger       => '_trigger_myattr',
     );
 
+Shortcut for a lazy builder:
+
+    has myattr => sub { ... };
+
+Shortcut for a simple default:
+
+    has myattr => "some value";
+
 =head1 MANUAL
 
 Like C<has> in Moose, this declares an attribute.
