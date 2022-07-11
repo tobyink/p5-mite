@@ -58,8 +58,8 @@ sub _build_kingpin {
     my $kingpin = Getopt::Kingpin->new;
     $kingpin->flags->get( 'help' )->short( 'h' );
     $kingpin->flag( 'verbose', 'Verbose mode.' )->short( 'v' )->bool;
-    $kingpin->flag( 'search-mite-dir', 'Only look for .mite/ in the current directory.' )->bool->default( !!1 );
-    $kingpin->flag( 'exit-if-no-mite-dir', 'Exit quietly if .mite/ cannot be found.' )->bool->default( !!0 );
+    $kingpin->flag( 'search-mite-dir', 'Only look for .mite/ in the current directory.' )->bool->default( true );
+    $kingpin->flag( 'exit-if-no-mite-dir', 'Exit quietly if .mite/ cannot be found.' )->bool->default( false );
     $kingpin->flag( 'set', 'Set config option.' )->string_hash;
 
     return $kingpin;
