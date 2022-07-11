@@ -10,6 +10,7 @@ our $VERSION   = '0.006007';
 use Import::Into;
 use Mite::Shim ();
 use Types::Standard ();
+use Types::Common::String ();
 use Types::Path::Tiny ();
 use Type::Params ();
 
@@ -48,6 +49,9 @@ sub to_import {
 	return (
 		[ 'Types::Standard' => [
 			qw( -types slurpy ),
+		] ],
+		[ 'Types::Common::String' => [
+			qw( -types ),
 		] ],
 		[ 'Types::Path::Tiny' => [
 			qw( -types ),

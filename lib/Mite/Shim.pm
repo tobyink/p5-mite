@@ -181,6 +181,9 @@ sub _make_has {
 
            'CODE' eq ref( $code = $spec{trigger} )
                and *{"$caller\::_trigger_$name"} = $code;
+
+           'CODE' eq ref( $code = $spec{clone} )
+               and *{"$caller\::_clone_$name"} = $code;
         }
 
         return;

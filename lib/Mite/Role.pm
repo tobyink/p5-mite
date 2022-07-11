@@ -22,12 +22,12 @@ has attributes =>
 
 has name =>
   is            => ro,
-  isa           => Str,
+  isa           => NonEmptyStr,
   required      => true;
 
 has shim_name =>
   is            => rw,
-  isa           => Str,
+  isa           => NonEmptyStr,
   lazy          => true,
   builder       => sub {
     my $self = shift;
@@ -47,12 +47,12 @@ has roles =>
 
 has imported_functions =>
   is            => ro,
-  isa           => HashRef[Str],
+  isa           => HashRef[NonEmptyStr],
   builder       => sub { {} };
 
 has required_methods =>
   is            => ro,
-  isa           => ArrayRef[Str],
+  isa           => ArrayRef[NonEmptyStr],
   builder       => sub { [] };
 
 ##-

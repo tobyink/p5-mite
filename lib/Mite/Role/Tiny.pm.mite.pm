@@ -72,30 +72,40 @@
 
         # Attribute: name
         croak "Missing key in constructor: name" unless exists $args->{"name"};
-        do {
+        (
+            (
+                do {
 
-            package Mite::Shim;
-            defined( $args->{"name"} ) and do {
-                ref( \$args->{"name"} ) eq 'SCALAR'
-                  or ref( \( my $val = $args->{"name"} ) ) eq 'SCALAR';
-            }
-          }
+                    package Mite::Shim;
+                    defined( $args->{"name"} ) and do {
+                        ref( \$args->{"name"} ) eq 'SCALAR'
+                          or ref( \( my $val = $args->{"name"} ) ) eq 'SCALAR';
+                    }
+                }
+            ) && do { package Mite::Shim; length( $args->{"name"} ) > 0 }
+          )
           or croak "Type check failed in constructor: %s should be %s", "name",
-          "Str";
+          "NonEmptyStr";
         $self->{"name"} = $args->{"name"};
 
         # Attribute: shim_name
         if ( exists $args->{"shim_name"} ) {
-            do {
+            (
+                (
+                    do {
 
-                package Mite::Shim;
-                defined( $args->{"shim_name"} ) and do {
-                    ref( \$args->{"shim_name"} ) eq 'SCALAR'
-                      or ref( \( my $val = $args->{"shim_name"} ) ) eq 'SCALAR';
-                }
-              }
+                        package Mite::Shim;
+                        defined( $args->{"shim_name"} ) and do {
+                            ref( \$args->{"shim_name"} ) eq 'SCALAR'
+                              or ref( \( my $val = $args->{"shim_name"} ) ) eq
+                              'SCALAR';
+                        }
+                    }
+                )
+                  && do { package Mite::Shim; length( $args->{"shim_name"} ) > 0 }
+              )
               or croak "Type check failed in constructor: %s should be %s",
-              "shim_name", "Str";
+              "shim_name", "NonEmptyStr";
             $self->{"shim_name"} = $args->{"shim_name"};
         }
 
@@ -157,20 +167,27 @@
                 ( ref($value) eq 'HASH' ) and do {
                     my $ok = 1;
                     for my $i ( values %{$value} ) {
-                        ( $ok = 0, last ) unless do {
+                        ( $ok = 0, last )
+                          unless (
+                            (
+                                do {
 
-                            package Mite::Shim;
-                            defined($i) and do {
-                                ref( \$i ) eq 'SCALAR'
-                                  or ref( \( my $val = $i ) ) eq 'SCALAR';
-                            }
-                        }
+                                    package Mite::Shim;
+                                    defined($i) and do {
+                                        ref( \$i ) eq 'SCALAR'
+                                          or ref( \( my $val = $i ) ) eq
+                                          'SCALAR';
+                                    }
+                                }
+                            )
+                            && ( length($i) > 0 )
+                          );
                     };
                     $ok;
                 }
               }
               or croak "Type check failed in constructor: %s should be %s",
-              "imported_functions", "HashRef[Str]";
+              "imported_functions", "HashRef[NonEmptyStr]";
             $self->{"imported_functions"} = $value;
         };
 
@@ -186,20 +203,27 @@
                 ( ref($value) eq 'ARRAY' ) and do {
                     my $ok = 1;
                     for my $i ( @{$value} ) {
-                        ( $ok = 0, last ) unless do {
+                        ( $ok = 0, last )
+                          unless (
+                            (
+                                do {
 
-                            package Mite::Shim;
-                            defined($i) and do {
-                                ref( \$i ) eq 'SCALAR'
-                                  or ref( \( my $val = $i ) ) eq 'SCALAR';
-                            }
-                        }
+                                    package Mite::Shim;
+                                    defined($i) and do {
+                                        ref( \$i ) eq 'SCALAR'
+                                          or ref( \( my $val = $i ) ) eq
+                                          'SCALAR';
+                                    }
+                                }
+                            )
+                            && ( length($i) > 0 )
+                          );
                     };
                     $ok;
                 }
               }
               or croak "Type check failed in constructor: %s should be %s",
-              "required_methods", "ArrayRef[Str]";
+              "required_methods", "ArrayRef[NonEmptyStr]";
             $self->{"required_methods"} = $value;
         };
 

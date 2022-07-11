@@ -17,7 +17,7 @@ use B ();
 has extends =>
   is            => bare,
   accessor      => 'superclasses',
-  isa           => ArrayRef[Str],
+  isa           => ArrayRef[NonEmptyStr],
   default       => sub { [] },
   trigger       => sub {
       my $self = shift;

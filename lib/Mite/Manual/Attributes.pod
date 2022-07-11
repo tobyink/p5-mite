@@ -309,6 +309,24 @@ the name of the attribute.
 Indicates that the attribute should weaken its reference to the
 attribute value.
 
+=head2 C<clone> B<< Str|CodeRef >>
+
+Stolen from L<MooseX::Extended>. Set to "1" to make a deep clone of
+the attribute value using L<Storable> whenever the attribute is read
+or written. If set to a method name or coderef, then the method will be
+called as C<< $self->$method( $attrname, $value ) >> and is expected
+to return a clone of the value.
+
+    has start_date => (
+        is       => ro,
+        isa      => 'InstanceOf["DateTime"]',
+        required => true,
+        clone    => sub {
+            my ( $self, $attrname, $value ) = @_;
+            return $value->clone;
+        },
+    );
+
 =head2 C<default> B<< Undef|Str|CodeRef|ScalarRef >>
 
 A default value for the attribute, or a coderef called as a method

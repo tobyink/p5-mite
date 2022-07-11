@@ -33,12 +33,12 @@ has _class_for_default =>
 
 has name =>
   is            => rw,
-  isa           => Str->where('length($_) > 0'),
+  isa           => NonEmptyStr,
   required      => true;
 
 has init_arg =>
   is            => rw,
-  isa           => Str|Undef,
+  isa           => Undef|Str,
   default       => sub { shift->name },
   lazy          => true;
 
@@ -59,7 +59,7 @@ has is =>
 
 has [ 'reader', 'writer', 'accessor', 'clearer', 'predicate', 'lvalue', 'local_writer' ] =>
   is            => rw,
-  isa           => Str->where('length($_) > 0') | Undef,
+  isa           => Maybe[NonEmptyStr],
   builder       => true,
   lazy          => true;
 
@@ -75,7 +75,7 @@ has does =>
 
 has type =>
   is            => 'lazy',
-  isa           => Object|Undef,
+  isa           => Maybe[Object],
   builder       => true;
 
 has coerce =>
@@ -104,8 +104,13 @@ has coderef_default_variable =>
 
 has [ 'trigger', 'builder' ] =>
   is            => rw,
-  isa           => Str->where('length($_) > 0') | CodeRef | Undef,
+  isa           => Maybe[NonEmptyStr|CodeRef],
   predicate     => true;
+
+has clone =>
+  is            => bare,
+  isa           => Maybe[NonEmptyStr|CodeRef],
+  reader        => 'cloner_method';
 
 has documentation =>
   is            => rw,
@@ -157,6 +162,7 @@ my @method_name_generator = (
         builder       => sub { "_build_$_" },
         trigger       => sub { "_trigger_$_" },
         local_writer  => sub { "locally_set_$_" },
+        clone         => sub { "_clone_$_" },
     },
     { # private
         reader        => sub { "_get_$_" },
@@ -168,6 +174,7 @@ my @method_name_generator = (
         builder       => sub { "_build_$_" },
         trigger       => sub { "_trigger_$_" },
         local_writer  => sub { "_locally_set_$_" },
+        clone         => sub { "_clone_$_" },
     },
 );
 
@@ -215,6 +222,10 @@ sub BUILD {
         elsif ( $self->type or $self->coerce ) {
             require Mite::Shim;
             Mite::Shim::croak( 'Attributes with type constraints or coercions cannot have an lvalue accessor' );
+        }
+        elsif ( $self->cloner_method ) {
+            require Mite::Shim;
+            Mite::Shim::croak( 'Attributes with autoclone cannot have an lvalue accessor' );
         }
     }
 }
@@ -425,12 +436,33 @@ sub _compile_trigger {
         $selfvar, $method_name, join( q{, }, @args );
 }
 
+sub _compile_clone {
+    my ( $self, $selfvar, $valuevar ) = @_;
+
+    if ( $self->cloner_method eq true ) {
+        return "Storable::dclone( $valuevar )";
+    }
+
+    if ( 'CODE' eq ref $self->cloner_method ) {
+        return sprintf '%s->_clone_%s( %s, %s )',
+            $selfvar, $self->name, $self->_q( $self->name ), $valuevar;
+    }
+
+    return sprintf '%s->%s( %s, %s )',
+        $selfvar, $self->cloner_method, $self->_q( $self->name ), $valuevar;
+}
+
 sub compile_init {
     my ( $self, $selfvar, $argvar ) = @_;
 
+    my @code;
+
+    if ( defined $self->cloner_method and $self->cloner_method eq true ) {
+        push @code, 'use Storable ();';
+    }
+
     my $init_arg = $self->_expand_name( $self->init_arg );
 
-    my @code;
     if ( defined $init_arg ) {
 
         if ( my @alias = $self->_all_aliases ) {
@@ -441,6 +473,11 @@ sub compile_init {
         my $code;
         my $valuevar = sprintf '%s->{%s}', $argvar, $self->_q_init_arg;
         my $postamble = '';
+
+        if ( defined $self->cloner_method ) {
+            push @code, sprintf '%s = %s if exists( %s );',
+                $valuevar, $self->_compile_clone( $selfvar, $valuevar ), $valuevar;
+        }
 
         if ( $self->has_default || $self->has_builder and not $self->lazy ) {
             $code .= sprintf 'do { my $value = exists( %s ) ? %s : %s; ',
@@ -518,6 +555,9 @@ my %code_template;
             $code = sprintf '( exists($_[0]{%s}) ? $_[0]{%s} : ( $_[0]{%s} = %s ) )',
                 $self->_q_name, $self->_q_name, $self->_q_name, $self->_compile_checked_default( '$_[0]' );
         }
+        if ( defined $self->cloner_method ) {
+            $code = $self->_compile_clone( '$_[0]', $code );
+        }
         unless ( $arg{no_croak} ) {
             $code = sprintf '@_ > 1 ? %s( "%s is a read-only attribute of @{[ref $_[0]]}" ) : %s',
                 $self->_function_for_croak, $self->name, $code;
@@ -543,31 +583,36 @@ my %code_template;
             $code .= sprintf 'my @oldvalue; @oldvalue = $_[0]{%s} if exists $_[0]{%s}; ',
                 $self->_q_name, $self->_q_name;
         }
+        my $valuevar = '$_[1]';
         if ( my $type = $self->type ) {
             local $Type::Tiny::AvoidCallbacks = 1;
-            my $valuevar = '$_[1]';
             if ( $self->coerce ) {
                 $code .= sprintf 'my $value = %s; ', $self->_compile_coercion($valuevar);
                 $valuevar = '$value';
             }
-            $code .= sprintf '%s or %s( "Type check failed in %%s: value should be %%s", %s, %s ); $_[0]{%s} = %s;',
-                $type->inline_check($valuevar), $self->_function_for_croak, $self->_q( $arg{label} // 'writer' ), $self->_q( $type->display_name ), $self->_q_name, $valuevar;
+            $code .= sprintf '%s or %s( "Type check failed in %%s: value should be %%s", %s, %s ); ',
+                $type->inline_check($valuevar), $self->_function_for_croak, $self->_q( $arg{label} // 'writer' ), $self->_q( $type->display_name );
         }
-        else {
-            $code .= sprintf '$_[0]{%s} = $_[1];', $self->_q_name;
+        if ( defined $self->cloner_method ) {
+            $code .= sprintf 'my $cloned = %s; ',
+                $self->_compile_clone( '$_[0]', $valuevar );
+            $valuevar = '$cloned';
         }
+        $code .= sprintf '$_[0]{%s} = %s; ',
+            $self->_q_name,
+            $valuevar;
         if ( $self->trigger ) {
             $code .= ' ' . $self->_compile_trigger(
                 '$_[0]',
                 sprintf( '$_[0]{%s}', $self->_q_name ),
                 '@oldvalue',
-            ) . ';';
+            ) . '; ';
         }
         if ( $self->weak_ref ) {
-            $code .= sprintf ' require Scalar::Util && Scalar::Util::weaken($_[0]{%s});',
+            $code .= sprintf 'require Scalar::Util && Scalar::Util::weaken($_[0]{%s}); ',
                 $self->_q_name;
         }
-        $code .= ' $_[0];';
+        $code .= '$_[0];';
         return $code;
     },
     accessor => sub {
@@ -673,14 +718,14 @@ sub compile {
         $want_pp{asserter} = 1;
     }
 
-    # Class::XSAccessor can't do type checks, triggers, or weaken
-    if ( $self->type or $self->weak_ref or $self->trigger ) {
+    # Class::XSAccessor can't do type checks, triggers, weaken, or cloning
+    if ( $self->type or $self->weak_ref or $self->trigger or $self->cloner_method ) {
         delete $want_xs{writer};
         delete $want_xs{accessor};
     }
 
-    # Class::XSAccessor can't do lazy builders checks
-    if ( $self->lazy ) {
+    # Class::XSAccessor can't do lazy builders checks or cloning
+    if ( $self->lazy or $self->cloner_method ) {
         delete $want_xs{reader};
         delete $want_xs{accessor};
     }

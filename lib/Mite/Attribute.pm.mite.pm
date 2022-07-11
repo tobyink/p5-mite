@@ -81,13 +81,10 @@
                           or ref( \( my $val = $args->{"name"} ) ) eq 'SCALAR';
                     }
                 }
-            )
-              && (
-                do { local $_ = $args->{"name"}; length($_) > 0 }
-              )
+            ) && do { package Mite::Shim; length( $args->{"name"} ) > 0 }
           )
           or croak "Type check failed in constructor: %s should be %s", "name",
-          "__ANON__";
+          "NonEmptyStr";
         $self->{"name"} = $args->{"name"};
 
         # Attribute: init_arg
@@ -96,7 +93,8 @@
 
                 package Mite::Shim;
                 (
-                    do {
+                    do { package Mite::Shim; !defined( $args->{"init_arg"} ) }
+                      or do {
 
                         package Mite::Shim;
                         defined( $args->{"init_arg"} ) and do {
@@ -104,13 +102,11 @@
                               or ref( \( my $val = $args->{"init_arg"} ) ) eq
                               'SCALAR';
                         }
-                      }
-                      or
-                      do { package Mite::Shim; !defined( $args->{"init_arg"} ) }
+                    }
                 );
               }
               or croak "Type check failed in constructor: %s should be %s",
-              "init_arg", "Str|Undef";
+              "init_arg", "Undef|Str";
             $self->{"init_arg"} = $args->{"init_arg"};
         }
 
@@ -166,29 +162,23 @@
             do {
 
                 package Mite::Shim;
-                (
+                !defined( $args->{"reader"} ) or (
                     (
-                        (
-                            do {
+                        do {
 
-                                package Mite::Shim;
-                                defined( $args->{"reader"} ) and do {
-                                    ref( \$args->{"reader"} ) eq 'SCALAR'
-                                      or ref( \( my $val = $args->{"reader"} ) )
-                                      eq 'SCALAR';
-                                }
+                            package Mite::Shim;
+                            defined( $args->{"reader"} ) and do {
+                                ref( \$args->{"reader"} ) eq 'SCALAR'
+                                  or ref( \( my $val = $args->{"reader"} ) ) eq
+                                  'SCALAR';
                             }
-                        )
-                          && (
-                            do { local $_ = $args->{"reader"}; length($_) > 0 }
-                          )
+                        }
                     )
-                      or
-                      do { package Mite::Shim; !defined( $args->{"reader"} ) }
+                    && do { package Mite::Shim; length( $args->{"reader"} ) > 0 }
                 );
               }
               or croak "Type check failed in constructor: %s should be %s",
-              "reader", "__ANON__|Undef";
+              "reader", "Maybe[NonEmptyStr]";
             $self->{"reader"} = $args->{"reader"};
         }
 
@@ -197,29 +187,23 @@
             do {
 
                 package Mite::Shim;
-                (
+                !defined( $args->{"writer"} ) or (
                     (
-                        (
-                            do {
+                        do {
 
-                                package Mite::Shim;
-                                defined( $args->{"writer"} ) and do {
-                                    ref( \$args->{"writer"} ) eq 'SCALAR'
-                                      or ref( \( my $val = $args->{"writer"} ) )
-                                      eq 'SCALAR';
-                                }
+                            package Mite::Shim;
+                            defined( $args->{"writer"} ) and do {
+                                ref( \$args->{"writer"} ) eq 'SCALAR'
+                                  or ref( \( my $val = $args->{"writer"} ) ) eq
+                                  'SCALAR';
                             }
-                        )
-                          && (
-                            do { local $_ = $args->{"writer"}; length($_) > 0 }
-                          )
+                        }
                     )
-                      or
-                      do { package Mite::Shim; !defined( $args->{"writer"} ) }
+                    && do { package Mite::Shim; length( $args->{"writer"} ) > 0 }
                 );
               }
               or croak "Type check failed in constructor: %s should be %s",
-              "writer", "__ANON__|Undef";
+              "writer", "Maybe[NonEmptyStr]";
             $self->{"writer"} = $args->{"writer"};
         }
 
@@ -228,33 +212,23 @@
             do {
 
                 package Mite::Shim;
-                (
+                !defined( $args->{"accessor"} ) or (
                     (
-                        (
-                            do {
+                        do {
 
-                                package Mite::Shim;
-                                defined( $args->{"accessor"} ) and do {
-                                    ref( \$args->{"accessor"} ) eq 'SCALAR'
-                                      or
-                                      ref( \( my $val = $args->{"accessor"} ) )
-                                      eq 'SCALAR';
-                                }
+                            package Mite::Shim;
+                            defined( $args->{"accessor"} ) and do {
+                                ref( \$args->{"accessor"} ) eq 'SCALAR'
+                                  or ref( \( my $val = $args->{"accessor"} ) )
+                                  eq 'SCALAR';
                             }
-                        )
-                          && (
-                            do {
-                                local $_ = $args->{"accessor"};
-                                length($_) > 0;
-                            }
-                          )
+                        }
                     )
-                      or
-                      do { package Mite::Shim; !defined( $args->{"accessor"} ) }
+                    && do { package Mite::Shim; length( $args->{"accessor"} ) > 0 }
                 );
               }
               or croak "Type check failed in constructor: %s should be %s",
-              "accessor", "__ANON__|Undef";
+              "accessor", "Maybe[NonEmptyStr]";
             $self->{"accessor"} = $args->{"accessor"};
         }
 
@@ -263,30 +237,23 @@
             do {
 
                 package Mite::Shim;
-                (
+                !defined( $args->{"clearer"} ) or (
                     (
-                        (
-                            do {
+                        do {
 
-                                package Mite::Shim;
-                                defined( $args->{"clearer"} ) and do {
-                                    ref( \$args->{"clearer"} ) eq 'SCALAR'
-                                      or
-                                      ref( \( my $val = $args->{"clearer"} ) )
-                                      eq 'SCALAR';
-                                }
+                            package Mite::Shim;
+                            defined( $args->{"clearer"} ) and do {
+                                ref( \$args->{"clearer"} ) eq 'SCALAR'
+                                  or ref( \( my $val = $args->{"clearer"} ) )
+                                  eq 'SCALAR';
                             }
-                        )
-                          && (
-                            do { local $_ = $args->{"clearer"}; length($_) > 0 }
-                          )
+                        }
                     )
-                      or
-                      do { package Mite::Shim; !defined( $args->{"clearer"} ) }
+                    && do { package Mite::Shim; length( $args->{"clearer"} ) > 0 }
                 );
               }
               or croak "Type check failed in constructor: %s should be %s",
-              "clearer", "__ANON__|Undef";
+              "clearer", "Maybe[NonEmptyStr]";
             $self->{"clearer"} = $args->{"clearer"};
         }
 
@@ -295,36 +262,27 @@
             do {
 
                 package Mite::Shim;
-                (
+                !defined( $args->{"predicate"} ) or (
                     (
-                        (
-                            do {
+                        do {
 
-                                package Mite::Shim;
-                                defined( $args->{"predicate"} ) and do {
-                                    ref( \$args->{"predicate"} ) eq 'SCALAR'
-                                      or
-                                      ref( \( my $val = $args->{"predicate"} ) )
-                                      eq 'SCALAR';
-                                }
+                            package Mite::Shim;
+                            defined( $args->{"predicate"} ) and do {
+                                ref( \$args->{"predicate"} ) eq 'SCALAR'
+                                  or ref( \( my $val = $args->{"predicate"} ) )
+                                  eq 'SCALAR';
                             }
-                        )
-                          && (
-                            do {
-                                local $_ = $args->{"predicate"};
-                                length($_) > 0;
-                            }
-                          )
+                        }
                     )
-                      or do {
+                    && do {
 
                         package Mite::Shim;
-                        !defined( $args->{"predicate"} );
+                        length( $args->{"predicate"} ) > 0;
                     }
                 );
               }
               or croak "Type check failed in constructor: %s should be %s",
-              "predicate", "__ANON__|Undef";
+              "predicate", "Maybe[NonEmptyStr]";
             $self->{"predicate"} = $args->{"predicate"};
         }
 
@@ -333,29 +291,23 @@
             do {
 
                 package Mite::Shim;
-                (
+                !defined( $args->{"lvalue"} ) or (
                     (
-                        (
-                            do {
+                        do {
 
-                                package Mite::Shim;
-                                defined( $args->{"lvalue"} ) and do {
-                                    ref( \$args->{"lvalue"} ) eq 'SCALAR'
-                                      or ref( \( my $val = $args->{"lvalue"} ) )
-                                      eq 'SCALAR';
-                                }
+                            package Mite::Shim;
+                            defined( $args->{"lvalue"} ) and do {
+                                ref( \$args->{"lvalue"} ) eq 'SCALAR'
+                                  or ref( \( my $val = $args->{"lvalue"} ) ) eq
+                                  'SCALAR';
                             }
-                        )
-                          && (
-                            do { local $_ = $args->{"lvalue"}; length($_) > 0 }
-                          )
+                        }
                     )
-                      or
-                      do { package Mite::Shim; !defined( $args->{"lvalue"} ) }
+                    && do { package Mite::Shim; length( $args->{"lvalue"} ) > 0 }
                 );
               }
               or croak "Type check failed in constructor: %s should be %s",
-              "lvalue", "__ANON__|Undef";
+              "lvalue", "Maybe[NonEmptyStr]";
             $self->{"lvalue"} = $args->{"lvalue"};
         }
 
@@ -364,36 +316,28 @@
             do {
 
                 package Mite::Shim;
-                (
+                !defined( $args->{"local_writer"} ) or (
                     (
-                        (
-                            do {
+                        do {
 
-                                package Mite::Shim;
-                                defined( $args->{"local_writer"} ) and do {
-                                    ref( \$args->{"local_writer"} ) eq 'SCALAR'
-                                      or ref(
-                                        \( my $val = $args->{"local_writer"} ) )
-                                      eq 'SCALAR';
-                                }
+                            package Mite::Shim;
+                            defined( $args->{"local_writer"} ) and do {
+                                ref( \$args->{"local_writer"} ) eq 'SCALAR'
+                                  or
+                                  ref( \( my $val = $args->{"local_writer"} ) )
+                                  eq 'SCALAR';
                             }
-                        )
-                          && (
-                            do {
-                                local $_ = $args->{"local_writer"};
-                                length($_) > 0;
-                            }
-                          )
+                        }
                     )
-                      or do {
+                    && do {
 
                         package Mite::Shim;
-                        !defined( $args->{"local_writer"} );
+                        length( $args->{"local_writer"} ) > 0;
                     }
                 );
               }
               or croak "Type check failed in constructor: %s should be %s",
-              "local_writer", "__ANON__|Undef";
+              "local_writer", "Maybe[NonEmptyStr]";
             $self->{"local_writer"} = $args->{"local_writer"};
         }
 
@@ -462,19 +406,17 @@
             do {
 
                 package Mite::Shim;
-                (
-                    (
-                        do {
+                !defined( $args->{"type"} ) or (
+                    do {
 
-                            package Mite::Shim;
-                            use Scalar::Util ();
-                            Scalar::Util::blessed( $args->{"type"} );
-                        }
-                    ) or do { package Mite::Shim; !defined( $args->{"type"} ) }
+                        package Mite::Shim;
+                        use Scalar::Util ();
+                        Scalar::Util::blessed( $args->{"type"} );
+                    }
                 );
               }
               or croak "Type check failed in constructor: %s should be %s",
-              "type", "Object|Undef";
+              "type", "Maybe[Object]";
             $self->{"type"} = $args->{"type"};
         }
 
@@ -565,35 +507,39 @@
             do {
 
                 package Mite::Shim;
-                (
+                !defined( $args->{"trigger"} ) or do {
+
+                    package Mite::Shim;
                     (
                         (
-                            do {
+                            (
+                                do {
+
+                                    package Mite::Shim;
+                                    defined( $args->{"trigger"} ) and do {
+                                        ref( \$args->{"trigger"} ) eq 'SCALAR'
+                                          or ref(
+                                            \( my $val = $args->{"trigger"} ) )
+                                          eq 'SCALAR';
+                                    }
+                                }
+                            )
+                              && do {
 
                                 package Mite::Shim;
-                                defined( $args->{"trigger"} ) and do {
-                                    ref( \$args->{"trigger"} ) eq 'SCALAR'
-                                      or
-                                      ref( \( my $val = $args->{"trigger"} ) )
-                                      eq 'SCALAR';
-                                }
+                                length( $args->{"trigger"} ) > 0;
                             }
                         )
-                          && (
-                            do { local $_ = $args->{"trigger"}; length($_) > 0 }
-                          )
-                    )
-                      or do {
+                          or do {
 
-                        package Mite::Shim;
-                        ref( $args->{"trigger"} ) eq 'CODE';
-                      }
-                      or
-                      do { package Mite::Shim; !defined( $args->{"trigger"} ) }
-                );
+                            package Mite::Shim;
+                            ref( $args->{"trigger"} ) eq 'CODE';
+                        }
+                    );
+                }
               }
               or croak "Type check failed in constructor: %s should be %s",
-              "trigger", "__ANON__|CodeRef|Undef";
+              "trigger", "Maybe[NonEmptyStr|CodeRef]";
             $self->{"trigger"} = $args->{"trigger"};
         }
 
@@ -602,36 +548,81 @@
             do {
 
                 package Mite::Shim;
-                (
+                !defined( $args->{"builder"} ) or do {
+
+                    package Mite::Shim;
                     (
                         (
-                            do {
+                            (
+                                do {
+
+                                    package Mite::Shim;
+                                    defined( $args->{"builder"} ) and do {
+                                        ref( \$args->{"builder"} ) eq 'SCALAR'
+                                          or ref(
+                                            \( my $val = $args->{"builder"} ) )
+                                          eq 'SCALAR';
+                                    }
+                                }
+                            )
+                              && do {
 
                                 package Mite::Shim;
-                                defined( $args->{"builder"} ) and do {
-                                    ref( \$args->{"builder"} ) eq 'SCALAR'
-                                      or
-                                      ref( \( my $val = $args->{"builder"} ) )
-                                      eq 'SCALAR';
-                                }
+                                length( $args->{"builder"} ) > 0;
                             }
                         )
-                          && (
-                            do { local $_ = $args->{"builder"}; length($_) > 0 }
-                          )
-                    )
-                      or do {
+                          or do {
 
-                        package Mite::Shim;
-                        ref( $args->{"builder"} ) eq 'CODE';
-                      }
-                      or
-                      do { package Mite::Shim; !defined( $args->{"builder"} ) }
-                );
+                            package Mite::Shim;
+                            ref( $args->{"builder"} ) eq 'CODE';
+                        }
+                    );
+                }
               }
               or croak "Type check failed in constructor: %s should be %s",
-              "builder", "__ANON__|CodeRef|Undef";
+              "builder", "Maybe[NonEmptyStr|CodeRef]";
             $self->{"builder"} = $args->{"builder"};
+        }
+
+        # Attribute: clone
+        if ( exists $args->{"clone"} ) {
+            do {
+
+                package Mite::Shim;
+                !defined( $args->{"clone"} ) or do {
+
+                    package Mite::Shim;
+                    (
+                        (
+                            (
+                                do {
+
+                                    package Mite::Shim;
+                                    defined( $args->{"clone"} ) and do {
+                                        ref( \$args->{"clone"} ) eq 'SCALAR'
+                                          or
+                                          ref( \( my $val = $args->{"clone"} ) )
+                                          eq 'SCALAR';
+                                    }
+                                }
+                            )
+                              && do {
+
+                                package Mite::Shim;
+                                length( $args->{"clone"} ) > 0;
+                            }
+                        )
+                          or do {
+
+                            package Mite::Shim;
+                            ref( $args->{"clone"} ) eq 'CODE';
+                        }
+                    );
+                }
+              }
+              or croak "Type check failed in constructor: %s should be %s",
+              "clone", "Maybe[NonEmptyStr|CodeRef]";
+            $self->{"clone"} = $args->{"clone"};
         }
 
         # Attribute: documentation
@@ -768,7 +759,7 @@
 
         # Enforce strict constructor
         my @unknown = grep not(
-/\A(?:_class_for_default|a(?:ccessor|lias)|builder|c(?:l(?:ass|earer)|o(?:deref_default_variable|erce))|d(?:efault|o(?:cumentation|es))|handles|i(?:nit_arg|sa?)|l(?:azy|ocal_writer|value)|name|predicate|re(?:ader|quired)|t(?:rigger|ype)|w(?:eak_ref|riter))\z/
+/\A(?:_class_for_default|a(?:ccessor|lias)|builder|c(?:l(?:ass|earer|one)|o(?:deref_default_variable|erce))|d(?:efault|o(?:cumentation|es))|handles|i(?:nit_arg|sa?)|l(?:azy|ocal_writer|value)|name|predicate|re(?:ader|quired)|t(?:rigger|ype)|w(?:eak_ref|riter))\z/
         ), keys %{$args};
         @unknown
           and croak(
@@ -907,27 +898,22 @@
             do {
 
                 package Mite::Shim;
-                (
+                !defined( $_[1] ) or (
                     (
-                        (
-                            do {
+                        do {
 
-                                package Mite::Shim;
-                                defined( $_[1] ) and do {
-                                    ref( \$_[1] ) eq 'SCALAR'
-                                      or ref( \( my $val = $_[1] ) ) eq 'SCALAR';
-                                }
+                            package Mite::Shim;
+                            defined( $_[1] ) and do {
+                                ref( \$_[1] ) eq 'SCALAR'
+                                  or ref( \( my $val = $_[1] ) ) eq 'SCALAR';
                             }
-                        )
-                          && (
-                            do { local $_ = $_[1]; length($_) > 0 }
-                          )
+                        }
                     )
-                      or ( !defined( $_[1] ) )
+                    && ( length( $_[1] ) > 0 )
                 );
               }
               or croak( "Type check failed in %s: value should be %s",
-                "accessor", "__ANON__|Undef" );
+                "accessor", "Maybe[NonEmptyStr]" );
             $_[0]{"accessor"} = $_[1];
             $_[0];
           }
@@ -939,37 +925,25 @@
                         do {
 
                             package Mite::Shim;
-                            (
+                            !defined($default_value) or (
                                 (
-                                    (
-                                        do {
+                                    do {
 
-                                            package Mite::Shim;
-                                            defined($default_value) and do {
-                                                ref( \$default_value ) eq
-                                                  'SCALAR'
-                                                  or ref(
-                                                    \(
-                                                        my $val =
-                                                          $default_value
-                                                    )
-                                                  ) eq 'SCALAR';
-                                            }
+                                        package Mite::Shim;
+                                        defined($default_value) and do {
+                                            ref( \$default_value ) eq 'SCALAR'
+                                              or ref(
+                                                \( my $val = $default_value ) )
+                                              eq 'SCALAR';
                                         }
-                                    )
-                                      && (
-                                        do {
-                                            local $_ = $default_value;
-                                            length($_) > 0;
-                                        }
-                                      )
+                                    }
                                 )
-                                  or ( !defined($default_value) )
+                                && ( length($default_value) > 0 )
                             );
                           }
                           or croak(
                             "Type check failed in default: %s should be %s",
-                            "accessor", "__ANON__|Undef" );
+                            "accessor", "Maybe[NonEmptyStr]" );
                         $default_value;
                     }
                 )
@@ -1069,28 +1043,30 @@
             do {
 
                 package Mite::Shim;
-                (
+                !defined( $_[1] ) or do {
+
+                    package Mite::Shim;
                     (
                         (
-                            do {
+                            (
+                                do {
 
-                                package Mite::Shim;
-                                defined( $_[1] ) and do {
-                                    ref( \$_[1] ) eq 'SCALAR'
-                                      or ref( \( my $val = $_[1] ) ) eq 'SCALAR';
+                                    package Mite::Shim;
+                                    defined( $_[1] ) and do {
+                                        ref( \$_[1] ) eq 'SCALAR'
+                                          or ref( \( my $val = $_[1] ) ) eq
+                                          'SCALAR';
+                                    }
                                 }
-                            }
+                            )
+                              && ( length( $_[1] ) > 0 )
                         )
-                          && (
-                            do { local $_ = $_[1]; length($_) > 0 }
-                          )
-                    )
-                      or ( ref( $_[1] ) eq 'CODE' )
-                      or ( !defined( $_[1] ) )
-                );
+                          or ( ref( $_[1] ) eq 'CODE' )
+                    );
+                }
               }
               or croak( "Type check failed in %s: value should be %s",
-                "accessor", "__ANON__|CodeRef|Undef" );
+                "accessor", "Maybe[NonEmptyStr|CodeRef]" );
             $_[0]{"builder"} = $_[1];
             $_[0];
           }
@@ -1125,27 +1101,22 @@
             do {
 
                 package Mite::Shim;
-                (
+                !defined( $_[1] ) or (
                     (
-                        (
-                            do {
+                        do {
 
-                                package Mite::Shim;
-                                defined( $_[1] ) and do {
-                                    ref( \$_[1] ) eq 'SCALAR'
-                                      or ref( \( my $val = $_[1] ) ) eq 'SCALAR';
-                                }
+                            package Mite::Shim;
+                            defined( $_[1] ) and do {
+                                ref( \$_[1] ) eq 'SCALAR'
+                                  or ref( \( my $val = $_[1] ) ) eq 'SCALAR';
                             }
-                        )
-                          && (
-                            do { local $_ = $_[1]; length($_) > 0 }
-                          )
+                        }
                     )
-                      or ( !defined( $_[1] ) )
+                    && ( length( $_[1] ) > 0 )
                 );
               }
               or croak( "Type check failed in %s: value should be %s",
-                "accessor", "__ANON__|Undef" );
+                "accessor", "Maybe[NonEmptyStr]" );
             $_[0]{"clearer"} = $_[1];
             $_[0];
           }
@@ -1157,42 +1128,45 @@
                         do {
 
                             package Mite::Shim;
-                            (
+                            !defined($default_value) or (
                                 (
-                                    (
-                                        do {
+                                    do {
 
-                                            package Mite::Shim;
-                                            defined($default_value) and do {
-                                                ref( \$default_value ) eq
-                                                  'SCALAR'
-                                                  or ref(
-                                                    \(
-                                                        my $val =
-                                                          $default_value
-                                                    )
-                                                  ) eq 'SCALAR';
-                                            }
+                                        package Mite::Shim;
+                                        defined($default_value) and do {
+                                            ref( \$default_value ) eq 'SCALAR'
+                                              or ref(
+                                                \( my $val = $default_value ) )
+                                              eq 'SCALAR';
                                         }
-                                    )
-                                      && (
-                                        do {
-                                            local $_ = $default_value;
-                                            length($_) > 0;
-                                        }
-                                      )
+                                    }
                                 )
-                                  or ( !defined($default_value) )
+                                && ( length($default_value) > 0 )
                             );
                           }
                           or croak(
                             "Type check failed in default: %s should be %s",
-                            "clearer", "__ANON__|Undef" );
+                            "clearer", "Maybe[NonEmptyStr]" );
                         $default_value;
                     }
                 )
             )
         }
+    }
+
+    # Accessors for clone
+    if ($__XS) {
+        Class::XSAccessor->import(
+            chained   => 1,
+            "getters" => { "cloner_method" => "clone" },
+        );
+    }
+    else {
+        *cloner_method = sub {
+            @_ > 1
+              ? croak("clone is a read-only attribute of @{[ref $_[0]]}")
+              : $_[0]{"clone"};
+        };
     }
 
     # Accessors for coderef_default_variable
@@ -1448,19 +1422,18 @@
 
                 package Mite::Shim;
                 (
-                    do {
+                    ( !defined( $_[1] ) ) or do {
 
                         package Mite::Shim;
                         defined( $_[1] ) and do {
                             ref( \$_[1] ) eq 'SCALAR'
                               or ref( \( my $val = $_[1] ) ) eq 'SCALAR';
                         }
-                      }
-                      or ( !defined( $_[1] ) )
+                    }
                 );
               }
               or croak( "Type check failed in %s: value should be %s",
-                "accessor", "Str|Undef" );
+                "accessor", "Undef|Str" );
             $_[0]{"init_arg"} = $_[1];
             $_[0];
           }
@@ -1477,7 +1450,7 @@
 
                             package Mite::Shim;
                             (
-                                do {
+                                ( !defined($default_value) ) or do {
 
                                     package Mite::Shim;
                                     defined($default_value) and do {
@@ -1486,13 +1459,12 @@
                                           ref( \( my $val = $default_value ) )
                                           eq 'SCALAR';
                                     }
-                                  }
-                                  or ( !defined($default_value) )
+                                }
                             );
                           }
                           or croak(
                             "Type check failed in default: %s should be %s",
-                            "init_arg", "Str|Undef" );
+                            "init_arg", "Undef|Str" );
                         $default_value;
                     }
                 )
@@ -1560,27 +1532,22 @@
             do {
 
                 package Mite::Shim;
-                (
+                !defined( $_[1] ) or (
                     (
-                        (
-                            do {
+                        do {
 
-                                package Mite::Shim;
-                                defined( $_[1] ) and do {
-                                    ref( \$_[1] ) eq 'SCALAR'
-                                      or ref( \( my $val = $_[1] ) ) eq 'SCALAR';
-                                }
+                            package Mite::Shim;
+                            defined( $_[1] ) and do {
+                                ref( \$_[1] ) eq 'SCALAR'
+                                  or ref( \( my $val = $_[1] ) ) eq 'SCALAR';
                             }
-                        )
-                          && (
-                            do { local $_ = $_[1]; length($_) > 0 }
-                          )
+                        }
                     )
-                      or ( !defined( $_[1] ) )
+                    && ( length( $_[1] ) > 0 )
                 );
               }
               or croak( "Type check failed in %s: value should be %s",
-                "accessor", "__ANON__|Undef" );
+                "accessor", "Maybe[NonEmptyStr]" );
             $_[0]{"local_writer"} = $_[1];
             $_[0];
           }
@@ -1592,37 +1559,25 @@
                         do {
 
                             package Mite::Shim;
-                            (
+                            !defined($default_value) or (
                                 (
-                                    (
-                                        do {
+                                    do {
 
-                                            package Mite::Shim;
-                                            defined($default_value) and do {
-                                                ref( \$default_value ) eq
-                                                  'SCALAR'
-                                                  or ref(
-                                                    \(
-                                                        my $val =
-                                                          $default_value
-                                                    )
-                                                  ) eq 'SCALAR';
-                                            }
+                                        package Mite::Shim;
+                                        defined($default_value) and do {
+                                            ref( \$default_value ) eq 'SCALAR'
+                                              or ref(
+                                                \( my $val = $default_value ) )
+                                              eq 'SCALAR';
                                         }
-                                    )
-                                      && (
-                                        do {
-                                            local $_ = $default_value;
-                                            length($_) > 0;
-                                        }
-                                      )
+                                    }
                                 )
-                                  or ( !defined($default_value) )
+                                && ( length($default_value) > 0 )
                             );
                           }
                           or croak(
                             "Type check failed in default: %s should be %s",
-                            "local_writer", "__ANON__|Undef" );
+                            "local_writer", "Maybe[NonEmptyStr]" );
                         $default_value;
                     }
                 )
@@ -1637,27 +1592,22 @@
             do {
 
                 package Mite::Shim;
-                (
+                !defined( $_[1] ) or (
                     (
-                        (
-                            do {
+                        do {
 
-                                package Mite::Shim;
-                                defined( $_[1] ) and do {
-                                    ref( \$_[1] ) eq 'SCALAR'
-                                      or ref( \( my $val = $_[1] ) ) eq 'SCALAR';
-                                }
+                            package Mite::Shim;
+                            defined( $_[1] ) and do {
+                                ref( \$_[1] ) eq 'SCALAR'
+                                  or ref( \( my $val = $_[1] ) ) eq 'SCALAR';
                             }
-                        )
-                          && (
-                            do { local $_ = $_[1]; length($_) > 0 }
-                          )
+                        }
                     )
-                      or ( !defined( $_[1] ) )
+                    && ( length( $_[1] ) > 0 )
                 );
               }
               or croak( "Type check failed in %s: value should be %s",
-                "accessor", "__ANON__|Undef" );
+                "accessor", "Maybe[NonEmptyStr]" );
             $_[0]{"lvalue"} = $_[1];
             $_[0];
           }
@@ -1669,37 +1619,25 @@
                         do {
 
                             package Mite::Shim;
-                            (
+                            !defined($default_value) or (
                                 (
-                                    (
-                                        do {
+                                    do {
 
-                                            package Mite::Shim;
-                                            defined($default_value) and do {
-                                                ref( \$default_value ) eq
-                                                  'SCALAR'
-                                                  or ref(
-                                                    \(
-                                                        my $val =
-                                                          $default_value
-                                                    )
-                                                  ) eq 'SCALAR';
-                                            }
+                                        package Mite::Shim;
+                                        defined($default_value) and do {
+                                            ref( \$default_value ) eq 'SCALAR'
+                                              or ref(
+                                                \( my $val = $default_value ) )
+                                              eq 'SCALAR';
                                         }
-                                    )
-                                      && (
-                                        do {
-                                            local $_ = $default_value;
-                                            length($_) > 0;
-                                        }
-                                      )
+                                    }
                                 )
-                                  or ( !defined($default_value) )
+                                && ( length($default_value) > 0 )
                             );
                           }
                           or croak(
                             "Type check failed in default: %s should be %s",
-                            "lvalue", "__ANON__|Undef" );
+                            "lvalue", "Maybe[NonEmptyStr]" );
                         $default_value;
                     }
                 )
@@ -1722,14 +1660,12 @@
                         }
                     }
                 )
-                  && (
-                    do { local $_ = $_[1]; length($_) > 0 }
-                  )
+                  && ( length( $_[1] ) > 0 )
               )
               or croak(
                 "Type check failed in %s: value should be %s",
                 "accessor",
-                "__ANON__"
+                "NonEmptyStr"
               );
             $_[0]{"name"} = $_[1];
             $_[0];
@@ -1744,27 +1680,22 @@
             do {
 
                 package Mite::Shim;
-                (
+                !defined( $_[1] ) or (
                     (
-                        (
-                            do {
+                        do {
 
-                                package Mite::Shim;
-                                defined( $_[1] ) and do {
-                                    ref( \$_[1] ) eq 'SCALAR'
-                                      or ref( \( my $val = $_[1] ) ) eq 'SCALAR';
-                                }
+                            package Mite::Shim;
+                            defined( $_[1] ) and do {
+                                ref( \$_[1] ) eq 'SCALAR'
+                                  or ref( \( my $val = $_[1] ) ) eq 'SCALAR';
                             }
-                        )
-                          && (
-                            do { local $_ = $_[1]; length($_) > 0 }
-                          )
+                        }
                     )
-                      or ( !defined( $_[1] ) )
+                    && ( length( $_[1] ) > 0 )
                 );
               }
               or croak( "Type check failed in %s: value should be %s",
-                "accessor", "__ANON__|Undef" );
+                "accessor", "Maybe[NonEmptyStr]" );
             $_[0]{"predicate"} = $_[1];
             $_[0];
           }
@@ -1776,37 +1707,25 @@
                         do {
 
                             package Mite::Shim;
-                            (
+                            !defined($default_value) or (
                                 (
-                                    (
-                                        do {
+                                    do {
 
-                                            package Mite::Shim;
-                                            defined($default_value) and do {
-                                                ref( \$default_value ) eq
-                                                  'SCALAR'
-                                                  or ref(
-                                                    \(
-                                                        my $val =
-                                                          $default_value
-                                                    )
-                                                  ) eq 'SCALAR';
-                                            }
+                                        package Mite::Shim;
+                                        defined($default_value) and do {
+                                            ref( \$default_value ) eq 'SCALAR'
+                                              or ref(
+                                                \( my $val = $default_value ) )
+                                              eq 'SCALAR';
                                         }
-                                    )
-                                      && (
-                                        do {
-                                            local $_ = $default_value;
-                                            length($_) > 0;
-                                        }
-                                      )
+                                    }
                                 )
-                                  or ( !defined($default_value) )
+                                && ( length($default_value) > 0 )
                             );
                           }
                           or croak(
                             "Type check failed in default: %s should be %s",
-                            "predicate", "__ANON__|Undef" );
+                            "predicate", "Maybe[NonEmptyStr]" );
                         $default_value;
                     }
                 )
@@ -1821,27 +1740,22 @@
             do {
 
                 package Mite::Shim;
-                (
+                !defined( $_[1] ) or (
                     (
-                        (
-                            do {
+                        do {
 
-                                package Mite::Shim;
-                                defined( $_[1] ) and do {
-                                    ref( \$_[1] ) eq 'SCALAR'
-                                      or ref( \( my $val = $_[1] ) ) eq 'SCALAR';
-                                }
+                            package Mite::Shim;
+                            defined( $_[1] ) and do {
+                                ref( \$_[1] ) eq 'SCALAR'
+                                  or ref( \( my $val = $_[1] ) ) eq 'SCALAR';
                             }
-                        )
-                          && (
-                            do { local $_ = $_[1]; length($_) > 0 }
-                          )
+                        }
                     )
-                      or ( !defined( $_[1] ) )
+                    && ( length( $_[1] ) > 0 )
                 );
               }
               or croak( "Type check failed in %s: value should be %s",
-                "accessor", "__ANON__|Undef" );
+                "accessor", "Maybe[NonEmptyStr]" );
             $_[0]{"reader"} = $_[1];
             $_[0];
           }
@@ -1853,37 +1767,25 @@
                         do {
 
                             package Mite::Shim;
-                            (
+                            !defined($default_value) or (
                                 (
-                                    (
-                                        do {
+                                    do {
 
-                                            package Mite::Shim;
-                                            defined($default_value) and do {
-                                                ref( \$default_value ) eq
-                                                  'SCALAR'
-                                                  or ref(
-                                                    \(
-                                                        my $val =
-                                                          $default_value
-                                                    )
-                                                  ) eq 'SCALAR';
-                                            }
+                                        package Mite::Shim;
+                                        defined($default_value) and do {
+                                            ref( \$default_value ) eq 'SCALAR'
+                                              or ref(
+                                                \( my $val = $default_value ) )
+                                              eq 'SCALAR';
                                         }
-                                    )
-                                      && (
-                                        do {
-                                            local $_ = $default_value;
-                                            length($_) > 0;
-                                        }
-                                      )
+                                    }
                                 )
-                                  or ( !defined($default_value) )
+                                && ( length($default_value) > 0 )
                             );
                           }
                           or croak(
                             "Type check failed in default: %s should be %s",
-                            "reader", "__ANON__|Undef" );
+                            "reader", "Maybe[NonEmptyStr]" );
                         $default_value;
                     }
                 )
@@ -1927,28 +1829,30 @@
             do {
 
                 package Mite::Shim;
-                (
+                !defined( $_[1] ) or do {
+
+                    package Mite::Shim;
                     (
                         (
-                            do {
+                            (
+                                do {
 
-                                package Mite::Shim;
-                                defined( $_[1] ) and do {
-                                    ref( \$_[1] ) eq 'SCALAR'
-                                      or ref( \( my $val = $_[1] ) ) eq 'SCALAR';
+                                    package Mite::Shim;
+                                    defined( $_[1] ) and do {
+                                        ref( \$_[1] ) eq 'SCALAR'
+                                          or ref( \( my $val = $_[1] ) ) eq
+                                          'SCALAR';
+                                    }
                                 }
-                            }
+                            )
+                              && ( length( $_[1] ) > 0 )
                         )
-                          && (
-                            do { local $_ = $_[1]; length($_) > 0 }
-                          )
-                    )
-                      or ( ref( $_[1] ) eq 'CODE' )
-                      or ( !defined( $_[1] ) )
-                );
+                          or ( ref( $_[1] ) eq 'CODE' )
+                    );
+                }
               }
               or croak( "Type check failed in %s: value should be %s",
-                "accessor", "__ANON__|CodeRef|Undef" );
+                "accessor", "Maybe[NonEmptyStr|CodeRef]" );
             $_[0]{"trigger"} = $_[1];
             $_[0];
           }
@@ -1964,20 +1868,17 @@
                     do {
 
                         package Mite::Shim;
-                        (
-                            (
-                                do {
+                        !defined($default_value) or (
+                            do {
 
-                                    package Mite::Shim;
-                                    use Scalar::Util ();
-                                    Scalar::Util::blessed($default_value);
-                                }
-                            )
-                              or ( !defined($default_value) )
+                                package Mite::Shim;
+                                use Scalar::Util ();
+                                Scalar::Util::blessed($default_value);
+                            }
                         );
                       }
                       or croak( "Type check failed in default: %s should be %s",
-                        "type", "Object|Undef" );
+                        "type", "Maybe[Object]" );
                     $default_value;
                 }
             )
@@ -2010,27 +1911,22 @@
             do {
 
                 package Mite::Shim;
-                (
+                !defined( $_[1] ) or (
                     (
-                        (
-                            do {
+                        do {
 
-                                package Mite::Shim;
-                                defined( $_[1] ) and do {
-                                    ref( \$_[1] ) eq 'SCALAR'
-                                      or ref( \( my $val = $_[1] ) ) eq 'SCALAR';
-                                }
+                            package Mite::Shim;
+                            defined( $_[1] ) and do {
+                                ref( \$_[1] ) eq 'SCALAR'
+                                  or ref( \( my $val = $_[1] ) ) eq 'SCALAR';
                             }
-                        )
-                          && (
-                            do { local $_ = $_[1]; length($_) > 0 }
-                          )
+                        }
                     )
-                      or ( !defined( $_[1] ) )
+                    && ( length( $_[1] ) > 0 )
                 );
               }
               or croak( "Type check failed in %s: value should be %s",
-                "accessor", "__ANON__|Undef" );
+                "accessor", "Maybe[NonEmptyStr]" );
             $_[0]{"writer"} = $_[1];
             $_[0];
           }
@@ -2042,37 +1938,25 @@
                         do {
 
                             package Mite::Shim;
-                            (
+                            !defined($default_value) or (
                                 (
-                                    (
-                                        do {
+                                    do {
 
-                                            package Mite::Shim;
-                                            defined($default_value) and do {
-                                                ref( \$default_value ) eq
-                                                  'SCALAR'
-                                                  or ref(
-                                                    \(
-                                                        my $val =
-                                                          $default_value
-                                                    )
-                                                  ) eq 'SCALAR';
-                                            }
+                                        package Mite::Shim;
+                                        defined($default_value) and do {
+                                            ref( \$default_value ) eq 'SCALAR'
+                                              or ref(
+                                                \( my $val = $default_value ) )
+                                              eq 'SCALAR';
                                         }
-                                    )
-                                      && (
-                                        do {
-                                            local $_ = $default_value;
-                                            length($_) > 0;
-                                        }
-                                      )
+                                    }
                                 )
-                                  or ( !defined($default_value) )
+                                && ( length($default_value) > 0 )
                             );
                           }
                           or croak(
                             "Type check failed in default: %s should be %s",
-                            "writer", "__ANON__|Undef" );
+                            "writer", "Maybe[NonEmptyStr]" );
                         $default_value;
                     }
                 )
