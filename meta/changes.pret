@@ -1,6 +1,15 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.006008 cpan:TOBYINK`
+	issued  2022-07-11;
+	changeset [
+		item [
+			a dcs:Addition;
+			label "clone option for attributes (stolen from MooseX::Extended).";
+		];
+	].
+
 `Mite 0.006007 cpan:TOBYINK`
 	issued  2022-07-11;
 	changeset [
