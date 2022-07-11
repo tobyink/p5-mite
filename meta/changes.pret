@@ -1,6 +1,15 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.006009 cpan:TOBYINK`
+	issued  2022-07-11;
+	changeset [
+		item [
+			a dcs:Change, dcs:Documentation;
+			label "Internally cleaned up the type constraints for the different options when defining an attribute; documented them better.";
+		];
+	].
+
 `Mite 0.006008 cpan:TOBYINK`
 	issued  2022-07-11;
 	changeset [
