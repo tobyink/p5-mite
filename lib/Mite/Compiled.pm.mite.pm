@@ -85,7 +85,7 @@
             }
           )
           or croak "Type check failed in constructor: %s should be %s",
-          "source", "InstanceOf[\"Mite::Source\"]";
+          "source", "Mite::Source";
         $self->{"source"} = $args->{"source"};
         require Scalar::Util && Scalar::Util::weaken( $self->{"source"} )
           if exists $self->{"source"};

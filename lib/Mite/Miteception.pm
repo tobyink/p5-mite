@@ -9,6 +9,7 @@ our $VERSION   = '0.006008';
 
 use Import::Into;
 use Mite::Shim ();
+use Mite::Types ();
 use Types::Standard ();
 use Types::Common::String ();
 use Types::Path::Tiny ();
@@ -47,6 +48,9 @@ sub to_import {
 	my ( $class, $arg ) = ( shift, @_ );
 	no warnings 'uninitialized';
 	return (
+		[ 'Mite::Types' => [
+			qw( -types ),
+		] ],
 		[ 'Types::Standard' => [
 			qw( -types slurpy ),
 		] ],

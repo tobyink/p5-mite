@@ -79,14 +79,13 @@
         if ( exists $args->{"project"} ) {
             (
                 do {
-
-                    package Mite::Shim;
                     use Scalar::Util ();
-                    Scalar::Util::blessed( $args->{"project"} );
+                    Scalar::Util::blessed( $args->{"project"} )
+                      and $args->{"project"}->isa(q[Mite::Project]);
                 }
               )
               or croak "Type check failed in constructor: %s should be %s",
-              "project", "Object";
+              "project", "Mite::Project";
             $self->{"project"} = $args->{"project"};
         }
 
@@ -241,15 +240,14 @@
                         my $default_value = $_[0]->_build_project;
                         (
                             do {
-
-                                package Mite::Shim;
                                 use Scalar::Util ();
-                                Scalar::Util::blessed($default_value);
+                                Scalar::Util::blessed($default_value)
+                                  and $default_value->isa(q[Mite::Project]);
                             }
                           )
                           or croak(
                             "Type check failed in default: %s should be %s",
-                            "project", "Object" );
+                            "project", "Mite::Project" );
                         $default_value;
                     }
                 )
@@ -268,14 +266,13 @@
                     my $default_value = $_[0]->_build_project;
                     (
                         do {
-
-                            package Mite::Shim;
                             use Scalar::Util ();
-                            Scalar::Util::blessed($default_value);
+                            Scalar::Util::blessed($default_value)
+                              and $default_value->isa(q[Mite::Project]);
                         }
                       )
                       or croak( "Type check failed in default: %s should be %s",
-                        "project", "Object" );
+                        "project", "Mite::Project" );
                     $default_value;
                 }
             )

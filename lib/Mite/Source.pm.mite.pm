@@ -97,7 +97,7 @@
                 }
               }
               or croak "Type check failed in constructor: %s should be %s",
-              "classes", "HashRef[InstanceOf[\"Mite::Class\"]]";
+              "classes", "HashRef[Mite::Class]";
             $self->{"classes"} = $value;
         };
 
@@ -111,7 +111,7 @@
                 }
               )
               or croak "Type check failed in constructor: %s should be %s",
-              "compiled", "InstanceOf[\"Mite::Compiled\"]";
+              "compiled", "Mite::Compiled";
             $self->{"compiled"} = $args->{"compiled"};
         }
 
@@ -125,7 +125,7 @@
                 }
               )
               or croak "Type check failed in constructor: %s should be %s",
-              "project", "InstanceOf[\"Mite::Project\"]";
+              "project", "Mite::Project";
             $self->{"project"} = $args->{"project"};
         }
         require Scalar::Util && Scalar::Util::weaken( $self->{"project"} )
@@ -239,11 +239,8 @@
                               and $default_value->isa(q[Mite::Compiled]);
                         }
                       )
-                      or croak(
-                        "Type check failed in default: %s should be %s",
-                        "compiled",
-                        "InstanceOf[\"Mite::Compiled\"]"
-                      );
+                      or croak( "Type check failed in default: %s should be %s",
+                        "compiled", "Mite::Compiled" );
                     $default_value;
                 }
             )
@@ -277,7 +274,7 @@
                 }
               )
               or croak( "Type check failed in %s: value should be %s",
-                "accessor", "InstanceOf[\"Mite::Project\"]" );
+                "accessor", "Mite::Project" );
             $_[0]{"project"} = $_[1];
             require Scalar::Util && Scalar::Util::weaken( $_[0]{"project"} );
             $_[0];

@@ -24,7 +24,7 @@ has file =>
 
 has source =>
   is            => ro,
-  isa           => InstanceOf['Mite::Source'],
+  isa           => MiteSource,
   # avoid a circular dep with Mite::Source
   weak_ref      => true,
   required      => true;

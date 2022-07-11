@@ -4,3 +4,4 @@ project: Mite
 shim: Mite::Shim
 source_from: lib
 perltidy: 1
+types: Mite::Types

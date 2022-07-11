@@ -57,7 +57,7 @@
                 }
               }
               or croak "Type check failed in constructor: %s should be %s",
-              "sources", "HashRef[InstanceOf[\"Mite::Source\"]]";
+              "sources", "HashRef[Mite::Source]";
             $self->{"sources"} = $value;
         };
 
@@ -71,7 +71,7 @@
                 }
               )
               or croak "Type check failed in constructor: %s should be %s",
-              "config", "InstanceOf[\"Mite::Config\"]";
+              "config", "Mite::Config";
             $self->{"config"} = $args->{"config"};
         }
 
@@ -279,11 +279,8 @@
                               and $default_value->isa(q[Mite::Config]);
                         }
                       )
-                      or croak(
-                        "Type check failed in default: %s should be %s",
-                        "config",
-                        "InstanceOf[\"Mite::Config\"]"
-                      );
+                      or croak( "Type check failed in default: %s should be %s",
+                        "config", "Mite::Config" );
                     $default_value;
                 }
             )

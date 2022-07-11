@@ -10,12 +10,12 @@ our $VERSION   = '0.006008';
 
 has sources =>
   is            => ro,
-  isa           => HashRef[InstanceOf['Mite::Source']],
+  isa           => HashRef[MiteSource],
   default       => sub { {} };
 
 has config =>
   is            => ro,
-  isa           => InstanceOf['Mite::Config'],
+  isa           => MiteConfig,
   lazy          => 1,
   default       => sub {
       require Mite::Config;

@@ -17,7 +17,7 @@ use B ();
 has extends =>
   is            => bare,
   accessor      => 'superclasses',
-  isa           => ArrayRef[NonEmptyStr],
+  isa           => ArrayRef[ValidClassName],
   default       => sub { [] },
   trigger       => sub {
       my $self = shift;
@@ -34,7 +34,7 @@ has extends =>
 # Super classes as Mite::Classes populated from $self->superclasses
 has parents =>
   is            => ro,
-  isa           => ArrayRef[InstanceOf['Mite::Class']],
+  isa           => ArrayRef[MiteClass],
   # Build on demand to allow the project to load all the classes first
   lazy          => true,
   builder       => '_build_parents',

@@ -17,17 +17,17 @@ BEGIN {
 
 has attributes =>
   is            => ro,
-  isa           => HashRef[InstanceOf['Mite::Attribute']],
+  isa           => HashRef[MiteAttribute],
   default       => sub { {} };
 
 has name =>
   is            => ro,
-  isa           => NonEmptyStr,
+  isa           => ValidClassName,
   required      => true;
 
 has shim_name =>
   is            => rw,
-  isa           => NonEmptyStr,
+  isa           => ValidClassName,
   lazy          => true,
   builder       => sub {
     my $self = shift;
@@ -36,23 +36,23 @@ has shim_name =>
 
 has source =>
   is            => rw,
-  isa           => InstanceOf['Mite::Source'],
+  isa           => MiteSource,
   # avoid a circular dep with Mite::Source
   weak_ref      => true;
 
 has roles =>
   is            => ro,
-  isa           => ArrayRef[Object],
+  isa           => ArrayRef[MiteRole],
   builder       => sub { [] };
 
 has imported_functions =>
   is            => ro,
-  isa           => HashRef[NonEmptyStr],
+  isa           => Map[ MethodName, Str ],
   builder       => sub { {} };
 
 has required_methods =>
   is            => ro,
-  isa           => ArrayRef[NonEmptyStr],
+  isa           => ArrayRef[MethodName],
   builder       => sub { [] };
 
 ##-

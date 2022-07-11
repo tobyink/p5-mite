@@ -16,12 +16,12 @@ has file =>
 
 has classes =>
   is            => ro,
-  isa           => HashRef[InstanceOf['Mite::Class']],
+  isa           => HashRef[MiteClass],
   default       => sub { {} };
 
 has compiled =>
   is            => ro,
-  isa           => InstanceOf['Mite::Compiled'],
+  isa           => MiteCompiled,
   lazy          => true,
   default       => sub {
       my $self = shift;
@@ -30,7 +30,7 @@ has compiled =>
 
 has project =>
   is            => rw,
-  isa           => InstanceOf['Mite::Project'],
+  isa           => MiteProject,
   # avoid a circular dep with Mite::Project
   weak_ref      => true;
 

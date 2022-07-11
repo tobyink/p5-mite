@@ -58,7 +58,7 @@
                 }
               }
               or croak "Type check failed in constructor: %s should be %s",
-              "attributes", "HashRef[InstanceOf[\"Mite::Attribute\"]]";
+              "attributes", "HashRef[Mite::Attribute]";
             $self->{"attributes"} = $value;
         };
 
@@ -74,10 +74,16 @@
                           or ref( \( my $val = $args->{"name"} ) ) eq 'SCALAR';
                     }
                 }
-            ) && do { package Mite::Shim; length( $args->{"name"} ) > 0 }
+            )
+              && (
+                do {
+                    local $_ = $args->{"name"};
+                    /\A[^\W0-9]\w*(?:::[^\W0-9]\w*)*\z/;
+                }
+              )
           )
           or croak "Type check failed in constructor: %s should be %s", "name",
-          "NonEmptyStr";
+          "ValidClassName";
         $self->{"name"} = $args->{"name"};
 
         # Attribute: shim_name
@@ -94,10 +100,15 @@
                         }
                     }
                 )
-                  && do { package Mite::Shim; length( $args->{"shim_name"} ) > 0 }
+                  && (
+                    do {
+                        local $_ = $args->{"shim_name"};
+                        /\A[^\W0-9]\w*(?:::[^\W0-9]\w*)*\z/;
+                    }
+                  )
               )
               or croak "Type check failed in constructor: %s should be %s",
-              "shim_name", "NonEmptyStr";
+              "shim_name", "ValidClassName";
             $self->{"shim_name"} = $args->{"shim_name"};
         }
 
@@ -111,7 +122,7 @@
                 }
               )
               or croak "Type check failed in constructor: %s should be %s",
-              "source", "InstanceOf[\"Mite::Source\"]";
+              "source", "Mite::Source";
             $self->{"source"} = $args->{"source"};
         }
         require Scalar::Util && Scalar::Util::weaken( $self->{"source"} )
@@ -132,10 +143,9 @@
                         ( $ok = 0, last )
                           unless (
                             do {
-
-                                package Mite::Shim;
                                 use Scalar::Util ();
-                                Scalar::Util::blessed($i);
+                                Scalar::Util::blessed($i)
+                                  and $i->isa(q[Mite::Role]);
                             }
                           );
                     };
@@ -143,7 +153,7 @@
                 }
               }
               or croak "Type check failed in constructor: %s should be %s",
-              "roles", "ArrayRef[Object]";
+              "roles", "ArrayRef[Mite::Role]";
             $self->{"roles"} = $value;
         };
 
@@ -158,28 +168,44 @@
                 package Mite::Shim;
                 ( ref($value) eq 'HASH' ) and do {
                     my $ok = 1;
-                    for my $i ( values %{$value} ) {
-                        ( $ok = 0, last )
-                          unless (
-                            (
-                                do {
+                    for my $v ( values %{$value} ) {
+                        ( $ok = 0, last ) unless do {
 
-                                    package Mite::Shim;
-                                    defined($i) and do {
-                                        ref( \$i ) eq 'SCALAR'
-                                          or ref( \( my $val = $i ) ) eq
-                                          'SCALAR';
-                                    }
-                                }
-                            )
-                            && ( length($i) > 0 )
-                          );
+                            package Mite::Shim;
+                            defined($v) and do {
+                                ref( \$v ) eq 'SCALAR'
+                                  or ref( \( my $val = $v ) ) eq 'SCALAR';
+                            }
+                        }
+                    };
+                    for my $k ( keys %{$value} ) {
+                        ( $ok = 0, last ) unless do {
+
+                            package Mite::Shim;
+                            (
+                                ( !!1 ) or (
+                                    (
+                                        do {
+
+                                            package Mite::Shim;
+                                            defined($k) and do {
+                                                ref( \$k ) eq 'SCALAR'
+                                                  or ref( \( my $val = $k ) )
+                                                  eq 'SCALAR';
+                                            }
+                                        }
+                                    )
+                                    && ( do { local $_ = $k; /\A[^\W0-9]\w*\z/ }
+                                    )
+                                )
+                            );
+                        }
                     };
                     $ok;
                 }
               }
               or croak "Type check failed in constructor: %s should be %s",
-              "imported_functions", "HashRef[NonEmptyStr]";
+              "imported_functions", "Map[MethodName,Str]";
             $self->{"imported_functions"} = $value;
         };
 
@@ -195,27 +221,33 @@
                 ( ref($value) eq 'ARRAY' ) and do {
                     my $ok = 1;
                     for my $i ( @{$value} ) {
-                        ( $ok = 0, last )
-                          unless (
-                            (
-                                do {
+                        ( $ok = 0, last ) unless do {
 
-                                    package Mite::Shim;
-                                    defined($i) and do {
-                                        ref( \$i ) eq 'SCALAR'
-                                          or ref( \( my $val = $i ) ) eq
-                                          'SCALAR';
-                                    }
-                                }
-                            )
-                            && ( length($i) > 0 )
-                          );
+                            package Mite::Shim;
+                            (
+                                ( !!1 ) or (
+                                    (
+                                        do {
+
+                                            package Mite::Shim;
+                                            defined($i) and do {
+                                                ref( \$i ) eq 'SCALAR'
+                                                  or ref( \( my $val = $i ) )
+                                                  eq 'SCALAR';
+                                            }
+                                        }
+                                    )
+                                    && ( do { local $_ = $i; /\A[^\W0-9]\w*\z/ }
+                                    )
+                                )
+                            );
+                        }
                     };
                     $ok;
                 }
               }
               or croak "Type check failed in constructor: %s should be %s",
-              "required_methods", "ArrayRef[NonEmptyStr]";
+              "required_methods", "ArrayRef[MethodName]";
             $self->{"required_methods"} = $value;
         };
 
@@ -386,12 +418,14 @@
                         }
                     }
                 )
-                  && ( length( $_[1] ) > 0 )
+                  && (
+                    do { local $_ = $_[1]; /\A[^\W0-9]\w*(?:::[^\W0-9]\w*)*\z/ }
+                  )
               )
               or croak(
                 "Type check failed in %s: value should be %s",
                 "accessor",
-                "NonEmptyStr"
+                "ValidClassName"
               );
             $_[0]{"shim_name"} = $_[1];
             $_[0];
@@ -414,12 +448,17 @@
                                     }
                                 }
                             )
-                              && ( length($default_value) > 0 )
+                              && (
+                                do {
+                                    local $_ = $default_value;
+                                    /\A[^\W0-9]\w*(?:::[^\W0-9]\w*)*\z/;
+                                }
+                              )
                           )
                           or croak(
                             "Type check failed in default: %s should be %s",
                             "shim_name",
-                            "NonEmptyStr"
+                            "ValidClassName"
                           );
                         $default_value;
                     }
@@ -440,7 +479,7 @@
                 }
               )
               or croak( "Type check failed in %s: value should be %s",
-                "accessor", "InstanceOf[\"Mite::Source\"]" );
+                "accessor", "Mite::Source" );
             $_[0]{"source"} = $_[1];
             require Scalar::Util && Scalar::Util::weaken( $_[0]{"source"} );
             $_[0];

@@ -15,18 +15,18 @@ has _order =>
 
 has class =>
   is            => rw,
-  isa           => Object,
+  isa           => MiteRole,
   weak_ref      => true;
 
 has compiling_class =>
   init_arg      => undef,
   is            => rw,
-  isa           => Object,
+  isa           => MiteRole,
   local_writer  => true;
 
 has _class_for_default =>
   is            => rw,
-  isa           => Object,
+  isa           => MiteRole,
   weak_ref      => true,
   lazy          => true,
   builder       => sub { shift->class };
@@ -38,7 +38,7 @@ has name =>
 
 has init_arg =>
   is            => rw,
-  isa           => Undef|Str,
+  isa           => NonEmptyStr|Undef,
   default       => sub { shift->name },
   lazy          => true;
 
@@ -59,7 +59,7 @@ has is =>
 
 has [ 'reader', 'writer', 'accessor', 'clearer', 'predicate', 'lvalue', 'local_writer' ] =>
   is            => rw,
-  isa           => Maybe[NonEmptyStr],
+  isa           => MethodName|One|Undef,
   builder       => true,
   lazy          => true;
 
@@ -75,7 +75,7 @@ has does =>
 
 has type =>
   is            => 'lazy',
-  isa           => Maybe[Object],
+  isa           => Object|Undef,
   builder       => true;
 
 has coerce =>
@@ -95,7 +95,7 @@ has lazy =>
 
 has coderef_default_variable =>
   is            => rw,
-  isa           => Str,
+  isa           => NonEmptyStr,
   lazy          => true,     # else $self->name might not be set
   default       => sub {
       # This must be coordinated with Mite.pm
@@ -104,12 +104,12 @@ has coderef_default_variable =>
 
 has [ 'trigger', 'builder' ] =>
   is            => rw,
-  isa           => Maybe[NonEmptyStr|CodeRef],
+  isa           => MethodName|One|CodeRef|Undef,
   predicate     => true;
 
 has clone =>
   is            => bare,
-  isa           => Maybe[NonEmptyStr|CodeRef],
+  isa           => MethodName|One|CodeRef|Undef,
   reader        => 'cloner_method';
 
 has documentation =>
@@ -118,13 +118,13 @@ has documentation =>
 
 has handles =>
   is            => rw,
-  isa           => HashRef->of( Str )->plus_coercions( ArrayRef, q{+{ map { $_ => $_ } @$_ }} ),
+  isa           => HandlesHash,
   predicate     => true,
   coerce        => true;
 
 has alias =>
   is            => rw,
-  isa           => ArrayRef->of(Str)->plus_coercions( Str, q{ [$_] }, Undef, q{ [] } ),
+  isa           => AliasList,
   coerce        => true,
   default       => sub { [] };
 

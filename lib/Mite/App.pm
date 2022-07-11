@@ -24,7 +24,7 @@ has kingpin => (
 
 has project => (
     is => lazy,
-    isa => Object,
+    isa => MiteProject,
     handles => [ 'config' ],
 );
 
