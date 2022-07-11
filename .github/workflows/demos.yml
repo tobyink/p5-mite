@@ -68,7 +68,7 @@ jobs:
           perl -v
       - name: Install Mite dependencies
         run: |
-          cpanm -n setenv Class::XSAccessor Perl::Tidy
+          cpanm -n setenv Class::XSAccessor Perl::Tidy Test2::V0
           cpanm -n --installdeps ./build
       - name: Configure Mite
         working-directory: ./build/
