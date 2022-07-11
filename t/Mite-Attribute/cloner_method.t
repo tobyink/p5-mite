@@ -50,9 +50,9 @@ use Mite::Shim;
 use Storable ();
 has foo => (
     is => 'ro',
-    clone => 'cloner',
+    clone => 'cloner_for_%s',
 );
-sub cloner {
+sub cloner_for_foo {
     my ( $self, $attrname, $value ) = @_;
     Storable::dclone( $value );
 }

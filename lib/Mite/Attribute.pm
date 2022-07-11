@@ -59,7 +59,7 @@ has is =>
 
 has [ 'reader', 'writer', 'accessor', 'clearer', 'predicate', 'lvalue', 'local_writer' ] =>
   is            => rw,
-  isa           => MethodName|One|Undef,
+  isa           => MethodName|MethodTemplate|One|Undef,
   builder       => true,
   lazy          => true;
 
@@ -104,12 +104,12 @@ has coderef_default_variable =>
 
 has [ 'trigger', 'builder' ] =>
   is            => rw,
-  isa           => MethodName|One|CodeRef|Undef,
+  isa           => MethodName|MethodTemplate|One|CodeRef|Undef,
   predicate     => true;
 
 has clone =>
   is            => bare,
-  isa           => MethodName|One|CodeRef|Undef,
+  isa           => MethodName|MethodTemplate|One|CodeRef|Undef,
   reader        => 'cloner_method';
 
 has documentation =>
@@ -449,7 +449,7 @@ sub _compile_clone {
     }
 
     return sprintf '%s->%s( %s, %s )',
-        $selfvar, $self->cloner_method, $self->_q( $self->name ), $valuevar;
+        $selfvar, $self->_expand_name( $self->cloner_method ), $self->_q( $self->name ), $valuevar;
 }
 
 sub compile_init {

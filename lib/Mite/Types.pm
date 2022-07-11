@@ -3,7 +3,7 @@ package Mite::Types;
 use strict;
 use warnings;
 use Type::Library 1.012 -base, -declare => qw(
-	One MethodName ValidClassName HandlesHash AliasList
+	One MethodName MethodTemplate ValidClassName HandlesHash AliasList
 	MiteRole MiteClass MiteAttribute MiteProject MiteSource MiteCompiled MiteConfig
 );
 
@@ -18,7 +18,12 @@ __PACKAGE__->add_type(
 
 __PACKAGE__->add_type(
 	name      => MethodName,
-	parent    => Any | Str->where( q{ /\A[^\W0-9]\w*\z/ } ),
+	parent    => Str->where( q{ /\A[^\W0-9]\w*\z/ } ),
+);
+
+__PACKAGE__->add_type(
+	name      => MethodTemplate,
+	parent    => Str->where( q{ /\%/ } ),
 );
 
 __PACKAGE__->add_type(
@@ -70,14 +75,14 @@ __PACKAGE__->add_type(
 
 __PACKAGE__->add_type(
 	name      => HandlesHash,
-	parent    => Map[ MethodName, MethodName ],
+	parent    => Map[ MethodName|MethodTemplate, MethodName ],
 )->coercion->add_type_coercions(
 	ArrayRef, q{ +{ map { $_ => $_ } @$_ } },
 );
 
 __PACKAGE__->add_type(
 	name      => AliasList,
-	parent    => ArrayRef[ MethodName ],
+	parent    => ArrayRef[ MethodName|MethodTemplate ],
 )->coercion->add_type_coercions(
 	Str,      q{ [$_] },
 	Undef,    q{ [] },

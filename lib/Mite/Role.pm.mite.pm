@@ -179,27 +179,21 @@
                         }
                     };
                     for my $k ( keys %{$value} ) {
-                        ( $ok = 0, last ) unless do {
-
-                            package Mite::Shim;
+                        ( $ok = 0, last )
+                          unless (
                             (
-                                ( !!1 ) or (
-                                    (
-                                        do {
+                                do {
 
-                                            package Mite::Shim;
-                                            defined($k) and do {
-                                                ref( \$k ) eq 'SCALAR'
-                                                  or ref( \( my $val = $k ) )
-                                                  eq 'SCALAR';
-                                            }
-                                        }
-                                    )
-                                    && ( do { local $_ = $k; /\A[^\W0-9]\w*\z/ }
-                                    )
-                                )
-                            );
-                        }
+                                    package Mite::Shim;
+                                    defined($k) and do {
+                                        ref( \$k ) eq 'SCALAR'
+                                          or ref( \( my $val = $k ) ) eq
+                                          'SCALAR';
+                                    }
+                                }
+                            )
+                            && ( do { local $_ = $k; /\A[^\W0-9]\w*\z/ } )
+                          );
                     };
                     $ok;
                 }
@@ -221,27 +215,21 @@
                 ( ref($value) eq 'ARRAY' ) and do {
                     my $ok = 1;
                     for my $i ( @{$value} ) {
-                        ( $ok = 0, last ) unless do {
-
-                            package Mite::Shim;
+                        ( $ok = 0, last )
+                          unless (
                             (
-                                ( !!1 ) or (
-                                    (
-                                        do {
+                                do {
 
-                                            package Mite::Shim;
-                                            defined($i) and do {
-                                                ref( \$i ) eq 'SCALAR'
-                                                  or ref( \( my $val = $i ) )
-                                                  eq 'SCALAR';
-                                            }
-                                        }
-                                    )
-                                    && ( do { local $_ = $i; /\A[^\W0-9]\w*\z/ }
-                                    )
-                                )
-                            );
-                        }
+                                    package Mite::Shim;
+                                    defined($i) and do {
+                                        ref( \$i ) eq 'SCALAR'
+                                          or ref( \( my $val = $i ) ) eq
+                                          'SCALAR';
+                                    }
+                                }
+                            )
+                            && ( do { local $_ = $i; /\A[^\W0-9]\w*\z/ } )
+                          );
                     };
                     $ok;
                 }
