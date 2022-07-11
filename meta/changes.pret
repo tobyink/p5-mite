@@ -1,6 +1,19 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.006007 cpan:TOBYINK`
+	issued  2022-07-11;
+	changeset [
+		item [
+			a dcs:Documentation;
+			label "Minor tweaks.";
+		];
+		item [
+			a dcs:Change;
+			label "Minor tidying.";
+		];
+	].
+
 `Mite 0.006006 cpan:TOBYINK`
 	issued  2022-07-10;
 	changeset [
