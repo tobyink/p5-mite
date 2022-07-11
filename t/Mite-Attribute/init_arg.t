@@ -4,7 +4,7 @@ use lib 't/lib';
 
 use Test::Mite;
 
-tests "strict_contructor" => sub {
+tests "init_arg" => sub {
     mite_load <<'CODE';
 package MyTest;
 use Mite::Shim;
@@ -24,6 +24,21 @@ CODE
     my $o2 = MyTest->new( bar => 66 );
     is $o2->foo, 66;
     is $o2->bar, undef;
+};
+
+tests "weird init_arg" => sub {
+    mite_load <<'CODE';
+package MyTest2;
+use Mite::Shim;
+has foo =>
+    is => 'rw',
+    init_arg => '  ~',
+    default => 99;
+1;
+CODE
+
+    my $o2 = MyTest2->new( '  ~' => 66 );
+    is $o2->foo, 66;
 };
 
 done_testing;
