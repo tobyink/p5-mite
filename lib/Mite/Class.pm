@@ -178,7 +178,21 @@ sub methods_to_export {
 }
 
 sub compilation_stages {
-    return qw(
+    my $self = shift;
+
+    # Check if we are inheriting from a Mite class in this project
+    my $inherit_from_mite = do {
+        # First parent
+        my $first_isa = do {
+            my @isa = $self->linear_isa;
+            shift @isa;
+            shift @isa;
+        };
+        !! ( $first_isa and $self->_get_parent( $first_isa ) );
+    };
+
+    # Always need these stages
+    my @stages = qw(
         _compile_package
         _compile_uses_mite
         _compile_pragmas
@@ -186,14 +200,29 @@ sub compilation_stages {
         _compile_imported_functions
         _compile_extends
         _compile_with
-        _compile_new
+    );
+
+    # Need a constructor if we're not inheriting from Mite,
+    # or if we define any new attributes.
+    push @stages, '_compile_new'
+        if !$inherit_from_mite
+        || keys %{ $self->attributes };
+
+    # Only need these stages if not already inheriting from Mite
+    push @stages, qw(
         _compile_buildall_method
         _compile_destroy
         _compile_meta_method
+    ) unless $inherit_from_mite;
+
+    # Always need these stages
+    push @stages, qw(
         _compile_does
         _compile_attribute_accessors
         _compile_composed_methods
     );
+
+    return @stages;
 }
 
 sub _compile_load_storable {
