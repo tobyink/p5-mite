@@ -1,10 +1,16 @@
 {
 
-    package Your::Project::Widget;
+    package Your::Project::SomeClass;
     our $USES_MITE = "Mite::Class";
     our $MITE_SHIM = "Your::Project::Mite";
     use strict;
     use warnings;
+
+    BEGIN {
+        require Your::Project::SomeRole;
+        our %DOES =
+          ( "Your::Project::SomeClass" => 1, "Your::Project::SomeRole" => 1 );
+    }
 
     sub new {
         my $class = ref( $_[0] ) ? ref(shift) : shift;
@@ -16,24 +22,18 @@
           : { ( @_ == 1 ) ? %{ $_[0] } : @_ };
         my $no_build = delete $args->{__no_BUILD__};
 
-        # Attribute: name
-        if ( exists $args->{"name"} ) {
+        # Enforce strict constructor
+        my @unknown = grep not(
             do {
 
                 package Your::Project::Mite;
-                defined( $args->{"name"} ) and do {
-                    ref( \$args->{"name"} ) eq 'SCALAR'
-                      or ref( \( my $val = $args->{"name"} ) ) eq 'SCALAR';
+                defined($_) and do {
+                    ref( \$_ ) eq 'SCALAR'
+                      or ref( \( my $val = $_ ) ) eq 'SCALAR';
                 }
-              }
-              or Your::Project::Mite::croak
-              "Type check failed in constructor: %s should be %s", "name",
-              "Str";
-            $self->{"name"} = $args->{"name"};
-        }
-
-        # Enforce strict constructor
-        my @unknown = grep not(/\Aname\z/), keys %{$args};
+            }
+          ),
+          keys %{$args};
         @unknown
           and Your::Project::Mite::croak(
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
@@ -100,25 +100,6 @@
 
     sub does {
         shift->DOES(@_);
-    }
-
-    my $__XS = !$ENV{MITE_PURE_PERL}
-      && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
-
-    # Accessors for name
-    if ($__XS) {
-        Class::XSAccessor->import(
-            chained   => 1,
-            "getters" => { "name" => "name" },
-        );
-    }
-    else {
-        *name = sub {
-            @_ > 1
-              ? Your::Project::Mite::croak(
-                "name is a read-only attribute of @{[ref $_[0]]}")
-              : $_[0]{"name"};
-        };
     }
 
     1;
