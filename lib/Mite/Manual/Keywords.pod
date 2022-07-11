@@ -94,7 +94,7 @@ implementations other than Mite and Role::Tiny.
 
 Options hashrefs, including the C<< -version >> option are not implemented.
 
-=head2 C<param> and C<field> keywords
+=head2 C<param> and C<field>
 
 The C<param> and C<field> keywords are available, like L<MooseX::Extended>.
 These act as an alternative to C<has>.
@@ -103,13 +103,13 @@ These act as an alternative to C<has>.
     
     param foo => ( isa => 'Str' );
 
-=head2 Method Modifiers
+=head2 C<before>, C<around>, and C<after>
 
 Basic versions of the C<before>, C<around>, and C<after> method modifiers
 are provided, but these may run in a different order from Moose if you
 use several modifiers on the same method.
 
-=head2 Boolean constants
+=head2 C<true> and C<false>
 
 Although they're not imported by default, you can import C<true> and
 C<false> keywords. They can made attribute definitions a little prettier:
@@ -123,7 +123,7 @@ C<false> keywords. They can made attribute definitions a little prettier:
         required => true,
     );
 
-=head2 Constants for "is"
+=head2 C<ro>, C<rw>, C<rwp>, C<bare>, and C<lazy>.
 
 You can export constants called C<ro>, C<rw>, C<rwp>, C<bare>, and C<lazy>.
 Again, these can make attribute definitions prettier:
