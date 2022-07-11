@@ -58,9 +58,13 @@ from a role or parent class:
 
 When modifying an attribute, you cannot use the C<is> option.
 
-The following options are supported.
+The following options are supported. (Expected types for the value of
+each option are also provided. A B<MethodName> is any valid Perl sub
+name; a B<MethodNameTemplate> may also contain "%s" as a placeholder;
+B<One> means the literal string "1". Other type constraints are
+self-explanatory.)
 
-=head2 C<is> B<< Enum["ro","rw","bare","rwp","lazy"] >>
+=head2 C<is> B<< Enum[ "ro", "rw", "bare", "rwp", "lazy" ] >>
 
 Supported values for C<is> include "ro", "rw", and "bare" like Moose,
 but also "rwp" and "lazy" like Moo. These are all just shortcuts for
@@ -68,7 +72,7 @@ defining other options.
 
 The default is C<< is => 'bare' >>.
 
-=head2 C<reader> B<< Maybe[Str] >> 
+=head2 C<reader> B<< MethodNameTemplate | One | Undef >>
 
 The name of the attribute reader method to generate. If set to "1",
 will generate a reader called "get_foo" if your attribute is called
@@ -86,7 +90,7 @@ attribute. This allows:
         reader   => 'fetch_%s',
     );
 
-=head2 C<writer> B<< Maybe[Str] >> 
+=head2 C<writer> B<< MethodNameTemplate | One | Undef >>
 
 The name of the attribute writer method to generate. If set to "1",
 will generate a writer called "set_foo" if your attribute is called
@@ -103,7 +107,7 @@ writer methods return C<< $self >>, allowing them to be chained:
 
     $object->set_bar( 42 )->set_baz( 99 );
 
-=head2 C<accessor> B<< Maybe[Str] >>
+=head2 C<accessor> B<< MethodNameTemplate | One | Undef >>
 
 The name of the dual-purpose attribute reader/writer method to generate.
 If set to "1", will generate a reader called "foo" if your attribute is
@@ -121,7 +125,7 @@ to be chained:
 
     $object->bar( 42 )->baz( 99 );
 
-=head2 C<clearer> B<< Maybe[Str] >>
+=head2 C<clearer> B<< MethodNameTemplate | One | Undef >>
 
 The name of the attribute clearer method to generate. If set to "1",
 will generate a clearer called "clear_foo" if your attribute is called
@@ -135,7 +139,7 @@ clearer methods return C<< $self >>, allowing them to be chained:
 
     $object->clear_foo->clear_bar->clear_baz;
 
-=head2 C<predicate> B<< Maybe[Str] >>
+=head2 C<predicate> B<< MethodNameTemplate | One | Undef >>
 
 The name of the attribute predicate method to generate. If set to "1",
 will generate a predicate called "has_foo" if your attribute is called
@@ -144,7 +148,7 @@ will generate a predicate called "has_foo" if your attribute is called
 If your predicate contains "%s" this will be replaced by the name of the
 attribute.
 
-=head2 C<lvalue> B<< Maybe[Str] >>
+=head2 C<lvalue> B<< MethodNameTemplate | One | Undef >>
 
 The name of the dual-purpose lvalue reader/writer method to generate.
 If set to "1", will generate a reader called "foo" if your attribute is
@@ -166,9 +170,9 @@ uses a type contraint or coercions, has a trigger, or uses weak_ref.
 This is roughly (but not exactly) the same functionality as
 L<MooseX::LvalueAttribute>.
 
-=head2 C<local_writer> B<< Maybe[Str] >> 
+=head2 C<local_writer> B<< MethodNameTemplate | One | Undef >>
 
-The name of the locally scoped writer method to generate. These work like
+The name of the dynamically scoped writer method to generate. These work like
 this:
 
     my $object = Your::Project::SomeClass->new( foo => 99 );
@@ -195,7 +199,7 @@ attribute.
 
 This is vaguely inspired by L<MooseX::LocalAttribute>.
 
-=head2 C<handles> B<< HashRef|ArrayRef >>
+=head2 C<handles> B<< Map[ MethodNameTemplate, MethodName ] >>
 
 Delegated methods. Currying and native traits are not supported.
 
@@ -213,7 +217,7 @@ the name of the attribute.
         },
     );
 
-=head2 C<init_arg> B<< Maybe[Str] >>
+=head2 C<init_arg> B<< NonEmptyStr | Undef >>
 
 The parameter expected to be passed to the constructor to initialize this
 attribute. May be undef if the attribute should not be intitialized in the
@@ -229,7 +233,7 @@ attribute.
 Indicates whether the attribute is required in the parameter. If the
 attribute has a non-lazy default, this is ignored.
 
-=head2 C<alias> B<< Str|ArrayRef[Str] >>
+=head2 C<alias> B<< ArrayRef[ MethodNameTemplate ] >>
 
 A list of aliases for the attibutes. If the attribute has an init_arg
 (including a default one), this provides alternative initialization
@@ -241,7 +245,7 @@ name, allowing this to work:
 
     has [ 'foo', 'bar' ] => (
         is => 'ro',
-        alias => 'get_%s',
+        alias => [ 'get_%s' ],
     );
 
 If you try to create aliases but don't have a reader or accessor,
@@ -252,13 +256,13 @@ then as a last resort the alias will be an alias for the writer.
     has foo => (
         is => 'bare',
         writer => 1,
-        alias => 'whatever',
+        alias => 'whatever',  # Mite will implicitly do Str -> ArrayRef here
     );
 
 Aliases are not natively supported by Moose, but this feature is
 analagous to L<MooseX::Aliases>.
 
-=head2 C<isa> B<< Str|TypeTiny >>
+=head2 C<isa> B<< Str | TypeTiny >>
 
 A string type name from L<Types::Standard>, L<Types::Common::String>,
 or L<Types::Common::Numeric>, or a blessed L<Type::Tiny> object. If
@@ -280,7 +284,7 @@ can be inlined, and none of your classes should load it directly (just rely
 on Mite to load it). This way you can use custom types in your project and
 your project will not have a dependency on Type::Library.
 
-=head2 C<does> B<< Str|TypeTiny >>
+=head2 C<does> B<< Str | TypeTiny >>
 
 Same as C<isa>, but if the type name is unrecognized, assumes it was a
 role name instead of assuming it was a class name.
@@ -290,7 +294,7 @@ role name instead of assuming it was a class name.
 Indicates that the attribute should attempt to coerce values to fit
 the type constraint.
 
-=head2 C<trigger> B<< CodeRef|Maybe[Str] >>
+=head2 C<trigger> B<< MethodNameTemplate | One | CodeRef >>
 
 If set to a string, is the name of a method to call whenever a new
 attribute value is set. This is I<not> called when an attribute is
@@ -309,7 +313,7 @@ the name of the attribute.
 Indicates that the attribute should weaken its reference to the
 attribute value.
 
-=head2 C<clone> B<< Str|CodeRef >>
+=head2 C<clone> B<< MethodNameTemplate | One | CodeRef | Undef >>
 
 Stolen from L<MooseX::Extended>. Set to "1" to make a deep clone of
 the attribute value using L<Storable> whenever the attribute is read
@@ -327,7 +331,7 @@ to return a clone of the value.
         },
     );
 
-=head2 C<default> B<< Undef|Str|CodeRef|ScalarRef >>
+=head2 C<default> B<< CodeRef | ScalarRef | Str | Undef >>
 
 A default value for the attribute, or a coderef called as a method
 to generate that default value.
@@ -344,7 +348,7 @@ code as a ScalarRef:
 This has performance benefits over using a coderef as it avoids the
 overhead of a sub call.
 
-=head2 C<builder> B<< Str|CodeRef >>
+=head2 C<builder> B<< MethodNameTemplate | One | CodeRef >>
 
 If set to a string, is the name of a method to call to build the
 default attribute value. If set to "1", will assume a builder called

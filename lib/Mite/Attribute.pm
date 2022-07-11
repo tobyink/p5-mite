@@ -59,7 +59,7 @@ has is =>
 
 has [ 'reader', 'writer', 'accessor', 'clearer', 'predicate', 'lvalue', 'local_writer' ] =>
   is            => rw,
-  isa           => MethodName|MethodTemplate|One|Undef,
+  isa           => MethodNameTemplate|One|Undef,
   builder       => true,
   lazy          => true;
 
@@ -104,12 +104,12 @@ has coderef_default_variable =>
 
 has [ 'trigger', 'builder' ] =>
   is            => rw,
-  isa           => MethodName|MethodTemplate|One|CodeRef|Undef,
+  isa           => MethodNameTemplate|One|CodeRef,
   predicate     => true;
 
 has clone =>
   is            => bare,
-  isa           => MethodName|MethodTemplate|One|CodeRef|Undef,
+  isa           => MethodNameTemplate|One|CodeRef|Undef,
   reader        => 'cloner_method';
 
 has documentation =>
