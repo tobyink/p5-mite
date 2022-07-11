@@ -182,6 +182,7 @@ sub compilation_stages {
         _compile_package
         _compile_uses_mite
         _compile_pragmas
+        _compile_load_storable
         _compile_imported_functions
         _compile_extends
         _compile_with
@@ -193,6 +194,17 @@ sub compilation_stages {
         _compile_attribute_accessors
         _compile_composed_methods
     );
+}
+
+sub _compile_load_storable {
+    my $self = shift;
+
+    return unless
+        grep   { defined($_) and $_ eq true }
+        map    { $_->cloner_method }
+        values %{ $self->all_attributes };
+
+    return "use Storable ();\n";
 }
 
 sub _compile_extends {

@@ -457,10 +457,6 @@ sub compile_init {
 
     my @code;
 
-    if ( defined $self->cloner_method and $self->cloner_method eq true ) {
-        push @code, 'use Storable ();';
-    }
-
     my $init_arg = $self->_expand_name( $self->init_arg );
 
     if ( defined $init_arg ) {
