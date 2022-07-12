@@ -33,7 +33,7 @@ jobs:
         shell: bash
         run: |
           eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
-          cpanm -n Try::Tiny LWP::UserAgent 
+          cpanm -n Try::Tiny LWP::UserAgent Data::Dump
       - name: Install Dist::Inkt
         shell: bash
         run: |
