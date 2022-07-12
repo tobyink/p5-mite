@@ -1,6 +1,23 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.006010 cpan:TOBYINK`
+	issued  2022-07-12;
+	changeset [
+		item [
+			a dcs:Change;
+			label "If a Mite class is directly inheriting from another Mite class in this project, it will no longer define its own BUILDALL, DESTROY, or __META__ methods and instead relies in the inherited methods; if it doesn't define any attributes it will also inherit its constructor.";
+		];
+		item [
+			a dcs:Tests;
+			label "Switch from Fennec to Test2::V0 and Test2::Tools::Spec.";
+		];
+		item [
+			a dcs:Packaging;
+			label "Add Class::XSAccessor to runtime recommendations.";
+		];
+	].
+
 `Mite 0.006009 cpan:TOBYINK`
 	issued  2022-07-11;
 	changeset [
