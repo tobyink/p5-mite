@@ -33,7 +33,7 @@ jobs:
         shell: bash
         run: |
           eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
-          cpanm -n Dist::Inkt::Profile::TOBYINK
+          cpanm -n Try::Tiny Dist::Inkt::Profile::TOBYINK
       - name: Make distribution
         shell: bash
         run: |
