@@ -295,8 +295,13 @@ sub _load_file {
         return;
     }
 
-    my $pm_file = $file->relative($inc_dir);
-    require $pm_file;
+    if ( my $pm_file = eval { $file->relative($inc_dir) } ) {
+        require $pm_file;
+    }
+    else {
+        local $@;
+        eval( $file->slurp ) or die $@;
+    }
 
     return;
 }
