@@ -15,8 +15,8 @@
 	:runtime-recommendation [ :on "Class::XSAccessor 1.19"^^:CpanId ];
 	:test-requirement       [ :on "Test::Output 1.02"^^:CpanId ];
 	:test-requirement       [ :on "Test::FailWarnings 0.008"^^:CpanId ];
-	:test-requirement       [ :on "Test2::V0"^^:CpanId ];
-	:test-requirement       [ :on "Test2::Tools::Spec"^^:CpanId ];
+	:test-requirement       [ :on "Test2::V0 0"^^:CpanId ];
+	:test-requirement       [ :on "Test2::Tools::Spec 0"^^:CpanId ];
 	:test-requirement       [ :on "Child 0.010"^^:CpanId ];
 	:test-requirement       [ :on "File::Copy::Recursive 0.38"^^:CpanId ];
 	:test-requirement       [ :on "Capture::Tiny 0.22"^^:CpanId ];
