@@ -12,6 +12,7 @@
 	:runtime-requirement    [ :on "Types::Path::Tiny 0"^^:CpanId ];
 	:runtime-requirement    [ :on "Types::Standard 1.014000"^^:CpanId ];
 	:runtime-requirement    [ :on "YAML::XS 0.41"^^:CpanId ];
+	:runtime-recommendation [ :on "Class::XSAccessor 1.19"^^:CpanId ];
 	:test-requirement       [ :on "Test::Output 1.02"^^:CpanId ];
 	:test-requirement       [ :on "Test::FailWarnings 0.008"^^:CpanId ];
 	:test-requirement       [ :on "Test2::V0"^^:CpanId ];
