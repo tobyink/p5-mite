@@ -1,6 +1,23 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.006011 cpan:TOBYINK`
+	issued  2022-07-12;
+	changeset [
+		item [
+			a dcs:Change;
+			label "Avoid creating do {} blocks in the constructor with a temporary variable when an attribute has no type constraint, but does have an eager default and an init_arg. This may provide a very small speed boost.";
+		];
+		item [
+			a dcs:Change;
+			label "Avoid creating do {} blocks in constructors and readers/accessors when calling a coderef default.";
+		];
+		item [
+			a dcs:Change;
+			label "Ensure that BUILD methods see the original hashref returned by BUILDARGS instead of altering it when processing aliases.";
+		];
+	].
+
 `Mite 0.006010 cpan:TOBYINK`
 	issued  2022-07-12;
 	changeset [
