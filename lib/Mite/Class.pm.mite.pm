@@ -288,6 +288,8 @@
               or croak "Type check failed in constructor: %s should be %s",
               "extends", "ArrayRef[ValidClassName]";
             $self->{"extends"} = $value;
+            $self->_trigger_extends( $self->{"extends"} )
+              if exists $args->{"extends"};
         };
 
         # Attribute: parents

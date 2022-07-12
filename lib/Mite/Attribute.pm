@@ -486,6 +486,14 @@ sub compile_init {
                 $valuevar = sprintf '( exists( %s ) ? %s : %s )',
                     $valuevar, $valuevar, $self->_compile_default( $selfvar );
             }
+
+            my $trigger_code = $self->trigger
+                ? $self->_compile_trigger(
+                    $selfvar,
+                    sprintf( '%s->{%s}', $selfvar, $self->_q_name ),
+                ) . sprintf( ' if exists %s->{%s}; ', $argvar, $self->_q_init_arg )
+                : '';
+            $postamble = $trigger_code . $postamble;
         }
         elsif ( $self->required and not $self->lazy ) {
             push @code, sprintf '%s "Missing key in constructor: %s" unless exists %s; ',
