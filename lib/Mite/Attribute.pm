@@ -452,6 +452,11 @@ sub _compile_clone {
         $selfvar, $self->_expand_name( $self->cloner_method ), $self->_q( $self->name ), $valuevar;
 }
 
+sub _sanitize_identifier {
+    ( my $str = pop ) =~ s/([_\W])/$1 eq '_' ? '__' : sprintf('_%x', ord($1))/ge;
+    $str;
+}
+
 sub compile_init {
     my ( $self, $selfvar, $argvar ) = @_;
 
@@ -462,8 +467,11 @@ sub compile_init {
     if ( defined $init_arg ) {
 
         if ( my @alias = $self->_all_aliases ) {
-            push @code, sprintf 'for my $alias ( %s ) { last if exists %s->{%s}; next if !exists %s->{$alias}; %s->{%s} = %s->{$alias} } ',
-                $self->_q( @alias ), $argvar, $self->_q_init_arg, $argvar, $argvar, $self->_q_init_arg, $argvar;
+            my $new_argvar = "\$args_for_" . $self->_sanitize_identifier( $self->name );
+            push @code, sprintf( 'my %s = {};', $new_argvar );
+            push @code, sprintf 'for ( %s, %s ) { next unless exists %s->{$_}; %s->{%s} = %s->{$_}; last; }',
+                $self->_q_init_arg, $self->_q( @alias ), $argvar, $new_argvar, $self->_q_init_arg, $argvar;
+            $argvar = $new_argvar;
         }
 
         my $code;
