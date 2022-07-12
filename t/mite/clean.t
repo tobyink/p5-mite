@@ -38,7 +38,7 @@ CODE
 
     my $project = Mite::Project->default;
 
-    cmp_deeply
+    is
       [ sort map { $_.'' } $project->find_mites ],
       [ sort 
           "lib/Foo.pm.mite.pm",
@@ -47,14 +47,14 @@ CODE
 
     mite_command "clean";
 
-    cmp_deeply
+    is
       [ sort map { $_.'' } $project->find_pms ],
       [ sort
           "lib/Foo.pm",
           "lib/Foo/Bar.pm"
       ], "clean ignores non mite files";
 
-    cmp_deeply
+    is
       [ sort map { $_.'' } $project->find_mites ],
       [], "clean only .mite.pm";
 

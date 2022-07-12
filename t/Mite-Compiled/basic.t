@@ -2,6 +2,7 @@
 
 use lib 't/lib';
 use Test::Mite;
+use Scalar::Util qw(refaddr);
 
 tests "new" => sub {
     my $source   = sim_source;
@@ -17,7 +18,8 @@ tests "classes" => sub {
 
     my $compiled = $source->compiled;
 
-    is_deeply [sort values %{$compiled->classes}], [sort($foo, $bar)];
+    is [map refaddr($_), sort values %{$compiled->classes}],
+       [map refaddr($_), sort($foo, $bar)];
 };
 
 tests "write" => sub {

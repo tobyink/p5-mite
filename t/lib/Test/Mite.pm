@@ -1,67 +1,33 @@
 {
     package Test::Mite;
 
-    use feature ':5.10';
     use strict;
     use warnings;
+    use feature ':5.10';
 
-    use parent 'Fennec';
+    use Import::Into;
     use Path::Tiny;
 
     # func, not a method, to avoid altering @_
     sub import {
+        my ( $class, %args ) = @_;
+
         # Turn on strict, warnings and 5.10 features
-        strict->import;
-        warnings->import;
-        require feature;
-        feature->import(":5.10");
+        'strict'->import::into( 1 );
+        'warnings'->import::into( 1 );
+        'feature'->import::into( 1, ":5.10" );
 
         # Make everything in @INC absolute so we can chdir in tests
         @INC = map { path($_)->absolute->stringify } @INC;
 
-        #push @_, test_sort => 'ordered';
-        goto &Fennec::import;
-    }
-
-    # Export our extra mite testing functions.
-    sub defaults {
-        my $class = shift;
-        my %params = $class->SUPER::defaults;
-
-        push @{ $params{utils} },
-          "Test::Mite::Functions",
-          "Test::Deep",
-          "Test::FailWarnings";
-
-        return %params;
-    }
-
-    # Test with and without Class::XSAccessor.
-    sub after_import {
-        my ($class, $info) = (shift, @_);
-        return unless $info->{meta}{with_recommends};
-
-        # Test the pure Perl implementation.
-        $info->{layer}->add_case(
-            [$info->{importer}, __FILE__, __LINE__ + 1],
-            case_pure_perl => sub {
-                $ENV{MITE_PURE_PERL} = 1;
-            },
-        );
-
-        # Test with Class::XSAccessor, if available.
-        $info->{layer}->add_case(
-            [$info->{importer}, __FILE__, __LINE__ + 1],
-            case_xs => sub {
-                $ENV{MITE_PURE_PERL} = 0;
-            },
-        ) if eval { require Class::XSAccessor };
+        'Test2::Tools::Spec'->import::into( 1 );
+        'Test2::V0'->import::into( 1 );
+        'Test::FailWarnings'->import::into( 1 );
+        'Test::Mite::Functions'->import::into( 1 );
     }
 }
 
 
-# Because of the way Fennec works, it's easier to put
-# all our extra functions into their on class.
 {
     package Test::Mite::Functions;
 
@@ -77,9 +43,10 @@
         mite_command
         make
         env_for_mite
+        new_ok lives_ok
     );
 
-    use Test::Sims;
+    use Test::Sims2;
     use Path::Tiny;
     use Child;
 
@@ -253,6 +220,20 @@
         $ENV{PERL5LIB} = join ':', grep { defined } $libdir, $ENV{PERL5LIB};
 
         return;
+    }
+
+    use Test2::V0 ();
+
+    sub new_ok {
+        my ( $class, $args ) = @_;
+        my $obj = $class->new( @{ $args || [] } );
+        Test2::V0::isa_ok( $obj, $class );
+        return $obj;
+    }
+
+    sub lives_ok (&;$) {
+        my ( $code, $desc ) = @_;
+        Test2::V0::ok( &Test2::V0::lives( $code ), $desc || 'lives_ok' );
     }
 
     # We're loaded, really!

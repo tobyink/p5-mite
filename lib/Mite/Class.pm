@@ -194,8 +194,8 @@ sub compilation_stages {
     # Always need these stages
     my @stages = qw(
         _compile_package
-        _compile_uses_mite
         _compile_pragmas
+        _compile_uses_mite
         _compile_load_storable
         _compile_imported_functions
         _compile_extends

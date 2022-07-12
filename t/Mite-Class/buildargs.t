@@ -19,7 +19,7 @@ CODE
     no warnings 'once';
 
     my $o = CCC->new( 1, 2, 3 );
-    is_deeply(
+    is(
         $o->list,
         [ 1, 2, 3 ],
         'expected results',

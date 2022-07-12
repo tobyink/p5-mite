@@ -18,7 +18,7 @@ tests "write config" => sub {
     ok -e $config->config_file;
 
     my $config2 = new_ok "Mite::Config";
-    cmp_deeply $config2->data, $test_data;
+    is $config2->data, $test_data;
 
     # Else the process ends in a temp dir and File::Temp can't clean it up
     chdir $orig_dir;

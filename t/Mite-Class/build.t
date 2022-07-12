@@ -31,7 +31,7 @@ CODE
     no warnings 'once';
 
     my $o = CCC->new;
-    is_deeply(
+    is(
         \@::BUILD,
         [
             [ 'PPP', 'CCC', {} ],

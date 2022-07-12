@@ -26,7 +26,7 @@ CODE
 
     my $child = new_ok "C1";
     is $child->foo, "child default";
-    throws_ok { $child->foo(23) }
+    like dies { $child->foo(23) },
               qr{(foo is a read-only attribute|Usage: C1::foo\(self\))};
 };
 

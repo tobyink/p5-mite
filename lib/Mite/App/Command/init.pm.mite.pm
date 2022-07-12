@@ -1,10 +1,12 @@
 {
 
     package Mite::App::Command::init;
-    our $USES_MITE = "Mite::Class";
-    our $MITE_SHIM = "Mite::Shim";
     use strict;
     use warnings;
+
+    our $USES_MITE    = "Mite::Class";
+    our $MITE_SHIM    = "Mite::Shim";
+    our $MITE_VERSION = "0.006009";
 
     BEGIN {
         require Scalar::Util;

@@ -24,14 +24,14 @@ CODE
     no warnings 'once';
 
     my $o = CCC->new;
-    is_deeply(
+    is(
         \@PPP::LOG,
         [],
         'nothing demolished',
     );
 
     undef $o;
-    is_deeply(
+    is(
         \@PPP::LOG,
         [ 'CCC', 'PPP' ],
         'demolish worked',

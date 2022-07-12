@@ -2,6 +2,7 @@
 
 use lib 't/lib';
 use Test::Mite;
+use Scalar::Util qw(refaddr);
 
 use Mite::Project;
 
@@ -17,16 +18,15 @@ tests "class() and source()" => sub {
         $sources[1]->class_for( "Baz" )
     );
 
-    cmp_deeply $project->classes, {
-        map { ($_->name, $_) } @classes
-    };
+    is [ sort keys %{ $project->classes } ],
+       [ sort map $_->name, @classes ];
 
     for my $class (@classes) {
-        is $project->class($class->name), $class;
+        is refaddr($project->class($class->name)), refaddr($class);
     }
 
     for my $source (@sources) {
-        is $project->source($source->file), $source;
+        is refaddr($project->source($source->file)), refaddr($source);
     }
 };
 

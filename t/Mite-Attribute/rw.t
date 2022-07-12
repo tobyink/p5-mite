@@ -5,7 +5,7 @@ use Test::Mite;
 
 use Mite::Attribute;
 
-after_case "Create a class to test with" => sub {
+BEGIN {
     package Foo;
 
     sub new {

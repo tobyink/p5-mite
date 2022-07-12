@@ -78,8 +78,8 @@ CODE
     ok -e "lib/Foo/Mite.pm";
 
     local @INC = ("lib", @INC);
-    require_ok 'Foo';
-    require_ok 'Foo::Bar';
+    ok require Foo;
+    ok require Foo::Bar;
 
     my $foo  = new_ok "Foo", [foo => 99];
     my $fbar = new_ok "Foo::Bar";

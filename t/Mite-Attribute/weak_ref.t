@@ -18,27 +18,27 @@ CODE
     {
         my $arrayref = [];
         my $object = MyTest->new( foo => $arrayref );
-        is_deeply( $object->foo, [], 'Constructor worked' );
+        is( $object->foo, [], 'Constructor worked' );
         undef $arrayref;
-        is_deeply( $object->foo, undef, '... and weakened properly' );
+        is( $object->foo, undef, '... and weakened properly' );
     }
     {
         my $object;
         my $arrayref = [];
         $object = MyTest->new();
         $object->set_foo( $arrayref );
-        is_deeply( $object->foo, [], 'Writer worked' );
+        is( $object->foo, [], 'Writer worked' );
         undef $arrayref;
-        is_deeply( $object->foo, undef, '... and weakened properly' );
+        is( $object->foo, undef, '... and weakened properly' );
     }
     {
         my $object;
         my $arrayref = [];
         $object = MyTest->new();
         $object->foo( $arrayref );
-        is_deeply( $object->foo, [], 'Accessor worked' );
+        is( $object->foo, [], 'Accessor worked' );
         undef $arrayref;
-        is_deeply( $object->foo, undef, '... and weakened properly' );
+        is( $object->foo, undef, '... and weakened properly' );
     }
 };
 

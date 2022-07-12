@@ -2,6 +2,7 @@
 
 use lib 't/lib';
 use Test::Mite;
+use Scalar::Util qw(refaddr);
 
 tests "project" => sub {
     my $class = sim_class;
@@ -18,7 +19,7 @@ tests "class" => sub {
 
     my $other_class = $other_source->class_for("Foo::Bar");
 
-    is $class->class("Foo::Bar"), $other_class;
+    is refaddr($class->class("Foo::Bar")), refaddr($other_class);
     ok !$class->class("I::DO::NOT::EXIST");
 };
 

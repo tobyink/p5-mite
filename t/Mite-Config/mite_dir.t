@@ -53,9 +53,9 @@ tests "no mite dir" => sub {
     my $config = new_ok "Mite::Config", [
         search_for_mite_dir => 0
     ];
-    throws_ok {
+    like dies {
         $config->mite_dir;
-    } qr{No .mite directory found.};
+    }, qr{No .mite directory found.};
 
     chdir $Orig_Dir;
 };

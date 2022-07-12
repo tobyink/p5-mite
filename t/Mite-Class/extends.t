@@ -3,7 +3,7 @@
 use lib 't/lib';
 use Test::Mite with_recommends => 1;
 
-tests "single inheritance and defaults" => sub {
+tests "basics" => sub {
     mite_load <<'CODE';
 package GP1;
 use Mite::Shim;
@@ -43,48 +43,48 @@ CODE
 
 tests "multiple inheritance and defaults" => sub {
     mite_load <<'CODE';
-package GP1;
+package xGP1;
 use Mite::Shim;
 has foo =>
     is      => 'rw',
     default => "gp1 foo default";
 
-package P1;
+package xP1;
 use Mite::Shim;
-extends 'GP1';
+extends 'xGP1';
 has bar =>
     is      => 'rw',
     default => "p1 bar default";
 
-package P2;
+package xP2;
 use Mite::Shim;
-extends 'GP1';
+extends 'xGP1';
 has foo =>
     is      => 'rw',
     default => "p2 foo default";
 
-package C1;
+package xC1;
 use Mite::Shim;
-extends 'P1', 'P2';
+extends 'xP1', 'xP2';
 has bar =>
     is      => 'rw';
 
 1;
 CODE
 
-    my $gparent = new_ok "GP1";
+    my $gparent = new_ok "xGP1";
     is $gparent->foo, 'gp1 foo default';
     ok !$gparent->can("bar");
 
-    my $parent1 = new_ok "P1";
+    my $parent1 = new_ok "xP1";
     is $parent1->foo, 'gp1 foo default';
     is $parent1->bar, 'p1 bar default';
 
-    my $parent2 = new_ok "P2";
+    my $parent2 = new_ok "xP2";
     is $parent2->foo, 'p2 foo default';
     ok !$parent2->can("bar");
 
-    my $child = new_ok "C1";
+    my $child = new_ok "xC1";
     is $child->foo, "p2 foo default";
     is $child->bar, undef;
 };

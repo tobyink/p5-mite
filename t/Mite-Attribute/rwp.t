@@ -5,7 +5,7 @@ use Test::Mite;
 
 use Mite::Attribute;
 
-after_case "Create a class to test with" => sub {
+BEGIN {
     package Foo;
 
     sub new {
@@ -22,7 +22,7 @@ after_case "Create a class to test with" => sub {
 tests "Basic read-only" => sub {
     my $obj = new_ok 'Foo', [foo => 23];
     is $obj->foo, 23;
-    throws_ok { $obj->foo("Flower child") }
+    like dies { $obj->foo("Flower child") },
         qr{(foo is a read-only attribute of Foo|Usage: Foo::foo\(self\))};
 };
 
@@ -43,6 +43,5 @@ tests "Private setter" => sub {
     $obj->_set_foo( 42 );
     is $obj->foo, 42;
 };
-
 
 done_testing;

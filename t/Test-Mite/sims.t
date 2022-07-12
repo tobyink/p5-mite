@@ -2,10 +2,11 @@
 
 use lib 't/lib';
 use Test::Mite;
+use Scalar::Util qw(refaddr);
 
 tests "sim_source" => sub {
     my $source = sim_source();
-    is_deeply $source->classes, {};
+    is $source->classes, {};
     ok -e $source->file;
     like $source->file, qr{\.pm$};
 };
@@ -17,22 +18,22 @@ tests "sim_source with class name" => sub {
     );
 
     like $source->file, qr{/Foo/Bar.pm$};
-    is_deeply $source->classes, {};
+    is $source->classes, {};
 };
 
 
 tests "sim sources in the same project" => sub {
-    is sim_source->project, sim_source->project;
+    is refaddr(sim_source->project), refaddr(sim_source->project);
 
     require Mite::Project;
-    is sim_source->project, Mite::Project->default;
+    is refaddr(sim_source->project), refaddr(Mite::Project->default);
 };
 
 
 tests "sim_class" => sub {
     my $class = sim_class;
     ok $class->source->has_class($class->name);
-    is $class->source->class_for($class->name), $class;
+    is refaddr($class->source->class_for($class->name)), refaddr($class);
 };
 
 

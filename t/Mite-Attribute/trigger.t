@@ -26,7 +26,7 @@ CODE
     $o->attr( 'accessor1' );
     $o->attr( 'accessor2' );
 
-    is_deeply(
+    is(
         $o->log,
         [
             [ 'constructor' ],

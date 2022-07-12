@@ -3,8 +3,8 @@
 use lib 't/lib';
 use Test::Mite;
 
+require Mite::Attribute;
 my $CLASS = 'Mite::Attribute';
-require_ok $CLASS;
 
 tests has_default => sub {
     my $attr = new_ok $CLASS, [ name => "foo" ];
@@ -69,7 +69,7 @@ has list =>
 CODE
 
     my $o = MyTest->new;
-    is_deeply( $o->list, [ 1..4 ] );
+    is( $o->list, [ 1..4 ] );
 };
 
 

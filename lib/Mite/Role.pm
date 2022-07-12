@@ -276,8 +276,8 @@ for my $function ( qw/ carp croak confess / ) {
 sub compilation_stages {
     return qw(
         _compile_package
-        _compile_uses_mite
         _compile_pragmas
+        _compile_uses_mite
         _compile_imported_functions
         _compile_with
         _compile_does
@@ -385,6 +385,7 @@ sub _compile_uses_mite {
     if ( $self->shim_name ) {
         push @code, sprintf 'our $MITE_SHIM = %s;', B::perlstring( $self->shim_name );
     }
+    push @code, sprintf 'our $MITE_VERSION = %s;', B::perlstring( $self->VERSION );
     join "\n", @code;
 }
 

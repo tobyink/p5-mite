@@ -2,6 +2,7 @@
 
 use lib 't/lib';
 use Test::Mite;
+use Scalar::Util qw(refaddr);
 
 tests "class_for" => sub {
     my $source = sim_source;
@@ -9,12 +10,12 @@ tests "class_for" => sub {
     my $foo = $source->class_for("Foo");
     my $bar = $source->class_for("Bar");
 
-    is $foo->source, $source;
-    is $bar->source, $source;
+    is refaddr($foo->source), refaddr($source);
+    is refaddr($bar->source), refaddr($source);
 
-    isnt $foo, $bar;
-    is $foo, $source->class_for("Foo"), "classes are cached";
-    is $bar, $source->class_for("Bar"), "  double check that";
+    isnt refaddr($foo), refaddr($bar);
+    is refaddr($foo), refaddr($source->class_for("Foo")), "classes are cached";
+    is refaddr($bar), refaddr($source->class_for("Bar")), "  double check that";
 
     ok $source->has_class("Foo");
     ok $source->has_class("Bar");
@@ -29,7 +30,7 @@ tests "add_classes" => sub {
 
     for my $class (@classes) {
         ok $source->has_class($class->name);
-        is $class->source, $source;
+        is refaddr($class->source), refaddr($source);
     }
 };
 
@@ -38,9 +39,9 @@ tests "compiled" => sub {
     my $compiled = $source->compiled;
 
     isa_ok $compiled, "Mite::Compiled";
-    is $compiled->source, $source;
+    is refaddr($compiled->source), refaddr($source);
 
-    is $source->compiled, $compiled, "compiled is cached";
+    is refaddr($source->compiled), refaddr($compiled), "compiled is cached";
 };
 
 tests "project" => sub {

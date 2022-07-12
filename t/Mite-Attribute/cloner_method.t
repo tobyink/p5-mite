@@ -17,7 +17,7 @@ CODE
     push @{ $o->foo }, 5;
     push @arr, 6;
 
-    is_deeply $o->{foo}, [ 1 .. 4 ];
+    is $o->{foo}, [ 1 .. 4 ];
 };
 
 tests "clone => CODEREF" => sub {
@@ -40,7 +40,7 @@ CODE
     push @{ $o->foo }, 5;
     push @arr, 6;
 
-    is_deeply $o->{foo}, [ 1 .. 4 ];
+    is $o->{foo}, [ 1 .. 4 ];
 };
 
 tests "clone => METHODNAME" => sub {
@@ -64,7 +64,7 @@ CODE
     push @{ $o->foo }, 5;
     push @arr, 6;
 
-    is_deeply $o->{foo}, [ 1 .. 4 ];
+    is $o->{foo}, [ 1 .. 4 ];
 };
 
 done_testing;

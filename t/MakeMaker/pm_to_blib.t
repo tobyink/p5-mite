@@ -56,7 +56,10 @@ tests "fix_pm_to_blib" => sub {
         push @blib_have, $path;
     }
 
-    cmp_deeply \@blib_have, bag(@blib_want);
+    is \@blib_have, bag {
+        item $_ for @blib_want;
+        end;
+    };
 
     chdir $Orig_Dir;
 };

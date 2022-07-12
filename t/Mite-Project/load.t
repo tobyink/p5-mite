@@ -44,6 +44,8 @@ CODE
     $project->load_directory;
     $project->write_mites;
 
+    ok 1;
+
     chdir $Orig_Cwd;
 };
 

@@ -6,7 +6,7 @@ use Test::Mite;
 use Path::Tiny;
 use Mite::Attribute;
 
-after_case "Create a class to test with"=> sub {
+BEGIN {
     my $class = sim_class(
         name            => 'Foo',
     );

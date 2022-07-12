@@ -14,7 +14,7 @@ with 'Test::RoleTinyYetAnotherRole';
 CODE
 
     no warnings 'once';
-    is_deeply(
+    is(
         \@Test::RoleTinyYetAnotherRole::LOG,
         [ [ 'Test::RoleTinyYetAnotherRole', 'MyTest' ] ],
     );

@@ -31,7 +31,7 @@ CODE
 
     my $o = MyTest->new;
     is $o->xyz( 'yes' ), 'YES';
-    is_deeply(
+    is(
         \@MyTest::LOG,
         [ 'BEFORE', 'AROUND1', 'METHOD', 'AROUND2', 'AFTER' ],
     ) or diag explain( \@MyTest::LOG );
