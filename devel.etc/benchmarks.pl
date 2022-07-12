@@ -47,7 +47,9 @@ BEGIN {
 for my \$n ( 1 .. $MAX ) {
 	my \$class  = "Local::Math::Add\$n";
 	my \$object = \$class->new;
-	\$object->do_sum( 0 ) == \$n or die;
+	for my \$x ( 0 .. 19 ) {
+		\$object->do_sum( \$x ) == \$n + \$x or die;
+	}
 }
 
 \$finished = time();

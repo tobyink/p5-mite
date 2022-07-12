@@ -476,10 +476,16 @@ sub compile_init {
         }
 
         if ( $self->has_default || $self->has_builder and not $self->lazy ) {
-            $code .= sprintf 'do { my $value = exists( %s ) ? %s : %s; ',
-                $valuevar, $valuevar, $self->_compile_default( $selfvar );
-            $valuevar = '$value';
-            $postamble = "}; $postamble";
+            if ( $self->type ) {
+                $code .= sprintf 'do { my $value = exists( %s ) ? %s : %s; ',
+                    $valuevar, $valuevar, $self->_compile_default( $selfvar );
+                $valuevar = '$value';
+                $postamble = "}; $postamble";
+            }
+            else {
+                $valuevar = sprintf '( exists( %s ) ? %s : %s )',
+                    $valuevar, $valuevar, $self->_compile_default( $selfvar );
+            }
         }
         elsif ( $self->required and not $self->lazy ) {
             push @code, sprintf '%s "Missing key in constructor: %s" unless exists %s; ',
