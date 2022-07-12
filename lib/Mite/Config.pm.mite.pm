@@ -246,11 +246,9 @@
             exists( $_[0]{"config_file"} ) ? $_[0]{"config_file"} : (
                 $_[0]{"config_file"} = do {
                     my $default_value = do {
-                        my $to_coerce = do {
-                            my $method =
-                              $Mite::Config::__config_file_DEFAULT__;
-                            $_[0]->$method;
-                        };
+                        my $to_coerce =
+                          $Mite::Config::__config_file_DEFAULT__->(
+                            $_[0] );
                         (
                             (
                                 do {
@@ -304,11 +302,8 @@
             (
                 exists( $_[0]{"data"} ) ? $_[0]{"data"} : (
                     $_[0]{"data"} = do {
-                        my $default_value = do {
-                            my $method =
-                              $Mite::Config::__data_DEFAULT__;
-                            $_[0]->$method;
-                        };
+                        my $default_value =
+                          $Mite::Config::__data_DEFAULT__->( $_[0] );
                         ( ref($default_value) eq 'HASH' )
                           or croak(
                             "Type check failed in default: %s should be %s",
@@ -328,11 +323,9 @@
             exists( $_[0]{"mite_dir"} ) ? $_[0]{"mite_dir"} : (
                 $_[0]{"mite_dir"} = do {
                     my $default_value = do {
-                        my $to_coerce = do {
-                            my $method =
-                              $Mite::Config::__mite_dir_DEFAULT__;
-                            $_[0]->$method;
-                        };
+                        my $to_coerce =
+                          $Mite::Config::__mite_dir_DEFAULT__->(
+                            $_[0] );
                         (
                             (
                                 do {

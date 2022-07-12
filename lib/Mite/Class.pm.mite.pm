@@ -45,10 +45,9 @@
         # Attribute: attributes
         do {
             my $value =
-              exists( $args->{"attributes"} ) ? $args->{"attributes"} : do {
-                my $method = $Mite::Role::__attributes_DEFAULT__;
-                $self->$method;
-              };
+              exists( $args->{"attributes"} )
+              ? $args->{"attributes"}
+              : $Mite::Role::__attributes_DEFAULT__->($self);
             do {
 
                 package Mite::Shim;
@@ -251,10 +250,10 @@
 
         # Attribute: extends
         do {
-            my $value = exists( $args->{"extends"} ) ? $args->{"extends"} : do {
-                my $method = $Mite::Class::__extends_DEFAULT__;
-                $self->$method;
-            };
+            my $value =
+              exists( $args->{"extends"} )
+              ? $args->{"extends"}
+              : $Mite::Class::__extends_DEFAULT__->($self);
             do {
 
                 package Mite::Shim;

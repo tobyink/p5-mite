@@ -76,10 +76,10 @@
 
         # Attribute: classes
         do {
-            my $value = exists( $args->{"classes"} ) ? $args->{"classes"} : do {
-                my $method = $Mite::Source::__classes_DEFAULT__;
-                $self->$method;
-            };
+            my $value =
+              exists( $args->{"classes"} )
+              ? $args->{"classes"}
+              : $Mite::Source::__classes_DEFAULT__->($self);
             do {
 
                 package Mite::Shim;
@@ -229,11 +229,8 @@
           : (
             exists( $_[0]{"compiled"} ) ? $_[0]{"compiled"} : (
                 $_[0]{"compiled"} = do {
-                    my $default_value = do {
-                        my $method =
-                          $Mite::Source::__compiled_DEFAULT__;
-                        $_[0]->$method;
-                    };
+                    my $default_value =
+                      $Mite::Source::__compiled_DEFAULT__->( $_[0] );
                     (
                         do {
                             use Scalar::Util ();

@@ -411,8 +411,7 @@ sub _compile_default {
 
     if ( $self->has_coderef_default ) {
         my $var = $self->coderef_default_variable;
-        return sprintf 'do { my $method = %s; %s->$method }',
-          $var, $selfvar;
+        return sprintf '%s->( %s )', $var, $selfvar;
     }
     elsif ( $self->has_inline_default ) {
         return ${ $self->default };

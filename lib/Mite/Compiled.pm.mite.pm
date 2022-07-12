@@ -211,11 +211,9 @@
                 exists( $_[0]{"file"} ) ? $_[0]{"file"} : (
                     $_[0]{"file"} = do {
                         my $default_value = do {
-                            my $to_coerce = do {
-                                my $method =
-                                  $Mite::Compiled::__file_DEFAULT__;
-                                $_[0]->$method;
-                            };
+                            my $to_coerce =
+                              $Mite::Compiled::__file_DEFAULT__->(
+                                $_[0] );
                             (
                                 (
                                     do {

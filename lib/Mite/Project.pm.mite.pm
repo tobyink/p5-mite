@@ -36,10 +36,10 @@
 
         # Attribute: sources
         do {
-            my $value = exists( $args->{"sources"} ) ? $args->{"sources"} : do {
-                my $method = $Mite::Project::__sources_DEFAULT__;
-                $self->$method;
-            };
+            my $value =
+              exists( $args->{"sources"} )
+              ? $args->{"sources"}
+              : $Mite::Project::__sources_DEFAULT__->($self);
             do {
 
                 package Mite::Shim;
@@ -269,11 +269,8 @@
         @_ > 1 ? croak("config is a read-only attribute of @{[ref $_[0]]}") : (
             exists( $_[0]{"config"} ) ? $_[0]{"config"} : (
                 $_[0]{"config"} = do {
-                    my $default_value = do {
-                        my $method =
-                          $Mite::Project::__config_DEFAULT__;
-                        $_[0]->$method;
-                    };
+                    my $default_value =
+                      $Mite::Project::__config_DEFAULT__->( $_[0] );
                     (
                         do {
                             use Scalar::Util ();

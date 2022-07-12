@@ -37,10 +37,9 @@
         # Attribute: attributes
         do {
             my $value =
-              exists( $args->{"attributes"} ) ? $args->{"attributes"} : do {
-                my $method = $Mite::Role::__attributes_DEFAULT__;
-                $self->$method;
-              };
+              exists( $args->{"attributes"} )
+              ? $args->{"attributes"}
+              : $Mite::Role::__attributes_DEFAULT__->($self);
             do {
 
                 package Mite::Shim;

@@ -1255,10 +1255,10 @@
 
         # Attribute: alias
         do {
-            my $value = exists( $args->{"alias"} ) ? $args->{"alias"} : do {
-                my $method = $Mite::Attribute::__alias_DEFAULT__;
-                $self->$method;
-            };
+            my $value =
+              exists( $args->{"alias"} )
+              ? $args->{"alias"}
+              : $Mite::Attribute::__alias_DEFAULT__->($self);
             do {
                 my $coerced_value = do {
                     my $to_coerce = $value;
@@ -2098,11 +2098,9 @@
                 ? $_[0]{"coderef_default_variable"}
                 : (
                     $_[0]{"coderef_default_variable"} = do {
-                        my $default_value = do {
-                            my $method =
-                              $Mite::Attribute::__coderef_default_variable_DEFAULT__;
-                            $_[0]->$method;
-                        };
+                        my $default_value =
+                          $Mite::Attribute::__coderef_default_variable_DEFAULT__
+                          ->( $_[0] );
                         (
                             (
                                 do {
@@ -2455,11 +2453,9 @@
             (
                 exists( $_[0]{"init_arg"} ) ? $_[0]{"init_arg"} : (
                     $_[0]{"init_arg"} = do {
-                        my $default_value = do {
-                            my $method =
-                              $Mite::Attribute::__init_arg_DEFAULT__;
-                            $_[0]->$method;
-                        };
+                        my $default_value =
+                          $Mite::Attribute::__init_arg_DEFAULT__->(
+                            $_[0] );
                         do {
 
                             package Mite::Shim;
