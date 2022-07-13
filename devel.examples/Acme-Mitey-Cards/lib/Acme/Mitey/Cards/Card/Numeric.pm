@@ -1,6 +1,6 @@
 package Acme::Mitey::Cards::Card::Numeric;
 
-our $VERSION   = '0.010';
+our $VERSION   = '0.011';
 our $AUTHORITY = 'cpan:TOBYINK';
 
 use Acme::Mitey::Cards::Mite qw( -bool -is );

@@ -80,8 +80,8 @@
 		];
 	].
 
-`Acme-Mitey-Cards 0.009 cpan:TOBYINK`
-	issued  2022-07-08;
+`Acme-Mitey-Cards 0.010 cpan:TOBYINK`
+	issued  2022-07-13;
 	changeset [
 		item [
 			a dcs:Update;
@@ -90,5 +90,14 @@
 		item [
 			a dcs:Change;
 			label "Acme::Mitey::Cards::Types is now built using Type::Library::Compiler from Acme::Mitey::Cards::Types::Source.";
+		];
+	].
+
+`Acme-Mitey-Cards 0.011 cpan:TOBYINK`
+	issued  2022-07-13;
+	changeset [
+		item [
+			a dcs:Update;
+			label "Rebuild using Type::Library::Compiler 0.005.";
 		];
 	].
