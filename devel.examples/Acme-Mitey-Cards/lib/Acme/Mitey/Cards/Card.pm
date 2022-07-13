@@ -4,18 +4,17 @@ our $VERSION   = '0.009';
 our $AUTHORITY = 'cpan:TOBYINK';
 
 use Acme::Mitey::Cards::Mite qw( -bool -is carp );
-
-use Acme::Mitey::Cards::Suit;
+use Acme::Mitey::Cards::Types::Compiled qw(:types);
 
 has deck => (
 	is       => ro,
-	isa      => 'Deck',
+	isa      => Deck,
 	weak_ref => true,
 );
 
 has reverse => (
 	is       => lazy,
-	isa      => 'Str',
+	isa      => Str,
 	builder  => sub { shift->deck->reverse },
 );
 

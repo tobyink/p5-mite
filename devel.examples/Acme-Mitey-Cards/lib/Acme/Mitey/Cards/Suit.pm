@@ -4,22 +4,23 @@ our $VERSION   = '0.009';
 our $AUTHORITY = 'cpan:TOBYINK';
 
 use Acme::Mitey::Cards::Mite qw( -bool -is );
+use Acme::Mitey::Cards::Types::Compiled qw(:types);
 
 has name => (
 	is       => ro,
-	isa      => 'NonEmptyStr',
+	isa      => NonEmptyStr,
 	required => true,
 );
 
 has abbreviation => (
 	is       => lazy,
-	isa      => 'Str',
+	isa      => Str,
 	builder  => sub { uc substr( shift->name, 0, 1 ) },
 );
 
 has colour => (
 	is       => ro,
-	isa      => 'Str',
+	isa      => Str,
 	required => true,
 );
 

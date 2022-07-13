@@ -329,6 +329,16 @@ sub _build_type {
     my $type;
     if ( ref $string ) {
         $type = $string;
+
+        if ( blessed $type and not $type->isa( 'Type::Tiny' ) ) {
+            if ( $type->can( 'to_TypeTiny' ) ) {
+                $type = $type->to_TypeTiny;
+            }
+            else {
+                require Types::TypeTiny;
+                $type = $type->Types::TypeTiny::to_TypeTiny;
+            }
+        }
     }
     else {
         require Type::Utils;

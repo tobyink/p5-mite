@@ -262,11 +262,14 @@ then as a last resort the alias will be an alias for the writer.
 Aliases are not natively supported by Moose, but this feature is
 analagous to L<MooseX::Aliases>.
 
-=head2 C<isa> B<< Str | TypeTiny >>
+=head2 C<isa> B<< Str | Ref >>
 
 A string type name from L<Types::Standard>, L<Types::Common::String>,
-or L<Types::Common::Numeric>, or a blessed L<Type::Tiny> object. If
-using a blessed object, you'll be introducing a dependency for your
+or L<Types::Common::Numeric>, or a blessed L<Type::Tiny> object.
+Alternatively, any reference which C<to_TypeTiny> from L<Types::TypeTiny>
+is able to coerce to a blessed Type::Tiny object, or any blessed object
+that provides a C<to_TypeTiny> method whichr returns a Type::Tiny object.
+If using a blessed object, you'll be introducing a dependency for your
 project on whatever type constraint library you're using, so prefer
 string type contraint names.
 
@@ -284,7 +287,10 @@ can be inlined, and none of your classes should load it directly (just rely
 on Mite to load it). This way you can use custom types in your project and
 your project will not have a dependency on Type::Library.
 
-=head2 C<does> B<< Str | TypeTiny >>
+L<Type::Library::Compiled> is an alternative way to create a zero-dependency
+type library which Mite is able to use.
+
+=head2 C<does> B<< Str | Ref >>
 
 Same as C<isa>, but if the type name is unrecognized, assumes it was a
 role name instead of assuming it was a class name.

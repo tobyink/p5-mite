@@ -4,6 +4,8 @@ our $VERSION   = '0.009';
 our $AUTHORITY = 'cpan:TOBYINK';
 
 use Acme::Mitey::Cards::Mite qw( -bool -is croak );
+use Acme::Mitey::Cards::Types::Compiled qw(:types);
+
 extends 'Acme::Mitey::Cards::Set';
 
 use Acme::Mitey::Cards::Suit;
@@ -14,13 +16,13 @@ use Acme::Mitey::Cards::Hand;
 
 has reverse => (
 	is       => ro,
-	isa      => 'NonEmptyStr',
+	isa      => NonEmptyStr,
 	default  => 'plain',
 );
 
 has original_cards => (
 	is       => lazy,
-	isa      => 'CardArray',
+	isa      => CardArray,
 );
 
 sub _build_cards {

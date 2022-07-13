@@ -4,12 +4,13 @@ our $VERSION   = '0.009';
 our $AUTHORITY = 'cpan:TOBYINK';
 
 use Acme::Mitey::Cards::Mite qw( -bool -is croak );
+use Acme::Mitey::Cards::Types::Compiled qw(:types);
 
 use List::Util ();
 
 has cards => (
 	is       => lazy,
-	isa      => 'CardArray',
+	isa      => CardArray,
 );
 
 sub _build_cards {

@@ -4,6 +4,8 @@ our $VERSION   = '0.009';
 our $AUTHORITY = 'cpan:TOBYINK';
 
 use Acme::Mitey::Cards::Mite qw( -bool -is );
+use Acme::Mitey::Cards::Types::Compiled qw(:types);
+
 extends 'Acme::Mitey::Cards::Card';
 
 sub to_string {
