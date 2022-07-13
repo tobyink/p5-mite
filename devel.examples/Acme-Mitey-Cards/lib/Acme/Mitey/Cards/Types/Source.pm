@@ -11,16 +11,11 @@ use Type::Library 1.014
 	],
 	-declare => qw(
 		Card FaceCard JokerCard NumericCard Deck Hand Set Suit
-		CardArray CardNumber Character StringOrObject
+		CardArray CardNumber Character
 	);
 
 use Type::Tiny::Class;
 use Type::Utils ();
-
-__PACKAGE__->add_type(
-	name      => StringOrObject,
-	parent    => Str | Object,
-);
 
 __PACKAGE__->add_type(
 	name      => CardNumber,

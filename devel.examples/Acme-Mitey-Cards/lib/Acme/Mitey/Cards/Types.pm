@@ -22,6 +22,7 @@ BEGIN {
 
 	use overload (
 		fallback => !!1,
+		'|'      => 'union',
 		bool     => sub { !! 1 },
 		'""'     => sub { shift->[1] },
 		'&{}'    => sub {
@@ -29,6 +30,16 @@ BEGIN {
 			return sub { $self->assert_return( @_ ) };
 		},
 	);
+
+	sub union {
+		my @types = grep ref( $_ ), @_;
+		my @codes = map $_->[0], @types;
+		bless [
+			sub { for ( @codes ) { return 1 if $_->(@_) } return 0 },
+			join( '|', map $_->[1], @types ),
+			\@types,
+		], __PACKAGE__;
+	}
 
 	sub check {
 		$_[0][0]->( $_[1] );
@@ -60,6 +71,12 @@ BEGIN {
 
 	sub to_TypeTiny {
 		my ( $coderef, $name, $library, $origname ) = @{ +shift };
+		if ( ref $library eq 'ARRAY' ) {
+			require Type::Tiny::Union;
+			return 'Type::Tiny::Union'->new(
+				type_constraints => [ map $_->to_TypeTiny, @$library ],
+			);
+		}
 		if ( $library ) {
 			local $@;
 			eval "require $library; 1" or die $@;
@@ -1551,29 +1568,6 @@ BEGIN {
 	push @{ $EXPORT_TAGS{"types"} },  "StrictNum";
 	push @{ $EXPORT_TAGS{"is"} },     "is_StrictNum";
 	push @{ $EXPORT_TAGS{"assert"} }, "assert_StrictNum";
-
-}
-
-# StringOrObject
-{
-	my $type;
-	sub StringOrObject () {
-		$type ||= bless( [ \&is_StringOrObject, "StringOrObject", "Acme::Mitey::Cards::Types::Source", "StringOrObject" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
-	}
-
-	sub is_StringOrObject ($) {
-		do {  (do {  defined($_[0]) and do { ref(\$_[0]) eq 'SCALAR' or ref(\(my $val = $_[0])) eq 'SCALAR' } } or (do {  use Scalar::Util (); Scalar::Util::blessed($_[0]) })) }
-	}
-
-	sub assert_StringOrObject ($) {
-		do {  (do {  defined($_[0]) and do { ref(\$_[0]) eq 'SCALAR' or ref(\(my $val = $_[0])) eq 'SCALAR' } } or (do {  use Scalar::Util (); Scalar::Util::blessed($_[0]) })) } ? $_[0] : StringOrObject->get_message( $_[0] );
-	}
-
-	$EXPORT_TAGS{"StringOrObject"} = [ qw( StringOrObject is_StringOrObject assert_StringOrObject ) ];
-	push @EXPORT_OK, @{ $EXPORT_TAGS{"StringOrObject"} };
-	push @{ $EXPORT_TAGS{"types"} },  "StringOrObject";
-	push @{ $EXPORT_TAGS{"is"} },     "is_StringOrObject";
-	push @{ $EXPORT_TAGS{"assert"} }, "assert_StringOrObject";
 
 }
 

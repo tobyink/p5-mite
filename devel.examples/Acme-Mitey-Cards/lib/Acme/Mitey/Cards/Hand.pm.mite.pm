@@ -92,7 +92,7 @@
               }
               or Acme::Mitey::Cards::Mite::croak
               "Type check failed in constructor: %s should be %s", "owner",
-              "StringOrObject";
+              "Str|Object";
             $self->{"owner"} = $args->{"owner"};
         }
 
@@ -151,7 +151,7 @@
               }
               or Acme::Mitey::Cards::Mite::croak(
                 "Type check failed in %s: value should be %s",
-                "accessor", "StringOrObject" );
+                "accessor", "Str|Object" );
             $_[0]{"owner"} = $_[1];
             $_[0];
           }

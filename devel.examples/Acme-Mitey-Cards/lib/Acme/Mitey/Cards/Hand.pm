@@ -10,7 +10,7 @@ extends 'Acme::Mitey::Cards::Set';
 
 has owner => (
 	is       => rw,
-	isa      => StringOrObject,
+	isa      => Str | Object,
 );
 
 1;
