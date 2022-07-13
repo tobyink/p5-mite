@@ -57,12 +57,12 @@ tests "all_attributes" => sub {
 
 
 tests "extend_attribute" => sub {
-    my $gparent = sim_class( name => "GP1" );
-    my $parent  = sim_class( name => "P1" );
-    my $child   = sim_class( name => "C1" );
+    my $gparent = sim_class( name => "zGP1" );
+    my $parent  = sim_class( name => "zP1" );
+    my $child   = sim_class( name => "zC1" );
 
-    $parent->superclasses(["GP1"]);
-    $child->superclasses(["P1"]);
+    $parent->superclasses(["zGP1"]);
+    $child->superclasses(["zP1"]);
 
     $gparent->add_attributes(
         sim_attribute( name => "foo", is => "ro", default => 23 ),
