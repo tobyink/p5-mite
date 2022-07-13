@@ -1,6 +1,6 @@
 package Acme::Mitey::Cards::Set;
 
-our $VERSION   = '0.009';
+our $VERSION   = '0.010';
 our $AUTHORITY = 'cpan:TOBYINK';
 
 use Acme::Mitey::Cards::Mite qw( -bool -is croak );

@@ -79,3 +79,16 @@
 			label "Rebuild using Mite 0.005004.";
 		];
 	].
+
+`Acme-Mitey-Cards 0.009 cpan:TOBYINK`
+	issued  2022-07-08;
+	changeset [
+		item [
+			a dcs:Update;
+			label "Rebuild using Mite 0.006012.";
+		];
+		item [
+			a dcs:Change;
+			label "Acme::Mitey::Cards::Types is now built using Type::Library::Compiler from Acme::Mitey::Cards::Types::Source.";
+		];
+	].
