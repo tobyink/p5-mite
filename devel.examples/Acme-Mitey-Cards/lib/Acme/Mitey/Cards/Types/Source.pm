@@ -1,4 +1,4 @@
-package Acme::Mitey::Cards::Types;
+package Acme::Mitey::Cards::Types::Source;
 
 use strict;
 use warnings;

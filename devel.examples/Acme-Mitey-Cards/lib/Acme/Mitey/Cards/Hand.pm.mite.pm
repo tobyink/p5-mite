@@ -70,8 +70,25 @@
             do {
 
                 package Acme::Mitey::Cards::Mite;
-                Acme::Mitey::Cards::Types::Compiled::is_StringOrObject(
-                    $args->{"owner"} );
+                (
+                    do {
+
+                        package Acme::Mitey::Cards::Mite;
+                        defined( $args->{"owner"} ) and do {
+                            ref( \$args->{"owner"} ) eq 'SCALAR'
+                              or ref( \( my $val = $args->{"owner"} ) ) eq
+                              'SCALAR';
+                        }
+                      }
+                      or (
+                        do {
+
+                            package Acme::Mitey::Cards::Mite;
+                            use Scalar::Util ();
+                            Scalar::Util::blessed( $args->{"owner"} );
+                        }
+                      )
+                );
               }
               or Acme::Mitey::Cards::Mite::croak
               "Type check failed in constructor: %s should be %s", "owner",
@@ -110,7 +127,28 @@
     sub owner {
         @_ > 1
           ? do {
-            ( Acme::Mitey::Cards::Types::Compiled::is_StringOrObject( $_[1] ) )
+            do {
+
+                package Acme::Mitey::Cards::Mite;
+                (
+                    do {
+
+                        package Acme::Mitey::Cards::Mite;
+                        defined( $_[1] ) and do {
+                            ref( \$_[1] ) eq 'SCALAR'
+                              or ref( \( my $val = $_[1] ) ) eq 'SCALAR';
+                        }
+                      }
+                      or (
+                        do {
+
+                            package Acme::Mitey::Cards::Mite;
+                            use Scalar::Util ();
+                            Scalar::Util::blessed( $_[1] );
+                        }
+                      )
+                );
+              }
               or Acme::Mitey::Cards::Mite::croak(
                 "Type check failed in %s: value should be %s",
                 "accessor", "StringOrObject" );
