@@ -6,7 +6,7 @@
 
     our $USES_MITE    = "Mite::Class";
     our $MITE_SHIM    = "Acme::Mitey::Cards::Mite";
-    our $MITE_VERSION = "0.006011";
+    our $MITE_VERSION = "0.006012";
 
     BEGIN {
         *bare  = \&Acme::Mitey::Cards::Mite::bare;
@@ -70,25 +70,8 @@
             do {
 
                 package Acme::Mitey::Cards::Mite;
-                (
-                    do {
-
-                        package Acme::Mitey::Cards::Mite;
-                        defined( $args->{"owner"} ) and do {
-                            ref( \$args->{"owner"} ) eq 'SCALAR'
-                              or ref( \( my $val = $args->{"owner"} ) ) eq
-                              'SCALAR';
-                        }
-                      }
-                      or (
-                        do {
-
-                            package Acme::Mitey::Cards::Mite;
-                            use Scalar::Util ();
-                            Scalar::Util::blessed( $args->{"owner"} );
-                        }
-                      )
-                );
+                Acme::Mitey::Cards::Types::Compiled::is_StringOrObject(
+                    $args->{"owner"} );
               }
               or Acme::Mitey::Cards::Mite::croak
               "Type check failed in constructor: %s should be %s", "owner",
@@ -127,28 +110,7 @@
     sub owner {
         @_ > 1
           ? do {
-            do {
-
-                package Acme::Mitey::Cards::Mite;
-                (
-                    do {
-
-                        package Acme::Mitey::Cards::Mite;
-                        defined( $_[1] ) and do {
-                            ref( \$_[1] ) eq 'SCALAR'
-                              or ref( \( my $val = $_[1] ) ) eq 'SCALAR';
-                        }
-                      }
-                      or (
-                        do {
-
-                            package Acme::Mitey::Cards::Mite;
-                            use Scalar::Util ();
-                            Scalar::Util::blessed( $_[1] );
-                        }
-                      )
-                );
-              }
+            ( Acme::Mitey::Cards::Types::Compiled::is_StringOrObject( $_[1] ) )
               or Acme::Mitey::Cards::Mite::croak(
                 "Type check failed in %s: value should be %s",
                 "accessor", "StringOrObject" );
