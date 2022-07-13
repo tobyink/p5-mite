@@ -82,4 +82,32 @@ CODE
     like $e, qr/Type check failed in accessor/;
 };
 
+tests "Sub::Quote type constraints work" => sub {
+    eval { require Sub::Quote; 1 } or do {
+        ok 1;
+        return;
+    };
+
+    mite_load <<'CODE';
+package FooCR;
+use Mite::Shim;
+use Sub::Quote qw(quote_sub);
+has num =>
+   is => 'rw',
+   isa => quote_sub q{ $_[0] > 0 };
+1;
+CODE
+
+    my $obj = FooCR->new( num => 42 );
+    $obj->num( 23 );
+    is $obj->num, 23;
+
+    local $@;
+    eval {
+        $obj->num( -12 );
+    };
+    my $e = $@;
+    like $e, qr/Type check failed in accessor/;
+};
+
 done_testing;

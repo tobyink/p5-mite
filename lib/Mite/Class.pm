@@ -7,7 +7,7 @@ use Mite::Miteception -all;
 extends qw(Mite::Role);
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.006011';
+our $VERSION   = '0.006012';
 
 use Path::Tiny;
 use mro;

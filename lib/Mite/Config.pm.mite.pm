@@ -6,7 +6,7 @@
 
     our $USES_MITE    = "Mite::Class";
     our $MITE_SHIM    = "Mite::Shim";
-    our $MITE_VERSION = "0.006011";
+    our $MITE_VERSION = "0.006012";
 
     BEGIN {
         require Scalar::Util;

@@ -1,6 +1,15 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.006012 cpan:TOBYINK`
+	issued  2022-07-13;
+	changeset [
+		item [
+			a dcs:Change;
+			label "If a type constraint is a reference but isn't a Type::Tiny object, try to coerce it to one. Note that the type still needs to be inlineable, but this allows for MooseX::Types to often work (but then why are you using Mite?), Sub::Quote, and also often Type::Library::Compiled types.";
+		];
+	].
+
 `Mite 0.006011 cpan:TOBYINK`
 	issued  2022-07-12;
 	changeset [

@@ -6,7 +6,7 @@ package Mite::Attribute;
 use Mite::Miteception qw( -all !lazy );
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.006011';
+our $VERSION   = '0.006012';
 
 has _order =>
   is            => rw,
@@ -65,12 +65,12 @@ has [ 'reader', 'writer', 'accessor', 'clearer', 'predicate', 'lvalue', 'local_w
 
 has isa =>
   is            => bare,
-  isa           => Str|Object,
+  isa           => Str|Ref,
   reader        => '_%s'; # collision with UNIVERSAL::isa
 
 has does =>
   is            => bare,
-  isa           => Str|Object,
+  isa           => Str|Ref,
   reader        => '_%s'; # collision with Mite's does method
 
 has type =>
@@ -338,6 +338,10 @@ sub _build_type {
                 require Types::TypeTiny;
                 $type = $type->Types::TypeTiny::to_TypeTiny;
             }
+        }
+        elsif ( not blessed $type ) {
+            require Types::TypeTiny;
+            $type = Types::TypeTiny::to_TypeTiny( $type );
         }
     }
     else {

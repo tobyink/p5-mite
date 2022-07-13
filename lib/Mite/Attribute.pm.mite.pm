@@ -6,7 +6,7 @@
 
     our $USES_MITE    = "Mite::Class";
     our $MITE_SHIM    = "Mite::Shim";
-    our $MITE_VERSION = "0.006011";
+    our $MITE_VERSION = "0.006012";
 
     BEGIN {
         require Scalar::Util;
@@ -697,18 +697,11 @@
                               'SCALAR';
                         }
                       }
-                      or (
-                        do {
-
-                            package Mite::Shim;
-                            use Scalar::Util ();
-                            Scalar::Util::blessed( $args->{"isa"} );
-                        }
-                      )
+                      or do { package Mite::Shim; !!ref( $args->{"isa"} ) }
                 );
               }
               or croak "Type check failed in constructor: %s should be %s",
-              "isa", "Str|Object";
+              "isa", "Str|Ref";
             $self->{"isa"} = $args->{"isa"};
         }
 
@@ -727,18 +720,11 @@
                               'SCALAR';
                         }
                       }
-                      or (
-                        do {
-
-                            package Mite::Shim;
-                            use Scalar::Util ();
-                            Scalar::Util::blessed( $args->{"does"} );
-                        }
-                      )
+                      or do { package Mite::Shim; !!ref( $args->{"does"} ) }
                 );
               }
               or croak "Type check failed in constructor: %s should be %s",
-              "does", "Str|Object";
+              "does", "Str|Ref";
             $self->{"does"} = $args->{"does"};
         }
 
