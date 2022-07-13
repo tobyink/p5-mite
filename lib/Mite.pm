@@ -127,6 +127,10 @@ L<Moose> is the complete Perl 5 OO module which this is all based on.
 
 L<Moo> is a lighter-weight Moose-compatible module with fewer dependencies.
 
+L<Type::Library::Compiler> allows you to create a zero-dependency compiled
+version of your type constraint library, which can be used by Mite.
+
+
 =head1 AUTHOR
 
 Michael G Schwern E<lt>mschwern@cpan.orgE<gt>.
