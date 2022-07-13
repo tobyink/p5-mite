@@ -16,6 +16,7 @@ my $types_to_compile = 'Type::Library::Compiler'->parse_list(
 my $compiler = 'Type::Library::Compiler'->new(
 	types              => $types_to_compile,
 	destination_module => 'Acme::Mitey::Cards::Types',
+	pod                => 0,
 );
 
 print $compiler->compile_to_file;
