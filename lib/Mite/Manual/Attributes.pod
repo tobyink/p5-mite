@@ -58,6 +58,13 @@ from a role or parent class:
 
 When modifying an attribute, you cannot use the C<is> option.
 
+Mite objects are always blessed hashrefs, and the name of the attribute
+is the hash key used to store the attribute. It is the maintainer of Mite's
+opinion that it is acceptable for an object method to directly access its
+own attributes this way, but not attributes defined in roles, parent classes,
+etc. Bypassing accessors will cause type checks, lazy defaults, triggers, etc
+to be ignored, so should be done with caution.
+
 The following options are supported. (Expected types for the value of
 each option are also provided. A B<MethodName> is any valid Perl sub
 name; a B<MethodNameTemplate> may also contain "%s" as a placeholder;
