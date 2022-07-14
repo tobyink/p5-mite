@@ -790,11 +790,32 @@
                         package Mite::Shim;
                         ref( $args->{"default"} ) eq 'SCALAR'
                           or ref( $args->{"default"} ) eq 'REF';
+                      }
+                      or do {
+
+                        package Mite::Shim;
+                        do {
+
+                            package Mite::Shim;
+                            ref( $args->{"default"} ) eq 'HASH';
+                          }
+                          and
+                          not( grep !/\A(?:)\z/, keys %{ $args->{"default"} } );
+                      }
+                      or do {
+
+                        package Mite::Shim;
+                        do {
+
+                            package Mite::Shim;
+                            ref( $args->{"default"} ) eq 'ARRAY';
+                          }
+                          and @{ $args->{"default"} } == 0;
                     }
                 );
               }
               or croak "Type check failed in constructor: %s should be %s",
-              "default", "Undef|Str|CodeRef|ScalarRef";
+              "default", "Undef|Str|CodeRef|ScalarRef|Dict[]|Tuple[]";
             $self->{"default"} = $args->{"default"};
         }
 
@@ -2199,10 +2220,21 @@
                       }
                       or ( ref( $_[1] ) eq 'CODE' )
                       or ( ref( $_[1] ) eq 'SCALAR' or ref( $_[1] ) eq 'REF' )
+                      or do {
+
+                        package Mite::Shim;
+                        ( ref( $_[1] ) eq 'HASH' )
+                          and not( grep !/\A(?:)\z/, keys %{ $_[1] } );
+                      }
+                      or do {
+
+                        package Mite::Shim;
+                        ( ref( $_[1] ) eq 'ARRAY' ) and @{ $_[1] } == 0;
+                    }
                 );
               }
               or croak( "Type check failed in %s: value should be %s",
-                "accessor", "Undef|Str|CodeRef|ScalarRef" );
+                "accessor", "Undef|Str|CodeRef|ScalarRef|Dict[]|Tuple[]" );
             $_[0]{"default"} = $_[1];
             $_[0];
           }

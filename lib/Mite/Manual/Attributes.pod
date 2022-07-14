@@ -337,7 +337,7 @@ to return a clone of the value.
         },
     );
 
-=head2 C<default> B<< CodeRef | ScalarRef | Str | Undef >>
+=head2 C<default> B<< CodeRef | ScalarRef | Str | Undef | Dict[] | Tuple[] >>
 
 A default value for the attribute, or a coderef called as a method
 to generate that default value.
@@ -353,6 +353,8 @@ code as a ScalarRef:
 
 This has performance benefits over using a coderef as it avoids the
 overhead of a sub call.
+
+An I<empty> arrayref or I<empty> hashref is also allowed as a default.
 
 =head2 C<builder> B<< MethodNameTemplate | One | CodeRef >>
 

@@ -85,7 +85,7 @@ has coerce =>
 
 has default =>
   is            => rw,
-  isa           => Undef|Str|CodeRef|ScalarRef,
+  isa           => Undef | Str | CodeRef | ScalarRef | Dict[] | Tuple[],
   predicate     => true;
 
 has lazy =>
@@ -386,6 +386,15 @@ sub has_inline_default {
     return ScalarRef->check( $self->default );
 }
 
+sub has_reference_default {
+    my $self = shift;
+
+    # We don't have a default
+    return 0 unless $self->has_default;
+
+    return HashRef->check( $self->default ) || ArrayRef->check( $self->default );
+}
+
 sub has_simple_default {
     my $self = shift;
 
@@ -429,6 +438,9 @@ sub _compile_default {
     }
     elsif ( $self->has_inline_default ) {
         return ${ $self->default };
+    }
+    elsif ( $self->has_reference_default ) {
+        return HashRef->check( $self->default ) ? '{}' : '[]';
     }
     elsif ( $self->has_simple_default ) {
         return defined( $self->default ) ? $self->_q( $self->default ) : 'undef';

@@ -72,5 +72,32 @@ CODE
     is( $o->list, [ 1..4 ] );
 };
 
+tests "arrayref default" => sub {
+    mite_load <<'CODE';
+package MyTest2;
+use Mite::Shim;
+has list =>
+    is => 'ro',
+    default => [];
+1;
+CODE
+
+    my $o = MyTest2->new;
+    is( $o->list, [] );
+};
+
+tests "hashref default" => sub {
+    mite_load <<'CODE';
+package MyTest3;
+use Mite::Shim;
+has list =>
+    is => 'ro',
+    default => {};
+1;
+CODE
+
+    my $o = MyTest3->new;
+    is( $o->list, {} );
+};
 
 done_testing;
