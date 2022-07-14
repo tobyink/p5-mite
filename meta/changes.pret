@@ -1,6 +1,19 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.006013 cpan:TOBYINK`
+	issued  2022-07-14;
+	changeset [
+		item [
+			a dcs:Change;
+			label "Allow [] and {} as defaults for attributes.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Fix some minor typos in the documentation for the isa option for attributes.";
+		];
+	].
+
 `Mite 0.006012 cpan:TOBYINK`
 	issued  2022-07-13;
 	changeset [

@@ -6,7 +6,7 @@ package Mite::Attribute;
 use Mite::Miteception qw( -all !lazy );
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.006012';
+our $VERSION   = '0.006013';
 
 has _order =>
   is            => rw,
