@@ -112,6 +112,12 @@ has clone =>
   isa           => MethodNameTemplate|One|CodeRef|Undef,
   reader        => 'cloner_method';
 
+has [ 'clone_on_read', 'clone_on_write' ] =>
+  is            => 'lazy',
+  isa           => Bool,
+  coerce        => true,
+  builder       => sub { !! shift->cloner_method };
+
 has documentation =>
   is            => rw,
   predicate     => true;
@@ -464,17 +470,17 @@ sub _compile_trigger {
 sub _compile_clone {
     my ( $self, $selfvar, $valuevar ) = @_;
 
-    if ( $self->cloner_method eq true ) {
-        return "Storable::dclone( $valuevar )";
-    }
-
     if ( 'CODE' eq ref $self->cloner_method ) {
         return sprintf '%s->_clone_%s( %s, %s )',
             $selfvar, $self->name, $self->_q( $self->name ), $valuevar;
     }
 
-    return sprintf '%s->%s( %s, %s )',
-        $selfvar, $self->_expand_name( $self->cloner_method ), $self->_q( $self->name ), $valuevar;
+    if ( MethodNameTemplate->check( $self->cloner_method ) ) {
+        return sprintf '%s->%s( %s, %s )',
+            $selfvar, $self->_expand_name( $self->cloner_method ), $self->_q( $self->name ), $valuevar;
+    }
+
+    return "Storable::dclone( $valuevar )";
 }
 
 sub _sanitize_identifier {
@@ -503,7 +509,7 @@ sub compile_init {
         my $valuevar = sprintf '%s->{%s}', $argvar, $self->_q_init_arg;
         my $postamble = '';
 
-        if ( defined $self->cloner_method ) {
+        if ( $self->clone_on_write ) {
             push @code, sprintf '%s = %s if exists( %s );',
                 $valuevar, $self->_compile_clone( $selfvar, $valuevar ), $valuevar;
         }
@@ -598,7 +604,7 @@ my %code_template;
             $code = sprintf '( exists($_[0]{%s}) ? $_[0]{%s} : ( $_[0]{%s} = %s ) )',
                 $self->_q_name, $self->_q_name, $self->_q_name, $self->_compile_checked_default( '$_[0]' );
         }
-        if ( defined $self->cloner_method ) {
+        if ( $self->clone_on_read ) {
             $code = $self->_compile_clone( '$_[0]', $code );
         }
         unless ( $arg{no_croak} ) {
@@ -636,7 +642,7 @@ my %code_template;
             $code .= sprintf '%s or %s( "Type check failed in %%s: value should be %%s", %s, %s ); ',
                 $type->inline_check($valuevar), $self->_function_for_croak, $self->_q( $arg{label} // 'writer' ), $self->_q( $type->display_name );
         }
-        if ( defined $self->cloner_method ) {
+        if ( $self->clone_on_write ) {
             $code .= sprintf 'my $cloned = %s; ',
                 $self->_compile_clone( '$_[0]', $valuevar );
             $valuevar = '$cloned';

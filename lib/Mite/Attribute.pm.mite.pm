@@ -1082,6 +1082,68 @@
             $self->{"clone"} = $args->{"clone"};
         }
 
+        # Attribute: clone_on_read
+        if ( exists $args->{"clone_on_read"} ) {
+            do {
+                my $coerced_value = do {
+                    my $to_coerce = $args->{"clone_on_read"};
+                    (
+                        (
+                            !ref $to_coerce
+                              and (!defined $to_coerce
+                                or $to_coerce eq q()
+                                or $to_coerce eq '0'
+                                or $to_coerce eq '1' )
+                        )
+                      ) ? $to_coerce
+                      : ( ( !!1 ) )
+                      ? scalar( do { local $_ = $to_coerce; !!$_ } )
+                      : $to_coerce;
+                };
+                (
+                    !ref $coerced_value
+                      and (!defined $coerced_value
+                        or $coerced_value eq q()
+                        or $coerced_value eq '0'
+                        or $coerced_value eq '1' )
+                  )
+                  or croak "Type check failed in constructor: %s should be %s",
+                  "clone_on_read", "Bool";
+                $self->{"clone_on_read"} = $coerced_value;
+            };
+        }
+
+        # Attribute: clone_on_write
+        if ( exists $args->{"clone_on_write"} ) {
+            do {
+                my $coerced_value = do {
+                    my $to_coerce = $args->{"clone_on_write"};
+                    (
+                        (
+                            !ref $to_coerce
+                              and (!defined $to_coerce
+                                or $to_coerce eq q()
+                                or $to_coerce eq '0'
+                                or $to_coerce eq '1' )
+                        )
+                      ) ? $to_coerce
+                      : ( ( !!1 ) )
+                      ? scalar( do { local $_ = $to_coerce; !!$_ } )
+                      : $to_coerce;
+                };
+                (
+                    !ref $coerced_value
+                      and (!defined $coerced_value
+                        or $coerced_value eq q()
+                        or $coerced_value eq '0'
+                        or $coerced_value eq '1' )
+                  )
+                  or croak "Type check failed in constructor: %s should be %s",
+                  "clone_on_write", "Bool";
+                $self->{"clone_on_write"} = $coerced_value;
+            };
+        }
+
         # Attribute: documentation
         if ( exists $args->{"documentation"} ) {
             $self->{"documentation"} = $args->{"documentation"};
@@ -1404,7 +1466,7 @@
 
         # Enforce strict constructor
         my @unknown = grep not(
-/\A(?:_class_for_default|a(?:ccessor|lias)|builder|c(?:l(?:ass|earer|one)|o(?:deref_default_variable|erce))|d(?:efault|o(?:cumentation|es))|handles|i(?:nit_arg|sa?)|l(?:azy|ocal_writer|value)|name|predicate|re(?:ader|quired)|t(?:rigger|ype)|w(?:eak_ref|riter))\z/
+/\A(?:_class_for_default|a(?:ccessor|lias)|builder|c(?:l(?:ass|earer|one(?:_on_(?:read|write))?)|o(?:deref_default_variable|erce))|d(?:efault|o(?:cumentation|es))|handles|i(?:nit_arg|sa?)|l(?:azy|ocal_writer|value)|name|predicate|re(?:ader|quired)|t(?:rigger|ype)|w(?:eak_ref|riter))\z/
         ), keys %{$args};
         @unknown
           and croak(
@@ -2072,6 +2134,80 @@
               ? croak("clone is a read-only attribute of @{[ref $_[0]]}")
               : $_[0]{"clone"};
         };
+    }
+
+    # Accessors for clone_on_read
+    sub clone_on_read {
+        @_ > 1
+          ? croak("clone_on_read is a read-only attribute of @{[ref $_[0]]}")
+          : (
+            exists( $_[0]{"clone_on_read"} ) ? $_[0]{"clone_on_read"} : (
+                $_[0]{"clone_on_read"} = do {
+                    my $default_value = do {
+                        my $to_coerce = $_[0]->_build_clone_on_read;
+                        (
+                            (
+                                !ref $to_coerce
+                                  and (!defined $to_coerce
+                                    or $to_coerce eq q()
+                                    or $to_coerce eq '0'
+                                    or $to_coerce eq '1' )
+                            )
+                          ) ? $to_coerce
+                          : ( ( !!1 ) )
+                          ? scalar( do { local $_ = $to_coerce; !!$_ } )
+                          : $to_coerce;
+                    };
+                    (
+                        !ref $default_value
+                          and (!defined $default_value
+                            or $default_value eq q()
+                            or $default_value eq '0'
+                            or $default_value eq '1' )
+                      )
+                      or croak( "Type check failed in default: %s should be %s",
+                        "clone_on_read", "Bool" );
+                    $default_value;
+                }
+            )
+          );
+    }
+
+    # Accessors for clone_on_write
+    sub clone_on_write {
+        @_ > 1
+          ? croak("clone_on_write is a read-only attribute of @{[ref $_[0]]}")
+          : (
+            exists( $_[0]{"clone_on_write"} ) ? $_[0]{"clone_on_write"} : (
+                $_[0]{"clone_on_write"} = do {
+                    my $default_value = do {
+                        my $to_coerce = $_[0]->_build_clone_on_write;
+                        (
+                            (
+                                !ref $to_coerce
+                                  and (!defined $to_coerce
+                                    or $to_coerce eq q()
+                                    or $to_coerce eq '0'
+                                    or $to_coerce eq '1' )
+                            )
+                          ) ? $to_coerce
+                          : ( ( !!1 ) )
+                          ? scalar( do { local $_ = $to_coerce; !!$_ } )
+                          : $to_coerce;
+                    };
+                    (
+                        !ref $default_value
+                          and (!defined $default_value
+                            or $default_value eq q()
+                            or $default_value eq '0'
+                            or $default_value eq '1' )
+                      )
+                      or croak( "Type check failed in default: %s should be %s",
+                        "clone_on_write", "Bool" );
+                    $default_value;
+                }
+            )
+          );
     }
 
     # Accessors for coderef_default_variable

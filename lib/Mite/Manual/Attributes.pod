@@ -344,6 +344,22 @@ to return a clone of the value.
         },
     );
 
+This option can be fine-tuned by setting the C<clone_on_read> and
+C<clone_on_write> boolean options. By default, attributes which have
+a clone method set will clone both incoming and outgoing references.
+
+    has start_date => (
+        is       => ro,
+        isa      => 'InstanceOf["DateTime"]',
+        required => true,
+        clone    => sub {
+            my ( $self, $attrname, $value ) = @_;
+            return $value->clone;
+        },
+        clone_on_write => true,
+        clone_on_read  => false,
+    );
+
 =head2 C<default> B<< CodeRef | ScalarRef | Str | Undef | Dict[] | Tuple[] >>
 
 A default value for the attribute, or a coderef called as a method
