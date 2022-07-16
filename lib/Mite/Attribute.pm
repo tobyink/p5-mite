@@ -29,7 +29,7 @@ has _class_for_default =>
   isa           => MiteRole,
   weak_ref      => true,
   lazy          => true,
-  builder       => sub { shift->class };
+  builder       => sub { $_[0]->class || $_[0]->compiling_class };
 
 has name =>
   is            => rw,
