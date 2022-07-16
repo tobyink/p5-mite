@@ -4,7 +4,9 @@ use lib 't/lib';
 
 use Test::Mite;
 
-tests "basic positional test" => sub {
+my $has_new_type_params = eval "use Type::Params 1.015 (); 1";
+
+$has_new_type_params and tests "basic positional test" => sub {
     mite_load <<'CODE';
 package MyTest;
 use Mite::Shim -all;
@@ -45,7 +47,7 @@ CODE
     }
 };
 
-tests "basic named test" => sub {
+$has_new_type_params and tests "basic named test" => sub {
     mite_load <<'CODE';
 package MyTest2;
 use Mite::Shim -all;
@@ -94,7 +96,7 @@ CODE
     }
 };
 
-tests "basic named-to-list test" => sub {
+$has_new_type_params and tests "basic named-to-list test" => sub {
     mite_load <<'CODE';
 package MyTest3;
 use Mite::Shim -all;
@@ -136,7 +138,7 @@ CODE
     }
 };
 
-tests "function test" => sub {
+$has_new_type_params and tests "function test" => sub {
     mite_load <<'CODE';
 package MyTest4;
 use Mite::Shim -all;
@@ -176,5 +178,7 @@ CODE
         like( $e, qr/Wrong number of parameters in signature for foo/, 'simple count fail' );
     }
 };
+
+ok 1;
 
 done_testing;
