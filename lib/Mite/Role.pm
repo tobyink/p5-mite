@@ -55,6 +55,11 @@ has required_methods =>
   isa           => ArrayRef[MethodName],
   builder       => sub { [] };
 
+has method_signatures =>
+  is            => ro,
+  isa           => Map[ MethodName, MiteSignature ],
+  builder       => sub { {} };
+
 ##-
 
 sub BUILD {
@@ -199,6 +204,22 @@ ERROR
     return;
 }
 
+sub add_method_signature {
+    my ( $self, $method_name, %opts ) = @_;
+
+    defined $self->method_signatures->{ $method_name }
+        and croak( 'Method signature for %s already exists', $method_name );
+
+    require Mite::Signature;
+    $self->method_signatures->{ $method_name } = 'Mite::Signature'->new(
+        method_name => $method_name,
+        class => $self,
+        %opts,
+    );
+
+    return;
+}
+
 sub add_role {
     my ( $self, $role ) = @_;
 
@@ -282,6 +303,7 @@ sub compilation_stages {
         _compile_with
         _compile_does
         _compile_composed_methods
+        _compile_method_signatures
         _compile_callback
     );
 }
@@ -419,6 +441,27 @@ sub __META__ {
     };
 }
 CODE
+}
+
+sub _compile_method_signatures {
+    my $self = shift;
+    my %sigs = %{ $self->method_signatures } or return;
+
+    my $code = "our \%SIGNATURE_FOR;\n\n";
+
+    for my $name ( sort keys %sigs ) {
+        $code .= sprintf(
+            '$SIGNATURE_FOR{%s} = %s;' . "\n\n",
+            B::perlstring( $name ),
+            $sigs{$name}->_compile_coderef,
+        );
+
+        if ( my $support = $sigs{$name}->_compile_support ) {
+            $code .= "$support\n\n";
+        }
+    }
+
+    return $code;
 }
 
 sub _compile_callback {

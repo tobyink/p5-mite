@@ -220,6 +220,7 @@ sub compilation_stages {
         _compile_does
         _compile_attribute_accessors
         _compile_composed_methods
+        _compile_method_signatures
     );
 
     return @stages;

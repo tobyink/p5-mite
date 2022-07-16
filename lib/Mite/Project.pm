@@ -186,6 +186,11 @@ sub inject_mite_functions {
         return;
     } if $requested->( 'with', 1 );
 
+    *{ $package .'::signature_for' } = sub {
+        $pkg->add_method_signature( @_ );
+        return;
+    } if $requested->( 'signature_for', 1 );
+
     *{ $package .'::extends' } = sub {
         $pkg->superclasses(
             defined( $fake_ns )

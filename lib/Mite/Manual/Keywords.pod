@@ -109,6 +109,93 @@ Basic versions of the C<before>, C<around>, and C<after> method modifiers
 are provided, but these may run in a different order from Moose if you
 use several modifiers on the same method.
 
+=head2 C<< signature_for $method_name => %spec >>
+
+Installs a wrapper for a method enforcing a method signature, inspired by
+L<Type::Params>. This is installed via the same mechanism as C<around>,
+so is sensitive to the same concerns with regard to ordering, etc.
+
+Simple example of named parameters:
+
+    signature_for my_method => (
+        named => [
+            foo  => 'Bool',
+            bar  => 'Int', { default => 42 },
+        ],
+    );
+    
+    sub my_method {
+        my ( $self, $arg ) = @_;
+        
+        if ( $arg->foo ) {
+            return $arg->bar / 2;
+        }
+        else {
+            return $arg->bar * 2;
+        }
+    }
+    
+    $object->my_method( foo => true, bar => 30 );
+    $object->my_method( { foo => true, bar => 36 } );
+    $object->my_method( foo => false );
+
+Simple example using positional parameters:
+
+    signature_for my_method => (
+        pos => [
+            'Bool',
+            'Int', { default => 42 },
+        ],
+    );
+    
+    sub my_method {
+        my ( $self, $foo, $bar ) = @_;
+        
+        if ( $foo ) {
+            return $bar / 2;
+        }
+        else {
+            return $bar * 2;
+        }
+    }
+    
+    $object->my_method( true, 30 );
+    $object->my_method( false );
+
+Simple example using named-to-list (named on the outside, positional on the
+inside):
+
+    signature_for my_method => (
+        named => [
+            foo => 'Bool',
+            bar => 'Int', { default => 42 },
+        ],
+        named_to_list => true,
+    );
+    
+    sub my_method {
+        my ( $self, $foo, $bar ) = @_;
+        
+        if ( $foo ) {
+            return $bar / 2;
+        }
+        else {
+            return $bar * 2;
+        }
+    }
+    
+    $object->my_method( foo => true, bar => 30 );
+    $object->my_method( { foo => true, bar => 36 } );
+    $object->my_method( foo => false );
+
+You can indicate that your sub is designed to be called as a function instead
+of a method (no C<< $self >>):
+
+    signature_for my_func => (
+        ...,
+        method => false,
+    );
+
 =head2 C<true> and C<false>
 
 Although they're not imported by default, you can import C<true> and

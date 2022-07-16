@@ -4,7 +4,8 @@ use strict;
 use warnings;
 use Type::Library 1.012 -base, -declare => qw(
 	One MethodName MethodNameTemplate ValidClassName HandlesHash AliasList
-	MiteRole MiteClass MiteAttribute MiteProject MiteSource MiteCompiled MiteConfig
+	MiteRole MiteClass MiteAttribute MiteProject MiteSource MiteCompiled
+	MiteConfig MiteSignature
 );
 
 use Types::Standard -types;
@@ -47,6 +48,12 @@ __PACKAGE__->add_type(
 	name      => MiteSource,
 	parent    => InstanceOf[ 'Mite::Source' ],
 	display_name => 'Mite::Source',
+);
+
+__PACKAGE__->add_type(
+	name      => MiteSignature,
+	parent    => InstanceOf[ 'Mite::Signature' ],
+	display_name => 'Mite::Signature',
 );
 
 __PACKAGE__->add_type(

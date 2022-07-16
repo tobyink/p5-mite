@@ -248,6 +248,52 @@
             $self->{"required_methods"} = $value;
         };
 
+        # Attribute: method_signatures
+        do {
+            my $value =
+              exists( $args->{"method_signatures"} )
+              ? $args->{"method_signatures"}
+              : $self->_build_method_signatures;
+            do {
+
+                package Mite::Shim;
+                ( ref($value) eq 'HASH' ) and do {
+                    my $ok = 1;
+                    for my $v ( values %{$value} ) {
+                        ( $ok = 0, last )
+                          unless (
+                            do {
+                                use Scalar::Util ();
+                                Scalar::Util::blessed($v)
+                                  and $v->isa(q[Mite::Signature]);
+                            }
+                          );
+                    };
+                    for my $k ( keys %{$value} ) {
+                        ( $ok = 0, last )
+                          unless (
+                            (
+                                do {
+
+                                    package Mite::Shim;
+                                    defined($k) and do {
+                                        ref( \$k ) eq 'SCALAR'
+                                          or ref( \( my $val = $k ) ) eq
+                                          'SCALAR';
+                                    }
+                                }
+                            )
+                            && ( do { local $_ = $k; /\A[^\W0-9]\w*\z/ } )
+                          );
+                    };
+                    $ok;
+                }
+              }
+              or croak "Type check failed in constructor: %s should be %s",
+              "method_signatures", "Map[MethodName,Mite::Signature]";
+            $self->{"method_signatures"} = $value;
+        };
+
         # Attribute: extends
         do {
             my $value =
@@ -317,7 +363,7 @@
 
         # Enforce strict constructor
         my @unknown = grep not(
-/\A(?:attributes|extends|imported_functions|name|parents|r(?:equired_methods|oles)|s(?:him_name|ource))\z/
+/\A(?:attributes|extends|imported_functions|method_signatures|name|parents|r(?:equired_methods|oles)|s(?:him_name|ource))\z/
         ), keys %{$args};
         @unknown
           and croak(
