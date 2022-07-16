@@ -7,7 +7,7 @@ use Mite::Miteception -all;
 extends qw(Mite::Role);
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.006013';
+our $VERSION   = '0.007000';
 
 sub inhale {
     my ( $class, $rolename, %args ) = @_;

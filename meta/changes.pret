@@ -1,6 +1,23 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.007000 cpan:TOBYINK`
+	issued  2022-07-17;
+	changeset [
+		item [
+			a dcs:Addition;
+			label "New `signature_for` keyword, adding Type::Params-like signatures.";
+		];
+		item [
+			a dcs:Addition;
+			label "clone_on_read and clone_on_write options for attributes.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Explicitly document that Mite's objects are blessed hashrefs.";
+		];
+	].
+
 `Mite 0.006013 cpan:TOBYINK`
 	issued  2022-07-14;
 	changeset [
