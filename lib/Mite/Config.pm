@@ -15,7 +15,7 @@ has mite_dir_name =>
 
 has mite_dir =>
   is            => ro,
-  isa           => Path->no_coercions->plus_coercions(Str, 'Path::Tiny::path($_)'),
+  isa           => Path,
   coerce        => true,
   lazy          => true,
   default       => sub {
@@ -26,7 +26,7 @@ has mite_dir =>
 
 has config_file =>
   is            => ro,
-  isa           => Path->no_coercions->plus_coercions(Str, 'Path::Tiny::path($_)'),
+  isa           => Path,
   coerce        => true,
   lazy          => true,
   default       => sub {

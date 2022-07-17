@@ -80,6 +80,28 @@
                       ? scalar(
                         do { local $_ = $to_coerce; Path::Tiny::path($_) }
                       )
+                      : (
+                        do {
+
+                            package Mite::Shim;
+                            defined($to_coerce) && !ref($to_coerce)
+                              or Scalar::Util::blessed($to_coerce) && (
+                                sub {
+                                    require overload;
+                                    overload::Overloaded( ref $_[0] or $_[0] )
+                                      and
+                                      overload::Method( ( ref $_[0] or $_[0] ),
+                                        $_[1] );
+                                }
+                            )->( $to_coerce, q[""] );
+                        }
+                      )
+                      ? scalar(
+                        do { local $_ = $to_coerce; Path::Tiny::path($_) }
+                      )
+                      : ( ( ref($to_coerce) eq 'ARRAY' ) ) ? scalar(
+                        do { local $_ = $to_coerce; Path::Tiny::path(@$_) }
+                      )
                       : $to_coerce;
                 };
                 (
@@ -121,6 +143,28 @@
                       )
                       ? scalar(
                         do { local $_ = $to_coerce; Path::Tiny::path($_) }
+                      )
+                      : (
+                        do {
+
+                            package Mite::Shim;
+                            defined($to_coerce) && !ref($to_coerce)
+                              or Scalar::Util::blessed($to_coerce) && (
+                                sub {
+                                    require overload;
+                                    overload::Overloaded( ref $_[0] or $_[0] )
+                                      and
+                                      overload::Method( ( ref $_[0] or $_[0] ),
+                                        $_[1] );
+                                }
+                            )->( $to_coerce, q[""] );
+                        }
+                      )
+                      ? scalar(
+                        do { local $_ = $to_coerce; Path::Tiny::path($_) }
+                      )
+                      : ( ( ref($to_coerce) eq 'ARRAY' ) ) ? scalar(
+                        do { local $_ = $to_coerce; Path::Tiny::path(@$_) }
                       )
                       : $to_coerce;
                 };
@@ -271,6 +315,30 @@
                           ? scalar(
                             do { local $_ = $to_coerce; Path::Tiny::path($_) }
                           )
+                          : (
+                            do {
+
+                                package Mite::Shim;
+                                defined($to_coerce) && !ref($to_coerce)
+                                  or Scalar::Util::blessed($to_coerce) && (
+                                    sub {
+                                        require overload;
+                                        overload::Overloaded(
+                                            ref $_[0]
+                                              or $_[0]
+                                          )
+                                          and overload::Method(
+                                            ( ref $_[0] or $_[0] ), $_[1] );
+                                    }
+                                )->( $to_coerce, q[""] );
+                            }
+                          )
+                          ? scalar(
+                            do { local $_ = $to_coerce; Path::Tiny::path($_) }
+                          )
+                          : ( ( ref($to_coerce) eq 'ARRAY' ) ) ? scalar(
+                            do { local $_ = $to_coerce; Path::Tiny::path(@$_) }
+                          )
                           : $to_coerce;
                     };
                     (
@@ -347,6 +415,30 @@
                           )
                           ? scalar(
                             do { local $_ = $to_coerce; Path::Tiny::path($_) }
+                          )
+                          : (
+                            do {
+
+                                package Mite::Shim;
+                                defined($to_coerce) && !ref($to_coerce)
+                                  or Scalar::Util::blessed($to_coerce) && (
+                                    sub {
+                                        require overload;
+                                        overload::Overloaded(
+                                            ref $_[0]
+                                              or $_[0]
+                                          )
+                                          and overload::Method(
+                                            ( ref $_[0] or $_[0] ), $_[1] );
+                                    }
+                                )->( $to_coerce, q[""] );
+                            }
+                          )
+                          ? scalar(
+                            do { local $_ = $to_coerce; Path::Tiny::path($_) }
+                          )
+                          : ( ( ref($to_coerce) eq 'ARRAY' ) ) ? scalar(
+                            do { local $_ = $to_coerce; Path::Tiny::path(@$_) }
                           )
                           : $to_coerce;
                     };

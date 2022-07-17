@@ -10,6 +10,7 @@ use Mite::Attribute;
 use Mite::Class;
 use Mite::Config;
 use Mite::Project;
+use Mite::Signature;
 
 my $config  = Mite::Config->new( search_for_mite_dir => 1 );
 my $project = Mite::Project->new( config => $config );

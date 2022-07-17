@@ -2,15 +2,20 @@ package Mite::Types;
 
 use strict;
 use warnings;
-use Type::Library 1.012 -base, -declare => qw(
-	One MethodName MethodNameTemplate ValidClassName HandlesHash AliasList
-	MiteRole MiteClass MiteAttribute MiteProject MiteSource MiteCompiled
-	MiteConfig MiteSignature
-);
+use Type::Library 1.012
+	-extends => [ qw(
+		Types::Standard
+		Types::Common::String
+		Types::Path::Tiny
+	) ],
+	-declare => qw(
+		One MethodName MethodNameTemplate ValidClassName HandlesHash AliasList
+		MiteRole MiteClass MiteAttribute MiteProject MiteSource MiteCompiled
+		MiteConfig MiteSignature
+	);
 
-use Types::Standard -types;
-use Types::Common::String -types;
-use Types::Common::Numeric -types;
+use Types::Standard 'slurpy';
+push our @EXPORT_OK, 'slurpy';
 
 __PACKAGE__->add_type(
 	name      => One,

@@ -10,7 +10,7 @@ our $VERSION   = '0.007000';
 
 has file =>
   is            => ro,
-  isa           => Path->no_coercions->plus_coercions(Str, 'Path::Tiny::path($_)'),,
+  isa           => Path,
   coerce        => true,
   required      => true;
 

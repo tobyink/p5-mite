@@ -10,9 +10,6 @@ our $VERSION   = '0.007000';
 use Import::Into;
 use Mite::Shim ();
 use Mite::Types ();
-use Types::Standard ();
-use Types::Common::String ();
-use Types::Path::Tiny ();
 use Type::Params ();
 
 sub import {
@@ -49,16 +46,7 @@ sub to_import {
 	no warnings 'uninitialized';
 	return (
 		[ 'Mite::Types' => [
-			qw( -types ),
-		] ],
-		[ 'Types::Standard' => [
 			qw( -types slurpy ),
-		] ],
-		[ 'Types::Common::String' => [
-			qw( -types ),
-		] ],
-		[ 'Types::Path::Tiny' => [
-			qw( -types ),
 		] ],
 		[ 'Type::Params' => [
 			compile           => { -as => 'sig_pos'   },
