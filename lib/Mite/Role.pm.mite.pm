@@ -538,5 +538,58 @@
           : ( $_[0]{"source"} );
     }
 
+    our %SIGNATURE_FOR;
+
+    $SIGNATURE_FOR{"add_attributes"} = sub {
+        my $__NEXT__ = shift;
+
+        my ( @out, %tmp, $tmp, $dtmp, @head );
+
+        @_ >= 1
+          or croak(
+            "Wrong number of parameters in signature for %s: %s, got %d",
+            "add_attributes", "expected exactly 1 parameters",
+            scalar(@_)
+          );
+
+        @head = splice( @_, 0, 1 );
+
+        # Parameter $head[0] (type: Defined)
+        ( defined( $head[0] ) )
+          or croak(
+"Type check failed in signature for add_attributes: %s should be %s",
+            "\$_[0]", "Defined"
+          );
+
+        my $SLURPY = [ @_[ 0 .. $#_ ] ];
+
+        # Parameter $SLURPY (type: ArrayRef[InstanceOf["Mite::Attribute"]])
+        do {
+
+            package Mite::Shim;
+            ( ref($SLURPY) eq 'ARRAY' ) and do {
+                my $ok = 1;
+                for my $i ( @{$SLURPY} ) {
+                    ( $ok = 0, last )
+                      unless (
+                        do {
+                            use Scalar::Util ();
+                            Scalar::Util::blessed($i)
+                              and $i->isa(q[Mite::Attribute]);
+                        }
+                      );
+                };
+                $ok;
+            }
+          }
+          or croak(
+"Type check failed in signature for add_attributes: %s should be %s",
+            "\$SLURPY", "ArrayRef[InstanceOf[\"Mite::Attribute\"]]"
+          );
+        push( @out, $SLURPY );
+
+        return ( &$__NEXT__( @head, @out ) );
+    };
+
     1;
 }

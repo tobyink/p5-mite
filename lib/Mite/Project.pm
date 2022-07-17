@@ -84,9 +84,8 @@ my $parse_mm_args = sub {
 };
 
 # This is the shim Mite.pm uses when compiling.
-sub inject_mite_functions {
-    state $sig = sig_named(
-        { head => [ Object ], named_to_list => true },
+signature_for inject_mite_functions => (
+    named => [
         package   => Any,
         file      => Any,
         kind      => Str,        { default => 'class' },
@@ -94,8 +93,12 @@ sub inject_mite_functions {
         shim      => Str,
         x_source  => Optional[Object],
         x_pkg     => Optional[Object],
-    );
-    my ( $self, $package, $file, $kind, $arg, $shim, $source, $pkg, $moresubs ) = &$sig;
+    ],
+    named_to_list => true,
+);
+
+sub inject_mite_functions {
+    my ( $self, $package, $file, $kind, $arg, $shim, $source, $pkg, $moresubs ) = @_;
     my $requested = sub { $arg->{$_[0]} ? 1 : $arg->{'!'.$_[0]} ? 0 : $arg->{'-all'} ? 1 : $_[1]; };
 
     my $fake_ns = $self->can('_module_fakeout_namespace') && $self->_module_fakeout_namespace;
@@ -254,9 +257,12 @@ sub write_mites {
     return;
 }
 
+signature_for load_files => (
+    pos => [ ArrayRef, 0 ],
+);
+
 sub load_files {
-    state $sig = sig_pos( 1, ArrayRef, 0 );
-    my ( $self, $files, $inc_dir ) = &$sig;
+    my ( $self, $files, $inc_dir ) = @_;
 
     local $ENV{MITE_COMPILE} = 1;
     local @INC = @INC;
@@ -360,9 +366,12 @@ sub clean_shim {
 }
 
 # Recursively gather all the pm files in a directory
+signature_for _recurse_directory => (
+    pos => [ Path, CodeRef ],
+);
+
 sub _recurse_directory {
-    state $sig = sig_pos( Object, Path, CodeRef );
-    my ( $self, $dir, $check ) = &$sig;
+    my ( $self, $dir, $check ) = @_;
 
     my @pm_files;
 

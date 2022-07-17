@@ -168,9 +168,12 @@ sub project {
     return $self->source->project;
 }
 
+signature_for add_attributes => (
+    pos => [ slurpy ArrayRef[InstanceOf['Mite::Attribute']] ],
+);
+
 sub add_attributes {
-    state $sig = sig_pos( Object, slurpy ArrayRef[InstanceOf['Mite::Attribute']] );
-    my ( $self, $attributes ) = &$sig;
+    my ( $self, $attributes ) = @_;
 
     for my $attribute (@$attributes) {
         $self->attributes->{ $attribute->name } = $attribute;

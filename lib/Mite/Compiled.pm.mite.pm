@@ -346,5 +346,39 @@
         };
     }
 
+    our %SIGNATURE_FOR;
+
+    $SIGNATURE_FOR{"_source_file2compiled_file"} = sub {
+        my $__NEXT__ = shift;
+
+        my ( %tmp, $tmp, @head );
+
+        @_ == 2
+          or croak(
+            "Wrong number of parameters in signature for %s: %s, got %d",
+            "_source_file2compiled_file",
+            "expected exactly 2 parameters",
+            scalar(@_)
+          );
+
+        @head = splice( @_, 0, 1 );
+
+        # Parameter $head[0] (type: Defined)
+        ( defined( $head[0] ) )
+          or croak(
+"Type check failed in signature for _source_file2compiled_file: %s should be %s",
+            "\$_[0]", "Defined"
+          );
+
+        # Parameter $_[0] (type: Defined)
+        ( defined( $_[0] ) )
+          or croak(
+"Type check failed in signature for _source_file2compiled_file: %s should be %s",
+            "\$_[1]", "Defined"
+          );
+
+        return ( &$__NEXT__( @head, @_ ) );
+    };
+
     1;
 }

@@ -45,10 +45,12 @@ MAKE
     }
 }
 
+signature_for fix_pm_to_blib => (
+    pos => [ Path, Path ],
+);
 
 sub fix_pm_to_blib {
-    state $sig = sig_pos( Any, Path, Path );
-    my ( $self, $from_dir, $to_dir ) = &$sig;
+    my ( $self, $from_dir, $to_dir ) = @_;
 
     find({
         wanted => sub {
@@ -71,10 +73,13 @@ sub fix_pm_to_blib {
     return;
 }
 
+signature_for change_parent_dir => (
+    method => false,
+    pos => [ Path, Path, Path ],
+);
 
 sub change_parent_dir {
-    state $sig = sig_pos( Path, Path, Path );
-    my ( $old_parent, $new_parent, $file ) = &$sig;
+    my ( $old_parent, $new_parent, $file ) = @_;
 
     return $new_parent->child( $file->relative($old_parent) );
 }

@@ -283,5 +283,269 @@
         };
     }
 
+    our %SIGNATURE_FOR;
+
+    $SIGNATURE_FOR{"_recurse_directory"} = sub {
+        my $__NEXT__ = shift;
+
+        my ( @out, %tmp, $tmp, $dtmp, @head );
+
+        @_ == 3
+          or croak(
+            "Wrong number of parameters in signature for %s: %s, got %d",
+            "_recurse_directory", "expected exactly 3 parameters",
+            scalar(@_)
+          );
+
+        @head = splice( @_, 0, 1 );
+
+        # Parameter $head[0] (type: Defined)
+        ( defined( $head[0] ) )
+          or croak(
+"Type check failed in signature for _recurse_directory: %s should be %s",
+            "\$_[0]", "Defined"
+          );
+
+        # Parameter $_[0] (type: Path)
+        $tmp = (
+            (
+                do {
+                    use Scalar::Util ();
+                    Scalar::Util::blessed( $_[0] )
+                      and $_[0]->isa(q[Path::Tiny]);
+                }
+            )
+        ) ? $_[0] : (
+            do {
+
+                package Mite::Shim;
+                defined( $_[0] ) and do {
+                    ref( \$_[0] ) eq 'SCALAR'
+                      or ref( \( my $val = $_[0] ) ) eq 'SCALAR';
+                }
+            }
+          )
+          ? scalar(
+            do { local $_ = $_[0]; Path::Tiny::path($_) }
+          )
+          : (
+            do {
+
+                package Mite::Shim;
+                defined( $_[0] ) && !ref( $_[0] )
+                  or Scalar::Util::blessed( $_[0] ) && (
+                    sub {
+                        require overload;
+                        overload::Overloaded( ref $_[0] or $_[0] )
+                          and overload::Method( ( ref $_[0] or $_[0] ), $_[1] );
+                    }
+                )->( $_[0], q[""] );
+            }
+          )
+          ? scalar(
+            do { local $_ = $_[0]; Path::Tiny::path($_) }
+          )
+          : ( ( ref( $_[0] ) eq 'ARRAY' ) ) ? scalar(
+            do { local $_ = $_[0]; Path::Tiny::path(@$_) }
+          )
+          : $_[0];
+        (
+            do {
+                use Scalar::Util ();
+                Scalar::Util::blessed($tmp) and $tmp->isa(q[Path::Tiny]);
+            }
+          )
+          or croak(
+"Type check failed in signature for _recurse_directory: %s should be %s",
+            "\$_[1]", "Path"
+          );
+        push( @out, $tmp );
+
+        # Parameter $_[1] (type: CodeRef)
+        ( ref( $_[1] ) eq 'CODE' )
+          or croak(
+"Type check failed in signature for _recurse_directory: %s should be %s",
+            "\$_[2]", "CodeRef"
+          );
+        push( @out, $_[1] );
+
+        return ( &$__NEXT__( @head, @out ) );
+    };
+
+    $SIGNATURE_FOR{"inject_mite_functions"} = sub {
+        my $__NEXT__ = shift;
+
+        my ( %out, %in, %tmp, $tmp, $dtmp, @head );
+
+        @_ == 2 && ( ref( $_[1] ) eq 'HASH' )
+          or @_ % 2 == 1 && @_ >= 7 && @_ <= 15
+          or croak(
+            "Wrong number of parameters in signature for %s: %s, got %d",
+            "inject_mite_functions", "that does not seem right",
+            scalar(@_)
+          );
+
+        @head = splice( @_, 0, 1 );
+
+        # Parameter $head[0] (type: Defined)
+        ( defined( $head[0] ) )
+          or croak(
+"Type check failed in signature for inject_mite_functions: %s should be %s",
+            "\$_[0]", "Defined"
+          );
+
+        %in = ( @_ == 1 and ( ref( $_[0] ) eq 'HASH' ) ) ? %{ $_[0] } : @_;
+
+        # Parameter package (type: Any)
+        exists( $in{"package"} )
+          or croak( "Failure in signature for inject_mite_functions: "
+              . 'Missing required parameter: package' );
+        1;    # ... nothing to do
+        $out{"package"} = $in{"package"} if exists( $in{"package"} );
+        delete( $in{"package"} );
+
+        # Parameter file (type: Any)
+        exists( $in{"file"} )
+          or croak( "Failure in signature for inject_mite_functions: "
+              . 'Missing required parameter: file' );
+        1;    # ... nothing to do
+        $out{"file"} = $in{"file"} if exists( $in{"file"} );
+        delete( $in{"file"} );
+
+        # Parameter kind (type: Str)
+        $dtmp = exists( $in{"kind"} ) ? $in{"kind"} : "class";
+        do {
+
+            package Mite::Shim;
+            defined($dtmp) and do {
+                ref( \$dtmp ) eq 'SCALAR'
+                  or ref( \( my $val = $dtmp ) ) eq 'SCALAR';
+            }
+          }
+          or croak(
+"Type check failed in signature for inject_mite_functions: %s should be %s",
+            "\$_{\"kind\"}", "Str"
+          );
+        $out{"kind"} = $dtmp;
+        delete( $in{"kind"} );
+
+        # Parameter arg (type: HashRef)
+        $dtmp = exists( $in{"arg"} ) ? $in{"arg"} : {};
+        ( ref($dtmp) eq 'HASH' )
+          or croak(
+"Type check failed in signature for inject_mite_functions: %s should be %s",
+            "\$_{\"arg\"}", "HashRef"
+          );
+        $out{"arg"} = $dtmp;
+        delete( $in{"arg"} );
+
+        # Parameter shim (type: Str)
+        exists( $in{"shim"} )
+          or croak( "Failure in signature for inject_mite_functions: "
+              . 'Missing required parameter: shim' );
+        do {
+
+            package Mite::Shim;
+            defined( $in{"shim"} ) and do {
+                ref( \$in{"shim"} ) eq 'SCALAR'
+                  or ref( \( my $val = $in{"shim"} ) ) eq 'SCALAR';
+            }
+          }
+          or croak(
+"Type check failed in signature for inject_mite_functions: %s should be %s",
+            "\$_{\"shim\"}", "Str"
+          );
+        $out{"shim"} = $in{"shim"} if exists( $in{"shim"} );
+        delete( $in{"shim"} );
+
+        # Parameter x_source (type: Optional[Object])
+        if ( exists( $in{"x_source"} ) ) {
+            (
+                do {
+
+                    package Mite::Shim;
+                    use Scalar::Util ();
+                    Scalar::Util::blessed( $in{"x_source"} );
+                }
+              )
+              or croak(
+"Type check failed in signature for inject_mite_functions: %s should be %s",
+                "\$_{\"x_source\"}", "Optional[Object]"
+              );
+            $out{"x_source"} = $in{"x_source"} if exists( $in{"x_source"} );
+            delete( $in{"x_source"} );
+        }
+
+        # Parameter x_pkg (type: Optional[Object])
+        if ( exists( $in{"x_pkg"} ) ) {
+            (
+                do {
+
+                    package Mite::Shim;
+                    use Scalar::Util ();
+                    Scalar::Util::blessed( $in{"x_pkg"} );
+                }
+              )
+              or croak(
+"Type check failed in signature for inject_mite_functions: %s should be %s",
+                "\$_{\"x_pkg\"}", "Optional[Object]"
+              );
+            $out{"x_pkg"} = $in{"x_pkg"} if exists( $in{"x_pkg"} );
+            delete( $in{"x_pkg"} );
+        }
+
+        # Unrecognized parameters
+        croak(
+            "Failure in signature for inject_mite_functions: "
+              . sprintf(
+                q{Unrecognized parameter%s: %s},
+                keys(%in) > 1 ? q{s} : q{},
+                join( q{, }, sort keys %in )
+              )
+        ) if keys %in;
+
+        return (
+            &$__NEXT__(
+                @head,            $out{"package"}, $out{"file"},
+                $out{"kind"},     $out{"arg"},     $out{"shim"},
+                $out{"x_source"}, $out{"x_pkg"}
+            )
+        );
+    };
+
+    $SIGNATURE_FOR{"load_files"} = sub {
+        my $__NEXT__ = shift;
+
+        my ( %tmp, $tmp, @head );
+
+        @_ >= 2 && @_ <= 3
+          or croak(
+            "Wrong number of parameters in signature for %s: %s, got %d",
+            "load_files", "expected exactly 2 parameters",
+            scalar(@_)
+          );
+
+        @head = splice( @_, 0, 1 );
+
+        # Parameter $head[0] (type: Defined)
+        ( defined( $head[0] ) )
+          or croak(
+            "Type check failed in signature for load_files: %s should be %s",
+            "\$_[0]", "Defined" );
+
+        # Parameter $_[0] (type: ArrayRef)
+        ( ref( $_[0] ) eq 'ARRAY' )
+          or croak(
+            "Type check failed in signature for load_files: %s should be %s",
+            "\$_[1]", "ArrayRef" );
+
+        # Parameter $_[1] (type: Any)
+        $#_ >= 1
+          or return ( &$__NEXT__( @head, @_ ) );
+        1;    # ... nothing to do
+
+        return ( &$__NEXT__( @head, @_ ) );
+    };
+
     1;
 }

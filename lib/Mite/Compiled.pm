@@ -84,9 +84,12 @@ sub classes {
     return $self->source->classes;
 }
 
+signature_for _source_file2compiled_file => (
+   pos => [ Defined ],
+);
+
 sub _source_file2compiled_file {
-    state $sig = sig_pos( Object, Defined );
-    my ( $self, $source_file ) = &$sig;
+    my ( $self, $source_file ) = @_;
 
     # Changes here must be coordinated with Mite.pm
     return $source_file . '.mite.pm';

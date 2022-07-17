@@ -10,49 +10,26 @@ our $VERSION   = '0.007002';
 use Import::Into;
 use Mite::Shim ();
 use Mite::Types ();
-use Type::Params ();
 
 sub import {
-	my $class = shift;
-	my %arg = map { lc($_) => 1 } @_;
-
-	my $kind = $arg{'-role'} ? 'role' : 'class';
-
-	for my $import ( $class->to_import( \%arg ) ) {
-		my ( $pkg, $args ) = @$import;
-		$pkg->import::into( 1, @{ $args || [] } );
-	}
-
-	my ( $caller, $file ) = caller;
+	'Mite::Types'->import::into( 1, qw( -types slurpy ) );
 
 	if ( $ENV{MITE_COMPILE_SELF} ) {
+		my $class = shift;
+		my %arg = map { lc($_) => 1 } @_;
+		my ( $caller, $file ) = caller;
 		require Mite::Project;
 		Mite::Project->default->inject_mite_functions(
 			 package     => $caller,
 			 file        => $file,
 			 arg         => \%arg,
-			 kind        => $kind,
+			 kind        => ( $arg{'-role'} ? 'role' : 'class' ),
 			 shim        => 'Mite::Shim',
 		);
 	}
 	else {
-		unshift @_, $class;
 		goto \&load_mite_file;
 	}
-}
-
-sub to_import {
-	my ( $class, $arg ) = ( shift, @_ );
-	no warnings 'uninitialized';
-	return (
-		[ 'Mite::Types' => [
-			qw( -types slurpy ),
-		] ],
-		[ 'Type::Params' => [
-			compile           => { -as => 'sig_pos'   },
-			compile_named_oo  => { -as => 'sig_named' },
-		] ],
-	);
 }
 
 # Stolen bits from Mite::Shim

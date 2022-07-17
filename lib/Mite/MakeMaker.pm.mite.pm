@@ -114,5 +114,323 @@
         shift->DOES(@_);
     }
 
+    our %SIGNATURE_FOR;
+
+    $SIGNATURE_FOR{"change_parent_dir"} = sub {
+        my $__NEXT__ = shift;
+
+        my ( @out, %tmp, $tmp, $dtmp, @head );
+
+        @_ == 3
+          or croak(
+            "Wrong number of parameters in signature for %s: %s, got %d",
+            "change_parent_dir", "expected exactly 3 parameters",
+            scalar(@_)
+          );
+
+        @head = splice( @_, 0, 0 );
+
+        # Parameter $_[0] (type: Path)
+        $tmp = (
+            (
+                do {
+                    use Scalar::Util ();
+                    Scalar::Util::blessed( $_[0] )
+                      and $_[0]->isa(q[Path::Tiny]);
+                }
+            )
+        ) ? $_[0] : (
+            do {
+
+                package Mite::Shim;
+                defined( $_[0] ) and do {
+                    ref( \$_[0] ) eq 'SCALAR'
+                      or ref( \( my $val = $_[0] ) ) eq 'SCALAR';
+                }
+            }
+          )
+          ? scalar(
+            do { local $_ = $_[0]; Path::Tiny::path($_) }
+          )
+          : (
+            do {
+
+                package Mite::Shim;
+                defined( $_[0] ) && !ref( $_[0] )
+                  or Scalar::Util::blessed( $_[0] ) && (
+                    sub {
+                        require overload;
+                        overload::Overloaded( ref $_[0] or $_[0] )
+                          and overload::Method( ( ref $_[0] or $_[0] ), $_[1] );
+                    }
+                )->( $_[0], q[""] );
+            }
+          )
+          ? scalar(
+            do { local $_ = $_[0]; Path::Tiny::path($_) }
+          )
+          : ( ( ref( $_[0] ) eq 'ARRAY' ) ) ? scalar(
+            do { local $_ = $_[0]; Path::Tiny::path(@$_) }
+          )
+          : $_[0];
+        (
+            do {
+                use Scalar::Util ();
+                Scalar::Util::blessed($tmp) and $tmp->isa(q[Path::Tiny]);
+            }
+          )
+          or croak(
+"Type check failed in signature for change_parent_dir: %s should be %s",
+            "\$_[0]", "Path"
+          );
+        push( @out, $tmp );
+
+        # Parameter $_[1] (type: Path)
+        $tmp = (
+            (
+                do {
+                    use Scalar::Util ();
+                    Scalar::Util::blessed( $_[1] )
+                      and $_[1]->isa(q[Path::Tiny]);
+                }
+            )
+        ) ? $_[1] : (
+            do {
+
+                package Mite::Shim;
+                defined( $_[1] ) and do {
+                    ref( \$_[1] ) eq 'SCALAR'
+                      or ref( \( my $val = $_[1] ) ) eq 'SCALAR';
+                }
+            }
+          )
+          ? scalar(
+            do { local $_ = $_[1]; Path::Tiny::path($_) }
+          )
+          : (
+            do {
+
+                package Mite::Shim;
+                defined( $_[1] ) && !ref( $_[1] )
+                  or Scalar::Util::blessed( $_[1] ) && (
+                    sub {
+                        require overload;
+                        overload::Overloaded( ref $_[0] or $_[0] )
+                          and overload::Method( ( ref $_[0] or $_[0] ), $_[1] );
+                    }
+                )->( $_[1], q[""] );
+            }
+          )
+          ? scalar(
+            do { local $_ = $_[1]; Path::Tiny::path($_) }
+          )
+          : ( ( ref( $_[1] ) eq 'ARRAY' ) ) ? scalar(
+            do { local $_ = $_[1]; Path::Tiny::path(@$_) }
+          )
+          : $_[1];
+        (
+            do {
+                use Scalar::Util ();
+                Scalar::Util::blessed($tmp) and $tmp->isa(q[Path::Tiny]);
+            }
+          )
+          or croak(
+"Type check failed in signature for change_parent_dir: %s should be %s",
+            "\$_[1]", "Path"
+          );
+        push( @out, $tmp );
+
+        # Parameter $_[2] (type: Path)
+        $tmp = (
+            (
+                do {
+                    use Scalar::Util ();
+                    Scalar::Util::blessed( $_[2] )
+                      and $_[2]->isa(q[Path::Tiny]);
+                }
+            )
+        ) ? $_[2] : (
+            do {
+
+                package Mite::Shim;
+                defined( $_[2] ) and do {
+                    ref( \$_[2] ) eq 'SCALAR'
+                      or ref( \( my $val = $_[2] ) ) eq 'SCALAR';
+                }
+            }
+          )
+          ? scalar(
+            do { local $_ = $_[2]; Path::Tiny::path($_) }
+          )
+          : (
+            do {
+
+                package Mite::Shim;
+                defined( $_[2] ) && !ref( $_[2] )
+                  or Scalar::Util::blessed( $_[2] ) && (
+                    sub {
+                        require overload;
+                        overload::Overloaded( ref $_[0] or $_[0] )
+                          and overload::Method( ( ref $_[0] or $_[0] ), $_[1] );
+                    }
+                )->( $_[2], q[""] );
+            }
+          )
+          ? scalar(
+            do { local $_ = $_[2]; Path::Tiny::path($_) }
+          )
+          : ( ( ref( $_[2] ) eq 'ARRAY' ) ) ? scalar(
+            do { local $_ = $_[2]; Path::Tiny::path(@$_) }
+          )
+          : $_[2];
+        (
+            do {
+                use Scalar::Util ();
+                Scalar::Util::blessed($tmp) and $tmp->isa(q[Path::Tiny]);
+            }
+          )
+          or croak(
+"Type check failed in signature for change_parent_dir: %s should be %s",
+            "\$_[2]", "Path"
+          );
+        push( @out, $tmp );
+
+        return ( &$__NEXT__( @head, @out ) );
+    };
+
+    $SIGNATURE_FOR{"fix_pm_to_blib"} = sub {
+        my $__NEXT__ = shift;
+
+        my ( @out, %tmp, $tmp, $dtmp, @head );
+
+        @_ == 3
+          or croak(
+            "Wrong number of parameters in signature for %s: %s, got %d",
+            "fix_pm_to_blib", "expected exactly 3 parameters",
+            scalar(@_)
+          );
+
+        @head = splice( @_, 0, 1 );
+
+        # Parameter $head[0] (type: Defined)
+        ( defined( $head[0] ) )
+          or croak(
+"Type check failed in signature for fix_pm_to_blib: %s should be %s",
+            "\$_[0]", "Defined"
+          );
+
+        # Parameter $_[0] (type: Path)
+        $tmp = (
+            (
+                do {
+                    use Scalar::Util ();
+                    Scalar::Util::blessed( $_[0] )
+                      and $_[0]->isa(q[Path::Tiny]);
+                }
+            )
+        ) ? $_[0] : (
+            do {
+
+                package Mite::Shim;
+                defined( $_[0] ) and do {
+                    ref( \$_[0] ) eq 'SCALAR'
+                      or ref( \( my $val = $_[0] ) ) eq 'SCALAR';
+                }
+            }
+          )
+          ? scalar(
+            do { local $_ = $_[0]; Path::Tiny::path($_) }
+          )
+          : (
+            do {
+
+                package Mite::Shim;
+                defined( $_[0] ) && !ref( $_[0] )
+                  or Scalar::Util::blessed( $_[0] ) && (
+                    sub {
+                        require overload;
+                        overload::Overloaded( ref $_[0] or $_[0] )
+                          and overload::Method( ( ref $_[0] or $_[0] ), $_[1] );
+                    }
+                )->( $_[0], q[""] );
+            }
+          )
+          ? scalar(
+            do { local $_ = $_[0]; Path::Tiny::path($_) }
+          )
+          : ( ( ref( $_[0] ) eq 'ARRAY' ) ) ? scalar(
+            do { local $_ = $_[0]; Path::Tiny::path(@$_) }
+          )
+          : $_[0];
+        (
+            do {
+                use Scalar::Util ();
+                Scalar::Util::blessed($tmp) and $tmp->isa(q[Path::Tiny]);
+            }
+          )
+          or croak(
+"Type check failed in signature for fix_pm_to_blib: %s should be %s",
+            "\$_[1]", "Path"
+          );
+        push( @out, $tmp );
+
+        # Parameter $_[1] (type: Path)
+        $tmp = (
+            (
+                do {
+                    use Scalar::Util ();
+                    Scalar::Util::blessed( $_[1] )
+                      and $_[1]->isa(q[Path::Tiny]);
+                }
+            )
+        ) ? $_[1] : (
+            do {
+
+                package Mite::Shim;
+                defined( $_[1] ) and do {
+                    ref( \$_[1] ) eq 'SCALAR'
+                      or ref( \( my $val = $_[1] ) ) eq 'SCALAR';
+                }
+            }
+          )
+          ? scalar(
+            do { local $_ = $_[1]; Path::Tiny::path($_) }
+          )
+          : (
+            do {
+
+                package Mite::Shim;
+                defined( $_[1] ) && !ref( $_[1] )
+                  or Scalar::Util::blessed( $_[1] ) && (
+                    sub {
+                        require overload;
+                        overload::Overloaded( ref $_[0] or $_[0] )
+                          and overload::Method( ( ref $_[0] or $_[0] ), $_[1] );
+                    }
+                )->( $_[1], q[""] );
+            }
+          )
+          ? scalar(
+            do { local $_ = $_[1]; Path::Tiny::path($_) }
+          )
+          : ( ( ref( $_[1] ) eq 'ARRAY' ) ) ? scalar(
+            do { local $_ = $_[1]; Path::Tiny::path(@$_) }
+          )
+          : $_[1];
+        (
+            do {
+                use Scalar::Util ();
+                Scalar::Util::blessed($tmp) and $tmp->isa(q[Path::Tiny]);
+            }
+          )
+          or croak(
+"Type check failed in signature for fix_pm_to_blib: %s should be %s",
+            "\$_[2]", "Path"
+          );
+        push( @out, $tmp );
+
+        return ( &$__NEXT__( @head, @out ) );
+    };
+
     1;
 }
