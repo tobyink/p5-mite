@@ -29,7 +29,6 @@ sub execute {
     my $project = $self->project;
 
     if ( $self->config->data->{dogfood} ) {
-        $project->_compiling_self( 1 );
         $project->_module_fakeout_namespace(
             sprintf 'A%02d::B%02d', int(rand(100)), int(rand(100))
         );

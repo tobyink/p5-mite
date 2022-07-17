@@ -23,11 +23,6 @@ has config =>
       return $config;
   };
 
-has _compiling_self =>
-  is            => rw,
-  isa           => Bool,
-  default       => false;
-
 has _module_fakeout_namespace =>
   is            => rw,
   isa           => Str | Undef;
@@ -280,13 +275,11 @@ sub _load_file {
 
     $file = Path::Tiny::path($file);
 
-    if ( $self->_compiling_self ) {
-        my $code = $file->slurp;
+    if ( defined $self->_module_fakeout_namespace ) {
+        my $ns = $self->_module_fakeout_namespace;
 
-        if ( defined $self->_module_fakeout_namespace ) {
-            my $ns = $self->_module_fakeout_namespace;
-            $code =~ s/package /package $ns\::/;
-        }
+        my $code = $file->slurp;
+        $code =~ s/package /package $ns\::/;
 
         do {
             local $@;
