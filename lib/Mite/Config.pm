@@ -48,8 +48,6 @@ has search_for_mite_dir =>
   isa           => Bool,
   default       => true;
 
-##-
-
 sub make_mite_dir {
     my ( $self, $dir ) = ( shift, @_ );
     $dir //= Path::Tiny->cwd;

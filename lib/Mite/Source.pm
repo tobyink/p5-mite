@@ -34,8 +34,6 @@ has project =>
   # avoid a circular dep with Mite::Project
   weak_ref      => true;
 
-##-
-
 use Mite::Compiled;
 use Mite::Class;
 

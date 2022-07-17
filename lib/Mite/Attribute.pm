@@ -8,10 +8,13 @@ use Mite::Miteception qw( -all !lazy );
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.007001';
 
+use B ();
+
+my $order = 0;
 has _order =>
   is            => rw,
   init_arg      => undef,
-  builder       => sub { state $order = 0; $order++ };
+  builder       => sub { $order++ };
 
 has class =>
   is            => rw,
@@ -138,9 +141,6 @@ has alias_is_for =>
   is            => 'lazy',
   init_arg      => undef;
 
-##-
-
-use B ();
 sub _q          { shift; join q[, ], map B::perlstring($_), @_ }
 sub _q_name     { B::perlstring( shift->name ) }
 sub _q_init_arg { my $self = shift; B::perlstring( $self->_expand_name( $self->init_arg ) ) }

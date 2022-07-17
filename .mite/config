@@ -3,5 +3,6 @@ compiled_to: lib
 project: Mite
 shim: Mite::Shim
 source_from: lib
+dogfood: 1
 perltidy: 1
 types: Mite::Types

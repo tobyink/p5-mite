@@ -60,8 +60,6 @@ has method_signatures =>
   isa           => Map[ MethodName, MiteSignature ],
   builder       => sub { {} };
 
-##-
-
 sub BUILD {
     my $self = shift;
 

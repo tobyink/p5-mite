@@ -40,8 +40,6 @@ has parents =>
   builder       => '_build_parents',
   clearer       => '_clear_parents';
 
-##-
-
 sub BUILD {
     my $self = shift;
 

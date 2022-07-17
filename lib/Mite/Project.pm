@@ -23,7 +23,7 @@ has config =>
       return $config;
   };
 
-has _limited_parsing =>
+has _compiling_self =>
   is            => rw,
   isa           => Bool,
   default       => false;
@@ -36,8 +36,6 @@ has debug =>
   is            => rw,
   isa           => Bool,
   default       => false;
-
-##-
 
 use Mite::Source;
 use Mite::Class;
@@ -113,7 +111,7 @@ sub inject_mite_functions {
     warn "Gather: $package\n" if $self->debug;
 
     $source //= $self->source_for(
-        Path::Tiny::path( $ENV{MITE_LIMITED_PARSING} // $file )
+        Path::Tiny::path( $ENV{MITE_COMPILE_SELF} // $file )
     );
     $pkg    //= $source->class_for(
         $package,
@@ -282,19 +280,18 @@ sub _load_file {
 
     $file = Path::Tiny::path($file);
 
-    if ( $self->_limited_parsing ) {
+    if ( $self->_compiling_self ) {
         my $code = $file->slurp;
-        my ( $head, $tail ) = split '##-', $code;
 
         if ( defined $self->_module_fakeout_namespace ) {
             my $ns = $self->_module_fakeout_namespace;
-            $head =~ s/package /package $ns\::/;
+            $code =~ s/package /package $ns\::/;
         }
 
         do {
             local $@;
-            local $ENV{MITE_LIMITED_PARSING} = "$file";
-            eval("$head; 1") or do die($@);
+            local $ENV{MITE_COMPILE_SELF} = "$file";
+            eval("$code; 1") or do die($@);
         };
 
         return;

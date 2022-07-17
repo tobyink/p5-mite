@@ -29,8 +29,6 @@ has source =>
   weak_ref      => true,
   required      => true;
 
-##-
-
 sub compile {
     my $self = shift;
 

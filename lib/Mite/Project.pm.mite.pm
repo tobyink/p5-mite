@@ -77,11 +77,11 @@
             $self->{"config"} = $args->{"config"};
         }
 
-        # Attribute: _limited_parsing
+        # Attribute: _compiling_self
         do {
             my $value =
-              exists( $args->{"_limited_parsing"} )
-              ? $args->{"_limited_parsing"}
+              exists( $args->{"_compiling_self"} )
+              ? $args->{"_compiling_self"}
               : "";
             (
                 !ref $value
@@ -91,8 +91,8 @@
                     or $value eq '1' )
               )
               or croak "Type check failed in constructor: %s should be %s",
-              "_limited_parsing", "Bool";
-            $self->{"_limited_parsing"} = $value;
+              "_compiling_self", "Bool";
+            $self->{"_compiling_self"} = $value;
         };
 
         # Attribute: _module_fakeout_namespace
@@ -145,7 +145,7 @@
 
         # Enforce strict constructor
         my @unknown = grep not(
-/\A(?:_(?:limited_parsing|module_fakeout_namespace)|config|debug|sources)\z/
+/\A(?:_(?:compiling_self|module_fakeout_namespace)|config|debug|sources)\z/
         ), keys %{$args};
         @unknown
           and croak(
@@ -218,8 +218,8 @@
     my $__XS = !$ENV{MITE_PURE_PERL}
       && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
-    # Accessors for _limited_parsing
-    sub _limited_parsing {
+    # Accessors for _compiling_self
+    sub _compiling_self {
         @_ > 1
           ? do {
             (
@@ -231,10 +231,10 @@
               )
               or croak( "Type check failed in %s: value should be %s",
                 "accessor", "Bool" );
-            $_[0]{"_limited_parsing"} = $_[1];
+            $_[0]{"_compiling_self"} = $_[1];
             $_[0];
           }
-          : ( $_[0]{"_limited_parsing"} );
+          : ( $_[0]{"_compiling_self"} );
     }
 
     # Accessors for _module_fakeout_namespace

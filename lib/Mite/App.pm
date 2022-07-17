@@ -8,6 +8,17 @@ use Mite::Miteception -all;
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.007001';
 
+use Module::Pluggable
+    search_path => [ 'Mite::App::Command' ],
+    sub_name    => '_plugins',
+    require     => true,
+    inner       => false,
+    on_require_error => sub {
+        my ( $plugin, $err ) = @_;
+        return if $plugin =~ /.mite$/;
+        croak $err;
+    };
+
 has commands => (
     is => ro,
     isa => HashRef[Object],
@@ -27,19 +38,6 @@ has project => (
     isa => MiteProject,
     handles => [ 'config' ],
 );
-
-##-
-
-use Module::Pluggable
-    search_path => [ 'Mite::App::Command' ],
-    sub_name    => '_plugins',
-    require     => true,
-    inner       => false,
-    on_require_error => sub {
-        my ( $plugin, $err ) = @_;
-        return if $plugin =~ /.mite$/;
-        croak $err;
-    };
 
 sub BUILD {
     my $self = shift;

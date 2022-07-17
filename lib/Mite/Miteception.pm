@@ -25,7 +25,7 @@ sub import {
 
 	my ( $caller, $file ) = caller;
 
-	if ( $ENV{MITE_LIMITED_PARSING} ) {
+	if ( $ENV{MITE_COMPILE_SELF} ) {
 		require Mite::Project;
 		Mite::Project->default->inject_mite_functions(
 			 package     => $caller,

@@ -21,8 +21,6 @@ has kingpin_command => (
     isa => Object,
 );
 
-##-
-
 sub command_name {
    my $self = shift;
    my $class = ref($self) || $self;

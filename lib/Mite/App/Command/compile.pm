@@ -9,8 +9,6 @@ extends qw(Mite::App::Command);
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.007001';
 
-##-
-
 sub abstract {
     return "Make your code ready to run.";
 }
@@ -18,9 +16,25 @@ sub abstract {
 sub execute {
     my $self = shift;
 
+    require Mite::Attribute;
+    require Mite::Class;
+    require Mite::Config;
+    require Mite::Project;
+    require Mite::Role;
+    require Mite::Role::Tiny;
+    require Mite::Signature;
+
     return 0 if $self->should_exit_quietly;
 
     my $project = $self->project;
+
+    if ( $self->config->data->{dogfood} ) {
+        $project->_compiling_self( 1 );
+        $project->_module_fakeout_namespace(
+            sprintf 'A%02d::B%02d', int(rand(100)), int(rand(100))
+        );
+    }
+
     $project->add_mite_shim;
     $project->load_directory;
     $project->write_mites;

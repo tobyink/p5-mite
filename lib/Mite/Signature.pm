@@ -60,8 +60,6 @@ has should_bless =>
   isa           => Bool,
   builder       => sub { !!( $_[0]->is_named && !$_[0]->named_to_list ) };
 
-##-
-
 sub BUILD {
     my $self = shift;
 

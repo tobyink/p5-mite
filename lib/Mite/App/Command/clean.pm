@@ -9,8 +9,6 @@ extends qw(Mite::App::Command);
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.007001';
 
-##-
-
 sub abstract {
     return "Remove compiled mite files.";
 }
