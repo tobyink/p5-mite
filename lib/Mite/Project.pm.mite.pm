@@ -77,24 +77,6 @@
             $self->{"config"} = $args->{"config"};
         }
 
-        # Attribute: _compiling_self
-        do {
-            my $value =
-              exists( $args->{"_compiling_self"} )
-              ? $args->{"_compiling_self"}
-              : "";
-            (
-                !ref $value
-                  and (!defined $value
-                    or $value eq q()
-                    or $value eq '0'
-                    or $value eq '1' )
-              )
-              or croak "Type check failed in constructor: %s should be %s",
-              "_compiling_self", "Bool";
-            $self->{"_compiling_self"} = $value;
-        };
-
         # Attribute: _module_fakeout_namespace
         if ( exists $args->{"_module_fakeout_namespace"} ) {
             do {
@@ -144,9 +126,9 @@
         };
 
         # Enforce strict constructor
-        my @unknown = grep not(
-/\A(?:_(?:compiling_self|module_fakeout_namespace)|config|debug|sources)\z/
-        ), keys %{$args};
+        my @unknown =
+          grep not(/\A(?:_module_fakeout_namespace|config|debug|sources)\z/),
+          keys %{$args};
         @unknown
           and croak(
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
@@ -217,25 +199,6 @@
 
     my $__XS = !$ENV{MITE_PURE_PERL}
       && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
-
-    # Accessors for _compiling_self
-    sub _compiling_self {
-        @_ > 1
-          ? do {
-            (
-                !ref $_[1]
-                  and (!defined $_[1]
-                    or $_[1] eq q()
-                    or $_[1] eq '0'
-                    or $_[1] eq '1' )
-              )
-              or croak( "Type check failed in %s: value should be %s",
-                "accessor", "Bool" );
-            $_[0]{"_compiling_self"} = $_[1];
-            $_[0];
-          }
-          : ( $_[0]{"_compiling_self"} );
-    }
 
     # Accessors for _module_fakeout_namespace
     sub _module_fakeout_namespace {
