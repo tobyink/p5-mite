@@ -6,7 +6,7 @@ package Mite::Attribute;
 use Mite::Miteception qw( -all !lazy );
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.007001';
+our $VERSION   = '0.007002';
 
 use B ();
 

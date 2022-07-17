@@ -1,7 +1,15 @@
 # This file acts as the project's changelog.
 #
 
-##
+`Mite 0.007002 cpan:TOBYINK`
+	issued  2022-07-17;
+	changeset [
+		item [
+			a dcs:Change;
+			label "Improvements to Mite's ability to self-compile.";
+		];
+	].
+
 `Mite 0.007001 cpan:TOBYINK`
 	issued  2022-07-17;
 	changeset [
@@ -10,7 +18,6 @@
 			label "Improvements to the Mite::Type module internally used by Mite.";
 		];
 	].
-
 
 `Mite 0.007000 cpan:TOBYINK`
 	issued  2022-07-17;
