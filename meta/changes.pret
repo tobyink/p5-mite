@@ -1,6 +1,15 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.007003 cpan:TOBYINK`
+	issued  2022-07-17;
+	changeset [
+		item [
+			a dcs:Change;
+			label "signature_for '+parent_class_method'";
+		];
+	].
+
 `Mite 0.007002 cpan:TOBYINK`
 	issued  2022-07-17;
 	changeset [
