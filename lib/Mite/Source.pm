@@ -19,6 +19,11 @@ has classes =>
   isa           => HashRef[MiteClass],
   default       => sub { {} };
 
+has class_order =>
+  is            => ro,
+  isa           => ArrayRef[NonEmptyStr],
+  default       => sub { [] };
+
 has compiled =>
   is            => ro,
   isa           => MiteCompiled,
@@ -54,8 +59,11 @@ sub add_classes {
     my ( $self, @classes ) = ( shift, @_ );
 
     for my $class (@classes) {
-        $self->classes->{$class->name} = $class;
         $class->source($self);
+
+        next if $self->classes->{$class->name};
+        $self->classes->{$class->name} = $class;
+        push @{ $self->class_order }, $class->name;
     }
 
     return;
@@ -66,10 +74,15 @@ sub class_for {
     my ( $self, $name, $metaclass ) = ( shift, @_ );
     $metaclass ||= 'Mite::Class';
 
-    return $self->classes->{$name} ||= $metaclass->new(
-        name    => $name,
-        source  => $self,
-    );
+    if ( not $self->classes->{$name} ) {
+        $self->classes->{$name} = $metaclass->new(
+            name    => $name,
+            source  => $self,
+        );
+        push @{ $self->class_order }, $name;
+    }
+
+    return $self->classes->{$name};
 }
 
 1;

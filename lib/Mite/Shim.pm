@@ -131,6 +131,7 @@ sub _inject_mite_functions {
 
     *{"$caller\::signature_for"} = sub {
         my ( $name ) = @_;
+        $name =~ s/^\+//;
         $class->around( $caller, $name, ${"$caller\::SIGNATURE_FOR"}{$name} );
     } if $requested->( signature_for => false );
 

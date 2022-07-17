@@ -124,6 +124,42 @@
             $self->{"classes"} = $value;
         };
 
+        # Attribute: class_order
+        do {
+            my $value =
+              exists( $args->{"class_order"} )
+              ? $args->{"class_order"}
+              : $Mite::Source::__class_order_DEFAULT__->($self);
+            do {
+
+                package Mite::Shim;
+                ( ref($value) eq 'ARRAY' ) and do {
+                    my $ok = 1;
+                    for my $i ( @{$value} ) {
+                        ( $ok = 0, last )
+                          unless (
+                            (
+                                do {
+
+                                    package Mite::Shim;
+                                    defined($i) and do {
+                                        ref( \$i ) eq 'SCALAR'
+                                          or ref( \( my $val = $i ) ) eq
+                                          'SCALAR';
+                                    }
+                                }
+                            )
+                            && ( length($i) > 0 )
+                          );
+                    };
+                    $ok;
+                }
+              }
+              or croak "Type check failed in constructor: %s should be %s",
+              "class_order", "ArrayRef[NonEmptyStr]";
+            $self->{"class_order"} = $value;
+        };
+
         # Attribute: compiled
         if ( exists $args->{"compiled"} ) {
             (
@@ -155,7 +191,8 @@
           if exists $self->{"project"};
 
         # Enforce strict constructor
-        my @unknown = grep not(/\A(?:c(?:lasses|ompiled)|file|project)\z/),
+        my @unknown =
+          grep not(/\A(?:c(?:lass(?:_order|es)|ompiled)|file|project)\z/),
           keys %{$args};
         @unknown
           and croak(
@@ -227,6 +264,21 @@
 
     my $__XS = !$ENV{MITE_PURE_PERL}
       && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
+
+    # Accessors for class_order
+    if ($__XS) {
+        Class::XSAccessor->import(
+            chained   => 1,
+            "getters" => { "class_order" => "class_order" },
+        );
+    }
+    else {
+        *class_order = sub {
+            @_ > 1
+              ? croak("class_order is a read-only attribute of @{[ref $_[0]]}")
+              : $_[0]{"class_order"};
+        };
+    }
 
     # Accessors for classes
     if ($__XS) {

@@ -13,6 +13,12 @@ has class =>
   isa           => MiteClass,
   weak_ref      => true;
 
+has compiling_class =>
+  init_arg      => undef,
+  is            => rw,
+  isa           => MiteRole,
+  local_writer  => true;
+
 has method_name =>
   is            => ro,
   isa           => Str,
@@ -52,7 +58,8 @@ has compiler =>
   init_arg      => undef,
   is            => lazy,
   isa           => Object,
-  builder       => true;
+  builder       => true,
+  handles       => [ qw( has_head has_tail has_slurpy ) ];
 
 has should_bless =>
   init_arg      => undef,
@@ -104,6 +111,10 @@ sub _build_compiler {
 sub _compile_coderef {
     my $self = shift;
 
+    if ( $self->compiling_class and $self->compiling_class != $self->class ) {
+        return sprintf( '$%s::SIGNATURE_FOR{%s}', $self->class->name, B::perlstring( $self->method_name ) );
+    }
+
     my $code = $self->compiler->coderef->code;
     $code =~ s/^\s+|\s+$//gs;
 
@@ -113,8 +124,48 @@ sub _compile_coderef {
 sub _compile_support {
     my $self = shift;
 
+    if ( $self->compiling_class and $self->compiling_class != $self->class ) {
+        return;
+    }
+
     return unless $self->should_bless;
     return $self->compiler->make_class_pp_code;
+}
+
+sub clone {
+    my ( $self, %args ) = @_;
+
+    # alias
+    $args{positional} = $args{pos} if exists $args{pos};
+
+    if ( $self->has_slurpy and $args{positional} ) {
+        croak "Cannot add new positional parameters when extending an existing signature with a slurpy parameter";
+    }
+    elsif ( $self->has_slurpy and $args{named} ) {
+        croak "Cannot add new named parameters when extending an existing signature with a slurpy parameter";
+    }
+    elsif ( $self->is_named and $args{positional} ) {
+        croak "Cannot add positional parameters when extending an existing signature which has named parameters";
+    }
+    elsif ( !$self->is_named and $args{named} ) {
+        croak "Cannot add named parameters when extending an existing signature which has positional parameters";
+    }
+
+    if ( $args{positional} ) {
+        $args{positional} = [ @{ $self->positional }, @{ $args{positional} } ];
+    }
+
+    if ( $args{named} ) {
+        $args{named} = [ @{ $self->named }, @{ $args{named} } ];
+    }
+
+    my %new_args = ( %$self, %args );
+
+    # Rebuild these
+    delete $new_args{compiler};
+    delete $new_args{should_bless};
+
+    return __PACKAGE__->new( %new_args );
 }
 
 1;

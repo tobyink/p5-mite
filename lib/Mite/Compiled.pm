@@ -27,19 +27,21 @@ has source =>
   isa           => MiteSource,
   # avoid a circular dep with Mite::Source
   weak_ref      => true,
-  required      => true;
+  required      => true,
+  handles       => [ qw( classes class_order ) ];
 
 sub compile {
     my $self = shift;
 
     my $code;
-    for my $class (values %{$self->classes}) {
+    for my $class_name ( @{ $self->class_order } ) {
+        my $class = $self->classes->{$class_name};
 
         # Only supported by Type::Tiny 1.013_001 but no harm
         # in doing this anyway.
         local $Type::Tiny::SafePackage = sprintf 'package %s;',
             eval { $self->source->project->config->data->{shim} }
-            // do { $class->name . '::__SAFE_NAMESPACE__' };
+            // do { $class_name . '::__SAFE_NAMESPACE__' };
 
         $code .= $class->compile;
     }
@@ -76,12 +78,6 @@ sub remove {
     my $self = shift;
 
     return $self->file->remove;
-}
-
-sub classes {
-    my $self = shift;
-
-    return $self->source->classes;
 }
 
 signature_for _source_file2compiled_file => (

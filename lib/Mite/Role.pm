@@ -451,6 +451,8 @@ sub _compile_method_signatures {
     my $code = "our \%SIGNATURE_FOR;\n\n";
 
     for my $name ( sort keys %sigs ) {
+        my $guard = $sigs{$name}->locally_set_compiling_class( $self );
+
         $code .= sprintf(
             '$SIGNATURE_FOR{%s} = %s;' . "\n\n",
             B::perlstring( $name ),

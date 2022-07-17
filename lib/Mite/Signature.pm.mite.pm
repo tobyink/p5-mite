@@ -266,6 +266,32 @@
     }
 
     # Accessors for compiler
+    sub _assert_blessed_compiler {
+        my $object = do {
+            (
+                exists( $_[0]{"compiler"} ) ? $_[0]{"compiler"} : (
+                    $_[0]{"compiler"} = do {
+                        my $default_value = $_[0]->_build_compiler;
+                        (
+                            do {
+
+                                package Mite::Shim;
+                                use Scalar::Util ();
+                                Scalar::Util::blessed($default_value);
+                            }
+                          )
+                          or croak(
+                            "Type check failed in default: %s should be %s",
+                            "compiler", "Object" );
+                        $default_value;
+                    }
+                )
+            )
+        };
+        blessed($object) or croak("compiler is not a blessed object");
+        $object;
+    }
+
     sub compiler {
         @_ > 1
           ? croak("compiler is a read-only attribute of @{[ref $_[0]]}")
@@ -287,6 +313,49 @@
                 }
             )
           );
+    }
+
+    # Delegated methods for compiler
+    sub has_head   { shift->_assert_blessed_compiler->has_head(@_) }
+    sub has_slurpy { shift->_assert_blessed_compiler->has_slurpy(@_) }
+    sub has_tail   { shift->_assert_blessed_compiler->has_tail(@_) }
+
+    # Accessors for compiling_class
+    sub compiling_class {
+        @_ > 1
+          ? do {
+            (
+                do {
+                    use Scalar::Util ();
+                    Scalar::Util::blessed( $_[1] )
+                      and $_[1]->isa(q[Mite::Role]);
+                }
+              )
+              or croak( "Type check failed in %s: value should be %s",
+                "accessor", "Mite::Role" );
+            $_[0]{"compiling_class"} = $_[1];
+            $_[0];
+          }
+          : ( $_[0]{"compiling_class"} );
+    }
+
+    sub locally_set_compiling_class {
+        defined wantarray
+          or croak("This method cannot be called in void context");
+        my $get   = "compiling_class";
+        my $set   = "compiling_class";
+        my $has   = sub { exists $_[0]{"compiling_class"} };
+        my $clear = sub { delete $_[0]{"compiling_class"}; $_[0]; };
+        my $old   = undef;
+        my ( $self, $new ) = @_;
+        my $restorer = $self->$has
+          ? do {
+            $old = $self->$get;
+            sub { $self->$set($old) }
+          }
+          : sub { $self->$clear };
+        @_ == 2 ? $self->$set($new) : $self->$clear;
+        &guard( $restorer, $old );
     }
 
     # Accessors for head

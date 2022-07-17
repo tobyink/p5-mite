@@ -183,7 +183,14 @@ sub inject_mite_functions {
     } if $requested->( 'with', 1 );
 
     *{ $package .'::signature_for' } = sub {
-        $pkg->add_method_signature( @_ );
+        my $name = shift;
+        if ( $name =~ /^\+/ ) {
+            $name =~ s/^\+//;
+            $pkg->extend_method_signature( $name, @_ );
+        }
+        else {
+            $pkg->add_method_signature( $name, @_ );
+        }
         return;
     } if $requested->( 'signature_for', 1 );
 

@@ -196,8 +196,27 @@ of a method (no C<< $self >>):
         method => false,
     );
 
-This feature requires L<Type::Params> 1.015_000 or above (at the developer's
-side; your compiled Mite files will still have no non-core dependencies!)
+If you override a method with a signature in a parent class, then the
+parent's signature won't wrap the child's method, but you can inherit
+its signature:
+
+    signature_for '+my_func';
+
+This will wrap your overridden method in the same signature as the parent
+method.
+
+You can also modify the parent class signature in your child class to add
+extra named or positional parameters:
+
+    signature_for '+my_func' => (
+        pos => [ Int ],
+    );
+
+You cannot add parameters like this if the parent class's signature has a
+slurpy parameter. Nor can you add positional parameters if the parent class's
+signature has named parameters or vice versa. If you need to radically change
+the parent class's signature, it's best not to use the C<< + >> sign, and
+instead define a whole new signature for the child class.
 
 =head2 C<true> and C<false>
 

@@ -346,6 +346,16 @@
         };
     }
 
+    sub _assert_blessed_source {
+        my $object = do { $_[0]{"source"} };
+        blessed($object) or croak("source is not a blessed object");
+        $object;
+    }
+
+    # Delegated methods for source
+    sub class_order { shift->_assert_blessed_source->class_order(@_) }
+    sub classes     { shift->_assert_blessed_source->classes(@_) }
+
     our %SIGNATURE_FOR;
 
     $SIGNATURE_FOR{"_source_file2compiled_file"} = sub {

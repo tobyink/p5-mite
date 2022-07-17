@@ -116,6 +116,32 @@ sub parents_attributes {
     return $self->chained_attributes(@parents);
 }
 
+sub extend_method_signature {
+    my ($self, $name, %args) = ( shift, @_ );
+
+    my @parents = $self->linear_parents;
+    shift @parents;  # remove ourselves from the inheritance list
+
+    my $found_signature;
+    for my $parent ( @parents ) {
+        if ( $parent->method_signatures->{$name} ) {
+            $found_signature = $parent->method_signatures->{$name};
+            last;
+        }
+    }
+
+    if ( $found_signature ) {
+        $self->method_signatures->{$name} = %args 
+            ? $found_signature->clone( %args, class => $self )
+            : $found_signature;
+    }
+    else {
+        croak "Could not find signature for $name in any parent class";
+    }
+
+    return;
+}
+
 sub _build_parents {
     my $self = shift;
 
