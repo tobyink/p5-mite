@@ -101,3 +101,12 @@
 			label "Rebuild using Type::Library::Compiler 0.005.";
 		];
 	].
+
+`Acme-Mitey-Cards 0.012 cpan:TOBYINK`
+	issued  2022-07-18;
+	changeset [
+		item [
+			a dcs:Update;
+			label "Use the new `signature_for` keyword in Mite 0.007000.";
+		];
+	].
