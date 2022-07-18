@@ -14,7 +14,6 @@ use Acme::Mitey::Cards::Hand;
 
 1;
 
-
 __END__
 
 =pod
