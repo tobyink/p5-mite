@@ -84,8 +84,8 @@ sub discard_jokers {
 
 signature_for deal_hand => (
 	named => [
-		count         => Int, { default => 7 },
-		args_for_hand => { slurpy => $ENV{MITE_COMPILE} ? HashRef->to_TypeTiny : HashRef },  # XXX
+		count         => Int,     { default => 7 },
+		args_for_hand => HashRef, { slurpy => true },
 	],
 );
 
@@ -97,7 +97,7 @@ sub deal_hand {
 
 	my $took = $self->take( $arg->count );
 	return Acme::Mitey::Cards::Hand->new(
-		%{ $arg->{args_for_hand} },          # XXX
+		%{ $arg->args_for_hand },
 		cards => [ @{ $took->cards } ],
 	);
 }

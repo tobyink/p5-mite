@@ -239,11 +239,11 @@
 
         my $SLURPY = \%in;
 
-        # Parameter args_for_hand (type: HashRef)
-        ( ref($SLURPY) eq 'HASH' )
+        # Parameter args_for_hand (type: Slurpy[HashRef])
+        ( ( ref($SLURPY) eq 'HASH' ) )
           or croak(
             "Type check failed in signature for deal_hand: %s should be %s",
-            "\$SLURPY", "HashRef" );
+            "\$SLURPY", "Slurpy[HashRef]" );
         $out{"args_for_hand"} = $SLURPY;
 
         return (
@@ -262,8 +262,9 @@
         package Acme::Mitey::Cards::Deck::__NAMED_ARGUMENTS__::deal_hand;
         use strict;
         no warnings;
-        sub count     { $_[0]{"count"} }
-        sub has_count { exists $_[0]{"count"} }
+        sub args_for_hand { $_[0]{"args_for_hand"} }
+        sub count         { $_[0]{"count"} }
+        sub has_count     { exists $_[0]{"count"} }
         1;
     }
 
