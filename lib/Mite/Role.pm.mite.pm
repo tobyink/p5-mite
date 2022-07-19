@@ -563,25 +563,27 @@
 
         my $SLURPY = [ @_[ 0 .. $#_ ] ];
 
-        # Parameter $SLURPY (type: ArrayRef[InstanceOf["Mite::Attribute"]])
-        do {
+     # Parameter $SLURPY (type: Slurpy[ArrayRef[InstanceOf["Mite::Attribute"]]])
+        (
+            do {
 
-            package Mite::Shim;
-            ( ref($SLURPY) eq 'ARRAY' ) and do {
-                my $ok = 1;
-                for my $i ( @{$SLURPY} ) {
-                    ( $ok = 0, last )
-                      unless (
-                        do {
-                            use Scalar::Util ();
-                            Scalar::Util::blessed($i)
-                              and $i->isa(q[Mite::Attribute]);
-                        }
-                      );
-                };
-                $ok;
+                package Mite::Shim;
+                ( ref($SLURPY) eq 'ARRAY' ) and do {
+                    my $ok = 1;
+                    for my $i ( @{$SLURPY} ) {
+                        ( $ok = 0, last )
+                          unless (
+                            do {
+                                use Scalar::Util ();
+                                Scalar::Util::blessed($i)
+                                  and $i->isa(q[Mite::Attribute]);
+                            }
+                          );
+                    };
+                    $ok;
+                }
             }
-          }
+          )
           or croak(
 "Type check failed in signature for add_attributes: %s should be %s",
             "\$SLURPY", "ArrayRef[InstanceOf[\"Mite::Attribute\"]]"

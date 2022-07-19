@@ -4,7 +4,8 @@ use warnings;
 
 package Mite::Signature::Compiler;
 
-use Type::Params::Signature 1.015 ();
+use Type::Params::Signature 1.016002 ();
+use Types::Standard qw( Slurpy );
 use Scalar::Util ();
 
 our @ISA = 'Type::Params::Signature';
@@ -42,10 +43,15 @@ sub _make_general_fail {
 sub _make_constraint_fail {
 	my ( $self, %args ) = @_;
 
+	my $type = $args{constraint};
+	if ( $type->parent and $type->parent->{uniq} == Slurpy->{uniq} ) {
+		$type = $type->type_parameter || $type;
+	}
+
 	my $croaker = $self->{mite_signature}->class->_function_for_croak;
 
 	return sprintf '%s( "Type check failed in signature for %s: %%s should be %%s", %s, %s )',
-		$croaker, $self->subname, B::perlstring( $args{display_var} || $args{varname} ), B::perlstring( $args{constraint}->display_name );
+		$croaker, $self->subname, B::perlstring( $args{display_var} || $args{varname} ), B::perlstring( $type->display_name );
 }
 
 sub _make_count_fail {
