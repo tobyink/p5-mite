@@ -110,3 +110,12 @@
 			label "Use the new `signature_for` keyword in Mite 0.007000.";
 		];
 	].
+
+`Acme-Mitey-Cards 0.013 cpan:TOBYINK`
+	issued  2022-07-19;
+	changeset [
+		item [
+			a dcs:Change;
+			label "Signature improvements.";
+		];
+	].
