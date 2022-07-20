@@ -292,7 +292,7 @@ sub _compile_new {
     my $self = shift;
     my @vars = ('$class', '$self', '$args', '$meta');
 
-    return sprintf <<'CODE', $self->_compile_meta(@vars), $self->_compile_bless(@vars), $self->_compile_buildargs(@vars), $self->_compile_init_attributes(@vars), $self->_compile_strict_constructor(@vars), $self->_compile_buildall(@vars, '$no_build');
+    return sprintf <<'CODE', $self->_compile_meta(@vars), $self->_compile_bless(@vars), $self->_compile_buildargs(@vars), $self->_compile_init_attributes(@vars), $self->_compile_buildall(@vars, '$no_build'), $self->_compile_strict_constructor(@vars);
 sub new {
     my $class = ref($_[0]) ? ref(shift) : shift;
     my $meta  = %s;
@@ -302,10 +302,10 @@ sub new {
 
 %s
 
-    # Unrecognized parameters
+    # Call BUILD methods
     %s
 
-    # Call BUILD methods
+    # Unrecognized parameters
     %s
 
     return $self;

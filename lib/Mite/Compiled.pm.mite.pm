@@ -114,14 +114,14 @@
         require Scalar::Util && Scalar::Util::weaken( $self->{"source"} )
           if exists $self->{"source"};
 
+        # Call BUILD methods
+        $self->BUILDALL($args) if ( !$no_build and @{ $meta->{BUILD} || [] } );
+
         # Unrecognized parameters
         my @unknown = grep not(/\A(?:file|source)\z/), keys %{$args};
         @unknown
           and croak(
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
-
-        # Call BUILD methods
-        $self->BUILDALL($args) if ( !$no_build and @{ $meta->{BUILD} || [] } );
 
         return $self;
     }

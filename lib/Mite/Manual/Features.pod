@@ -34,6 +34,10 @@ you.
 
 Works as in L<Moose>. Mite generates C<BUILDALL> for you.
 
+From Mite 0.007004 onwards, your C<BUILD> method gets called I<before>
+the strict constructor check, which allows you to remove keys from
+C<< $args >> if you don't want them to trigger an exception.
+
 =head3 C<DEMOLISH> / C<DESTROY>
 
 Works as in L<Moose>. Mite generates C<DESTROY> for you.

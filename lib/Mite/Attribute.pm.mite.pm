@@ -1464,6 +1464,9 @@
             };
         };
 
+        # Call BUILD methods
+        $self->BUILDALL($args) if ( !$no_build and @{ $meta->{BUILD} || [] } );
+
         # Unrecognized parameters
         my @unknown = grep not(
 /\A(?:_class_for_default|a(?:ccessor|lias)|builder|c(?:l(?:ass|earer|one(?:_on_(?:read|write))?)|o(?:deref_default_variable|erce))|d(?:efault|o(?:cumentation|es))|handles|i(?:nit_arg|sa?)|l(?:azy|ocal_writer|value)|name|predicate|re(?:ader|quired)|t(?:rigger|ype)|w(?:eak_ref|riter))\z/
@@ -1471,9 +1474,6 @@
         @unknown
           and croak(
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
-
-        # Call BUILD methods
-        $self->BUILDALL($args) if ( !$no_build and @{ $meta->{BUILD} || [] } );
 
         return $self;
     }

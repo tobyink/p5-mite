@@ -361,6 +361,9 @@
             $self->{"parents"} = $args->{"parents"};
         }
 
+        # Call BUILD methods
+        $self->BUILDALL($args) if ( !$no_build and @{ $meta->{BUILD} || [] } );
+
         # Unrecognized parameters
         my @unknown = grep not(
 /\A(?:attributes|extends|imported_functions|method_signatures|name|parents|r(?:equired_methods|oles)|s(?:him_name|ource))\z/
@@ -368,9 +371,6 @@
         @unknown
           and croak(
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
-
-        # Call BUILD methods
-        $self->BUILDALL($args) if ( !$no_build and @{ $meta->{BUILD} || [] } );
 
         return $self;
     }

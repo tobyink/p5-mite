@@ -125,6 +125,9 @@
             $self->{"debug"} = $value;
         };
 
+        # Call BUILD methods
+        $self->BUILDALL($args) if ( !$no_build and @{ $meta->{BUILD} || [] } );
+
         # Unrecognized parameters
         my @unknown =
           grep not(/\A(?:_module_fakeout_namespace|config|debug|sources)\z/),
@@ -132,9 +135,6 @@
         @unknown
           and croak(
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
-
-        # Call BUILD methods
-        $self->BUILDALL($args) if ( !$no_build and @{ $meta->{BUILD} || [] } );
 
         return $self;
     }

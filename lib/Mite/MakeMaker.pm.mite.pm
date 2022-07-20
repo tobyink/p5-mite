@@ -34,6 +34,9 @@
           : { ( @_ == 1 ) ? %{ $_[0] } : @_ };
         my $no_build = delete $args->{__no_BUILD__};
 
+        # Call BUILD methods
+        $self->BUILDALL($args) if ( !$no_build and @{ $meta->{BUILD} || [] } );
+
         # Unrecognized parameters
         my @unknown = grep not(
             do {
@@ -49,9 +52,6 @@
         @unknown
           and croak(
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
-
-        # Call BUILD methods
-        $self->BUILDALL($args) if ( !$no_build and @{ $meta->{BUILD} || [] } );
 
         return $self;
     }

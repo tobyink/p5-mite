@@ -286,6 +286,9 @@
             $self->{"method_signatures"} = $value;
         };
 
+        # Call BUILD methods
+        $self->BUILDALL($args) if ( !$no_build and @{ $meta->{BUILD} || [] } );
+
         # Unrecognized parameters
         my @unknown = grep not(
 /\A(?:attributes|imported_functions|method_signatures|name|r(?:equired_methods|oles)|s(?:him_name|ource))\z/
@@ -293,9 +296,6 @@
         @unknown
           and croak(
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
-
-        # Call BUILD methods
-        $self->BUILDALL($args) if ( !$no_build and @{ $meta->{BUILD} || [] } );
 
         return $self;
     }

@@ -175,6 +175,9 @@
             $self->{"named_to_list"} = $value;
         };
 
+        # Call BUILD methods
+        $self->BUILDALL($args) if ( !$no_build and @{ $meta->{BUILD} || [] } );
+
         # Unrecognized parameters
         my @unknown = grep not(
 /\A(?:class|head|method(?:_name)?|named(?:_to_list)?|pos(?:itional)?|tail)\z/
@@ -182,9 +185,6 @@
         @unknown
           and croak(
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
-
-        # Call BUILD methods
-        $self->BUILDALL($args) if ( !$no_build and @{ $meta->{BUILD} || [] } );
 
         return $self;
     }
