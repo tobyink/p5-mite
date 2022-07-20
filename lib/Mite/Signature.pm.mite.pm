@@ -34,7 +34,7 @@
           : { ( @_ == 1 ) ? %{ $_[0] } : @_ };
         my $no_build = delete $args->{__no_BUILD__};
 
-        # Attribute: class
+        # Attribute class (type: Mite::Class)
         if ( exists $args->{"class"} ) {
             (
                 do {
@@ -50,7 +50,7 @@
         require Scalar::Util && Scalar::Util::weaken( $self->{"class"} )
           if exists $self->{"class"};
 
-        # Attribute: method_name
+        # Attribute method_name (type: Str)
         croak "Missing key in constructor: method_name"
           unless exists $args->{"method_name"};
         do {
@@ -65,7 +65,7 @@
           "method_name", "Str";
         $self->{"method_name"} = $args->{"method_name"};
 
-        # Attribute: named
+        # Attribute named (type: ArrayRef)
         if ( exists $args->{"named"} ) {
             do { package Mite::Shim; ref( $args->{"named"} ) eq 'ARRAY' }
               or croak "Type check failed in constructor: %s should be %s",
@@ -73,7 +73,7 @@
             $self->{"named"} = $args->{"named"};
         }
 
-        # Attribute: positional
+        # Attribute positional (type: ArrayRef)
         my $args_for_positional = {};
         for ( "positional", "pos" ) {
             next unless exists $args->{$_};
@@ -91,7 +91,7 @@
             $self->{"positional"} = $args_for_positional->{"positional"};
         }
 
-        # Attribute: method
+        # Attribute method (type: Bool)
         do {
             my $value = exists( $args->{"method"} ) ? $args->{"method"} : "1";
             (
@@ -106,7 +106,7 @@
             $self->{"method"} = $value;
         };
 
-        # Attribute: head
+        # Attribute head (type: ArrayRef|Int)
         if ( exists $args->{"head"} ) {
             do {
 
@@ -128,7 +128,7 @@
             $self->{"head"} = $args->{"head"};
         }
 
-        # Attribute: tail
+        # Attribute tail (type: ArrayRef|Int)
         if ( exists $args->{"tail"} ) {
             do {
 
@@ -150,7 +150,7 @@
             $self->{"tail"} = $args->{"tail"};
         }
 
-        # Attribute: named_to_list
+        # Attribute named_to_list (type: Bool|ArrayRef)
         do {
             my $value =
               exists( $args->{"named_to_list"} )
@@ -175,7 +175,7 @@
             $self->{"named_to_list"} = $value;
         };
 
-        # Enforce strict constructor
+        # Unrecognized parameters
         my @unknown = grep not(
 /\A(?:class|head|method(?:_name)?|named(?:_to_list)?|pos(?:itional)?|tail)\z/
         ), keys %{$args};

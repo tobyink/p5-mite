@@ -34,7 +34,7 @@
           : { ( @_ == 1 ) ? %{ $_[0] } : @_ };
         my $no_build = delete $args->{__no_BUILD__};
 
-        # Attribute: app
+        # Attribute app (type: Object)
         croak "Missing key in constructor: app" unless exists $args->{"app"};
         (
             do {
@@ -50,7 +50,7 @@
         require Scalar::Util && Scalar::Util::weaken( $self->{"app"} )
           if exists $self->{"app"};
 
-        # Attribute: kingpin_command
+        # Attribute kingpin_command (type: Object)
         if ( exists $args->{"kingpin_command"} ) {
             (
                 do {
@@ -65,7 +65,7 @@
             $self->{"kingpin_command"} = $args->{"kingpin_command"};
         }
 
-        # Enforce strict constructor
+        # Unrecognized parameters
         my @unknown = grep not(/\A(?:app|kingpin_command)\z/), keys %{$args};
         @unknown
           and croak(

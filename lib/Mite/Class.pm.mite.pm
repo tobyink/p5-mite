@@ -42,7 +42,7 @@
           : { ( @_ == 1 ) ? %{ $_[0] } : @_ };
         my $no_build = delete $args->{__no_BUILD__};
 
-        # Attribute: attributes
+        # Attribute attributes (type: HashRef[Mite::Attribute])
         do {
             my $value =
               exists( $args->{"attributes"} )
@@ -71,7 +71,7 @@
             $self->{"attributes"} = $value;
         };
 
-        # Attribute: name
+        # Attribute name (type: ValidClassName)
         croak "Missing key in constructor: name" unless exists $args->{"name"};
         (
             (
@@ -95,7 +95,7 @@
           "ValidClassName";
         $self->{"name"} = $args->{"name"};
 
-        # Attribute: shim_name
+        # Attribute shim_name (type: ValidClassName)
         if ( exists $args->{"shim_name"} ) {
             (
                 (
@@ -121,7 +121,7 @@
             $self->{"shim_name"} = $args->{"shim_name"};
         }
 
-        # Attribute: source
+        # Attribute source (type: Mite::Source)
         if ( exists $args->{"source"} ) {
             (
                 do {
@@ -137,7 +137,7 @@
         require Scalar::Util && Scalar::Util::weaken( $self->{"source"} )
           if exists $self->{"source"};
 
-        # Attribute: roles
+        # Attribute roles (type: ArrayRef[Mite::Role])
         do {
             my $value =
               exists( $args->{"roles"} )
@@ -166,7 +166,7 @@
             $self->{"roles"} = $value;
         };
 
-        # Attribute: imported_functions
+        # Attribute imported_functions (type: Map[MethodName,Str])
         do {
             my $value =
               exists( $args->{"imported_functions"} )
@@ -212,7 +212,7 @@
             $self->{"imported_functions"} = $value;
         };
 
-        # Attribute: required_methods
+        # Attribute required_methods (type: ArrayRef[MethodName])
         do {
             my $value =
               exists( $args->{"required_methods"} )
@@ -248,7 +248,7 @@
             $self->{"required_methods"} = $value;
         };
 
-        # Attribute: method_signatures
+        # Attribute method_signatures (type: Map[MethodName,Mite::Signature])
         do {
             my $value =
               exists( $args->{"method_signatures"} )
@@ -294,7 +294,7 @@
             $self->{"method_signatures"} = $value;
         };
 
-        # Attribute: extends
+        # Attribute extends (type: ArrayRef[ValidClassName])
         do {
             my $value =
               exists( $args->{"extends"} )
@@ -337,7 +337,7 @@
               if exists $args->{"extends"};
         };
 
-        # Attribute: parents
+        # Attribute parents (type: ArrayRef[Mite::Class])
         if ( exists $args->{"parents"} ) {
             (
                 do { package Mite::Shim; ref( $args->{"parents"} ) eq 'ARRAY' }
@@ -361,7 +361,7 @@
             $self->{"parents"} = $args->{"parents"};
         }
 
-        # Enforce strict constructor
+        # Unrecognized parameters
         my @unknown = grep not(
 /\A(?:attributes|extends|imported_functions|method_signatures|name|parents|r(?:equired_methods|oles)|s(?:him_name|ource))\z/
         ), keys %{$args};

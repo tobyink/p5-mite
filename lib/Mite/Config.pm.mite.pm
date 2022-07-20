@@ -34,7 +34,7 @@
           : { ( @_ == 1 ) ? %{ $_[0] } : @_ };
         my $no_build = delete $args->{__no_BUILD__};
 
-        # Attribute: mite_dir_name
+        # Attribute mite_dir_name (type: Str)
         do {
             my $value =
               exists( $args->{"mite_dir_name"} )
@@ -53,7 +53,7 @@
             $self->{"mite_dir_name"} = $value;
         };
 
-        # Attribute: mite_dir
+        # Attribute mite_dir (type: Path)
         if ( exists $args->{"mite_dir"} ) {
             do {
                 my $coerced_value = do {
@@ -117,7 +117,7 @@
             };
         }
 
-        # Attribute: config_file
+        # Attribute config_file (type: Path)
         if ( exists $args->{"config_file"} ) {
             do {
                 my $coerced_value = do {
@@ -181,7 +181,7 @@
             };
         }
 
-        # Attribute: data
+        # Attribute data (type: HashRef)
         if ( exists $args->{"data"} ) {
             do { package Mite::Shim; ref( $args->{"data"} ) eq 'HASH' }
               or croak "Type check failed in constructor: %s should be %s",
@@ -189,7 +189,7 @@
             $self->{"data"} = $args->{"data"};
         }
 
-        # Attribute: search_for_mite_dir
+        # Attribute search_for_mite_dir (type: Bool)
         do {
             my $value =
               exists( $args->{"search_for_mite_dir"} )
@@ -207,7 +207,7 @@
             $self->{"search_for_mite_dir"} = $value;
         };
 
-        # Enforce strict constructor
+        # Unrecognized parameters
         my @unknown = grep not(
             /\A(?:config_file|data|mite_dir(?:_name)?|search_for_mite_dir)\z/),
           keys %{$args};

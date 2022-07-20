@@ -33,10 +33,10 @@
           : { ( @_ == 1 ) ? %{ $_[0] } : @_ };
         my $no_build = delete $args->{__no_BUILD__};
 
-        # Attribute: _order
+        # Attribute _order
         $self->{"_order"} = $self->_build__order;
 
-        # Attribute: class
+        # Attribute class (type: Mite::Role)
         if ( exists $args->{"class"} ) {
             (
                 do {
@@ -52,7 +52,7 @@
         require Scalar::Util && Scalar::Util::weaken( $self->{"class"} )
           if exists $self->{"class"};
 
-        # Attribute: _class_for_default
+        # Attribute _class_for_default (type: Mite::Role)
         if ( exists $args->{"_class_for_default"} ) {
             (
                 do {
@@ -69,7 +69,7 @@
           && Scalar::Util::weaken( $self->{"_class_for_default"} )
           if exists $self->{"_class_for_default"};
 
-        # Attribute: name
+        # Attribute name (type: NonEmptyStr)
         croak "Missing key in constructor: name" unless exists $args->{"name"};
         (
             (
@@ -87,7 +87,7 @@
           "NonEmptyStr";
         $self->{"name"} = $args->{"name"};
 
-        # Attribute: init_arg
+        # Attribute init_arg (type: NonEmptyStr|Undef)
         if ( exists $args->{"init_arg"} ) {
             do {
 
@@ -121,7 +121,7 @@
             $self->{"init_arg"} = $args->{"init_arg"};
         }
 
-        # Attribute: required
+        # Attribute required (type: Bool)
         do {
             my $value =
               exists( $args->{"required"} ) ? $args->{"required"} : "";
@@ -137,7 +137,7 @@
             $self->{"required"} = $value;
         };
 
-        # Attribute: weak_ref
+        # Attribute weak_ref (type: Bool)
         do {
             my $value =
               exists( $args->{"weak_ref"} ) ? $args->{"weak_ref"} : "";
@@ -153,7 +153,7 @@
             $self->{"weak_ref"} = $value;
         };
 
-        # Attribute: is
+        # Attribute is (type: Enum["ro","rw","rwp","lazy","bare"])
         do {
             my $value = exists( $args->{"is"} ) ? $args->{"is"} : "bare";
             do {
@@ -168,7 +168,7 @@
             $self->{"is"} = $value;
         };
 
-        # Attribute: reader
+        # Attribute reader (type: MethodNameTemplate|One|Undef)
         if ( exists $args->{"reader"} ) {
             do {
 
@@ -239,7 +239,7 @@
             $self->{"reader"} = $args->{"reader"};
         }
 
-        # Attribute: writer
+        # Attribute writer (type: MethodNameTemplate|One|Undef)
         if ( exists $args->{"writer"} ) {
             do {
 
@@ -310,7 +310,7 @@
             $self->{"writer"} = $args->{"writer"};
         }
 
-        # Attribute: accessor
+        # Attribute accessor (type: MethodNameTemplate|One|Undef)
         if ( exists $args->{"accessor"} ) {
             do {
 
@@ -383,7 +383,7 @@
             $self->{"accessor"} = $args->{"accessor"};
         }
 
-        # Attribute: clearer
+        # Attribute clearer (type: MethodNameTemplate|One|Undef)
         if ( exists $args->{"clearer"} ) {
             do {
 
@@ -454,7 +454,7 @@
             $self->{"clearer"} = $args->{"clearer"};
         }
 
-        # Attribute: predicate
+        # Attribute predicate (type: MethodNameTemplate|One|Undef)
         if ( exists $args->{"predicate"} ) {
             do {
 
@@ -530,7 +530,7 @@
             $self->{"predicate"} = $args->{"predicate"};
         }
 
-        # Attribute: lvalue
+        # Attribute lvalue (type: MethodNameTemplate|One|Undef)
         if ( exists $args->{"lvalue"} ) {
             do {
 
@@ -601,7 +601,7 @@
             $self->{"lvalue"} = $args->{"lvalue"};
         }
 
-        # Attribute: local_writer
+        # Attribute local_writer (type: MethodNameTemplate|One|Undef)
         if ( exists $args->{"local_writer"} ) {
             do {
 
@@ -682,7 +682,7 @@
             $self->{"local_writer"} = $args->{"local_writer"};
         }
 
-        # Attribute: isa
+        # Attribute isa (type: Str|Ref)
         if ( exists $args->{"isa"} ) {
             do {
 
@@ -705,7 +705,7 @@
             $self->{"isa"} = $args->{"isa"};
         }
 
-        # Attribute: does
+        # Attribute does (type: Str|Ref)
         if ( exists $args->{"does"} ) {
             do {
 
@@ -728,7 +728,7 @@
             $self->{"does"} = $args->{"does"};
         }
 
-        # Attribute: type
+        # Attribute type (type: Object|Undef)
         if ( exists $args->{"type"} ) {
             do {
 
@@ -749,7 +749,7 @@
             $self->{"type"} = $args->{"type"};
         }
 
-        # Attribute: coerce
+        # Attribute coerce (type: Bool)
         do {
             my $value = exists( $args->{"coerce"} ) ? $args->{"coerce"} : "";
             (
@@ -764,7 +764,7 @@
             $self->{"coerce"} = $value;
         };
 
-        # Attribute: default
+        # Attribute default (type: Undef|Str|CodeRef|ScalarRef|Dict[]|Tuple[])
         if ( exists $args->{"default"} ) {
             do {
 
@@ -819,7 +819,7 @@
             $self->{"default"} = $args->{"default"};
         }
 
-        # Attribute: lazy
+        # Attribute lazy (type: Bool)
         do {
             my $value = exists( $args->{"lazy"} ) ? $args->{"lazy"} : "";
             (
@@ -834,7 +834,7 @@
             $self->{"lazy"} = $value;
         };
 
-        # Attribute: coderef_default_variable
+        # Attribute coderef_default_variable (type: NonEmptyStr)
         if ( exists $args->{"coderef_default_variable"} ) {
             (
                 (
@@ -865,7 +865,7 @@
               $args->{"coderef_default_variable"};
         }
 
-        # Attribute: trigger
+        # Attribute trigger (type: MethodNameTemplate|One|CodeRef)
         if ( exists $args->{"trigger"} ) {
             do {
 
@@ -939,7 +939,7 @@
             $self->{"trigger"} = $args->{"trigger"};
         }
 
-        # Attribute: builder
+        # Attribute builder (type: MethodNameTemplate|One|CodeRef)
         if ( exists $args->{"builder"} ) {
             do {
 
@@ -1013,7 +1013,7 @@
             $self->{"builder"} = $args->{"builder"};
         }
 
-        # Attribute: clone
+        # Attribute clone (type: MethodNameTemplate|One|CodeRef|Undef)
         if ( exists $args->{"clone"} ) {
             do {
 
@@ -1082,7 +1082,7 @@
             $self->{"clone"} = $args->{"clone"};
         }
 
-        # Attribute: clone_on_read
+        # Attribute clone_on_read (type: Bool)
         if ( exists $args->{"clone_on_read"} ) {
             do {
                 my $coerced_value = do {
@@ -1113,7 +1113,7 @@
             };
         }
 
-        # Attribute: clone_on_write
+        # Attribute clone_on_write (type: Bool)
         if ( exists $args->{"clone_on_write"} ) {
             do {
                 my $coerced_value = do {
@@ -1144,12 +1144,12 @@
             };
         }
 
-        # Attribute: documentation
+        # Attribute documentation
         if ( exists $args->{"documentation"} ) {
             $self->{"documentation"} = $args->{"documentation"};
         }
 
-        # Attribute: handles
+        # Attribute handles (type: HandlesHash)
         if ( exists $args->{"handles"} ) {
             do {
                 my $coerced_value = do {
@@ -1322,7 +1322,7 @@
             };
         }
 
-        # Attribute: alias
+        # Attribute alias (type: AliasList)
         do {
             my $value =
               exists( $args->{"alias"} )
@@ -1464,7 +1464,7 @@
             };
         };
 
-        # Enforce strict constructor
+        # Unrecognized parameters
         my @unknown = grep not(
 /\A(?:_class_for_default|a(?:ccessor|lias)|builder|c(?:l(?:ass|earer|one(?:_on_(?:read|write))?)|o(?:deref_default_variable|erce))|d(?:efault|o(?:cumentation|es))|handles|i(?:nit_arg|sa?)|l(?:azy|ocal_writer|value)|name|predicate|re(?:ader|quired)|t(?:rigger|ype)|w(?:eak_ref|riter))\z/
         ), keys %{$args};

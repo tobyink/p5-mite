@@ -34,7 +34,7 @@
           : { ( @_ == 1 ) ? %{ $_[0] } : @_ };
         my $no_build = delete $args->{__no_BUILD__};
 
-        # Attribute: file
+        # Attribute file (type: Path)
         if ( exists $args->{"file"} ) {
             do {
                 my $coerced_value = do {
@@ -98,7 +98,7 @@
             };
         }
 
-        # Attribute: source
+        # Attribute source (type: Mite::Source)
         croak "Missing key in constructor: source"
           unless exists $args->{"source"};
         (
@@ -114,7 +114,7 @@
         require Scalar::Util && Scalar::Util::weaken( $self->{"source"} )
           if exists $self->{"source"};
 
-        # Enforce strict constructor
+        # Unrecognized parameters
         my @unknown = grep not(/\A(?:file|source)\z/), keys %{$args};
         @unknown
           and croak(

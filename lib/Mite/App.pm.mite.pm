@@ -34,7 +34,7 @@
           : { ( @_ == 1 ) ? %{ $_[0] } : @_ };
         my $no_build = delete $args->{__no_BUILD__};
 
-        # Attribute: commands
+        # Attribute commands (type: HashRef[Object])
         do {
             my $value =
               exists( $args->{"commands"} ) ? $args->{"commands"} : {};
@@ -62,7 +62,7 @@
             $self->{"commands"} = $value;
         };
 
-        # Attribute: kingpin
+        # Attribute kingpin (type: Object)
         if ( exists $args->{"kingpin"} ) {
             (
                 do {
@@ -77,7 +77,7 @@
             $self->{"kingpin"} = $args->{"kingpin"};
         }
 
-        # Attribute: project
+        # Attribute project (type: Mite::Project)
         if ( exists $args->{"project"} ) {
             (
                 do {
@@ -91,7 +91,7 @@
             $self->{"project"} = $args->{"project"};
         }
 
-        # Enforce strict constructor
+        # Unrecognized parameters
         my @unknown = grep not(/\A(?:commands|kingpin|project)\z/),
           keys %{$args};
         @unknown

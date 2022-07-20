@@ -34,7 +34,7 @@
           : { ( @_ == 1 ) ? %{ $_[0] } : @_ };
         my $no_build = delete $args->{__no_BUILD__};
 
-        # Attribute: sources
+        # Attribute sources (type: HashRef[Mite::Source])
         do {
             my $value =
               exists( $args->{"sources"} )
@@ -63,7 +63,7 @@
             $self->{"sources"} = $value;
         };
 
-        # Attribute: config
+        # Attribute config (type: Mite::Config)
         if ( exists $args->{"config"} ) {
             (
                 do {
@@ -77,7 +77,7 @@
             $self->{"config"} = $args->{"config"};
         }
 
-        # Attribute: _module_fakeout_namespace
+        # Attribute _module_fakeout_namespace (type: Str|Undef)
         if ( exists $args->{"_module_fakeout_namespace"} ) {
             do {
 
@@ -110,7 +110,7 @@
               $args->{"_module_fakeout_namespace"};
         }
 
-        # Attribute: debug
+        # Attribute debug (type: Bool)
         do {
             my $value = exists( $args->{"debug"} ) ? $args->{"debug"} : "";
             (
@@ -125,7 +125,7 @@
             $self->{"debug"} = $value;
         };
 
-        # Enforce strict constructor
+        # Unrecognized parameters
         my @unknown =
           grep not(/\A(?:_module_fakeout_namespace|config|debug|sources)\z/),
           keys %{$args};

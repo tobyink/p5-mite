@@ -302,7 +302,7 @@ sub new {
 
 %s
 
-    # Enforce strict constructor
+    # Unrecognized parameters
     %s
 
     # Call BUILD methods
@@ -443,7 +443,8 @@ sub _compile_init_attributes {
         my $guard = $attr->locally_set_compiling_class( $self );
         my @lines = grep !!$_, $attr->compile_init( $selfvar, $argvar );
         if ( @lines ) {
-            push @code, sprintf "# Attribute: %s", $attr->name;
+            push @code, sprintf "# Attribute %s%s",
+               $attr->name, $attr->type ? sprintf( ' (type: %s)', $attr->type->display_name ) : '';
             push @code, @lines;
             push @code, '';
         }

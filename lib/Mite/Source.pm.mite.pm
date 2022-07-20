@@ -34,7 +34,7 @@
           : { ( @_ == 1 ) ? %{ $_[0] } : @_ };
         my $no_build = delete $args->{__no_BUILD__};
 
-        # Attribute: file
+        # Attribute file (type: Path)
         croak "Missing key in constructor: file" unless exists $args->{"file"};
         do {
             my $coerced_value = do {
@@ -95,7 +95,7 @@
             $self->{"file"} = $coerced_value;
         };
 
-        # Attribute: classes
+        # Attribute classes (type: HashRef[Mite::Class])
         do {
             my $value =
               exists( $args->{"classes"} )
@@ -124,7 +124,7 @@
             $self->{"classes"} = $value;
         };
 
-        # Attribute: class_order
+        # Attribute class_order (type: ArrayRef[NonEmptyStr])
         do {
             my $value =
               exists( $args->{"class_order"} )
@@ -160,7 +160,7 @@
             $self->{"class_order"} = $value;
         };
 
-        # Attribute: compiled
+        # Attribute compiled (type: Mite::Compiled)
         if ( exists $args->{"compiled"} ) {
             (
                 do {
@@ -174,7 +174,7 @@
             $self->{"compiled"} = $args->{"compiled"};
         }
 
-        # Attribute: project
+        # Attribute project (type: Mite::Project)
         if ( exists $args->{"project"} ) {
             (
                 do {
@@ -190,7 +190,7 @@
         require Scalar::Util && Scalar::Util::weaken( $self->{"project"} )
           if exists $self->{"project"};
 
-        # Enforce strict constructor
+        # Unrecognized parameters
         my @unknown =
           grep not(/\A(?:c(?:lass(?:_order|es)|ompiled)|file|project)\z/),
           keys %{$args};
