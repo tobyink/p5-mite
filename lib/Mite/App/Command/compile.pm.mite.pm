@@ -32,6 +32,7 @@
         push @ISA, "Mite::App::Command";
     }
 
+    # See UNIVERSAL
     sub DOES {
         my ( $self, $role ) = @_;
         our %DOES;
@@ -40,6 +41,7 @@
         return $self->SUPER::DOES($role);
     }
 
+    # Alias for Moose/Moo-compatibility
     sub does {
         shift->DOES(@_);
     }

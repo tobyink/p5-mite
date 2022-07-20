@@ -349,6 +349,7 @@ END
 sub _compile_does {
     my $self = shift;
     return <<'CODE'
+# See UNIVERSAL
 sub DOES {
     my ( $self, $role ) = @_;
     our %DOES;
@@ -357,6 +358,7 @@ sub DOES {
     return $self->SUPER::DOES( $role );
 }
 
+# Alias for Moose/Moo-compatibility
 sub does {
     shift->DOES( @_ );
 }
@@ -423,6 +425,7 @@ CODE
 
 sub _compile_meta_method {
     return <<'CODE';
+# Gather metadata for constructor and destructor
 sub __META__ {
     no strict 'refs';
     no warnings 'once';
@@ -448,7 +451,8 @@ sub _compile_method_signatures {
     my $self = shift;
     my %sigs = %{ $self->method_signatures } or return;
 
-    my $code = "our \%SIGNATURE_FOR;\n\n";
+    my $code = "# Method signatures\n"
+        . "our \%SIGNATURE_FOR;\n\n";
 
     for my $name ( sort keys %sigs ) {
         my $guard = $sigs{$name}->locally_set_compiling_class( $self );

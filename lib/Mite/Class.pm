@@ -293,6 +293,7 @@ sub _compile_new {
     my @vars = ('$class', '$self', '$args', '$meta');
 
     return sprintf <<'CODE', $self->_compile_meta(@vars), $self->_compile_bless(@vars), $self->_compile_buildargs(@vars), $self->_compile_init_attributes(@vars), $self->_compile_buildall(@vars, '$no_build'), $self->_compile_strict_constructor(@vars);
+# Standard Moose/Moo-style constructor
 sub new {
     my $class = ref($_[0]) ? ref(shift) : shift;
     my $meta  = %s;
@@ -387,6 +388,7 @@ sub _compile_buildall_method {
     my $self = shift;
 
     return sprintf <<'CODE', $self->_compile_meta( '$class', '$_[0]', '$_[1]', '$meta' ),
+# Used by constructor to call BUILD methods
 sub BUILDALL {
     my $class = ref( $_[0] );
     my $meta  = %s;
@@ -398,6 +400,7 @@ CODE
 sub _compile_destroy {
     my $self = shift;
     sprintf <<'CODE', $self->_compile_meta( '$class', '$self' );
+# Destructor should call DEMOLISH methods
 sub DESTROY {
     my $self  = shift;
     my $class = ref( $self ) || $self;

@@ -24,6 +24,7 @@
         *true    = \&Mite::Shim::true;
     }
 
+    # Standard Moose/Moo-style constructor
     sub new {
         my $class = ref( $_[0] ) ? ref(shift) : shift;
         my $meta  = ( $Mite::META{$class} ||= $class->__META__ );
@@ -126,12 +127,14 @@
         return $self;
     }
 
+    # Used by constructor to call BUILD methods
     sub BUILDALL {
         my $class = ref( $_[0] );
         my $meta  = ( $Mite::META{$class} ||= $class->__META__ );
         $_->(@_) for @{ $meta->{BUILD} || [] };
     }
 
+    # Destructor should call DEMOLISH methods
     sub DESTROY {
         my $self  = shift;
         my $class = ref($self) || $self;
@@ -152,6 +155,7 @@
         return;
     }
 
+    # Gather metadata for constructor and destructor
     sub __META__ {
         no strict 'refs';
         no warnings 'once';
@@ -172,6 +176,7 @@
         };
     }
 
+    # See UNIVERSAL
     sub DOES {
         my ( $self, $role ) = @_;
         our %DOES;
@@ -180,6 +185,7 @@
         return $self->SUPER::DOES($role);
     }
 
+    # Alias for Moose/Moo-compatibility
     sub does {
         shift->DOES(@_);
     }
@@ -356,6 +362,7 @@
     sub class_order { shift->_assert_blessed_source->class_order(@_) }
     sub classes     { shift->_assert_blessed_source->classes(@_) }
 
+    # Method signatures
     our %SIGNATURE_FOR;
 
     $SIGNATURE_FOR{"_source_file2compiled_file"} = sub {
