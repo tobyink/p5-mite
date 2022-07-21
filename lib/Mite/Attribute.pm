@@ -466,6 +466,11 @@ sub _compile_default {
     elsif ( $self->has_reference_default ) {
         return HashRef->check( $self->default ) ? '{}' : '[]';
     }
+    elsif ( $self->has_simple_default and $self->type and $self->type == Bool ) {
+        my $truthy = $self->compiling_class->imported_functions->{true}  ? 'true'  : '!!1';
+        my $falsey = $self->compiling_class->imported_functions->{false} ? 'false' : '!!0';
+        return $self->default ? $truthy : $falsey;
+    }
     elsif ( $self->has_simple_default ) {
         return defined( $self->default ) ? $self->_q( $self->default ) : 'undef';
     }

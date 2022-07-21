@@ -183,7 +183,7 @@
             my $value =
               exists( $args->{"search_for_mite_dir"} )
               ? $args->{"search_for_mite_dir"}
-              : "1";
+              : true;
             (
                 !ref $value
                   and (!defined $value

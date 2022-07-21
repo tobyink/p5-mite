@@ -125,7 +125,7 @@
         # Attribute required (type: Bool)
         do {
             my $value =
-              exists( $args->{"required"} ) ? $args->{"required"} : "";
+              exists( $args->{"required"} ) ? $args->{"required"} : false;
             (
                 !ref $value
                   and (!defined $value
@@ -141,7 +141,7 @@
         # Attribute weak_ref (type: Bool)
         do {
             my $value =
-              exists( $args->{"weak_ref"} ) ? $args->{"weak_ref"} : "";
+              exists( $args->{"weak_ref"} ) ? $args->{"weak_ref"} : false;
             (
                 !ref $value
                   and (!defined $value
@@ -752,7 +752,7 @@
 
         # Attribute coerce (type: Bool)
         do {
-            my $value = exists( $args->{"coerce"} ) ? $args->{"coerce"} : "";
+            my $value = exists( $args->{"coerce"} ) ? $args->{"coerce"} : false;
             (
                 !ref $value
                   and (!defined $value
@@ -822,7 +822,7 @@
 
         # Attribute lazy (type: Bool)
         do {
-            my $value = exists( $args->{"lazy"} ) ? $args->{"lazy"} : "";
+            my $value = exists( $args->{"lazy"} ) ? $args->{"lazy"} : false;
             (
                 !ref $value
                   and (!defined $value

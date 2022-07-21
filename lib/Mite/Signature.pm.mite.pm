@@ -94,7 +94,7 @@
 
         # Attribute method (type: Bool)
         do {
-            my $value = exists( $args->{"method"} ) ? $args->{"method"} : "1";
+            my $value = exists( $args->{"method"} ) ? $args->{"method"} : true;
             (
                 !ref $value
                   and (!defined $value

@@ -113,7 +113,7 @@
 
         # Attribute debug (type: Bool)
         do {
-            my $value = exists( $args->{"debug"} ) ? $args->{"debug"} : "";
+            my $value = exists( $args->{"debug"} ) ? $args->{"debug"} : false;
             (
                 !ref $value
                   and (!defined $value
