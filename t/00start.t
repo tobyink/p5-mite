@@ -16,7 +16,7 @@ my %modules = (
 		Import::Into 0
 		Path::Tiny 0.052
 		Types::Path::Tiny 0
-		Types::Standard 1.014000
+		Types::Standard 1.016000
 		YAML::XS 0.41
 		Class::XSAccessor 1.19
 	) },
