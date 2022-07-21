@@ -42,7 +42,7 @@
           "Object";
         $self->{"app"} = $args->{"app"};
         require Scalar::Util && Scalar::Util::weaken( $self->{"app"} )
-          if exists $self->{"app"};
+          if ref $self->{"app"};
 
         # Attribute kingpin_command (type: Object)
         if ( exists $args->{"kingpin_command"} ) {

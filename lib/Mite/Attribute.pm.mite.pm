@@ -51,7 +51,7 @@
             $self->{"class"} = $args->{"class"};
         }
         require Scalar::Util && Scalar::Util::weaken( $self->{"class"} )
-          if exists $self->{"class"};
+          if ref $self->{"class"};
 
         # Attribute _class_for_default (type: Mite::Role)
         if ( exists $args->{"_class_for_default"} ) {
@@ -68,7 +68,7 @@
         }
         require Scalar::Util
           && Scalar::Util::weaken( $self->{"_class_for_default"} )
-          if exists $self->{"_class_for_default"};
+          if ref $self->{"_class_for_default"};
 
         # Attribute name (type: NonEmptyStr)
         croak "Missing key in constructor: name" unless exists $args->{"name"};
@@ -1560,7 +1560,8 @@
                 "accessor", "Mite::Role" );
             $_[0]{"_class_for_default"} = $_[1];
             require Scalar::Util
-              && Scalar::Util::weaken( $_[0]{"_class_for_default"} );
+              && Scalar::Util::weaken( $_[0]{"_class_for_default"} )
+              if ref $_[0]{"_class_for_default"};
             $_[0];
           }
           : do {
@@ -1973,7 +1974,8 @@
               or croak( "Type check failed in %s: value should be %s",
                 "accessor", "Mite::Role" );
             $_[0]{"class"} = $_[1];
-            require Scalar::Util && Scalar::Util::weaken( $_[0]{"class"} );
+            require Scalar::Util && Scalar::Util::weaken( $_[0]{"class"} )
+              if ref $_[0]{"class"};
             $_[0];
           }
           : ( $_[0]{"class"} );

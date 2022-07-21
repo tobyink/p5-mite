@@ -128,7 +128,7 @@
             $self->{"source"} = $args->{"source"};
         }
         require Scalar::Util && Scalar::Util::weaken( $self->{"source"} )
-          if exists $self->{"source"};
+          if ref $self->{"source"};
 
         # Attribute roles (type: ArrayRef[Mite::Role])
         do {
@@ -538,7 +538,8 @@
               or croak( "Type check failed in %s: value should be %s",
                 "accessor", "Mite::Source" );
             $_[0]{"source"} = $_[1];
-            require Scalar::Util && Scalar::Util::weaken( $_[0]{"source"} );
+            require Scalar::Util && Scalar::Util::weaken( $_[0]{"source"} )
+              if ref $_[0]{"source"};
             $_[0];
           }
           : ( $_[0]{"source"} );

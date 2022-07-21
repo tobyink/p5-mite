@@ -183,7 +183,7 @@
             $self->{"project"} = $args->{"project"};
         }
         require Scalar::Util && Scalar::Util::weaken( $self->{"project"} )
-          if exists $self->{"project"};
+          if ref $self->{"project"};
 
         # Call BUILD methods
         $self->BUILDALL($args) if ( !$no_build and @{ $meta->{BUILD} || [] } );
@@ -348,7 +348,8 @@
               or croak( "Type check failed in %s: value should be %s",
                 "accessor", "Mite::Project" );
             $_[0]{"project"} = $_[1];
-            require Scalar::Util && Scalar::Util::weaken( $_[0]{"project"} );
+            require Scalar::Util && Scalar::Util::weaken( $_[0]{"project"} )
+              if ref $_[0]{"project"};
             $_[0];
           }
           : ( $_[0]{"project"} );

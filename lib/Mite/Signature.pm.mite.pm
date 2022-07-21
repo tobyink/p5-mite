@@ -49,7 +49,7 @@
             $self->{"class"} = $args->{"class"};
         }
         require Scalar::Util && Scalar::Util::weaken( $self->{"class"} )
-          if exists $self->{"class"};
+          if ref $self->{"class"};
 
         # Attribute method_name (type: Str)
         croak "Missing key in constructor: method_name"

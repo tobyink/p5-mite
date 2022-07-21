@@ -136,7 +136,7 @@
             $self->{"source"} = $args->{"source"};
         }
         require Scalar::Util && Scalar::Util::weaken( $self->{"source"} )
-          if exists $self->{"source"};
+          if ref $self->{"source"};
 
         # Attribute roles (type: ArrayRef[Mite::Role])
         do {

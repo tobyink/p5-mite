@@ -604,7 +604,7 @@ sub compile_init {
     }
 
     if ( $self->weak_ref ) {
-        push @code, sprintf 'require Scalar::Util && Scalar::Util::weaken(%s->{%s}) if exists %s->{%s};',
+        push @code, sprintf 'require Scalar::Util && Scalar::Util::weaken(%s->{%s}) if ref %s->{%s};',
             $selfvar, $self->_q_name, $selfvar, $self->_q_name;
     }
 
@@ -678,8 +678,8 @@ my %code_template;
             ) . '; ';
         }
         if ( $self->weak_ref ) {
-            $code .= sprintf 'require Scalar::Util && Scalar::Util::weaken($_[0]{%s}); ',
-                $self->_q_name;
+            $code .= sprintf 'require Scalar::Util && Scalar::Util::weaken($_[0]{%s}) if ref $_[0]{%s}; ',
+                $self->_q_name, $self->_q_name;
         }
         $code .= '$_[0];';
         return $code;

@@ -107,7 +107,7 @@
           "source", "Mite::Source";
         $self->{"source"} = $args->{"source"};
         require Scalar::Util && Scalar::Util::weaken( $self->{"source"} )
-          if exists $self->{"source"};
+          if ref $self->{"source"};
 
         # Call BUILD methods
         $self->BUILDALL($args) if ( !$no_build and @{ $meta->{BUILD} || [] } );
