@@ -423,16 +423,18 @@ sub has_simple_default {
 sub _compile_check {
     my ( $self, $varname ) = @_;
 
-    my $type = $self->type;
+    my $type  = $self->type;
 
     if ( $self->compiling_class
     and  $self->compiling_class->imported_functions->{blessed} ) {
-        if ( $type == Object ) {
+        my $ctype = $type->find_constraining_type;
+
+        if ( $ctype == Object ) {
             return "blessed( $varname )";
         }
-        elsif ( $type->isa( 'Type::Tiny::Class' ) ) {
+        elsif ( $ctype->isa( 'Type::Tiny::Class' ) ) {
             return sprintf 'blessed( %s ) && %s->isa( %s )',
-                $varname, $varname, $self->_q( $type->class );
+                $varname, $varname, $self->_q( $ctype->class );
         }
     }
 

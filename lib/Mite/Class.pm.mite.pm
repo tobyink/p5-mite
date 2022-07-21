@@ -124,13 +124,8 @@
 
         # Attribute source (type: Mite::Source)
         if ( exists $args->{"source"} ) {
-            (
-                do {
-                    use Scalar::Util ();
-                    Scalar::Util::blessed( $args->{"source"} )
-                      and $args->{"source"}->isa(q[Mite::Source]);
-                }
-              )
+            blessed( $args->{"source"} )
+              && $args->{"source"}->isa("Mite::Source")
               or croak "Type check failed in constructor: %s should be %s",
               "source", "Mite::Source";
             $self->{"source"} = $args->{"source"};

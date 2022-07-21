@@ -157,13 +157,8 @@
 
         # Attribute compiled (type: Mite::Compiled)
         if ( exists $args->{"compiled"} ) {
-            (
-                do {
-                    use Scalar::Util ();
-                    Scalar::Util::blessed( $args->{"compiled"} )
-                      and $args->{"compiled"}->isa(q[Mite::Compiled]);
-                }
-              )
+            blessed( $args->{"compiled"} )
+              && $args->{"compiled"}->isa("Mite::Compiled")
               or croak "Type check failed in constructor: %s should be %s",
               "compiled", "Mite::Compiled";
             $self->{"compiled"} = $args->{"compiled"};
@@ -171,13 +166,8 @@
 
         # Attribute project (type: Mite::Project)
         if ( exists $args->{"project"} ) {
-            (
-                do {
-                    use Scalar::Util ();
-                    Scalar::Util::blessed( $args->{"project"} )
-                      and $args->{"project"}->isa(q[Mite::Project]);
-                }
-              )
+            blessed( $args->{"project"} )
+              && $args->{"project"}->isa("Mite::Project")
               or croak "Type check failed in constructor: %s should be %s",
               "project", "Mite::Project";
             $self->{"project"} = $args->{"project"};
@@ -304,13 +294,8 @@
                 $_[0]{"compiled"} = do {
                     my $default_value =
                       $Mite::Source::__compiled_DEFAULT__->( $_[0] );
-                    (
-                        do {
-                            use Scalar::Util ();
-                            Scalar::Util::blessed($default_value)
-                              and $default_value->isa(q[Mite::Compiled]);
-                        }
-                      )
+                    blessed($default_value)
+                      && $default_value->isa("Mite::Compiled")
                       or croak( "Type check failed in default: %s should be %s",
                         "compiled", "Mite::Compiled" );
                     $default_value;
@@ -338,13 +323,7 @@
     sub project {
         @_ > 1
           ? do {
-            (
-                do {
-                    use Scalar::Util ();
-                    Scalar::Util::blessed( $_[1] )
-                      and $_[1]->isa(q[Mite::Project]);
-                }
-              )
+            blessed( $_[1] ) && $_[1]->isa("Mite::Project")
               or croak( "Type check failed in %s: value should be %s",
                 "accessor", "Mite::Project" );
             $_[0]{"project"} = $_[1];

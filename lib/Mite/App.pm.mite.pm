@@ -73,13 +73,8 @@
 
         # Attribute project (type: Mite::Project)
         if ( exists $args->{"project"} ) {
-            (
-                do {
-                    use Scalar::Util ();
-                    Scalar::Util::blessed( $args->{"project"} )
-                      and $args->{"project"}->isa(q[Mite::Project]);
-                }
-              )
+            blessed( $args->{"project"} )
+              && $args->{"project"}->isa("Mite::Project")
               or croak "Type check failed in constructor: %s should be %s",
               "project", "Mite::Project";
             $self->{"project"} = $args->{"project"};
@@ -225,13 +220,8 @@
                 exists( $_[0]{"project"} ) ? $_[0]{"project"} : (
                     $_[0]{"project"} = do {
                         my $default_value = $_[0]->_build_project;
-                        (
-                            do {
-                                use Scalar::Util ();
-                                Scalar::Util::blessed($default_value)
-                                  and $default_value->isa(q[Mite::Project]);
-                            }
-                          )
+                        blessed($default_value)
+                          && $default_value->isa("Mite::Project")
                           or croak(
                             "Type check failed in default: %s should be %s",
                             "project", "Mite::Project" );
@@ -251,13 +241,8 @@
             exists( $_[0]{"project"} ) ? $_[0]{"project"} : (
                 $_[0]{"project"} = do {
                     my $default_value = $_[0]->_build_project;
-                    (
-                        do {
-                            use Scalar::Util ();
-                            Scalar::Util::blessed($default_value)
-                              and $default_value->isa(q[Mite::Project]);
-                        }
-                      )
+                    blessed($default_value)
+                      && $default_value->isa("Mite::Project")
                       or croak( "Type check failed in default: %s should be %s",
                         "project", "Mite::Project" );
                     $default_value;

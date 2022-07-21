@@ -39,13 +39,7 @@
 
         # Attribute class (type: Mite::Role)
         if ( exists $args->{"class"} ) {
-            (
-                do {
-                    use Scalar::Util ();
-                    Scalar::Util::blessed( $args->{"class"} )
-                      and $args->{"class"}->isa(q[Mite::Role]);
-                }
-              )
+            blessed( $args->{"class"} ) && $args->{"class"}->isa("Mite::Role")
               or croak "Type check failed in constructor: %s should be %s",
               "class", "Mite::Role";
             $self->{"class"} = $args->{"class"};
@@ -55,13 +49,8 @@
 
         # Attribute _class_for_default (type: Mite::Role)
         if ( exists $args->{"_class_for_default"} ) {
-            (
-                do {
-                    use Scalar::Util ();
-                    Scalar::Util::blessed( $args->{"_class_for_default"} )
-                      and $args->{"_class_for_default"}->isa(q[Mite::Role]);
-                }
-              )
+            blessed( $args->{"_class_for_default"} )
+              && $args->{"_class_for_default"}->isa("Mite::Role")
               or croak "Type check failed in constructor: %s should be %s",
               "_class_for_default", "Mite::Role";
             $self->{"_class_for_default"} = $args->{"_class_for_default"};
@@ -1549,13 +1538,7 @@
     sub _class_for_default {
         @_ > 1
           ? do {
-            (
-                do {
-                    use Scalar::Util ();
-                    Scalar::Util::blessed( $_[1] )
-                      and $_[1]->isa(q[Mite::Role]);
-                }
-              )
+            blessed( $_[1] ) && $_[1]->isa("Mite::Role")
               or croak( "Type check failed in %s: value should be %s",
                 "accessor", "Mite::Role" );
             $_[0]{"_class_for_default"} = $_[1];
@@ -1571,13 +1554,8 @@
                 : (
                     $_[0]{"_class_for_default"} = do {
                         my $default_value = $_[0]->_build__class_for_default;
-                        (
-                            do {
-                                use Scalar::Util ();
-                                Scalar::Util::blessed($default_value)
-                                  and $default_value->isa(q[Mite::Role]);
-                            }
-                          )
+                        blessed($default_value)
+                          && $default_value->isa("Mite::Role")
                           or croak(
                             "Type check failed in default: %s should be %s",
                             "_class_for_default", "Mite::Role" );
@@ -1964,13 +1942,7 @@
     sub class {
         @_ > 1
           ? do {
-            (
-                do {
-                    use Scalar::Util ();
-                    Scalar::Util::blessed( $_[1] )
-                      and $_[1]->isa(q[Mite::Role]);
-                }
-              )
+            blessed( $_[1] ) && $_[1]->isa("Mite::Role")
               or croak( "Type check failed in %s: value should be %s",
                 "accessor", "Mite::Role" );
             $_[0]{"class"} = $_[1];
@@ -2302,13 +2274,7 @@
     sub compiling_class {
         @_ > 1
           ? do {
-            (
-                do {
-                    use Scalar::Util ();
-                    Scalar::Util::blessed( $_[1] )
-                      and $_[1]->isa(q[Mite::Role]);
-                }
-              )
+            blessed( $_[1] ) && $_[1]->isa("Mite::Role")
               or croak( "Type check failed in %s: value should be %s",
                 "accessor", "Mite::Role" );
             $_[0]{"compiling_class"} = $_[1];

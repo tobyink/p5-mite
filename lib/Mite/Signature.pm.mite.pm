@@ -37,13 +37,7 @@
 
         # Attribute class (type: Mite::Class)
         if ( exists $args->{"class"} ) {
-            (
-                do {
-                    use Scalar::Util ();
-                    Scalar::Util::blessed( $args->{"class"} )
-                      and $args->{"class"}->isa(q[Mite::Class]);
-                }
-              )
+            blessed( $args->{"class"} ) && $args->{"class"}->isa("Mite::Class")
               or croak "Type check failed in constructor: %s should be %s",
               "class", "Mite::Class";
             $self->{"class"} = $args->{"class"};
@@ -316,13 +310,7 @@
     sub compiling_class {
         @_ > 1
           ? do {
-            (
-                do {
-                    use Scalar::Util ();
-                    Scalar::Util::blessed( $_[1] )
-                      and $_[1]->isa(q[Mite::Role]);
-                }
-              )
+            blessed( $_[1] ) && $_[1]->isa("Mite::Role")
               or croak( "Type check failed in %s: value should be %s",
                 "accessor", "Mite::Role" );
             $_[0]{"compiling_class"} = $_[1];

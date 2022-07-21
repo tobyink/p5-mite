@@ -66,13 +66,8 @@
 
         # Attribute config (type: Mite::Config)
         if ( exists $args->{"config"} ) {
-            (
-                do {
-                    use Scalar::Util ();
-                    Scalar::Util::blessed( $args->{"config"} )
-                      and $args->{"config"}->isa(q[Mite::Config]);
-                }
-              )
+            blessed( $args->{"config"} )
+              && $args->{"config"}->isa("Mite::Config")
               or croak "Type check failed in constructor: %s should be %s",
               "config", "Mite::Config";
             $self->{"config"} = $args->{"config"};
@@ -240,13 +235,8 @@
                 $_[0]{"config"} = do {
                     my $default_value =
                       $Mite::Project::__config_DEFAULT__->( $_[0] );
-                    (
-                        do {
-                            use Scalar::Util ();
-                            Scalar::Util::blessed($default_value)
-                              and $default_value->isa(q[Mite::Config]);
-                        }
-                      )
+                    blessed($default_value)
+                      && $default_value->isa("Mite::Config")
                       or croak( "Type check failed in default: %s should be %s",
                         "config", "Mite::Config" );
                     $default_value;
