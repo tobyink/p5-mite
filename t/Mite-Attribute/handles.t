@@ -4,7 +4,7 @@ use lib 't/lib';
 
 use Test::Mite;
 
-tests "required" => sub {
+tests "handles" => sub {
     mite_load <<'CODE';
 package Thingy;
 use Mite::Shim;
@@ -55,6 +55,38 @@ CODE
         is( $object->foo_xyz, 42 );
         is( $object->foo_bar, 42 );
     }
+};
+
+
+tests "persistence with lazy builder" => sub {
+    mite_load <<'CODE';
+package RandomThing;
+use Mite::Shim;
+has number =>
+    is => 'ro',
+    builder => sub { rand() };
+
+package GatewayToRandom;
+use Mite::Shim;
+has random_thing =>
+    is => 'lazy',
+    builder => sub { RandomThing->new },
+    handles => [ 'number' ];
+
+1;
+CODE
+
+    my $object = 'GatewayToRandom'->new;
+    my $first  = $object->number;
+
+    is( $object->number, $first );
+    is( $object->number, $first );
+    is( $object->number, $first );
+    is( $object->number, $first );
+    is( $object->number, $first );
+    is( $object->number, $first );
+    is( $object->number, $first );
+    is( $object->number, $first );
 };
 
 done_testing;
