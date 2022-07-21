@@ -456,7 +456,10 @@ sub _compile_checked_default {
 sub _compile_default {
     my ( $self, $selfvar ) = @_;
 
-    if ( $self->has_coderef_default ) {
+    if ( $self->has_builder ) {
+        return sprintf '%s->%s', $selfvar, $self->_expand_name( $self->builder );
+    }
+    elsif ( $self->has_coderef_default ) {
         my $var = $self->coderef_default_variable;
         return sprintf '%s->( %s )', $var, $selfvar;
     }
@@ -473,9 +476,6 @@ sub _compile_default {
     }
     elsif ( $self->has_simple_default ) {
         return defined( $self->default ) ? $self->_q( $self->default ) : 'undef';
-    }
-    elsif ( $self->has_builder ) {
-        return sprintf '%s->%s', $selfvar, $self->_expand_name( $self->builder );
     }
 
     # should never get here
