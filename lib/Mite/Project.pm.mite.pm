@@ -288,11 +288,9 @@
         my ( @out, %tmp, $tmp, $dtmp, @head );
 
         @_ == 3
-          or croak(
-            "Wrong number of parameters in signature for %s: %s, got %d",
-            "_recurse_directory", "expected exactly 3 parameters",
-            scalar(@_)
-          );
+          or
+          croak( "Wrong number of parameters in signature for %s: got %d, %s",
+            "_recurse_directory", scalar(@_), "expected exactly 3 parameters" );
 
         @head = splice( @_, 0, 1 );
 
@@ -376,11 +374,9 @@
 
         @_ == 2 && ( ref( $_[1] ) eq 'HASH' )
           or @_ % 2 == 1 && @_ >= 7 && @_ <= 15
-          or croak(
-            "Wrong number of parameters in signature for %s: %s, got %d",
-            "inject_mite_functions", "that does not seem right",
-            scalar(@_)
-          );
+          or
+          croak( "Wrong number of parameters in signature for %s: got %d, %s",
+            "inject_mite_functions", scalar(@_), "that does not seem right" );
 
         @head = splice( @_, 0, 1 );
 
@@ -516,11 +512,9 @@
         my ( %tmp, $tmp, @head );
 
         @_ >= 2 && @_ <= 3
-          or croak(
-            "Wrong number of parameters in signature for %s: %s, got %d",
-            "load_files", "expected exactly 2 parameters",
-            scalar(@_)
-          );
+          or
+          croak( "Wrong number of parameters in signature for %s: got %d, %s",
+            "load_files", scalar(@_), "expected exactly 2 parameters" );
 
         @head = splice( @_, 0, 1 );
 

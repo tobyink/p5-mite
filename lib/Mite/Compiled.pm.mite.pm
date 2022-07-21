@@ -349,10 +349,10 @@
 
         @_ == 2
           or croak(
-            "Wrong number of parameters in signature for %s: %s, got %d",
+            "Wrong number of parameters in signature for %s: got %d, %s",
             "_source_file2compiled_file",
-            "expected exactly 2 parameters",
-            scalar(@_)
+            scalar(@_),
+            "expected exactly 2 parameters"
           );
 
         @head = splice( @_, 0, 1 );

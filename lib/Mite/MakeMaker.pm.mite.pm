@@ -129,11 +129,9 @@
         my ( @out, %tmp, $tmp, $dtmp, @head );
 
         @_ == 3
-          or croak(
-            "Wrong number of parameters in signature for %s: %s, got %d",
-            "change_parent_dir", "expected exactly 3 parameters",
-            scalar(@_)
-          );
+          or
+          croak( "Wrong number of parameters in signature for %s: got %d, %s",
+            "change_parent_dir", scalar(@_), "expected exactly 3 parameters" );
 
         @head = splice( @_, 0, 0 );
 
@@ -311,11 +309,9 @@
         my ( @out, %tmp, $tmp, $dtmp, @head );
 
         @_ == 3
-          or croak(
-            "Wrong number of parameters in signature for %s: %s, got %d",
-            "fix_pm_to_blib", "expected exactly 3 parameters",
-            scalar(@_)
-          );
+          or
+          croak( "Wrong number of parameters in signature for %s: got %d, %s",
+            "fix_pm_to_blib", scalar(@_), "expected exactly 3 parameters" );
 
         @head = splice( @_, 0, 1 );
 

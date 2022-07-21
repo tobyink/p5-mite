@@ -78,11 +78,11 @@ sub _make_count_fail {
 	my $croaker = $self->{mite_signature}->class->_function_for_croak;
 
 	if ( $args{got} ) {
-		return sprintf '%s( "Wrong number of parameters in signature for %%s: %%s, got %%d", %s, %s, %s )',
-			$croaker, B::perlstring( $self->subname ), B::perlstring( $msg ), $args{got};
+		return sprintf '%s( "Wrong number of parameters in signature for %%s: got %%d, %%s", %s, %s, %s )',
+			$croaker, B::perlstring( $self->subname ), $args{got}, B::perlstring( $msg );
 	}
 	else {
-		return sprintf '%s( "Wrong number of parameters in signature for %%s: %%s, got something else", %s, %s )',
+		return sprintf '%s( "Wrong number of parameters in signature for %%s: got ???, %%s", %s, %s )',
 			$croaker, B::perlstring( $self->subname ), B::perlstring( $msg );
 	}
 	

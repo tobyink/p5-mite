@@ -543,11 +543,9 @@
         my ( @out, %tmp, $tmp, $dtmp, @head );
 
         @_ >= 1
-          or croak(
-            "Wrong number of parameters in signature for %s: %s, got %d",
-            "add_attributes", "expected exactly 1 parameters",
-            scalar(@_)
-          );
+          or
+          croak( "Wrong number of parameters in signature for %s: got %d, %s",
+            "add_attributes", scalar(@_), "expected exactly 1 parameters" );
 
         @head = splice( @_, 0, 1 );
 
