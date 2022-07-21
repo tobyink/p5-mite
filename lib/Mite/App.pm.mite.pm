@@ -65,14 +65,7 @@
 
         # Attribute kingpin (type: Object)
         if ( exists $args->{"kingpin"} ) {
-            (
-                do {
-
-                    package Mite::Shim;
-                    use Scalar::Util ();
-                    Scalar::Util::blessed( $args->{"kingpin"} );
-                }
-              )
+            blessed( $args->{"kingpin"} )
               or croak "Type check failed in constructor: %s should be %s",
               "kingpin", "Object";
             $self->{"kingpin"} = $args->{"kingpin"};
@@ -193,14 +186,7 @@
                 exists( $_[0]{"kingpin"} ) ? $_[0]{"kingpin"} : (
                     $_[0]{"kingpin"} = do {
                         my $default_value = $_[0]->_build_kingpin;
-                        (
-                            do {
-
-                                package Mite::Shim;
-                                use Scalar::Util ();
-                                Scalar::Util::blessed($default_value);
-                            }
-                          )
+                        blessed($default_value)
                           or croak(
                             "Type check failed in default: %s should be %s",
                             "kingpin", "Object" );
@@ -220,14 +206,7 @@
             exists( $_[0]{"kingpin"} ) ? $_[0]{"kingpin"} : (
                 $_[0]{"kingpin"} = do {
                     my $default_value = $_[0]->_build_kingpin;
-                    (
-                        do {
-
-                            package Mite::Shim;
-                            use Scalar::Util ();
-                            Scalar::Util::blessed($default_value);
-                        }
-                      )
+                    blessed($default_value)
                       or croak( "Type check failed in default: %s should be %s",
                         "kingpin", "Object" );
                     $default_value;

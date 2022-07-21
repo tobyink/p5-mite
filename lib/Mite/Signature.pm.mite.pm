@@ -278,14 +278,7 @@
                 exists( $_[0]{"compiler"} ) ? $_[0]{"compiler"} : (
                     $_[0]{"compiler"} = do {
                         my $default_value = $_[0]->_build_compiler;
-                        (
-                            do {
-
-                                package Mite::Shim;
-                                use Scalar::Util ();
-                                Scalar::Util::blessed($default_value);
-                            }
-                          )
+                        blessed($default_value)
                           or croak(
                             "Type check failed in default: %s should be %s",
                             "compiler", "Object" );
@@ -305,14 +298,7 @@
             exists( $_[0]{"compiler"} ) ? $_[0]{"compiler"} : (
                 $_[0]{"compiler"} = do {
                     my $default_value = $_[0]->_build_compiler;
-                    (
-                        do {
-
-                            package Mite::Shim;
-                            use Scalar::Util ();
-                            Scalar::Util::blessed($default_value);
-                        }
-                      )
+                    blessed($default_value)
                       or croak( "Type check failed in default: %s should be %s",
                         "compiler", "Object" );
                     $default_value;

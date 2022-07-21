@@ -105,13 +105,7 @@
                       )
                       : $to_coerce;
                 };
-                (
-                    do {
-                        use Scalar::Util ();
-                        Scalar::Util::blessed($coerced_value)
-                          and $coerced_value->isa(q[Path::Tiny]);
-                    }
-                  )
+                blessed($coerced_value) && $coerced_value->isa("Path::Tiny")
                   or croak "Type check failed in constructor: %s should be %s",
                   "mite_dir", "Path";
                 $self->{"mite_dir"} = $coerced_value;
@@ -169,13 +163,7 @@
                       )
                       : $to_coerce;
                 };
-                (
-                    do {
-                        use Scalar::Util ();
-                        Scalar::Util::blessed($coerced_value)
-                          and $coerced_value->isa(q[Path::Tiny]);
-                    }
-                  )
+                blessed($coerced_value) && $coerced_value->isa("Path::Tiny")
                   or croak "Type check failed in constructor: %s should be %s",
                   "config_file", "Path";
                 $self->{"config_file"} = $coerced_value;
@@ -347,13 +335,7 @@
                           )
                           : $to_coerce;
                     };
-                    (
-                        do {
-                            use Scalar::Util ();
-                            Scalar::Util::blessed($default_value)
-                              and $default_value->isa(q[Path::Tiny]);
-                        }
-                      )
+                    blessed($default_value) && $default_value->isa("Path::Tiny")
                       or croak( "Type check failed in default: %s should be %s",
                         "config_file", "Path" );
                     $default_value;
@@ -448,13 +430,7 @@
                           )
                           : $to_coerce;
                     };
-                    (
-                        do {
-                            use Scalar::Util ();
-                            Scalar::Util::blessed($default_value)
-                              and $default_value->isa(q[Path::Tiny]);
-                        }
-                      )
+                    blessed($default_value) && $default_value->isa("Path::Tiny")
                       or croak( "Type check failed in default: %s should be %s",
                         "mite_dir", "Path" );
                     $default_value;

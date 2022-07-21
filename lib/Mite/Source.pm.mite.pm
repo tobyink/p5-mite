@@ -84,13 +84,7 @@
                   )
                   : $to_coerce;
             };
-            (
-                do {
-                    use Scalar::Util ();
-                    Scalar::Util::blessed($coerced_value)
-                      and $coerced_value->isa(q[Path::Tiny]);
-                }
-              )
+            blessed($coerced_value) && $coerced_value->isa("Path::Tiny")
               or croak "Type check failed in constructor: %s should be %s",
               "file", "Path";
             $self->{"file"} = $coerced_value;

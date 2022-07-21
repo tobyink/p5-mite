@@ -409,6 +409,26 @@ sub has_simple_default {
     return !ref $self->default;
 }
 
+sub _compile_check {
+    my ( $self, $varname ) = @_;
+
+    my $type = $self->type;
+
+    if ( $self->compiling_class
+    and  $self->compiling_class->imported_functions->{blessed} ) {
+        if ( $type == Object ) {
+            return "blessed( $varname )";
+        }
+        elsif ( $type->isa( 'Type::Tiny::Class' ) ) {
+            return sprintf 'blessed( %s ) && %s->isa( %s )',
+                $varname, $varname, $self->_q( $type->class );
+        }
+    }
+
+    local $Type::Tiny::AvoidCallbacks = 1;
+    return $type->inline_check( $varname );
+}
+
 sub _compile_coercion {
     my ( $self, $expression ) = @_;
     if ( $self->coerce and my $type = $self->type ) {
@@ -425,14 +445,12 @@ sub _compile_checked_default {
     my $default = $self->_compile_default( $selfvar );
     my $type = $self->type or return $default;
 
-    local $Type::Tiny::AvoidCallbacks = 1;
-
     if ( $self->coerce ) {
         $default = $self->_compile_coercion( $default );
     }
 
     return sprintf 'do { my $default_value = %s; %s or %s( "Type check failed in default: %%s should be %%s", %s, %s ); $default_value }',
-        $default, $type->inline_check('$default_value'), $self->_function_for_croak, $self->_q($self->name), $self->_q($type->display_name);
+        $default, $self->_compile_check('$default_value'), $self->_function_for_croak, $self->_q($self->name), $self->_q($type->display_name);
 }
 
 sub _compile_default {
@@ -552,8 +570,6 @@ sub compile_init {
         }
 
         if ( my $type = $self->type ) {
-            local $Type::Tiny::AvoidCallbacks = 1;
-            
             if ( $self->coerce ) {
                 $code .= sprintf 'do { my $coerced_value = %s; ', $self->_compile_coercion( $valuevar );
                 $valuevar = '$coerced_value';
@@ -561,7 +577,7 @@ sub compile_init {
             }
 
             $code .= sprintf '%s or %s "Type check failed in constructor: %%s should be %%s", %s, %s; ',
-                $type->inline_check( $valuevar ),
+                $self->_compile_check( $valuevar ),
                 $self->_function_for_croak,
                 $self->_q_init_arg,
                 $self->_q( $type->display_name );
@@ -634,13 +650,12 @@ my %code_template;
         }
         my $valuevar = '$_[1]';
         if ( my $type = $self->type ) {
-            local $Type::Tiny::AvoidCallbacks = 1;
             if ( $self->coerce ) {
                 $code .= sprintf 'my $value = %s; ', $self->_compile_coercion($valuevar);
                 $valuevar = '$value';
             }
             $code .= sprintf '%s or %s( "Type check failed in %%s: value should be %%s", %s, %s ); ',
-                $type->inline_check($valuevar), $self->_function_for_croak, $self->_q( $arg{label} // 'writer' ), $self->_q( $type->display_name );
+                $self->_compile_check($valuevar), $self->_function_for_croak, $self->_q( $arg{label} // 'writer' ), $self->_q( $type->display_name );
         }
         if ( $self->clone_on_write ) {
             $code .= sprintf 'my $cloned = %s; ',

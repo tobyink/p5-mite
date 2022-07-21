@@ -37,14 +37,7 @@
 
         # Attribute app (type: Object)
         croak "Missing key in constructor: app" unless exists $args->{"app"};
-        (
-            do {
-
-                package Mite::Shim;
-                use Scalar::Util ();
-                Scalar::Util::blessed( $args->{"app"} );
-            }
-          )
+        blessed( $args->{"app"} )
           or croak "Type check failed in constructor: %s should be %s", "app",
           "Object";
         $self->{"app"} = $args->{"app"};
@@ -53,14 +46,7 @@
 
         # Attribute kingpin_command (type: Object)
         if ( exists $args->{"kingpin_command"} ) {
-            (
-                do {
-
-                    package Mite::Shim;
-                    use Scalar::Util ();
-                    Scalar::Util::blessed( $args->{"kingpin_command"} );
-                }
-              )
+            blessed( $args->{"kingpin_command"} )
               or croak "Type check failed in constructor: %s should be %s",
               "kingpin_command", "Object";
             $self->{"kingpin_command"} = $args->{"kingpin_command"};
@@ -178,14 +164,7 @@
             exists( $_[0]{"kingpin_command"} ) ? $_[0]{"kingpin_command"} : (
                 $_[0]{"kingpin_command"} = do {
                     my $default_value = $_[0]->_build_kingpin_command;
-                    (
-                        do {
-
-                            package Mite::Shim;
-                            use Scalar::Util ();
-                            Scalar::Util::blessed($default_value);
-                        }
-                      )
+                    blessed($default_value)
                       or croak( "Type check failed in default: %s should be %s",
                         "kingpin_command", "Object" );
                     $default_value;

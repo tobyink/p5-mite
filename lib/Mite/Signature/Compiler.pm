@@ -29,6 +29,7 @@ sub _coderef_start_extra {
 
 sub _make_return_expression {
 	my ( $self, $coderef ) = @_;
+
 	sprintf 'return( &$__NEXT__( %s ) )', join( q{, }, $self->_make_return_list );
 }
 

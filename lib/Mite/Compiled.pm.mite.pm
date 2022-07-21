@@ -86,13 +86,7 @@
                       )
                       : $to_coerce;
                 };
-                (
-                    do {
-                        use Scalar::Util ();
-                        Scalar::Util::blessed($coerced_value)
-                          and $coerced_value->isa(q[Path::Tiny]);
-                    }
-                  )
+                blessed($coerced_value) && $coerced_value->isa("Path::Tiny")
                   or croak "Type check failed in constructor: %s should be %s",
                   "file", "Path";
                 $self->{"file"} = $coerced_value;
@@ -243,13 +237,7 @@
                   )
                   : $to_coerce;
             };
-            (
-                do {
-                    use Scalar::Util ();
-                    Scalar::Util::blessed($value)
-                      and $value->isa(q[Path::Tiny]);
-                }
-              )
+            blessed($value) && $value->isa("Path::Tiny")
               or croak( "Type check failed in %s: value should be %s",
                 "accessor", "Path" );
             $_[0]{"file"} = $value;
@@ -320,13 +308,8 @@
                               )
                               : $to_coerce;
                         };
-                        (
-                            do {
-                                use Scalar::Util ();
-                                Scalar::Util::blessed($default_value)
-                                  and $default_value->isa(q[Path::Tiny]);
-                            }
-                          )
+                        blessed($default_value)
+                          && $default_value->isa("Path::Tiny")
                           or croak(
                             "Type check failed in default: %s should be %s",
                             "file", "Path" );
