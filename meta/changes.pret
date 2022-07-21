@@ -1,6 +1,27 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.007005 cpan:TOBYINK`
+	issued  2022-07-21;
+	changeset [
+		item [
+			a dcs:Change;
+			label "Builders are now used over defaults if an attribute has both, but you shouldn't be doing that anyway.";
+		];
+		item [
+			a dcs:Change;
+			label "Check ref($thing) before calling Scalar::Util::weaken($thing).";
+		];
+		item [
+			a dcs:Change;
+			label "Slightly prettier code for isa checks of attributes where isa => Object or isa => InstanceOf['Some::Class'].";
+		];
+		item [
+			a dcs:Change;
+			label "Slightly prettier code for setting defaults of attributes where isa => Bool.";
+		];
+	].
+
 `Mite 0.007004 cpan:TOBYINK`
 	issued  2022-07-20;
 	changeset [

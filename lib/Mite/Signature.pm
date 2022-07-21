@@ -6,7 +6,7 @@ package Mite::Signature;
 use Mite::Miteception -all;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.007004';
+our $VERSION   = '0.007005';
 
 has class =>
   is            => ro,
