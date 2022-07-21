@@ -1,6 +1,27 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.007006 cpan:TOBYINK`
+	issued  2022-07-21;
+	changeset [
+		item [
+			a dcs:Change;
+			label "Mite will now complain if you attempt to provide both a default and a builder for the same attribute.";
+		];
+		item [
+			a dcs:Change;
+			label "If you extend an attribute with a default in a parent class, adding a builder in the child class, the builder will successfully replace the default. And vice versa.";
+		];
+		item [
+			a dcs:Change;
+			label "Make previous optimizations for isa => Object or isa => InstanceOf['Some::Class'] apply more often.";
+		];
+		item [
+			a dcs:Change;
+			label "Minor changes to some error messages thrown by method signatures.";
+		];
+	].
+
 `Mite 0.007005 cpan:TOBYINK`
 	issued  2022-07-21;
 	changeset [
