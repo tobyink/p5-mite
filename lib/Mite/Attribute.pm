@@ -192,8 +192,12 @@ sub BUILD {
 
     if ( $self->is eq 'lazy' ) {
         $self->lazy( true );
-        $self->builder( true ) unless $self->has_builder;
+        $self->builder( true ) unless $self->has_builder || $self->has_default;
         $self->is( ro );
+    }
+
+    if ( $self->has_builder and $self->has_default ) {
+        croak "Attribute cannot have both default and builder.";
     }
 
     for my $property ( 'builder', 'trigger' ) {
@@ -266,6 +270,13 @@ sub clone {
     # these should not be cloned at all
     delete $inherit{coderef_default_variable};
     delete $inherit{_order};
+
+    # Allow child class to switch from default to builder
+    # or vice versa.
+    if ( exists $args{builder} or exists $args{default} ) {
+        delete $inherit{builder};
+        delete $inherit{default};
+    }
 
     return ref($self)->new( %inherit, %args );
 }

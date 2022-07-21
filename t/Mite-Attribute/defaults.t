@@ -100,4 +100,29 @@ CODE
     is( $o->list, {} );
 };
 
+tests "default inheriting from builder" => sub {
+    mite_load <<'CODE';
+package MyParent;
+use Mite::Shim;
+has list =>
+    is => 'ro',
+    builder => sub { [ 1, 2, 3 ] };
+
+package MyChild;
+use Mite::Shim;
+extends 'MyParent';
+has '+list' =>
+    default => sub {
+        my $orig = shift->_build_list;
+        push @$orig, 4;
+        return $orig;
+    };
+
+1;
+CODE
+
+    is( MyParent->new->list, [ 1, 2, 3 ] );
+    is( MyChild->new->list, [ 1, 2, 3, 4 ] );
+};
+
 done_testing;
