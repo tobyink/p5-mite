@@ -315,7 +315,7 @@
 
         @head = splice( @_, 0, 1 );
 
-        # Parameter $head[0] (type: Defined)
+        # Parameter invocant (type: Defined)
         ( defined( $head[0] ) )
           or croak(
 "Type check failed in signature for fix_pm_to_blib: %s should be %s",

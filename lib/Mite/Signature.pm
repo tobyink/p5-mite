@@ -43,7 +43,7 @@ has method =>
 has head =>
   is            => lazy,
   isa           => ArrayRef | Int,
-  builder       => sub { shift->method ? [ Defined ] : [] };
+  builder       => sub { shift->method ? [ Defined, { name => 'invocant' } ] : [] };
 
 has tail =>
   is            => ro,

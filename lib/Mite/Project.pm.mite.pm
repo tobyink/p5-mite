@@ -294,7 +294,7 @@
 
         @head = splice( @_, 0, 1 );
 
-        # Parameter $head[0] (type: Defined)
+        # Parameter invocant (type: Defined)
         ( defined( $head[0] ) )
           or croak(
 "Type check failed in signature for _recurse_directory: %s should be %s",
@@ -380,7 +380,7 @@
 
         @head = splice( @_, 0, 1 );
 
-        # Parameter $head[0] (type: Defined)
+        # Parameter invocant (type: Defined)
         ( defined( $head[0] ) )
           or croak(
 "Type check failed in signature for inject_mite_functions: %s should be %s",
@@ -518,7 +518,7 @@
 
         @head = splice( @_, 0, 1 );
 
-        # Parameter $head[0] (type: Defined)
+        # Parameter invocant (type: Defined)
         ( defined( $head[0] ) )
           or croak(
             "Type check failed in signature for load_files: %s should be %s",

@@ -549,7 +549,7 @@
 
         @head = splice( @_, 0, 1 );
 
-        # Parameter $head[0] (type: Defined)
+        # Parameter invocant (type: Defined)
         ( defined( $head[0] ) )
           or croak(
 "Type check failed in signature for add_attributes: %s should be %s",

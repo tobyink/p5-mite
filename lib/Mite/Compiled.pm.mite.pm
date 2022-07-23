@@ -357,7 +357,7 @@
 
         @head = splice( @_, 0, 1 );
 
-        # Parameter $head[0] (type: Defined)
+        # Parameter invocant (type: Defined)
         ( defined( $head[0] ) )
           or croak(
 "Type check failed in signature for _source_file2compiled_file: %s should be %s",
