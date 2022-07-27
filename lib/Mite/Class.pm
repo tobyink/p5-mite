@@ -471,46 +471,26 @@ sub _compile_attribute_accessors {
     return $code;
 }
 
-sub _compile_mop {
-    my $self = shift;
-
-    return sprintf <<'CODE', B::perlstring( $self->name ), $self->_compile_mop_attributes;
-{
-    my $CLASS = Moose::Meta::Class->initialize( %s );
-
-%s
-}
-CODE
+sub _mop_metaclass {
+    return 'Moose::Meta::Class';
 }
 
-sub _compile_mop_attributes {
-    my $self = shift;
-
-    my $code = '';
-
-    my @attrs =
-        sort { $a->_order <=> $b->_order }
-        values %{ $self->attributes };
-    if ( @attrs ) {
-        $code .= "    my \%ATTR;\n\n";
-        for my $attr ( @attrs ) {
-            my $guard = $attr->locally_set_compiling_class( $self );
-            my $attr_code = $attr->_compile_mop;
-            $attr_code =~ s/^/    /gm;
-            $code .= $attr_code . "\n\n";
-        }
-    }
-
-    return $code;
+sub _mop_attribute_metaclass {
+   return 'Moose::Meta::Attribute';
 }
 
 sub _compile_mop_postamble {
     my $self = shift;
+
+    my $code = $self->SUPER::_compile_mop_postamble( @_ );
+
     my @superclasses = @{ $self->superclasses || [] }
-        or return '';
-    return sprintf "Moose::Util::find_meta( %s )->superclasses( %s );\n",
+        or return $code;
+    $code .= sprintf "Moose::Util::find_meta( %s )->superclasses( %s );\n",
         B::perlstring( $self->name ),
         join q{, }, map B::perlstring( $_ ), @superclasses;
+
+    return $code;
 }
 
 1;

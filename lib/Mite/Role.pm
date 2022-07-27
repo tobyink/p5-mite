@@ -530,6 +530,51 @@ sub __FINALIZE_APPLICATION__ {
 CODE
 }
 
+sub _mop_metaclass {
+    return 'Moose::Meta::Role';
+}
+
+sub _mop_attribute_metaclass {
+   return 'Moose::Meta::Role::Attribute';
+}
+
+sub _compile_mop {
+    my $self = shift;
+
+    return sprintf <<'CODE', $self->_mop_metaclass, B::perlstring( $self->name ), $self->_compile_mop_attributes;
+{
+    my $PACKAGE = %s->initialize( %s );
+
+%s
+}
+CODE
+}
+
+sub _compile_mop_attributes {
+    my $self = shift;
+
+    my $code = '';
+
+    my @attrs =
+        sort { $a->_order <=> $b->_order }
+        values %{ $self->attributes };
+    if ( @attrs ) {
+        $code .= "    my \%ATTR;\n\n";
+        for my $attr ( @attrs ) {
+            my $guard = $attr->locally_set_compiling_class( $self );
+            my $attr_code = $attr->_compile_mop;
+            $attr_code =~ s/^/    /gm;
+            $code .= $attr_code . "\n";
+        }
+    }
+
+    return $code;
+}
+
+sub _compile_mop_postamble {
+    return '';
+}
+
 1;
 
 __END__

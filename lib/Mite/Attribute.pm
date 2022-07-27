@@ -872,7 +872,12 @@ sub _compile_mop {
     my $opts_indent = "\n    ";
 
     $opts_string .= $opts_indent . '__hack_no_process_options => true,';
-    $opts_string .= $opts_indent . 'associated_class => $CLASS,';
+    if ( $self->compiling_class->isa('Mite::Class') ) {
+        $opts_string .= $opts_indent . 'associated_class => $PACKAGE,';
+    }
+    else {
+        $opts_string .= $opts_indent . 'associated_role => $PACKAGE,';
+    }
 
     {
         my %translate = ( ro => 'ro', rw => 'rw', rwp => 'ro', bare => 'bare', lazy => 'ro'  );
@@ -923,7 +928,7 @@ sub _compile_mop {
         definition_context => { toolkit => 'Mite' },
     );
     $ATTR{%s}->associate_method( $ACCESSOR );
-    $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+    $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
 }
 CODE
     }
@@ -942,7 +947,7 @@ CODE
         definition_context => { toolkit => 'Mite' },
     );
     $ATTR{%s}->associate_method( $ACCESSOR );
-    $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+    $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
 }
 CODE
     }
@@ -967,7 +972,7 @@ CODE
         definition_context => { toolkit => 'Mite' },
     );
     $ATTR{%s}->associate_method( $DELEGATION );
-    $CLASS->add_method( $DELEGATION->name, $DELEGATION );
+    $PACKAGE->add_method( $DELEGATION->name, $DELEGATION );
 }
 CODE
         }
@@ -987,7 +992,7 @@ CODE
         definition_context => { toolkit => 'Mite' },
     );
     $ATTR{%s}->associate_method( $ALIAS );
-    $CLASS->add_method( $ALIAS->name, $ALIAS );
+    $PACKAGE->add_method( $ALIAS->name, $ALIAS );
 }
 CODE
         }
@@ -1019,13 +1024,13 @@ CODE
 
     $accessors_code =~ s/\n$//;
     $opts_string .= "\n";
-    return sprintf <<'CODE', $self->_q_name, $self->_q_name, $opts_string, $accessors_code, $self->_q_name;
-$ATTR{%s} = Moose::Meta::Attribute->new( %s,%s);
+    return sprintf <<'CODE', $self->_q_name, $self->compiling_class->_mop_attribute_metaclass, $self->_q_name, $opts_string, $accessors_code, $self->_q_name;
+$ATTR{%s} = %s->new( %s,%s);
 %s
 do {
 	no warnings 'redefine';
 	local *Moose::Meta::Attribute::install_accessors = sub {};
-	$CLASS->add_attribute( $ATTR{%s} );
+	$PACKAGE->add_attribute( $ATTR{%s} );
 };
 CODE
 }

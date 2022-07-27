@@ -4,13 +4,13 @@ use constant { true => !!1, false => !!0 };
 require "Mite/App.pm";
 
 {
-    my $CLASS = Moose::Meta::Class->initialize( "Mite::App" );
+    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::App" );
 
     my %ATTR;
 
     $ATTR{"commands"} = Moose::Meta::Attribute->new( "commands",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "ro", 
         weak_ref => false,
         init_arg => "commands",
@@ -30,18 +30,17 @@ require "Mite/App.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"commands"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"commands"} );
+    	$PACKAGE->add_attribute( $ATTR{"commands"} );
     };
-
 
     $ATTR{"kingpin"} = Moose::Meta::Attribute->new( "kingpin",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "ro", 
         weak_ref => false,
         init_arg => "kingpin",
@@ -61,7 +60,7 @@ require "Mite/App.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"kingpin"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     {
         my $DELEGATION = Moose::Meta::Method::Delegation->new(
@@ -74,18 +73,17 @@ require "Mite/App.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"kingpin"}->associate_method( $DELEGATION );
-        $CLASS->add_method( $DELEGATION->name, $DELEGATION );
+        $PACKAGE->add_method( $DELEGATION->name, $DELEGATION );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"kingpin"} );
+    	$PACKAGE->add_attribute( $ATTR{"kingpin"} );
     };
-
 
     $ATTR{"project"} = Moose::Meta::Attribute->new( "project",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "ro", 
         weak_ref => false,
         init_arg => "project",
@@ -105,7 +103,7 @@ require "Mite/App.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"project"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     {
         my $DELEGATION = Moose::Meta::Method::Delegation->new(
@@ -118,14 +116,13 @@ require "Mite/App.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"project"}->associate_method( $DELEGATION );
-        $CLASS->add_method( $DELEGATION->name, $DELEGATION );
+        $PACKAGE->add_method( $DELEGATION->name, $DELEGATION );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"project"} );
+    	$PACKAGE->add_attribute( $ATTR{"project"} );
     };
-
 
 
 }
@@ -133,13 +130,13 @@ require "Mite/App.pm";
 require "Mite/App/Command.pm";
 
 {
-    my $CLASS = Moose::Meta::Class->initialize( "Mite::App::Command" );
+    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::App::Command" );
 
     my %ATTR;
 
     $ATTR{"app"} = Moose::Meta::Attribute->new( "app",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "ro", 
         weak_ref => true,
         init_arg => "app",
@@ -157,7 +154,7 @@ require "Mite/App/Command.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"app"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     {
         my $DELEGATION = Moose::Meta::Method::Delegation->new(
@@ -170,7 +167,7 @@ require "Mite/App/Command.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"app"}->associate_method( $DELEGATION );
-        $CLASS->add_method( $DELEGATION->name, $DELEGATION );
+        $PACKAGE->add_method( $DELEGATION->name, $DELEGATION );
     }
     {
         my $DELEGATION = Moose::Meta::Method::Delegation->new(
@@ -183,7 +180,7 @@ require "Mite/App/Command.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"app"}->associate_method( $DELEGATION );
-        $CLASS->add_method( $DELEGATION->name, $DELEGATION );
+        $PACKAGE->add_method( $DELEGATION->name, $DELEGATION );
     }
     {
         my $DELEGATION = Moose::Meta::Method::Delegation->new(
@@ -196,18 +193,17 @@ require "Mite/App/Command.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"app"}->associate_method( $DELEGATION );
-        $CLASS->add_method( $DELEGATION->name, $DELEGATION );
+        $PACKAGE->add_method( $DELEGATION->name, $DELEGATION );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"app"} );
+    	$PACKAGE->add_attribute( $ATTR{"app"} );
     };
-
 
     $ATTR{"kingpin_command"} = Moose::Meta::Attribute->new( "kingpin_command",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "ro", 
         weak_ref => false,
         init_arg => "kingpin_command",
@@ -227,14 +223,13 @@ require "Mite/App/Command.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"kingpin_command"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"kingpin_command"} );
+    	$PACKAGE->add_attribute( $ATTR{"kingpin_command"} );
     };
-
 
 
 }
@@ -242,7 +237,7 @@ require "Mite/App/Command.pm";
 require "Mite/App/Command/clean.pm";
 
 {
-    my $CLASS = Moose::Meta::Class->initialize( "Mite::App::Command::clean" );
+    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::App::Command::clean" );
 
 
 }
@@ -250,7 +245,7 @@ require "Mite/App/Command/clean.pm";
 require "Mite/App/Command/compile.pm";
 
 {
-    my $CLASS = Moose::Meta::Class->initialize( "Mite::App::Command::compile" );
+    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::App::Command::compile" );
 
 
 }
@@ -258,7 +253,7 @@ require "Mite/App/Command/compile.pm";
 require "Mite/App/Command/init.pm";
 
 {
-    my $CLASS = Moose::Meta::Class->initialize( "Mite::App::Command::init" );
+    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::App::Command::init" );
 
 
 }
@@ -266,7 +261,7 @@ require "Mite/App/Command/init.pm";
 require "Mite/App/Command/preview.pm";
 
 {
-    my $CLASS = Moose::Meta::Class->initialize( "Mite::App::Command::preview" );
+    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::App::Command::preview" );
 
 
 }
@@ -274,13 +269,13 @@ require "Mite/App/Command/preview.pm";
 require "Mite/Attribute.pm";
 
 {
-    my $CLASS = Moose::Meta::Class->initialize( "Mite::Attribute" );
+    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::Attribute" );
 
     my %ATTR;
 
     $ATTR{"_order"} = Moose::Meta::Attribute->new( "_order",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "rw", 
         weak_ref => false,
         init_arg => undef,
@@ -298,18 +293,17 @@ require "Mite/Attribute.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"_order"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"_order"} );
+    	$PACKAGE->add_attribute( $ATTR{"_order"} );
     };
-
 
     $ATTR{"class"} = Moose::Meta::Attribute->new( "class",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "rw", 
         weak_ref => true,
         init_arg => "class",
@@ -327,18 +321,17 @@ require "Mite/Attribute.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"class"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"class"} );
+    	$PACKAGE->add_attribute( $ATTR{"class"} );
     };
-
 
     $ATTR{"compiling_class"} = Moose::Meta::Attribute->new( "compiling_class",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "rw", 
         weak_ref => false,
         init_arg => undef,
@@ -355,7 +348,7 @@ require "Mite/Attribute.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"compiling_class"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     {
         my $ACCESSOR = Moose::Meta::Method->_new(
@@ -365,18 +358,17 @@ require "Mite/Attribute.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"compiling_class"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"compiling_class"} );
+    	$PACKAGE->add_attribute( $ATTR{"compiling_class"} );
     };
-
 
     $ATTR{"_class_for_default"} = Moose::Meta::Attribute->new( "_class_for_default",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "rw", 
         weak_ref => true,
         init_arg => "_class_for_default",
@@ -396,18 +388,17 @@ require "Mite/Attribute.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"_class_for_default"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"_class_for_default"} );
+    	$PACKAGE->add_attribute( $ATTR{"_class_for_default"} );
     };
-
 
     $ATTR{"name"} = Moose::Meta::Attribute->new( "name",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "rw", 
         weak_ref => false,
         init_arg => "name",
@@ -425,18 +416,17 @@ require "Mite/Attribute.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"name"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"name"} );
+    	$PACKAGE->add_attribute( $ATTR{"name"} );
     };
-
 
     $ATTR{"init_arg"} = Moose::Meta::Attribute->new( "init_arg",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "rw", 
         weak_ref => false,
         init_arg => "init_arg",
@@ -456,18 +446,17 @@ require "Mite/Attribute.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"init_arg"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"init_arg"} );
+    	$PACKAGE->add_attribute( $ATTR{"init_arg"} );
     };
-
 
     $ATTR{"required"} = Moose::Meta::Attribute->new( "required",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "rw", 
         weak_ref => false,
         init_arg => "required",
@@ -487,18 +476,17 @@ require "Mite/Attribute.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"required"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"required"} );
+    	$PACKAGE->add_attribute( $ATTR{"required"} );
     };
-
 
     $ATTR{"weak_ref"} = Moose::Meta::Attribute->new( "weak_ref",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "rw", 
         weak_ref => false,
         init_arg => "weak_ref",
@@ -518,18 +506,17 @@ require "Mite/Attribute.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"weak_ref"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"weak_ref"} );
+    	$PACKAGE->add_attribute( $ATTR{"weak_ref"} );
     };
-
 
     $ATTR{"is"} = Moose::Meta::Attribute->new( "is",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "rw", 
         weak_ref => false,
         init_arg => "is",
@@ -549,18 +536,17 @@ require "Mite/Attribute.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"is"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"is"} );
+    	$PACKAGE->add_attribute( $ATTR{"is"} );
     };
-
 
     $ATTR{"reader"} = Moose::Meta::Attribute->new( "reader",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "rw", 
         weak_ref => false,
         init_arg => "reader",
@@ -580,18 +566,17 @@ require "Mite/Attribute.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"reader"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"reader"} );
+    	$PACKAGE->add_attribute( $ATTR{"reader"} );
     };
-
 
     $ATTR{"writer"} = Moose::Meta::Attribute->new( "writer",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "rw", 
         weak_ref => false,
         init_arg => "writer",
@@ -611,18 +596,17 @@ require "Mite/Attribute.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"writer"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"writer"} );
+    	$PACKAGE->add_attribute( $ATTR{"writer"} );
     };
-
 
     $ATTR{"accessor"} = Moose::Meta::Attribute->new( "accessor",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "rw", 
         weak_ref => false,
         init_arg => "accessor",
@@ -642,18 +626,17 @@ require "Mite/Attribute.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"accessor"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"accessor"} );
+    	$PACKAGE->add_attribute( $ATTR{"accessor"} );
     };
-
 
     $ATTR{"clearer"} = Moose::Meta::Attribute->new( "clearer",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "rw", 
         weak_ref => false,
         init_arg => "clearer",
@@ -673,18 +656,17 @@ require "Mite/Attribute.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"clearer"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"clearer"} );
+    	$PACKAGE->add_attribute( $ATTR{"clearer"} );
     };
-
 
     $ATTR{"predicate"} = Moose::Meta::Attribute->new( "predicate",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "rw", 
         weak_ref => false,
         init_arg => "predicate",
@@ -704,18 +686,17 @@ require "Mite/Attribute.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"predicate"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"predicate"} );
+    	$PACKAGE->add_attribute( $ATTR{"predicate"} );
     };
-
 
     $ATTR{"lvalue"} = Moose::Meta::Attribute->new( "lvalue",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "rw", 
         weak_ref => false,
         init_arg => "lvalue",
@@ -735,18 +716,17 @@ require "Mite/Attribute.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"lvalue"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"lvalue"} );
+    	$PACKAGE->add_attribute( $ATTR{"lvalue"} );
     };
-
 
     $ATTR{"local_writer"} = Moose::Meta::Attribute->new( "local_writer",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "rw", 
         weak_ref => false,
         init_arg => "local_writer",
@@ -766,18 +746,17 @@ require "Mite/Attribute.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"local_writer"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"local_writer"} );
+    	$PACKAGE->add_attribute( $ATTR{"local_writer"} );
     };
-
 
     $ATTR{"isa"} = Moose::Meta::Attribute->new( "isa",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "bare", 
         weak_ref => false,
         init_arg => "isa",
@@ -795,18 +774,17 @@ require "Mite/Attribute.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"isa"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"isa"} );
+    	$PACKAGE->add_attribute( $ATTR{"isa"} );
     };
-
 
     $ATTR{"does"} = Moose::Meta::Attribute->new( "does",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "bare", 
         weak_ref => false,
         init_arg => "does",
@@ -824,18 +802,17 @@ require "Mite/Attribute.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"does"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"does"} );
+    	$PACKAGE->add_attribute( $ATTR{"does"} );
     };
-
 
     $ATTR{"type"} = Moose::Meta::Attribute->new( "type",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "ro", 
         weak_ref => false,
         init_arg => "type",
@@ -855,18 +832,17 @@ require "Mite/Attribute.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"type"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"type"} );
+    	$PACKAGE->add_attribute( $ATTR{"type"} );
     };
-
 
     $ATTR{"coerce"} = Moose::Meta::Attribute->new( "coerce",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "rw", 
         weak_ref => false,
         init_arg => "coerce",
@@ -886,18 +862,17 @@ require "Mite/Attribute.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"coerce"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"coerce"} );
+    	$PACKAGE->add_attribute( $ATTR{"coerce"} );
     };
-
 
     $ATTR{"default"} = Moose::Meta::Attribute->new( "default",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "rw", 
         weak_ref => false,
         init_arg => "default",
@@ -917,7 +892,7 @@ require "Mite/Attribute.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"default"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     {
         my $ACCESSOR = Moose::Meta::Method::Accessor->new(
@@ -929,18 +904,17 @@ require "Mite/Attribute.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"default"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"default"} );
+    	$PACKAGE->add_attribute( $ATTR{"default"} );
     };
-
 
     $ATTR{"lazy"} = Moose::Meta::Attribute->new( "lazy",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "rw", 
         weak_ref => false,
         init_arg => "lazy",
@@ -960,18 +934,17 @@ require "Mite/Attribute.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"lazy"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"lazy"} );
+    	$PACKAGE->add_attribute( $ATTR{"lazy"} );
     };
-
 
     $ATTR{"coderef_default_variable"} = Moose::Meta::Attribute->new( "coderef_default_variable",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "rw", 
         weak_ref => false,
         init_arg => "coderef_default_variable",
@@ -991,18 +964,17 @@ require "Mite/Attribute.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"coderef_default_variable"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"coderef_default_variable"} );
+    	$PACKAGE->add_attribute( $ATTR{"coderef_default_variable"} );
     };
-
 
     $ATTR{"trigger"} = Moose::Meta::Attribute->new( "trigger",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "rw", 
         weak_ref => false,
         init_arg => "trigger",
@@ -1021,7 +993,7 @@ require "Mite/Attribute.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"trigger"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     {
         my $ACCESSOR = Moose::Meta::Method::Accessor->new(
@@ -1033,18 +1005,17 @@ require "Mite/Attribute.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"trigger"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"trigger"} );
+    	$PACKAGE->add_attribute( $ATTR{"trigger"} );
     };
-
 
     $ATTR{"builder"} = Moose::Meta::Attribute->new( "builder",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "rw", 
         weak_ref => false,
         init_arg => "builder",
@@ -1063,7 +1034,7 @@ require "Mite/Attribute.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"builder"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     {
         my $ACCESSOR = Moose::Meta::Method::Accessor->new(
@@ -1075,18 +1046,17 @@ require "Mite/Attribute.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"builder"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"builder"} );
+    	$PACKAGE->add_attribute( $ATTR{"builder"} );
     };
-
 
     $ATTR{"clone"} = Moose::Meta::Attribute->new( "clone",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "bare", 
         weak_ref => false,
         init_arg => "clone",
@@ -1104,18 +1074,17 @@ require "Mite/Attribute.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"clone"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"clone"} );
+    	$PACKAGE->add_attribute( $ATTR{"clone"} );
     };
-
 
     $ATTR{"clone_on_read"} = Moose::Meta::Attribute->new( "clone_on_read",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "ro", 
         weak_ref => false,
         init_arg => "clone_on_read",
@@ -1136,18 +1105,17 @@ require "Mite/Attribute.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"clone_on_read"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"clone_on_read"} );
+    	$PACKAGE->add_attribute( $ATTR{"clone_on_read"} );
     };
-
 
     $ATTR{"clone_on_write"} = Moose::Meta::Attribute->new( "clone_on_write",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "ro", 
         weak_ref => false,
         init_arg => "clone_on_write",
@@ -1168,18 +1136,17 @@ require "Mite/Attribute.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"clone_on_write"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"clone_on_write"} );
+    	$PACKAGE->add_attribute( $ATTR{"clone_on_write"} );
     };
-
 
     $ATTR{"documentation"} = Moose::Meta::Attribute->new( "documentation",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "rw", 
         weak_ref => false,
         init_arg => "documentation",
@@ -1197,7 +1164,7 @@ require "Mite/Attribute.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"documentation"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     {
         my $ACCESSOR = Moose::Meta::Method::Accessor->new(
@@ -1209,18 +1176,17 @@ require "Mite/Attribute.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"documentation"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"documentation"} );
+    	$PACKAGE->add_attribute( $ATTR{"documentation"} );
     };
-
 
     $ATTR{"handles"} = Moose::Meta::Attribute->new( "handles",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "rw", 
         weak_ref => false,
         init_arg => "handles",
@@ -1240,7 +1206,7 @@ require "Mite/Attribute.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"handles"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     {
         my $ACCESSOR = Moose::Meta::Method::Accessor->new(
@@ -1252,18 +1218,17 @@ require "Mite/Attribute.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"handles"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"handles"} );
+    	$PACKAGE->add_attribute( $ATTR{"handles"} );
     };
-
 
     $ATTR{"alias"} = Moose::Meta::Attribute->new( "alias",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "rw", 
         weak_ref => false,
         init_arg => "alias",
@@ -1284,18 +1249,17 @@ require "Mite/Attribute.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"alias"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"alias"} );
+    	$PACKAGE->add_attribute( $ATTR{"alias"} );
     };
-
 
     $ATTR{"alias_is_for"} = Moose::Meta::Attribute->new( "alias_is_for",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "ro", 
         weak_ref => false,
         init_arg => undef,
@@ -1313,14 +1277,13 @@ require "Mite/Attribute.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"alias_is_for"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"alias_is_for"} );
+    	$PACKAGE->add_attribute( $ATTR{"alias_is_for"} );
     };
-
 
 
 }
@@ -1328,13 +1291,13 @@ require "Mite/Attribute.pm";
 require "Mite/Class.pm";
 
 {
-    my $CLASS = Moose::Meta::Class->initialize( "Mite::Class" );
+    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::Class" );
 
     my %ATTR;
 
     $ATTR{"extends"} = Moose::Meta::Attribute->new( "extends",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "bare", 
         weak_ref => false,
         init_arg => "extends",
@@ -1355,18 +1318,17 @@ require "Mite/Class.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"extends"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"extends"} );
+    	$PACKAGE->add_attribute( $ATTR{"extends"} );
     };
-
 
     $ATTR{"parents"} = Moose::Meta::Attribute->new( "parents",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "ro", 
         weak_ref => false,
         init_arg => "parents",
@@ -1387,7 +1349,7 @@ require "Mite/Class.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"parents"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     {
         my $ACCESSOR = Moose::Meta::Method::Accessor->new(
@@ -1399,14 +1361,13 @@ require "Mite/Class.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"parents"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"parents"} );
+    	$PACKAGE->add_attribute( $ATTR{"parents"} );
     };
-
 
 
 }
@@ -1414,13 +1375,13 @@ require "Mite/Class.pm";
 require "Mite/Compiled.pm";
 
 {
-    my $CLASS = Moose::Meta::Class->initialize( "Mite::Compiled" );
+    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::Compiled" );
 
     my %ATTR;
 
     $ATTR{"file"} = Moose::Meta::Attribute->new( "file",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "rw", 
         weak_ref => false,
         init_arg => "file",
@@ -1441,18 +1402,17 @@ require "Mite/Compiled.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"file"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"file"} );
+    	$PACKAGE->add_attribute( $ATTR{"file"} );
     };
-
 
     $ATTR{"source"} = Moose::Meta::Attribute->new( "source",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "ro", 
         weak_ref => true,
         init_arg => "source",
@@ -1470,7 +1430,7 @@ require "Mite/Compiled.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"source"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     {
         my $DELEGATION = Moose::Meta::Method::Delegation->new(
@@ -1483,7 +1443,7 @@ require "Mite/Compiled.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"source"}->associate_method( $DELEGATION );
-        $CLASS->add_method( $DELEGATION->name, $DELEGATION );
+        $PACKAGE->add_method( $DELEGATION->name, $DELEGATION );
     }
     {
         my $DELEGATION = Moose::Meta::Method::Delegation->new(
@@ -1496,14 +1456,13 @@ require "Mite/Compiled.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"source"}->associate_method( $DELEGATION );
-        $CLASS->add_method( $DELEGATION->name, $DELEGATION );
+        $PACKAGE->add_method( $DELEGATION->name, $DELEGATION );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"source"} );
+    	$PACKAGE->add_attribute( $ATTR{"source"} );
     };
-
 
 
 }
@@ -1511,13 +1470,13 @@ require "Mite/Compiled.pm";
 require "Mite/Config.pm";
 
 {
-    my $CLASS = Moose::Meta::Class->initialize( "Mite::Config" );
+    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::Config" );
 
     my %ATTR;
 
     $ATTR{"mite_dir_name"} = Moose::Meta::Attribute->new( "mite_dir_name",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "ro", 
         weak_ref => false,
         init_arg => "mite_dir_name",
@@ -1537,18 +1496,17 @@ require "Mite/Config.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"mite_dir_name"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"mite_dir_name"} );
+    	$PACKAGE->add_attribute( $ATTR{"mite_dir_name"} );
     };
-
 
     $ATTR{"mite_dir"} = Moose::Meta::Attribute->new( "mite_dir",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "ro", 
         weak_ref => false,
         init_arg => "mite_dir",
@@ -1569,18 +1527,17 @@ require "Mite/Config.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"mite_dir"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"mite_dir"} );
+    	$PACKAGE->add_attribute( $ATTR{"mite_dir"} );
     };
-
 
     $ATTR{"config_file"} = Moose::Meta::Attribute->new( "config_file",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "ro", 
         weak_ref => false,
         init_arg => "config_file",
@@ -1601,18 +1558,17 @@ require "Mite/Config.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"config_file"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"config_file"} );
+    	$PACKAGE->add_attribute( $ATTR{"config_file"} );
     };
-
 
     $ATTR{"data"} = Moose::Meta::Attribute->new( "data",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "rw", 
         weak_ref => false,
         init_arg => "data",
@@ -1632,18 +1588,17 @@ require "Mite/Config.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"data"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"data"} );
+    	$PACKAGE->add_attribute( $ATTR{"data"} );
     };
-
 
     $ATTR{"search_for_mite_dir"} = Moose::Meta::Attribute->new( "search_for_mite_dir",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "rw", 
         weak_ref => false,
         init_arg => "search_for_mite_dir",
@@ -1663,14 +1618,13 @@ require "Mite/Config.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"search_for_mite_dir"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"search_for_mite_dir"} );
+    	$PACKAGE->add_attribute( $ATTR{"search_for_mite_dir"} );
     };
-
 
 
 }
@@ -1678,7 +1632,7 @@ require "Mite/Config.pm";
 require "Mite/MakeMaker.pm";
 
 {
-    my $CLASS = Moose::Meta::Class->initialize( "Mite::MakeMaker" );
+    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::MakeMaker" );
 
 
 }
@@ -1686,13 +1640,13 @@ require "Mite/MakeMaker.pm";
 require "Mite/Project.pm";
 
 {
-    my $CLASS = Moose::Meta::Class->initialize( "Mite::Project" );
+    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::Project" );
 
     my %ATTR;
 
     $ATTR{"sources"} = Moose::Meta::Attribute->new( "sources",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "ro", 
         weak_ref => false,
         init_arg => "sources",
@@ -1712,18 +1666,17 @@ require "Mite/Project.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"sources"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"sources"} );
+    	$PACKAGE->add_attribute( $ATTR{"sources"} );
     };
-
 
     $ATTR{"config"} = Moose::Meta::Attribute->new( "config",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "ro", 
         weak_ref => false,
         init_arg => "config",
@@ -1743,18 +1696,17 @@ require "Mite/Project.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"config"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"config"} );
+    	$PACKAGE->add_attribute( $ATTR{"config"} );
     };
-
 
     $ATTR{"_module_fakeout_namespace"} = Moose::Meta::Attribute->new( "_module_fakeout_namespace",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "rw", 
         weak_ref => false,
         init_arg => "_module_fakeout_namespace",
@@ -1772,18 +1724,17 @@ require "Mite/Project.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"_module_fakeout_namespace"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"_module_fakeout_namespace"} );
+    	$PACKAGE->add_attribute( $ATTR{"_module_fakeout_namespace"} );
     };
-
 
     $ATTR{"debug"} = Moose::Meta::Attribute->new( "debug",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "rw", 
         weak_ref => false,
         init_arg => "debug",
@@ -1803,14 +1754,13 @@ require "Mite/Project.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"debug"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"debug"} );
+    	$PACKAGE->add_attribute( $ATTR{"debug"} );
     };
-
 
 
 }
@@ -1818,13 +1768,13 @@ require "Mite/Project.pm";
 require "Mite/Role.pm";
 
 {
-    my $CLASS = Moose::Meta::Class->initialize( "Mite::Role" );
+    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::Role" );
 
     my %ATTR;
 
     $ATTR{"attributes"} = Moose::Meta::Attribute->new( "attributes",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "ro", 
         weak_ref => false,
         init_arg => "attributes",
@@ -1844,18 +1794,17 @@ require "Mite/Role.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"attributes"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"attributes"} );
+    	$PACKAGE->add_attribute( $ATTR{"attributes"} );
     };
-
 
     $ATTR{"name"} = Moose::Meta::Attribute->new( "name",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "ro", 
         weak_ref => false,
         init_arg => "name",
@@ -1873,18 +1822,17 @@ require "Mite/Role.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"name"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"name"} );
+    	$PACKAGE->add_attribute( $ATTR{"name"} );
     };
-
 
     $ATTR{"shim_name"} = Moose::Meta::Attribute->new( "shim_name",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "rw", 
         weak_ref => false,
         init_arg => "shim_name",
@@ -1904,18 +1852,17 @@ require "Mite/Role.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"shim_name"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"shim_name"} );
+    	$PACKAGE->add_attribute( $ATTR{"shim_name"} );
     };
-
 
     $ATTR{"source"} = Moose::Meta::Attribute->new( "source",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "rw", 
         weak_ref => true,
         init_arg => "source",
@@ -1933,18 +1880,17 @@ require "Mite/Role.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"source"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"source"} );
+    	$PACKAGE->add_attribute( $ATTR{"source"} );
     };
-
 
     $ATTR{"roles"} = Moose::Meta::Attribute->new( "roles",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "ro", 
         weak_ref => false,
         init_arg => "roles",
@@ -1964,18 +1910,17 @@ require "Mite/Role.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"roles"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"roles"} );
+    	$PACKAGE->add_attribute( $ATTR{"roles"} );
     };
-
 
     $ATTR{"imported_functions"} = Moose::Meta::Attribute->new( "imported_functions",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "ro", 
         weak_ref => false,
         init_arg => "imported_functions",
@@ -1995,18 +1940,17 @@ require "Mite/Role.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"imported_functions"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"imported_functions"} );
+    	$PACKAGE->add_attribute( $ATTR{"imported_functions"} );
     };
-
 
     $ATTR{"required_methods"} = Moose::Meta::Attribute->new( "required_methods",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "ro", 
         weak_ref => false,
         init_arg => "required_methods",
@@ -2026,18 +1970,17 @@ require "Mite/Role.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"required_methods"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"required_methods"} );
+    	$PACKAGE->add_attribute( $ATTR{"required_methods"} );
     };
-
 
     $ATTR{"method_signatures"} = Moose::Meta::Attribute->new( "method_signatures",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "ro", 
         weak_ref => false,
         init_arg => "method_signatures",
@@ -2057,14 +2000,13 @@ require "Mite/Role.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"method_signatures"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"method_signatures"} );
+    	$PACKAGE->add_attribute( $ATTR{"method_signatures"} );
     };
-
 
 
 }
@@ -2072,7 +2014,7 @@ require "Mite/Role.pm";
 require "Mite/Role/Tiny.pm";
 
 {
-    my $CLASS = Moose::Meta::Class->initialize( "Mite::Role::Tiny" );
+    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::Role::Tiny" );
 
 
 }
@@ -2080,13 +2022,13 @@ require "Mite/Role/Tiny.pm";
 require "Mite/Signature.pm";
 
 {
-    my $CLASS = Moose::Meta::Class->initialize( "Mite::Signature" );
+    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::Signature" );
 
     my %ATTR;
 
     $ATTR{"class"} = Moose::Meta::Attribute->new( "class",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "ro", 
         weak_ref => true,
         init_arg => "class",
@@ -2104,18 +2046,17 @@ require "Mite/Signature.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"class"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"class"} );
+    	$PACKAGE->add_attribute( $ATTR{"class"} );
     };
-
 
     $ATTR{"compiling_class"} = Moose::Meta::Attribute->new( "compiling_class",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "rw", 
         weak_ref => false,
         init_arg => undef,
@@ -2132,7 +2073,7 @@ require "Mite/Signature.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"compiling_class"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     {
         my $ACCESSOR = Moose::Meta::Method->_new(
@@ -2142,18 +2083,17 @@ require "Mite/Signature.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"compiling_class"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"compiling_class"} );
+    	$PACKAGE->add_attribute( $ATTR{"compiling_class"} );
     };
-
 
     $ATTR{"method_name"} = Moose::Meta::Attribute->new( "method_name",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "ro", 
         weak_ref => false,
         init_arg => "method_name",
@@ -2171,18 +2111,17 @@ require "Mite/Signature.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"method_name"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"method_name"} );
+    	$PACKAGE->add_attribute( $ATTR{"method_name"} );
     };
-
 
     $ATTR{"named"} = Moose::Meta::Attribute->new( "named",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "ro", 
         weak_ref => false,
         init_arg => "named",
@@ -2201,7 +2140,7 @@ require "Mite/Signature.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"named"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     {
         my $ACCESSOR = Moose::Meta::Method::Accessor->new(
@@ -2213,18 +2152,17 @@ require "Mite/Signature.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"named"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"named"} );
+    	$PACKAGE->add_attribute( $ATTR{"named"} );
     };
-
 
     $ATTR{"positional"} = Moose::Meta::Attribute->new( "positional",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "ro", 
         weak_ref => false,
         init_arg => "positional",
@@ -2243,7 +2181,7 @@ require "Mite/Signature.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"positional"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     {
         my $ACCESSOR = Moose::Meta::Method::Accessor->new(
@@ -2255,7 +2193,7 @@ require "Mite/Signature.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"positional"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     {
         my $ALIAS = Moose::Meta::Method->_new(
@@ -2265,18 +2203,17 @@ require "Mite/Signature.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"positional"}->associate_method( $ALIAS );
-        $CLASS->add_method( $ALIAS->name, $ALIAS );
+        $PACKAGE->add_method( $ALIAS->name, $ALIAS );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"positional"} );
+    	$PACKAGE->add_attribute( $ATTR{"positional"} );
     };
-
 
     $ATTR{"method"} = Moose::Meta::Attribute->new( "method",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "ro", 
         weak_ref => false,
         init_arg => "method",
@@ -2296,18 +2233,17 @@ require "Mite/Signature.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"method"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"method"} );
+    	$PACKAGE->add_attribute( $ATTR{"method"} );
     };
-
 
     $ATTR{"head"} = Moose::Meta::Attribute->new( "head",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "ro", 
         weak_ref => false,
         init_arg => "head",
@@ -2327,18 +2263,17 @@ require "Mite/Signature.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"head"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"head"} );
+    	$PACKAGE->add_attribute( $ATTR{"head"} );
     };
-
 
     $ATTR{"tail"} = Moose::Meta::Attribute->new( "tail",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "ro", 
         weak_ref => false,
         init_arg => "tail",
@@ -2356,18 +2291,17 @@ require "Mite/Signature.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"tail"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"tail"} );
+    	$PACKAGE->add_attribute( $ATTR{"tail"} );
     };
-
 
     $ATTR{"named_to_list"} = Moose::Meta::Attribute->new( "named_to_list",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "ro", 
         weak_ref => false,
         init_arg => "named_to_list",
@@ -2387,18 +2321,17 @@ require "Mite/Signature.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"named_to_list"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"named_to_list"} );
+    	$PACKAGE->add_attribute( $ATTR{"named_to_list"} );
     };
-
 
     $ATTR{"compiler"} = Moose::Meta::Attribute->new( "compiler",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "ro", 
         weak_ref => false,
         init_arg => undef,
@@ -2417,7 +2350,7 @@ require "Mite/Signature.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"compiler"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     {
         my $DELEGATION = Moose::Meta::Method::Delegation->new(
@@ -2430,7 +2363,7 @@ require "Mite/Signature.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"compiler"}->associate_method( $DELEGATION );
-        $CLASS->add_method( $DELEGATION->name, $DELEGATION );
+        $PACKAGE->add_method( $DELEGATION->name, $DELEGATION );
     }
     {
         my $DELEGATION = Moose::Meta::Method::Delegation->new(
@@ -2443,7 +2376,7 @@ require "Mite/Signature.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"compiler"}->associate_method( $DELEGATION );
-        $CLASS->add_method( $DELEGATION->name, $DELEGATION );
+        $PACKAGE->add_method( $DELEGATION->name, $DELEGATION );
     }
     {
         my $DELEGATION = Moose::Meta::Method::Delegation->new(
@@ -2456,18 +2389,17 @@ require "Mite/Signature.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"compiler"}->associate_method( $DELEGATION );
-        $CLASS->add_method( $DELEGATION->name, $DELEGATION );
+        $PACKAGE->add_method( $DELEGATION->name, $DELEGATION );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"compiler"} );
+    	$PACKAGE->add_attribute( $ATTR{"compiler"} );
     };
-
 
     $ATTR{"should_bless"} = Moose::Meta::Attribute->new( "should_bless",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "ro", 
         weak_ref => false,
         init_arg => undef,
@@ -2486,14 +2418,13 @@ require "Mite/Signature.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"should_bless"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"should_bless"} );
+    	$PACKAGE->add_attribute( $ATTR{"should_bless"} );
     };
-
 
 
 }
@@ -2501,13 +2432,13 @@ require "Mite/Signature.pm";
 require "Mite/Source.pm";
 
 {
-    my $CLASS = Moose::Meta::Class->initialize( "Mite::Source" );
+    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::Source" );
 
     my %ATTR;
 
     $ATTR{"file"} = Moose::Meta::Attribute->new( "file",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "ro", 
         weak_ref => false,
         init_arg => "file",
@@ -2526,18 +2457,17 @@ require "Mite/Source.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"file"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"file"} );
+    	$PACKAGE->add_attribute( $ATTR{"file"} );
     };
-
 
     $ATTR{"classes"} = Moose::Meta::Attribute->new( "classes",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "ro", 
         weak_ref => false,
         init_arg => "classes",
@@ -2557,18 +2487,17 @@ require "Mite/Source.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"classes"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"classes"} );
+    	$PACKAGE->add_attribute( $ATTR{"classes"} );
     };
-
 
     $ATTR{"class_order"} = Moose::Meta::Attribute->new( "class_order",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "ro", 
         weak_ref => false,
         init_arg => "class_order",
@@ -2588,18 +2517,17 @@ require "Mite/Source.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"class_order"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"class_order"} );
+    	$PACKAGE->add_attribute( $ATTR{"class_order"} );
     };
-
 
     $ATTR{"compiled"} = Moose::Meta::Attribute->new( "compiled",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "ro", 
         weak_ref => false,
         init_arg => "compiled",
@@ -2619,18 +2547,17 @@ require "Mite/Source.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"compiled"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"compiled"} );
+    	$PACKAGE->add_attribute( $ATTR{"compiled"} );
     };
-
 
     $ATTR{"project"} = Moose::Meta::Attribute->new( "project",
         __hack_no_process_options => true,
-        associated_class => $CLASS,
+        associated_class => $PACKAGE,
         is => "rw", 
         weak_ref => true,
         init_arg => "project",
@@ -2648,14 +2575,13 @@ require "Mite/Source.pm";
             definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"project"}->associate_method( $ACCESSOR );
-        $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
     	no warnings 'redefine';
     	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$CLASS->add_attribute( $ATTR{"project"} );
+    	$PACKAGE->add_attribute( $ATTR{"project"} );
     };
-
 
 
 }
