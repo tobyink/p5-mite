@@ -264,6 +264,53 @@ sub write_mites {
     return;
 }
 
+sub _project_mopper_file {
+    my $self = shift;
+
+    my $config = $self->config;
+    my $mop_package = $config->data->{mop} or return;
+    my $mop_dir = $config->data->{source_from};
+
+    my $mop_file = $mop_package;
+    $mop_file =~ s{::}{/}g;
+    $mop_file .= ".pm";
+    return Path::Tiny::path($mop_dir, $mop_file);
+}
+
+sub write_mopper {
+    my $self = shift;
+
+    my $mop_file = $self->_project_mopper_file or return;
+
+    my $dir = Path::Tiny::path( $self->config->data->{source_from} );
+
+    my $code = $self->_compile_mop_header;
+    for my $source ( sort { $a->file cmp $b->file } values %{ $self->sources } ) {
+        my $relative_name = $source->file->relative($dir);
+        $code .= $source->_compile_mop( $relative_name );
+    }
+    for my $class ( sort { $a->name cmp $b->name } values %{ $self->classes } ) {
+        $code .= $class->_compile_mop_postamble;
+    }
+
+    if ( my $yuck = $self->_module_fakeout_namespace ) {
+        $code =~ s/$yuck\:://g;
+    }
+
+    warn "Write MOP: $mop_file\n" if $self->debug;
+    $mop_file->spew( $code );
+
+    return;
+}
+
+sub _compile_mop_header {
+    return <<'CODE';
+use Moose ();
+use constant { true => !!1, false => !!0 };
+
+CODE
+}
+
 signature_for load_files => (
     pos => [ ArrayRef, 0 ],
 );

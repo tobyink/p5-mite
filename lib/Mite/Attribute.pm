@@ -89,6 +89,7 @@ has coerce =>
 has default =>
   is            => rw,
   isa           => Undef | Str | CodeRef | ScalarRef | Dict[] | Tuple[],
+  documentation => 'We support more possibilities than Moose!',
   predicate     => true;
 
 has lazy =>
@@ -861,6 +862,172 @@ sub compile {
     }
 
     return $code;
+}
+
+sub _compile_mop {
+    my $self = shift;
+
+    my $opts_string = '';
+    my $accessors_code = '';
+    my $opts_indent = "\n    ";
+
+    $opts_string .= $opts_indent . '__hack_no_process_options => true,';
+    $opts_string .= $opts_indent . 'associated_class => $CLASS,';
+
+    {
+        my %translate = ( ro => 'ro', rw => 'rw', rwp => 'ro', bare => 'bare', lazy => 'ro'  );
+        $opts_string .= $opts_indent . sprintf( 'is => "%s", ', $translate{$self->is} );
+    }
+
+    $opts_string .= $opts_indent . sprintf( 'weak_ref => %s,', $self->weak_ref ? 'true' : 'false' );
+
+    {
+        my $init_arg = $self->init_arg;
+        if ( defined $init_arg ) {
+            $opts_string .= $opts_indent . sprintf( 'init_arg => %s,', $self->_q_init_arg );
+            $opts_string .= $opts_indent . sprintf( 'required => %s,', $self->required ? 'true' : 'false' );
+        }
+        else {
+            $opts_string .= $opts_indent . 'init_arg => undef,';
+        }
+    }
+
+    if ( my $type = $self->type ) {
+        # Easy case...
+        if ( $type->name and $type->library ) {
+            $opts_string .= $opts_indent . sprintf( 'type_constraint => do { require %s; %s::%s() },', $type->library, $type->library, $type->name );
+            if ( $type->has_coercion and $self->coerce ) {
+                $opts_string .= $opts_indent . 'coerce => true,';
+            }
+        }
+        else {
+            $opts_string .= $opts_indent . 'type_constraint => do { require Types::Standard; Types::Standard::Item() },';  # XXX - this gets tricky
+        }
+    }
+
+    for my $accessor ( qw/ reader writer accessor predicate clearer / ) {
+        my $name = $self->_expand_name( $self->$accessor );
+        defined $name or next;
+        my $qname = $self->_q( $name );
+
+        $opts_string .= $opts_indent . sprintf( '%s => %s,', $accessor, $qname );
+
+        $accessors_code .= sprintf <<'CODE', $accessor, $self->_q_name, $qname, $self->compiling_class->name, $name, $self->_q($self->compiling_class->name), $self->_q_name;
+{
+    my $ACCESSOR = Moose::Meta::Method::Accessor->new(
+        accessor_type => '%s',
+        attribute => $ATTR{%s},
+        name => %s,
+        body => \&%s::%s,
+        package_name => %s,
+        definition_context => { toolkit => 'Mite' },
+    );
+    $ATTR{%s}->associate_method( $ACCESSOR );
+    $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+}
+CODE
+    }
+
+    for my $accessor ( qw/ lvalue local_writer / ) {
+        my $name = $self->_expand_name( $self->$accessor );
+        defined $name or next;
+        my $qname = $self->_q( $name );
+
+        $accessors_code .= sprintf <<'CODE', $qname, $self->compiling_class->name, $name, $self->_q($self->compiling_class->name), $self->_q_name;
+{
+    my $ACCESSOR = Moose::Meta::Method->_new(
+        name => %s,
+        body => \&%s::%s,
+        package_name => %s,
+        definition_context => { toolkit => 'Mite' },
+    );
+    $ATTR{%s}->associate_method( $ACCESSOR );
+    $CLASS->add_method( $ACCESSOR->name, $ACCESSOR );
+}
+CODE
+    }
+
+    {
+        my $h = $self->handles || {};
+        for my $delegated ( sort keys %$h ) {
+            my $name = $self->_expand_name( $delegated );
+            my $qname = $self->_q( $name );
+            my $target = $h->{$delegated};
+            my $qtarget = $self->_q( $target );
+
+            $accessors_code .= sprintf <<'CODE', $qname, $self->_q_name, $qtarget, $self->compiling_class->name, $name, $self->_q($self->compiling_class->name), $self->_q_name;
+{
+    my $DELEGATION = Moose::Meta::Method::Delegation->new(
+        name => %s,
+        attribute => $ATTR{%s},
+        delegate_to_method => %s,
+        curried_arguments => [],
+        body => \&%s::%s,
+        package_name => %s,
+        definition_context => { toolkit => 'Mite' },
+    );
+    $ATTR{%s}->associate_method( $DELEGATION );
+    $CLASS->add_method( $DELEGATION->name, $DELEGATION );
+}
+CODE
+        }
+    }
+
+    {
+        my @aliases = $self->_all_aliases;
+        for my $name ( sort @aliases ) {
+            my $qname = $self->_q( $name );
+
+            $accessors_code .= sprintf <<'CODE', $qname, $self->compiling_class->name, $name, $self->_q($self->compiling_class->name), $self->_q_name;
+{
+    my $ALIAS = Moose::Meta::Method->_new(
+        name => %s,
+        body => \&%s::%s,
+        package_name => %s,
+        definition_context => { toolkit => 'Mite' },
+    );
+    $ATTR{%s}->associate_method( $ALIAS );
+    $CLASS->add_method( $ALIAS->name, $ALIAS );
+}
+CODE
+        }
+    }
+
+    if ( my $builder = $self->_expand_name( $self->builder ) ) {
+        $opts_string .= $opts_indent . sprintf( 'builder => %s,', $self->_q( $builder ) );
+    }
+    elsif ( $self->has_inline_default or $self->has_reference_default ) {
+        $opts_string .= $opts_indent . sprintf( 'default => sub { %s },', $self->_compile_default );
+    }
+    elsif ( $self->has_coderef_default ) {
+        $opts_string .= $opts_indent . sprintf( 'default => %s,', $self->coderef_default_variable );
+    }
+    elsif ( $self->has_default ) {
+        $opts_string .= $opts_indent . sprintf( 'default => %s,', $self->_compile_default );
+    }
+    if ( $self->has_default or $self->has_builder ) {
+        $opts_string .= $opts_indent . sprintf( 'lazy => %s,', $self->lazy ? 'true' : 'false' );
+    }
+
+    if ( my $trigger = $self->_expand_name( $self->trigger ) ) {
+        $opts_string .= $opts_indent . sprintf( 'trigger => sub { shift->%s( @_ ) },', $trigger );
+    }
+
+    if ( $self->has_documentation ) {
+        $opts_string .= $opts_indent . sprintf( 'documentation => %s,', $self->_q( $self->documentation ) );
+    }
+
+    $accessors_code =~ s/\n$//;
+    $opts_string .= "\n";
+    return sprintf <<'CODE', $self->_q_name, $self->_q_name, $opts_string, $accessors_code, $self->_q_name;
+$ATTR{%s} = Moose::Meta::Attribute->new( %s,%s);
+%s
+do {
+	no warnings 'redefine';
+	local *Moose::Meta::Attribute::install_accessors = sub {};
+	$CLASS->add_attribute( $ATTR{%s} );
+};
+CODE
 }
 
 1;

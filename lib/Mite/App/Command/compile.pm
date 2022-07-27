@@ -37,6 +37,7 @@ sub execute {
     $project->add_mite_shim;
     $project->load_directory;
     $project->write_mites;
+    $project->write_mopper;
 
     return 0;
 }
