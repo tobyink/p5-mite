@@ -92,6 +92,10 @@ sub _compile_mop {
         map { $self->classes->{$_}->_compile_mop }
         @{ $self->class_order };
 
+    while ( $joined =~ /\n\n/ ) {
+        $joined =~ s/\n\n/\n/g;
+    }
+
     return sprintf <<'CODE', B::perlstring( "$name" ), $joined;
 require %s;
 

@@ -493,6 +493,19 @@ sub _compile_mop_postamble {
     return $code;
 }
 
+sub _compile_mop_required_methods {
+    return '';  # classes don't care
+}
+
+sub _compile_mop_modifiers {
+    return '';  # classes don't care
+}
+
+sub _compile_mop_tc {
+    return sprintf '    Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( %s );',
+        B::perlstring( shift->name );
+}
+
 1;
 
 __END__

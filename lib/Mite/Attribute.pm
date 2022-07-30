@@ -9,6 +9,7 @@ our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.007006';
 
 use B ();
+use List::Util ();
 
 my $order = 0;
 has _order =>
@@ -901,12 +902,44 @@ sub _compile_mop {
         # Easy case...
         if ( $type->name and $type->library ) {
             $opts_string .= $opts_indent . sprintf( 'type_constraint => do { require %s; %s::%s() },', $type->library, $type->library, $type->name );
-            if ( $type->has_coercion and $self->coerce ) {
-                $opts_string .= $opts_indent . 'coerce => true,';
-            }
+        }
+        elsif ( $type->isa( 'Type::Tiny::Union' ) and List::Util::all { $_->name and $_->library } @$type ) {
+            my $requires = join q{; }, List::Util::uniq( map sprintf( 'require %s', $_->library ), @$type );
+            my $union    = join q{ | }, List::Util::uniq( map sprintf( '%s::%s()', $_->library, $_->name ), @$type );
+            $opts_string .= $opts_indent . sprintf( 'type_constraint => do { %s; %s },', $requires, $union );
+        }
+        elsif ( $type->is_parameterized
+        and 1 == @{ $type->parameters }
+        and $type->parent->name
+        and $type->parent->library
+        and $type->type_parameter->name
+        and $type->type_parameter->library ) {
+            my $requires = join q{; }, List::Util::uniq( map sprintf( 'require %s', $_->library ), $type->parent, $type->type_parameter );
+            my $ptype    = sprintf( '%s::%s()->parameterize( %s::%s() )', $type->parent->library, $type->parent->name, $type->type_parameter->library, , $type->type_parameter->name );
+            $opts_string .= $opts_indent . sprintf( 'type_constraint => do { %s; %s },', $requires, $ptype );
         }
         else {
-            $opts_string .= $opts_indent . 'type_constraint => do { require Types::Standard; Types::Standard::Item() },';  # XXX - this gets tricky
+            local $Type::Tiny::AvoidCallbacks = 1;
+            local $Type::Tiny::SafePackage = '';
+            $opts_string .= $opts_indent . 'type_constraint => do {';
+            $opts_string .= $opts_indent . '    require Type::Tiny;';
+            $opts_string .= $opts_indent . '    my $TYPE = Type::Tiny->new(';
+            $opts_string .= $opts_indent . sprintf '        display_name => %s,', B::perlstring( $type->display_name );
+            $opts_string .= $opts_indent . sprintf '        constraint   => sub { %s },', $type->inline_check( '$_' );
+            $opts_string .= $opts_indent . '    );';
+            if ( $type->has_coercion ) {
+                $opts_string .= $opts_indent . '    require Types::Standard;';
+                $opts_string .= $opts_indent . '    $TYPE->coercion->add_type_coercions(';
+                $opts_string .= $opts_indent . '        Types::Standard::Any(),';
+                $opts_string .= $opts_indent . sprintf '        sub { %s },', $type->coercion->inline_coercion( '$_' );
+                $opts_string .= $opts_indent . '    );';
+                $opts_string .= $opts_indent . '    $TYPE->coercion->freeze;';
+            }
+            $opts_string .= $opts_indent . '    $TYPE;';
+            $opts_string .= $opts_indent . '},';
+        }
+        if ( $type->has_coercion and $self->coerce ) {
+           $opts_string .= $opts_indent . 'coerce => true,';
         }
     }
 

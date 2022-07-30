@@ -306,6 +306,8 @@ sub write_mopper {
 sub _compile_mop_header {
     return <<'CODE';
 use Moose ();
+use Moose::Util ();
+use Moose::Util::TypeConstraints ();
 use constant { true => !!1, false => !!0 };
 
 CODE
@@ -330,6 +332,11 @@ sub load_files {
 
 sub _load_file {
     my ( $self, $file, $inc_dir ) = @_;
+
+    if ( $file eq $self->_project_mopper_file ) {
+        warn "Skipping $file: it's the mop\n" if $self->debug;
+        return;
+    }
 
     warn "Load module: $file\n" if $self->debug;
 

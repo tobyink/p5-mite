@@ -541,10 +541,13 @@ sub _mop_attribute_metaclass {
 sub _compile_mop {
     my $self = shift;
 
-    return sprintf <<'CODE', $self->_mop_metaclass, B::perlstring( $self->name ), $self->_compile_mop_attributes;
+    return sprintf <<'CODE', $self->_mop_metaclass, B::perlstring( $self->name ), $self->_compile_mop_attributes, $self->_compile_mop_required_methods, $self->_compile_mop_modifiers, $self->_compile_mop_tc;
 {
     my $PACKAGE = %s->initialize( %s );
 
+%s
+%s
+%s
 %s
 }
 CODE
@@ -571,8 +574,40 @@ sub _compile_mop_attributes {
     return $code;
 }
 
+sub _compile_mop_modifiers {
+    my $self = shift;
+
+    return sprintf <<'CODE', $self->name;
+    for ( @%s::METHOD_MODIFIERS ) {
+        my ( $type, $names, $code ) = @$_;
+        $PACKAGE->${\"add_$type\_method_modifier"}( $_, $code ) for @$names;
+    }
+CODE
+}
+
+sub _compile_mop_required_methods {
+    my $self = shift;
+    my $code = '';
+    if ( my @req = @{ $self->required_methods } ) {
+        $code .= sprintf "    \$PACKAGE->add_required_methods( %s );\n", 
+            join( q{, }, map B::perlstring( $_ ), @req ),
+    }
+    return $code;
+}
+
 sub _compile_mop_postamble {
-    return '';
+    my $self = shift;
+    my $code = '';
+    for my $role ( @{ $self->roles } ) {
+        $code .= sprintf "\$PACKAGE->add_role( Moose::Util::find_meta( %s ) );\n",
+            B::perlstring( $role->name );
+    }
+    return $code;
+}
+
+sub _compile_mop_tc {
+    return sprintf '    Moose::Util::TypeConstraints::find_or_create_does_type_constraint( %s );',
+        shift->name;
 }
 
 1;

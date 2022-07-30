@@ -1,13 +1,13 @@
 use Moose ();
+use Moose::Util ();
+use Moose::Util::TypeConstraints ();
 use constant { true => !!1, false => !!0 };
 
 require "Mite/App.pm";
 
 {
     my $PACKAGE = Moose::Meta::Class->initialize( "Mite::App" );
-
     my %ATTR;
-
     $ATTR{"commands"} = Moose::Meta::Attribute->new( "commands",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -15,7 +15,7 @@ require "Mite/App.pm";
         weak_ref => false,
         init_arg => "commands",
         required => false,
-        type_constraint => do { require Types::Standard; Types::Standard::Item() },
+        type_constraint => do { require Types::Standard; Types::Standard::HashRef()->parameterize( Types::Standard::Object() ) },
         reader => "commands",
         default => sub { {} },
         lazy => false,
@@ -37,7 +37,6 @@ require "Mite/App.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"commands"} );
     };
-
     $ATTR{"kingpin"} = Moose::Meta::Attribute->new( "kingpin",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -80,7 +79,6 @@ require "Mite/App.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"kingpin"} );
     };
-
     $ATTR{"project"} = Moose::Meta::Attribute->new( "project",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -123,17 +121,14 @@ require "Mite/App.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"project"} );
     };
-
-
+    Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( "Mite::App" );
 }
 
 require "Mite/App/Command.pm";
 
 {
     my $PACKAGE = Moose::Meta::Class->initialize( "Mite::App::Command" );
-
     my %ATTR;
-
     $ATTR{"app"} = Moose::Meta::Attribute->new( "app",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -200,7 +195,6 @@ require "Mite/App/Command.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"app"} );
     };
-
     $ATTR{"kingpin_command"} = Moose::Meta::Attribute->new( "kingpin_command",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -230,49 +224,42 @@ require "Mite/App/Command.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"kingpin_command"} );
     };
-
-
+    Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( "Mite::App::Command" );
 }
 
 require "Mite/App/Command/clean.pm";
 
 {
     my $PACKAGE = Moose::Meta::Class->initialize( "Mite::App::Command::clean" );
-
-
+    Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( "Mite::App::Command::clean" );
 }
 
 require "Mite/App/Command/compile.pm";
 
 {
     my $PACKAGE = Moose::Meta::Class->initialize( "Mite::App::Command::compile" );
-
-
+    Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( "Mite::App::Command::compile" );
 }
 
 require "Mite/App/Command/init.pm";
 
 {
     my $PACKAGE = Moose::Meta::Class->initialize( "Mite::App::Command::init" );
-
-
+    Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( "Mite::App::Command::init" );
 }
 
 require "Mite/App/Command/preview.pm";
 
 {
     my $PACKAGE = Moose::Meta::Class->initialize( "Mite::App::Command::preview" );
-
-
+    Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( "Mite::App::Command::preview" );
 }
 
 require "Mite/Attribute.pm";
 
 {
     my $PACKAGE = Moose::Meta::Class->initialize( "Mite::Attribute" );
-
     my %ATTR;
-
     $ATTR{"_order"} = Moose::Meta::Attribute->new( "_order",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -300,7 +287,6 @@ require "Mite/Attribute.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"_order"} );
     };
-
     $ATTR{"class"} = Moose::Meta::Attribute->new( "class",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -328,7 +314,6 @@ require "Mite/Attribute.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"class"} );
     };
-
     $ATTR{"compiling_class"} = Moose::Meta::Attribute->new( "compiling_class",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -365,7 +350,6 @@ require "Mite/Attribute.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"compiling_class"} );
     };
-
     $ATTR{"_class_for_default"} = Moose::Meta::Attribute->new( "_class_for_default",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -395,7 +379,6 @@ require "Mite/Attribute.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"_class_for_default"} );
     };
-
     $ATTR{"name"} = Moose::Meta::Attribute->new( "name",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -423,7 +406,6 @@ require "Mite/Attribute.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"name"} );
     };
-
     $ATTR{"init_arg"} = Moose::Meta::Attribute->new( "init_arg",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -431,7 +413,7 @@ require "Mite/Attribute.pm";
         weak_ref => false,
         init_arg => "init_arg",
         required => false,
-        type_constraint => do { require Types::Standard; Types::Standard::Item() },
+        type_constraint => do { require Types::Common::String; require Types::Standard; Types::Common::String::NonEmptyStr() | Types::Standard::Undef() },
         accessor => "init_arg",
         default => $Mite::Attribute::__init_arg_DEFAULT__,
         lazy => true,
@@ -453,7 +435,6 @@ require "Mite/Attribute.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"init_arg"} );
     };
-
     $ATTR{"required"} = Moose::Meta::Attribute->new( "required",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -483,7 +464,6 @@ require "Mite/Attribute.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"required"} );
     };
-
     $ATTR{"weak_ref"} = Moose::Meta::Attribute->new( "weak_ref",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -513,7 +493,6 @@ require "Mite/Attribute.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"weak_ref"} );
     };
-
     $ATTR{"is"} = Moose::Meta::Attribute->new( "is",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -521,7 +500,14 @@ require "Mite/Attribute.pm";
         weak_ref => false,
         init_arg => "is",
         required => false,
-        type_constraint => do { require Types::Standard; Types::Standard::Item() },
+        type_constraint => do {
+            require Type::Tiny;
+            my $TYPE = Type::Tiny->new(
+                display_name => "Enum[\"ro\",\"rw\",\"rwp\",\"lazy\",\"bare\"]",
+                constraint   => sub { do {  (defined and !ref and m{\A(?:(?:bare|lazy|r(?:wp?|o)))\z}) } },
+            );
+            $TYPE;
+        },
         accessor => "is",
         default => "bare",
         lazy => false,
@@ -543,7 +529,6 @@ require "Mite/Attribute.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"is"} );
     };
-
     $ATTR{"reader"} = Moose::Meta::Attribute->new( "reader",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -551,7 +536,7 @@ require "Mite/Attribute.pm";
         weak_ref => false,
         init_arg => "reader",
         required => false,
-        type_constraint => do { require Types::Standard; Types::Standard::Item() },
+        type_constraint => do { require Mite::Types; require Types::Standard; Mite::Types::MethodNameTemplate() | Mite::Types::One() | Types::Standard::Undef() },
         accessor => "reader",
         builder => "_build_reader",
         lazy => true,
@@ -573,7 +558,6 @@ require "Mite/Attribute.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"reader"} );
     };
-
     $ATTR{"writer"} = Moose::Meta::Attribute->new( "writer",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -581,7 +565,7 @@ require "Mite/Attribute.pm";
         weak_ref => false,
         init_arg => "writer",
         required => false,
-        type_constraint => do { require Types::Standard; Types::Standard::Item() },
+        type_constraint => do { require Mite::Types; require Types::Standard; Mite::Types::MethodNameTemplate() | Mite::Types::One() | Types::Standard::Undef() },
         accessor => "writer",
         builder => "_build_writer",
         lazy => true,
@@ -603,7 +587,6 @@ require "Mite/Attribute.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"writer"} );
     };
-
     $ATTR{"accessor"} = Moose::Meta::Attribute->new( "accessor",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -611,7 +594,7 @@ require "Mite/Attribute.pm";
         weak_ref => false,
         init_arg => "accessor",
         required => false,
-        type_constraint => do { require Types::Standard; Types::Standard::Item() },
+        type_constraint => do { require Mite::Types; require Types::Standard; Mite::Types::MethodNameTemplate() | Mite::Types::One() | Types::Standard::Undef() },
         accessor => "accessor",
         builder => "_build_accessor",
         lazy => true,
@@ -633,7 +616,6 @@ require "Mite/Attribute.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"accessor"} );
     };
-
     $ATTR{"clearer"} = Moose::Meta::Attribute->new( "clearer",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -641,7 +623,7 @@ require "Mite/Attribute.pm";
         weak_ref => false,
         init_arg => "clearer",
         required => false,
-        type_constraint => do { require Types::Standard; Types::Standard::Item() },
+        type_constraint => do { require Mite::Types; require Types::Standard; Mite::Types::MethodNameTemplate() | Mite::Types::One() | Types::Standard::Undef() },
         accessor => "clearer",
         builder => "_build_clearer",
         lazy => true,
@@ -663,7 +645,6 @@ require "Mite/Attribute.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"clearer"} );
     };
-
     $ATTR{"predicate"} = Moose::Meta::Attribute->new( "predicate",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -671,7 +652,7 @@ require "Mite/Attribute.pm";
         weak_ref => false,
         init_arg => "predicate",
         required => false,
-        type_constraint => do { require Types::Standard; Types::Standard::Item() },
+        type_constraint => do { require Mite::Types; require Types::Standard; Mite::Types::MethodNameTemplate() | Mite::Types::One() | Types::Standard::Undef() },
         accessor => "predicate",
         builder => "_build_predicate",
         lazy => true,
@@ -693,7 +674,6 @@ require "Mite/Attribute.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"predicate"} );
     };
-
     $ATTR{"lvalue"} = Moose::Meta::Attribute->new( "lvalue",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -701,7 +681,7 @@ require "Mite/Attribute.pm";
         weak_ref => false,
         init_arg => "lvalue",
         required => false,
-        type_constraint => do { require Types::Standard; Types::Standard::Item() },
+        type_constraint => do { require Mite::Types; require Types::Standard; Mite::Types::MethodNameTemplate() | Mite::Types::One() | Types::Standard::Undef() },
         accessor => "lvalue",
         builder => "_build_lvalue",
         lazy => true,
@@ -723,7 +703,6 @@ require "Mite/Attribute.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"lvalue"} );
     };
-
     $ATTR{"local_writer"} = Moose::Meta::Attribute->new( "local_writer",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -731,7 +710,7 @@ require "Mite/Attribute.pm";
         weak_ref => false,
         init_arg => "local_writer",
         required => false,
-        type_constraint => do { require Types::Standard; Types::Standard::Item() },
+        type_constraint => do { require Mite::Types; require Types::Standard; Mite::Types::MethodNameTemplate() | Mite::Types::One() | Types::Standard::Undef() },
         accessor => "local_writer",
         builder => "_build_local_writer",
         lazy => true,
@@ -753,7 +732,6 @@ require "Mite/Attribute.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"local_writer"} );
     };
-
     $ATTR{"isa"} = Moose::Meta::Attribute->new( "isa",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -761,7 +739,7 @@ require "Mite/Attribute.pm";
         weak_ref => false,
         init_arg => "isa",
         required => false,
-        type_constraint => do { require Types::Standard; Types::Standard::Item() },
+        type_constraint => do { require Types::Standard; Types::Standard::Str() | Types::Standard::Ref() },
         reader => "_isa",
     );
     {
@@ -781,7 +759,6 @@ require "Mite/Attribute.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"isa"} );
     };
-
     $ATTR{"does"} = Moose::Meta::Attribute->new( "does",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -789,7 +766,7 @@ require "Mite/Attribute.pm";
         weak_ref => false,
         init_arg => "does",
         required => false,
-        type_constraint => do { require Types::Standard; Types::Standard::Item() },
+        type_constraint => do { require Types::Standard; Types::Standard::Str() | Types::Standard::Ref() },
         reader => "_does",
     );
     {
@@ -809,7 +786,6 @@ require "Mite/Attribute.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"does"} );
     };
-
     $ATTR{"type"} = Moose::Meta::Attribute->new( "type",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -817,7 +793,7 @@ require "Mite/Attribute.pm";
         weak_ref => false,
         init_arg => "type",
         required => false,
-        type_constraint => do { require Types::Standard; Types::Standard::Item() },
+        type_constraint => do { require Types::Standard; Types::Standard::Object() | Types::Standard::Undef() },
         reader => "type",
         builder => "_build_type",
         lazy => true,
@@ -839,7 +815,6 @@ require "Mite/Attribute.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"type"} );
     };
-
     $ATTR{"coerce"} = Moose::Meta::Attribute->new( "coerce",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -869,7 +844,6 @@ require "Mite/Attribute.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"coerce"} );
     };
-
     $ATTR{"default"} = Moose::Meta::Attribute->new( "default",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -877,7 +851,14 @@ require "Mite/Attribute.pm";
         weak_ref => false,
         init_arg => "default",
         required => false,
-        type_constraint => do { require Types::Standard; Types::Standard::Item() },
+        type_constraint => do {
+            require Type::Tiny;
+            my $TYPE = Type::Tiny->new(
+                display_name => "Undef|Str|CodeRef|ScalarRef|Dict[]|Tuple[]",
+                constraint   => sub { do {  ((!defined($_)) or do {  defined($_) and do { ref(\$_) eq 'SCALAR' or ref(\(my $val = $_)) eq 'SCALAR' } } or (ref($_) eq 'CODE') or (ref($_) eq 'SCALAR' or ref($_) eq 'REF') or do {  (ref($_) eq 'HASH') and not(grep !/\A(?:)\z/, keys %{$_}) } or do {  (ref($_) eq 'ARRAY') and @{$_} == 0 }) } },
+            );
+            $TYPE;
+        },
         accessor => "default",
         predicate => "has_default",
         documentation => "We support more possibilities than Moose!",
@@ -911,7 +892,6 @@ require "Mite/Attribute.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"default"} );
     };
-
     $ATTR{"lazy"} = Moose::Meta::Attribute->new( "lazy",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -941,7 +921,6 @@ require "Mite/Attribute.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"lazy"} );
     };
-
     $ATTR{"coderef_default_variable"} = Moose::Meta::Attribute->new( "coderef_default_variable",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -971,7 +950,6 @@ require "Mite/Attribute.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"coderef_default_variable"} );
     };
-
     $ATTR{"trigger"} = Moose::Meta::Attribute->new( "trigger",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -979,7 +957,7 @@ require "Mite/Attribute.pm";
         weak_ref => false,
         init_arg => "trigger",
         required => false,
-        type_constraint => do { require Types::Standard; Types::Standard::Item() },
+        type_constraint => do { require Mite::Types; require Types::Standard; Mite::Types::MethodNameTemplate() | Mite::Types::One() | Types::Standard::CodeRef() },
         accessor => "trigger",
         predicate => "has_trigger",
     );
@@ -1012,7 +990,6 @@ require "Mite/Attribute.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"trigger"} );
     };
-
     $ATTR{"builder"} = Moose::Meta::Attribute->new( "builder",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -1020,7 +997,7 @@ require "Mite/Attribute.pm";
         weak_ref => false,
         init_arg => "builder",
         required => false,
-        type_constraint => do { require Types::Standard; Types::Standard::Item() },
+        type_constraint => do { require Mite::Types; require Types::Standard; Mite::Types::MethodNameTemplate() | Mite::Types::One() | Types::Standard::CodeRef() },
         accessor => "builder",
         predicate => "has_builder",
     );
@@ -1053,7 +1030,6 @@ require "Mite/Attribute.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"builder"} );
     };
-
     $ATTR{"clone"} = Moose::Meta::Attribute->new( "clone",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -1061,7 +1037,7 @@ require "Mite/Attribute.pm";
         weak_ref => false,
         init_arg => "clone",
         required => false,
-        type_constraint => do { require Types::Standard; Types::Standard::Item() },
+        type_constraint => do { require Mite::Types; require Types::Standard; Mite::Types::MethodNameTemplate() | Mite::Types::One() | Types::Standard::CodeRef() | Types::Standard::Undef() },
         reader => "cloner_method",
     );
     {
@@ -1081,7 +1057,6 @@ require "Mite/Attribute.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"clone"} );
     };
-
     $ATTR{"clone_on_read"} = Moose::Meta::Attribute->new( "clone_on_read",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -1112,7 +1087,6 @@ require "Mite/Attribute.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"clone_on_read"} );
     };
-
     $ATTR{"clone_on_write"} = Moose::Meta::Attribute->new( "clone_on_write",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -1143,7 +1117,6 @@ require "Mite/Attribute.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"clone_on_write"} );
     };
-
     $ATTR{"documentation"} = Moose::Meta::Attribute->new( "documentation",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -1183,7 +1156,6 @@ require "Mite/Attribute.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"documentation"} );
     };
-
     $ATTR{"handles"} = Moose::Meta::Attribute->new( "handles",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -1225,7 +1197,6 @@ require "Mite/Attribute.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"handles"} );
     };
-
     $ATTR{"alias"} = Moose::Meta::Attribute->new( "alias",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -1256,7 +1227,6 @@ require "Mite/Attribute.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"alias"} );
     };
-
     $ATTR{"alias_is_for"} = Moose::Meta::Attribute->new( "alias_is_for",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -1284,17 +1254,14 @@ require "Mite/Attribute.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"alias_is_for"} );
     };
-
-
+    Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( "Mite::Attribute" );
 }
 
 require "Mite/Class.pm";
 
 {
     my $PACKAGE = Moose::Meta::Class->initialize( "Mite::Class" );
-
     my %ATTR;
-
     $ATTR{"extends"} = Moose::Meta::Attribute->new( "extends",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -1302,7 +1269,7 @@ require "Mite/Class.pm";
         weak_ref => false,
         init_arg => "extends",
         required => false,
-        type_constraint => do { require Types::Standard; Types::Standard::Item() },
+        type_constraint => do { require Types::Standard; require Mite::Types; Types::Standard::ArrayRef()->parameterize( Mite::Types::ValidClassName() ) },
         accessor => "superclasses",
         default => $Mite::Class::__extends_DEFAULT__,
         lazy => false,
@@ -1325,7 +1292,6 @@ require "Mite/Class.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"extends"} );
     };
-
     $ATTR{"parents"} = Moose::Meta::Attribute->new( "parents",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -1333,7 +1299,7 @@ require "Mite/Class.pm";
         weak_ref => false,
         init_arg => "parents",
         required => false,
-        type_constraint => do { require Types::Standard; Types::Standard::Item() },
+        type_constraint => do { require Types::Standard; require Mite::Types; Types::Standard::ArrayRef()->parameterize( Mite::Types::MiteClass() ) },
         reader => "parents",
         clearer => "_clear_parents",
         builder => "_build_parents",
@@ -1368,17 +1334,14 @@ require "Mite/Class.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"parents"} );
     };
-
-
+    Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( "Mite::Class" );
 }
 
 require "Mite/Compiled.pm";
 
 {
     my $PACKAGE = Moose::Meta::Class->initialize( "Mite::Compiled" );
-
     my %ATTR;
-
     $ATTR{"file"} = Moose::Meta::Attribute->new( "file",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -1409,7 +1372,6 @@ require "Mite/Compiled.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"file"} );
     };
-
     $ATTR{"source"} = Moose::Meta::Attribute->new( "source",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -1463,17 +1425,14 @@ require "Mite/Compiled.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"source"} );
     };
-
-
+    Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( "Mite::Compiled" );
 }
 
 require "Mite/Config.pm";
 
 {
     my $PACKAGE = Moose::Meta::Class->initialize( "Mite::Config" );
-
     my %ATTR;
-
     $ATTR{"mite_dir_name"} = Moose::Meta::Attribute->new( "mite_dir_name",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -1503,7 +1462,6 @@ require "Mite/Config.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"mite_dir_name"} );
     };
-
     $ATTR{"mite_dir"} = Moose::Meta::Attribute->new( "mite_dir",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -1534,7 +1492,6 @@ require "Mite/Config.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"mite_dir"} );
     };
-
     $ATTR{"config_file"} = Moose::Meta::Attribute->new( "config_file",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -1565,7 +1522,6 @@ require "Mite/Config.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"config_file"} );
     };
-
     $ATTR{"data"} = Moose::Meta::Attribute->new( "data",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -1595,7 +1551,6 @@ require "Mite/Config.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"data"} );
     };
-
     $ATTR{"search_for_mite_dir"} = Moose::Meta::Attribute->new( "search_for_mite_dir",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -1625,25 +1580,21 @@ require "Mite/Config.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"search_for_mite_dir"} );
     };
-
-
+    Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( "Mite::Config" );
 }
 
 require "Mite/MakeMaker.pm";
 
 {
     my $PACKAGE = Moose::Meta::Class->initialize( "Mite::MakeMaker" );
-
-
+    Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( "Mite::MakeMaker" );
 }
 
 require "Mite/Project.pm";
 
 {
     my $PACKAGE = Moose::Meta::Class->initialize( "Mite::Project" );
-
     my %ATTR;
-
     $ATTR{"sources"} = Moose::Meta::Attribute->new( "sources",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -1651,7 +1602,7 @@ require "Mite/Project.pm";
         weak_ref => false,
         init_arg => "sources",
         required => false,
-        type_constraint => do { require Types::Standard; Types::Standard::Item() },
+        type_constraint => do { require Types::Standard; require Mite::Types; Types::Standard::HashRef()->parameterize( Mite::Types::MiteSource() ) },
         reader => "sources",
         default => $Mite::Project::__sources_DEFAULT__,
         lazy => false,
@@ -1673,7 +1624,6 @@ require "Mite/Project.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"sources"} );
     };
-
     $ATTR{"config"} = Moose::Meta::Attribute->new( "config",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -1703,7 +1653,6 @@ require "Mite/Project.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"config"} );
     };
-
     $ATTR{"_module_fakeout_namespace"} = Moose::Meta::Attribute->new( "_module_fakeout_namespace",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -1711,7 +1660,7 @@ require "Mite/Project.pm";
         weak_ref => false,
         init_arg => "_module_fakeout_namespace",
         required => false,
-        type_constraint => do { require Types::Standard; Types::Standard::Item() },
+        type_constraint => do { require Types::Standard; Types::Standard::Str() | Types::Standard::Undef() },
         accessor => "_module_fakeout_namespace",
     );
     {
@@ -1731,7 +1680,6 @@ require "Mite/Project.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"_module_fakeout_namespace"} );
     };
-
     $ATTR{"debug"} = Moose::Meta::Attribute->new( "debug",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -1761,17 +1709,14 @@ require "Mite/Project.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"debug"} );
     };
-
-
+    Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( "Mite::Project" );
 }
 
 require "Mite/Role.pm";
 
 {
     my $PACKAGE = Moose::Meta::Class->initialize( "Mite::Role" );
-
     my %ATTR;
-
     $ATTR{"attributes"} = Moose::Meta::Attribute->new( "attributes",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -1779,7 +1724,7 @@ require "Mite/Role.pm";
         weak_ref => false,
         init_arg => "attributes",
         required => false,
-        type_constraint => do { require Types::Standard; Types::Standard::Item() },
+        type_constraint => do { require Types::Standard; require Mite::Types; Types::Standard::HashRef()->parameterize( Mite::Types::MiteAttribute() ) },
         reader => "attributes",
         default => $Mite::Role::__attributes_DEFAULT__,
         lazy => false,
@@ -1801,7 +1746,6 @@ require "Mite/Role.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"attributes"} );
     };
-
     $ATTR{"name"} = Moose::Meta::Attribute->new( "name",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -1829,7 +1773,6 @@ require "Mite/Role.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"name"} );
     };
-
     $ATTR{"shim_name"} = Moose::Meta::Attribute->new( "shim_name",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -1859,7 +1802,6 @@ require "Mite/Role.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"shim_name"} );
     };
-
     $ATTR{"source"} = Moose::Meta::Attribute->new( "source",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -1887,7 +1829,6 @@ require "Mite/Role.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"source"} );
     };
-
     $ATTR{"roles"} = Moose::Meta::Attribute->new( "roles",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -1895,7 +1836,7 @@ require "Mite/Role.pm";
         weak_ref => false,
         init_arg => "roles",
         required => false,
-        type_constraint => do { require Types::Standard; Types::Standard::Item() },
+        type_constraint => do { require Types::Standard; require Mite::Types; Types::Standard::ArrayRef()->parameterize( Mite::Types::MiteRole() ) },
         reader => "roles",
         builder => "_build_roles",
         lazy => false,
@@ -1917,7 +1858,6 @@ require "Mite/Role.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"roles"} );
     };
-
     $ATTR{"imported_functions"} = Moose::Meta::Attribute->new( "imported_functions",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -1925,7 +1865,14 @@ require "Mite/Role.pm";
         weak_ref => false,
         init_arg => "imported_functions",
         required => false,
-        type_constraint => do { require Types::Standard; Types::Standard::Item() },
+        type_constraint => do {
+            require Type::Tiny;
+            my $TYPE = Type::Tiny->new(
+                display_name => "Map[MethodName,Str]",
+                constraint   => sub { do {  (ref($_) eq 'HASH') and do { my $ok = 1; for my $v (values %{$_}) { ($ok = 0, last) unless do {  defined($v) and do { ref(\$v) eq 'SCALAR' or ref(\(my $val = $v)) eq 'SCALAR' } } }; for my $k (keys %{$_}) { ($ok = 0, last) unless ((do {  defined($k) and do { ref(\$k) eq 'SCALAR' or ref(\(my $val = $k)) eq 'SCALAR' } }) && (do { local $_ = $k;  /\A[^\W0-9]\w*\z/  })) }; $ok } } },
+            );
+            $TYPE;
+        },
         reader => "imported_functions",
         builder => "_build_imported_functions",
         lazy => false,
@@ -1947,7 +1894,6 @@ require "Mite/Role.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"imported_functions"} );
     };
-
     $ATTR{"required_methods"} = Moose::Meta::Attribute->new( "required_methods",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -1955,7 +1901,7 @@ require "Mite/Role.pm";
         weak_ref => false,
         init_arg => "required_methods",
         required => false,
-        type_constraint => do { require Types::Standard; Types::Standard::Item() },
+        type_constraint => do { require Types::Standard; require Mite::Types; Types::Standard::ArrayRef()->parameterize( Mite::Types::MethodName() ) },
         reader => "required_methods",
         builder => "_build_required_methods",
         lazy => false,
@@ -1977,7 +1923,6 @@ require "Mite/Role.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"required_methods"} );
     };
-
     $ATTR{"method_signatures"} = Moose::Meta::Attribute->new( "method_signatures",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -1985,7 +1930,14 @@ require "Mite/Role.pm";
         weak_ref => false,
         init_arg => "method_signatures",
         required => false,
-        type_constraint => do { require Types::Standard; Types::Standard::Item() },
+        type_constraint => do {
+            require Type::Tiny;
+            my $TYPE = Type::Tiny->new(
+                display_name => "Map[MethodName,Mite::Signature]",
+                constraint   => sub { do {  (ref($_) eq 'HASH') and do { my $ok = 1; for my $v (values %{$_}) { ($ok = 0, last) unless (do { use Scalar::Util (); Scalar::Util::blessed($v) and $v->isa(q[Mite::Signature]) }) }; for my $k (keys %{$_}) { ($ok = 0, last) unless ((do {  defined($k) and do { ref(\$k) eq 'SCALAR' or ref(\(my $val = $k)) eq 'SCALAR' } }) && (do { local $_ = $k;  /\A[^\W0-9]\w*\z/  })) }; $ok } } },
+            );
+            $TYPE;
+        },
         reader => "method_signatures",
         builder => "_build_method_signatures",
         lazy => false,
@@ -2007,25 +1959,21 @@ require "Mite/Role.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"method_signatures"} );
     };
-
-
+    Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( "Mite::Role" );
 }
 
 require "Mite/Role/Tiny.pm";
 
 {
     my $PACKAGE = Moose::Meta::Class->initialize( "Mite::Role::Tiny" );
-
-
+    Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( "Mite::Role::Tiny" );
 }
 
 require "Mite/Signature.pm";
 
 {
     my $PACKAGE = Moose::Meta::Class->initialize( "Mite::Signature" );
-
     my %ATTR;
-
     $ATTR{"class"} = Moose::Meta::Attribute->new( "class",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -2053,7 +2001,6 @@ require "Mite/Signature.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"class"} );
     };
-
     $ATTR{"compiling_class"} = Moose::Meta::Attribute->new( "compiling_class",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -2090,7 +2037,6 @@ require "Mite/Signature.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"compiling_class"} );
     };
-
     $ATTR{"method_name"} = Moose::Meta::Attribute->new( "method_name",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -2118,7 +2064,6 @@ require "Mite/Signature.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"method_name"} );
     };
-
     $ATTR{"named"} = Moose::Meta::Attribute->new( "named",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -2126,7 +2071,20 @@ require "Mite/Signature.pm";
         weak_ref => false,
         init_arg => "named",
         required => false,
-        type_constraint => do { require Types::Standard; Types::Standard::Item() },
+        type_constraint => do {
+            require Type::Tiny;
+            my $TYPE = Type::Tiny->new(
+                display_name => "ArrayRef",
+                constraint   => sub { (ref($_) eq 'ARRAY') },
+            );
+            require Types::Standard;
+            $TYPE->coercion->add_type_coercions(
+                Types::Standard::Any(),
+                sub { ((ref($_) eq 'ARRAY')) ? $_ : ((ref($_) eq 'HASH')) ? scalar(do { [%$_] }) : $_ },
+            );
+            $TYPE->coercion->freeze;
+            $TYPE;
+        },
         reader => "named",
         predicate => "is_named",
     );
@@ -2159,7 +2117,6 @@ require "Mite/Signature.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"named"} );
     };
-
     $ATTR{"positional"} = Moose::Meta::Attribute->new( "positional",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -2210,7 +2167,6 @@ require "Mite/Signature.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"positional"} );
     };
-
     $ATTR{"method"} = Moose::Meta::Attribute->new( "method",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -2240,7 +2196,6 @@ require "Mite/Signature.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"method"} );
     };
-
     $ATTR{"head"} = Moose::Meta::Attribute->new( "head",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -2248,7 +2203,7 @@ require "Mite/Signature.pm";
         weak_ref => false,
         init_arg => "head",
         required => false,
-        type_constraint => do { require Types::Standard; Types::Standard::Item() },
+        type_constraint => do { require Types::Standard; Types::Standard::ArrayRef() | Types::Standard::Int() },
         reader => "head",
         builder => "_build_head",
         lazy => true,
@@ -2270,7 +2225,6 @@ require "Mite/Signature.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"head"} );
     };
-
     $ATTR{"tail"} = Moose::Meta::Attribute->new( "tail",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -2278,7 +2232,7 @@ require "Mite/Signature.pm";
         weak_ref => false,
         init_arg => "tail",
         required => false,
-        type_constraint => do { require Types::Standard; Types::Standard::Item() },
+        type_constraint => do { require Types::Standard; Types::Standard::ArrayRef() | Types::Standard::Int() },
         reader => "tail",
     );
     {
@@ -2298,7 +2252,6 @@ require "Mite/Signature.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"tail"} );
     };
-
     $ATTR{"named_to_list"} = Moose::Meta::Attribute->new( "named_to_list",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -2306,7 +2259,7 @@ require "Mite/Signature.pm";
         weak_ref => false,
         init_arg => "named_to_list",
         required => false,
-        type_constraint => do { require Types::Standard; Types::Standard::Item() },
+        type_constraint => do { require Types::Standard; Types::Standard::Bool() | Types::Standard::ArrayRef() },
         reader => "named_to_list",
         default => "",
         lazy => false,
@@ -2328,7 +2281,6 @@ require "Mite/Signature.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"named_to_list"} );
     };
-
     $ATTR{"compiler"} = Moose::Meta::Attribute->new( "compiler",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -2396,7 +2348,6 @@ require "Mite/Signature.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"compiler"} );
     };
-
     $ATTR{"should_bless"} = Moose::Meta::Attribute->new( "should_bless",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -2425,17 +2376,14 @@ require "Mite/Signature.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"should_bless"} );
     };
-
-
+    Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( "Mite::Signature" );
 }
 
 require "Mite/Source.pm";
 
 {
     my $PACKAGE = Moose::Meta::Class->initialize( "Mite::Source" );
-
     my %ATTR;
-
     $ATTR{"file"} = Moose::Meta::Attribute->new( "file",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -2464,7 +2412,6 @@ require "Mite/Source.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"file"} );
     };
-
     $ATTR{"classes"} = Moose::Meta::Attribute->new( "classes",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -2472,7 +2419,7 @@ require "Mite/Source.pm";
         weak_ref => false,
         init_arg => "classes",
         required => false,
-        type_constraint => do { require Types::Standard; Types::Standard::Item() },
+        type_constraint => do { require Types::Standard; require Mite::Types; Types::Standard::HashRef()->parameterize( Mite::Types::MiteClass() ) },
         reader => "classes",
         default => $Mite::Source::__classes_DEFAULT__,
         lazy => false,
@@ -2494,7 +2441,6 @@ require "Mite/Source.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"classes"} );
     };
-
     $ATTR{"class_order"} = Moose::Meta::Attribute->new( "class_order",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -2502,7 +2448,7 @@ require "Mite/Source.pm";
         weak_ref => false,
         init_arg => "class_order",
         required => false,
-        type_constraint => do { require Types::Standard; Types::Standard::Item() },
+        type_constraint => do { require Types::Standard; require Types::Common::String; Types::Standard::ArrayRef()->parameterize( Types::Common::String::NonEmptyStr() ) },
         reader => "class_order",
         default => $Mite::Source::__class_order_DEFAULT__,
         lazy => false,
@@ -2524,7 +2470,6 @@ require "Mite/Source.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"class_order"} );
     };
-
     $ATTR{"compiled"} = Moose::Meta::Attribute->new( "compiled",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -2554,7 +2499,6 @@ require "Mite/Source.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"compiled"} );
     };
-
     $ATTR{"project"} = Moose::Meta::Attribute->new( "project",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
@@ -2582,8 +2526,7 @@ require "Mite/Source.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"project"} );
     };
-
-
+    Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( "Mite::Source" );
 }
 
 Moose::Util::find_meta( "Mite::App::Command::clean" )->superclasses( "Mite::App::Command" );

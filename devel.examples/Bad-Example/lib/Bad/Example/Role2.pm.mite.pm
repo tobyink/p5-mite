@@ -1,10 +1,12 @@
 {
 package Bad::Example::Role2;
-our $USES_MITE = "Mite::Role";
-our $MITE_SHIM = "Bad::Example::Mite";
 use strict;
 use warnings;
 
+our $USES_MITE = "Mite::Role";
+our $MITE_SHIM = "Bad::Example::Mite";
+our $MITE_VERSION = "0.007006";
+# See UNIVERSAL
 sub DOES {
     my ( $self, $role ) = @_;
     our %DOES;
@@ -13,6 +15,7 @@ sub DOES {
     return $self->SUPER::DOES( $role );
 }
 
+# Alias for Moose/Moo-compatibility
 sub does {
     shift->DOES( @_ );
 }
