@@ -11,6 +11,7 @@ require "Mite/App.pm";
     $ATTR{"commands"} = Moose::Meta::Attribute->new( "commands",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/App.pm", line => "22", package => "Mite::App", toolkit => "Mite", type => "class" },
         is => "ro", 
         weak_ref => false,
         init_arg => "commands",
@@ -27,7 +28,7 @@ require "Mite/App.pm";
             name => "commands",
             body => \&Mite::App::commands,
             package_name => "Mite::App",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::App::commands", file => "lib/Mite/App.pm", line => "22", package => "Mite::App", toolkit => "Mite", type => "class" },
         );
         $ATTR{"commands"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -40,6 +41,7 @@ require "Mite/App.pm";
     $ATTR{"kingpin"} = Moose::Meta::Attribute->new( "kingpin",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/App.pm", line => "28", package => "Mite::App", toolkit => "Mite", type => "class" },
         is => "ro", 
         weak_ref => false,
         init_arg => "kingpin",
@@ -56,7 +58,7 @@ require "Mite/App.pm";
             name => "kingpin",
             body => \&Mite::App::kingpin,
             package_name => "Mite::App",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::App::kingpin", file => "lib/Mite/App.pm", line => "28", package => "Mite::App", toolkit => "Mite", type => "class" },
         );
         $ATTR{"kingpin"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -69,7 +71,6 @@ require "Mite/App.pm";
             curried_arguments => [],
             body => \&Mite::App::_parse_argv,
             package_name => "Mite::App",
-            definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"kingpin"}->associate_method( $DELEGATION );
         $PACKAGE->add_method( $DELEGATION->name, $DELEGATION );
@@ -82,6 +83,7 @@ require "Mite/App.pm";
     $ATTR{"project"} = Moose::Meta::Attribute->new( "project",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/App.pm", line => "36", package => "Mite::App", toolkit => "Mite", type => "class" },
         is => "ro", 
         weak_ref => false,
         init_arg => "project",
@@ -98,7 +100,7 @@ require "Mite/App.pm";
             name => "project",
             body => \&Mite::App::project,
             package_name => "Mite::App",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::App::project", file => "lib/Mite/App.pm", line => "36", package => "Mite::App", toolkit => "Mite", type => "class" },
         );
         $ATTR{"project"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -111,7 +113,6 @@ require "Mite/App.pm";
             curried_arguments => [],
             body => \&Mite::App::config,
             package_name => "Mite::App",
-            definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"project"}->associate_method( $DELEGATION );
         $PACKAGE->add_method( $DELEGATION->name, $DELEGATION );
@@ -132,6 +133,7 @@ require "Mite/App/Command.pm";
     $ATTR{"app"} = Moose::Meta::Attribute->new( "app",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/App/Command.pm", line => "11", package => "Mite::App::Command", toolkit => "Mite", type => "class" },
         is => "ro", 
         weak_ref => true,
         init_arg => "app",
@@ -146,7 +148,7 @@ require "Mite/App/Command.pm";
             name => "app",
             body => \&Mite::App::Command::app,
             package_name => "Mite::App::Command",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::App::Command::app", file => "lib/Mite/App/Command.pm", line => "11", package => "Mite::App::Command", toolkit => "Mite", type => "class" },
         );
         $ATTR{"app"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -159,7 +161,6 @@ require "Mite/App/Command.pm";
             curried_arguments => [],
             body => \&Mite::App::Command::config,
             package_name => "Mite::App::Command",
-            definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"app"}->associate_method( $DELEGATION );
         $PACKAGE->add_method( $DELEGATION->name, $DELEGATION );
@@ -172,7 +173,6 @@ require "Mite/App/Command.pm";
             curried_arguments => [],
             body => \&Mite::App::Command::kingpin,
             package_name => "Mite::App::Command",
-            definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"app"}->associate_method( $DELEGATION );
         $PACKAGE->add_method( $DELEGATION->name, $DELEGATION );
@@ -185,7 +185,6 @@ require "Mite/App/Command.pm";
             curried_arguments => [],
             body => \&Mite::App::Command::project,
             package_name => "Mite::App::Command",
-            definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"app"}->associate_method( $DELEGATION );
         $PACKAGE->add_method( $DELEGATION->name, $DELEGATION );
@@ -198,6 +197,7 @@ require "Mite/App/Command.pm";
     $ATTR{"kingpin_command"} = Moose::Meta::Attribute->new( "kingpin_command",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/App/Command.pm", line => "19", package => "Mite::App::Command", toolkit => "Mite", type => "class" },
         is => "ro", 
         weak_ref => false,
         init_arg => "kingpin_command",
@@ -214,7 +214,7 @@ require "Mite/App/Command.pm";
             name => "kingpin_command",
             body => \&Mite::App::Command::kingpin_command,
             package_name => "Mite::App::Command",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::App::Command::kingpin_command", file => "lib/Mite/App/Command.pm", line => "19", package => "Mite::App::Command", toolkit => "Mite", type => "class" },
         );
         $ATTR{"kingpin_command"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -263,6 +263,7 @@ require "Mite/Attribute.pm";
     $ATTR{"_order"} = Moose::Meta::Attribute->new( "_order",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Attribute.pm", line => "18", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         is => "rw", 
         weak_ref => false,
         init_arg => undef,
@@ -277,7 +278,7 @@ require "Mite/Attribute.pm";
             name => "_order",
             body => \&Mite::Attribute::_order,
             package_name => "Mite::Attribute",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "accessor Mite::Attribute::_order", file => "lib/Mite/Attribute.pm", line => "18", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         );
         $ATTR{"_order"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -287,9 +288,40 @@ require "Mite/Attribute.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"_order"} );
     };
+    $ATTR{"definition_context"} = Moose::Meta::Attribute->new( "definition_context",
+        __hack_no_process_options => true,
+        associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Attribute.pm", line => "20", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
+        is => "rw", 
+        weak_ref => false,
+        init_arg => "definition_context",
+        required => false,
+        type_constraint => do { require Types::Standard; Types::Standard::HashRef() },
+        accessor => "definition_context",
+        default => sub { {} },
+        lazy => false,
+    );
+    {
+        my $ACCESSOR = Moose::Meta::Method::Accessor->new(
+            accessor_type => 'accessor',
+            attribute => $ATTR{"definition_context"},
+            name => "definition_context",
+            body => \&Mite::Attribute::definition_context,
+            package_name => "Mite::Attribute",
+            definition_context => { context => "has declaration", description => "accessor Mite::Attribute::definition_context", file => "lib/Mite/Attribute.pm", line => "20", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
+        );
+        $ATTR{"definition_context"}->associate_method( $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
+    }
+    do {
+    	no warnings 'redefine';
+    	local *Moose::Meta::Attribute::install_accessors = sub {};
+    	$PACKAGE->add_attribute( $ATTR{"definition_context"} );
+    };
     $ATTR{"class"} = Moose::Meta::Attribute->new( "class",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Attribute.pm", line => "25", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         is => "rw", 
         weak_ref => true,
         init_arg => "class",
@@ -304,7 +336,7 @@ require "Mite/Attribute.pm";
             name => "class",
             body => \&Mite::Attribute::class,
             package_name => "Mite::Attribute",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "accessor Mite::Attribute::class", file => "lib/Mite/Attribute.pm", line => "25", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         );
         $ATTR{"class"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -317,6 +349,7 @@ require "Mite/Attribute.pm";
     $ATTR{"compiling_class"} = Moose::Meta::Attribute->new( "compiling_class",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Attribute.pm", line => "30", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         is => "rw", 
         weak_ref => false,
         init_arg => undef,
@@ -330,7 +363,7 @@ require "Mite/Attribute.pm";
             name => "compiling_class",
             body => \&Mite::Attribute::compiling_class,
             package_name => "Mite::Attribute",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "accessor Mite::Attribute::compiling_class", file => "lib/Mite/Attribute.pm", line => "30", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         );
         $ATTR{"compiling_class"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -340,7 +373,6 @@ require "Mite/Attribute.pm";
             name => "locally_set_compiling_class",
             body => \&Mite::Attribute::locally_set_compiling_class,
             package_name => "Mite::Attribute",
-            definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"compiling_class"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -353,6 +385,7 @@ require "Mite/Attribute.pm";
     $ATTR{"_class_for_default"} = Moose::Meta::Attribute->new( "_class_for_default",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Attribute.pm", line => "41", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         is => "rw", 
         weak_ref => true,
         init_arg => "_class_for_default",
@@ -369,7 +402,7 @@ require "Mite/Attribute.pm";
             name => "_class_for_default",
             body => \&Mite::Attribute::_class_for_default,
             package_name => "Mite::Attribute",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "accessor Mite::Attribute::_class_for_default", file => "lib/Mite/Attribute.pm", line => "41", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         );
         $ATTR{"_class_for_default"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -382,6 +415,7 @@ require "Mite/Attribute.pm";
     $ATTR{"name"} = Moose::Meta::Attribute->new( "name",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Attribute.pm", line => "43", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         is => "rw", 
         weak_ref => false,
         init_arg => "name",
@@ -396,7 +430,7 @@ require "Mite/Attribute.pm";
             name => "name",
             body => \&Mite::Attribute::name,
             package_name => "Mite::Attribute",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "accessor Mite::Attribute::name", file => "lib/Mite/Attribute.pm", line => "43", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         );
         $ATTR{"name"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -409,6 +443,7 @@ require "Mite/Attribute.pm";
     $ATTR{"init_arg"} = Moose::Meta::Attribute->new( "init_arg",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Attribute.pm", line => "52", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         is => "rw", 
         weak_ref => false,
         init_arg => "init_arg",
@@ -425,7 +460,7 @@ require "Mite/Attribute.pm";
             name => "init_arg",
             body => \&Mite::Attribute::init_arg,
             package_name => "Mite::Attribute",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "accessor Mite::Attribute::init_arg", file => "lib/Mite/Attribute.pm", line => "52", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         );
         $ATTR{"init_arg"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -438,6 +473,7 @@ require "Mite/Attribute.pm";
     $ATTR{"required"} = Moose::Meta::Attribute->new( "required",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Attribute.pm", line => "54", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         is => "rw", 
         weak_ref => false,
         init_arg => "required",
@@ -454,7 +490,7 @@ require "Mite/Attribute.pm";
             name => "required",
             body => \&Mite::Attribute::required,
             package_name => "Mite::Attribute",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "accessor Mite::Attribute::required", file => "lib/Mite/Attribute.pm", line => "54", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         );
         $ATTR{"required"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -467,6 +503,7 @@ require "Mite/Attribute.pm";
     $ATTR{"weak_ref"} = Moose::Meta::Attribute->new( "weak_ref",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Attribute.pm", line => "59", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         is => "rw", 
         weak_ref => false,
         init_arg => "weak_ref",
@@ -483,7 +520,7 @@ require "Mite/Attribute.pm";
             name => "weak_ref",
             body => \&Mite::Attribute::weak_ref,
             package_name => "Mite::Attribute",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "accessor Mite::Attribute::weak_ref", file => "lib/Mite/Attribute.pm", line => "59", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         );
         $ATTR{"weak_ref"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -496,6 +533,7 @@ require "Mite/Attribute.pm";
     $ATTR{"is"} = Moose::Meta::Attribute->new( "is",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Attribute.pm", line => "64", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         is => "rw", 
         weak_ref => false,
         init_arg => "is",
@@ -519,7 +557,7 @@ require "Mite/Attribute.pm";
             name => "is",
             body => \&Mite::Attribute::is,
             package_name => "Mite::Attribute",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "accessor Mite::Attribute::is", file => "lib/Mite/Attribute.pm", line => "64", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         );
         $ATTR{"is"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -532,6 +570,7 @@ require "Mite/Attribute.pm";
     $ATTR{"reader"} = Moose::Meta::Attribute->new( "reader",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Attribute.pm", line => "69", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         is => "rw", 
         weak_ref => false,
         init_arg => "reader",
@@ -548,7 +587,7 @@ require "Mite/Attribute.pm";
             name => "reader",
             body => \&Mite::Attribute::reader,
             package_name => "Mite::Attribute",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "accessor Mite::Attribute::reader", file => "lib/Mite/Attribute.pm", line => "69", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         );
         $ATTR{"reader"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -561,6 +600,7 @@ require "Mite/Attribute.pm";
     $ATTR{"writer"} = Moose::Meta::Attribute->new( "writer",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Attribute.pm", line => "69", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         is => "rw", 
         weak_ref => false,
         init_arg => "writer",
@@ -577,7 +617,7 @@ require "Mite/Attribute.pm";
             name => "writer",
             body => \&Mite::Attribute::writer,
             package_name => "Mite::Attribute",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "accessor Mite::Attribute::writer", file => "lib/Mite/Attribute.pm", line => "69", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         );
         $ATTR{"writer"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -590,6 +630,7 @@ require "Mite/Attribute.pm";
     $ATTR{"accessor"} = Moose::Meta::Attribute->new( "accessor",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Attribute.pm", line => "69", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         is => "rw", 
         weak_ref => false,
         init_arg => "accessor",
@@ -606,7 +647,7 @@ require "Mite/Attribute.pm";
             name => "accessor",
             body => \&Mite::Attribute::accessor,
             package_name => "Mite::Attribute",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "accessor Mite::Attribute::accessor", file => "lib/Mite/Attribute.pm", line => "69", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         );
         $ATTR{"accessor"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -619,6 +660,7 @@ require "Mite/Attribute.pm";
     $ATTR{"clearer"} = Moose::Meta::Attribute->new( "clearer",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Attribute.pm", line => "69", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         is => "rw", 
         weak_ref => false,
         init_arg => "clearer",
@@ -635,7 +677,7 @@ require "Mite/Attribute.pm";
             name => "clearer",
             body => \&Mite::Attribute::clearer,
             package_name => "Mite::Attribute",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "accessor Mite::Attribute::clearer", file => "lib/Mite/Attribute.pm", line => "69", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         );
         $ATTR{"clearer"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -648,6 +690,7 @@ require "Mite/Attribute.pm";
     $ATTR{"predicate"} = Moose::Meta::Attribute->new( "predicate",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Attribute.pm", line => "69", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         is => "rw", 
         weak_ref => false,
         init_arg => "predicate",
@@ -664,7 +707,7 @@ require "Mite/Attribute.pm";
             name => "predicate",
             body => \&Mite::Attribute::predicate,
             package_name => "Mite::Attribute",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "accessor Mite::Attribute::predicate", file => "lib/Mite/Attribute.pm", line => "69", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         );
         $ATTR{"predicate"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -677,6 +720,7 @@ require "Mite/Attribute.pm";
     $ATTR{"lvalue"} = Moose::Meta::Attribute->new( "lvalue",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Attribute.pm", line => "69", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         is => "rw", 
         weak_ref => false,
         init_arg => "lvalue",
@@ -693,7 +737,7 @@ require "Mite/Attribute.pm";
             name => "lvalue",
             body => \&Mite::Attribute::lvalue,
             package_name => "Mite::Attribute",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "accessor Mite::Attribute::lvalue", file => "lib/Mite/Attribute.pm", line => "69", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         );
         $ATTR{"lvalue"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -706,6 +750,7 @@ require "Mite/Attribute.pm";
     $ATTR{"local_writer"} = Moose::Meta::Attribute->new( "local_writer",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Attribute.pm", line => "69", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         is => "rw", 
         weak_ref => false,
         init_arg => "local_writer",
@@ -722,7 +767,7 @@ require "Mite/Attribute.pm";
             name => "local_writer",
             body => \&Mite::Attribute::local_writer,
             package_name => "Mite::Attribute",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "accessor Mite::Attribute::local_writer", file => "lib/Mite/Attribute.pm", line => "69", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         );
         $ATTR{"local_writer"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -735,6 +780,7 @@ require "Mite/Attribute.pm";
     $ATTR{"isa"} = Moose::Meta::Attribute->new( "isa",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Attribute.pm", line => "75", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         is => "bare", 
         weak_ref => false,
         init_arg => "isa",
@@ -749,7 +795,7 @@ require "Mite/Attribute.pm";
             name => "_isa",
             body => \&Mite::Attribute::_isa,
             package_name => "Mite::Attribute",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::Attribute::_isa", file => "lib/Mite/Attribute.pm", line => "75", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         );
         $ATTR{"isa"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -762,6 +808,7 @@ require "Mite/Attribute.pm";
     $ATTR{"does"} = Moose::Meta::Attribute->new( "does",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Attribute.pm", line => "80", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         is => "bare", 
         weak_ref => false,
         init_arg => "does",
@@ -776,7 +823,7 @@ require "Mite/Attribute.pm";
             name => "_does",
             body => \&Mite::Attribute::_does,
             package_name => "Mite::Attribute",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::Attribute::_does", file => "lib/Mite/Attribute.pm", line => "80", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         );
         $ATTR{"does"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -789,6 +836,7 @@ require "Mite/Attribute.pm";
     $ATTR{"type"} = Moose::Meta::Attribute->new( "type",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Attribute.pm", line => "85", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         is => "ro", 
         weak_ref => false,
         init_arg => "type",
@@ -805,7 +853,7 @@ require "Mite/Attribute.pm";
             name => "type",
             body => \&Mite::Attribute::type,
             package_name => "Mite::Attribute",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::Attribute::type", file => "lib/Mite/Attribute.pm", line => "85", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         );
         $ATTR{"type"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -818,6 +866,7 @@ require "Mite/Attribute.pm";
     $ATTR{"coerce"} = Moose::Meta::Attribute->new( "coerce",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Attribute.pm", line => "90", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         is => "rw", 
         weak_ref => false,
         init_arg => "coerce",
@@ -834,7 +883,7 @@ require "Mite/Attribute.pm";
             name => "coerce",
             body => \&Mite::Attribute::coerce,
             package_name => "Mite::Attribute",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "accessor Mite::Attribute::coerce", file => "lib/Mite/Attribute.pm", line => "90", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         );
         $ATTR{"coerce"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -847,6 +896,7 @@ require "Mite/Attribute.pm";
     $ATTR{"default"} = Moose::Meta::Attribute->new( "default",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Attribute.pm", line => "95", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         is => "rw", 
         weak_ref => false,
         init_arg => "default",
@@ -870,7 +920,7 @@ require "Mite/Attribute.pm";
             name => "default",
             body => \&Mite::Attribute::default,
             package_name => "Mite::Attribute",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "accessor Mite::Attribute::default", file => "lib/Mite/Attribute.pm", line => "95", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         );
         $ATTR{"default"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -882,7 +932,7 @@ require "Mite/Attribute.pm";
             name => "has_default",
             body => \&Mite::Attribute::has_default,
             package_name => "Mite::Attribute",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "predicate Mite::Attribute::has_default", file => "lib/Mite/Attribute.pm", line => "95", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         );
         $ATTR{"default"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -895,6 +945,7 @@ require "Mite/Attribute.pm";
     $ATTR{"lazy"} = Moose::Meta::Attribute->new( "lazy",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Attribute.pm", line => "101", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         is => "rw", 
         weak_ref => false,
         init_arg => "lazy",
@@ -911,7 +962,7 @@ require "Mite/Attribute.pm";
             name => "lazy",
             body => \&Mite::Attribute::lazy,
             package_name => "Mite::Attribute",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "accessor Mite::Attribute::lazy", file => "lib/Mite/Attribute.pm", line => "101", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         );
         $ATTR{"lazy"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -924,6 +975,7 @@ require "Mite/Attribute.pm";
     $ATTR{"coderef_default_variable"} = Moose::Meta::Attribute->new( "coderef_default_variable",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Attribute.pm", line => "113", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         is => "rw", 
         weak_ref => false,
         init_arg => "coderef_default_variable",
@@ -940,7 +992,7 @@ require "Mite/Attribute.pm";
             name => "coderef_default_variable",
             body => \&Mite::Attribute::coderef_default_variable,
             package_name => "Mite::Attribute",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "accessor Mite::Attribute::coderef_default_variable", file => "lib/Mite/Attribute.pm", line => "113", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         );
         $ATTR{"coderef_default_variable"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -953,6 +1005,7 @@ require "Mite/Attribute.pm";
     $ATTR{"trigger"} = Moose::Meta::Attribute->new( "trigger",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Attribute.pm", line => "115", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         is => "rw", 
         weak_ref => false,
         init_arg => "trigger",
@@ -968,7 +1021,7 @@ require "Mite/Attribute.pm";
             name => "trigger",
             body => \&Mite::Attribute::trigger,
             package_name => "Mite::Attribute",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "accessor Mite::Attribute::trigger", file => "lib/Mite/Attribute.pm", line => "115", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         );
         $ATTR{"trigger"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -980,7 +1033,7 @@ require "Mite/Attribute.pm";
             name => "has_trigger",
             body => \&Mite::Attribute::has_trigger,
             package_name => "Mite::Attribute",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "predicate Mite::Attribute::has_trigger", file => "lib/Mite/Attribute.pm", line => "115", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         );
         $ATTR{"trigger"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -993,6 +1046,7 @@ require "Mite/Attribute.pm";
     $ATTR{"builder"} = Moose::Meta::Attribute->new( "builder",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Attribute.pm", line => "115", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         is => "rw", 
         weak_ref => false,
         init_arg => "builder",
@@ -1008,7 +1062,7 @@ require "Mite/Attribute.pm";
             name => "builder",
             body => \&Mite::Attribute::builder,
             package_name => "Mite::Attribute",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "accessor Mite::Attribute::builder", file => "lib/Mite/Attribute.pm", line => "115", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         );
         $ATTR{"builder"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -1020,7 +1074,7 @@ require "Mite/Attribute.pm";
             name => "has_builder",
             body => \&Mite::Attribute::has_builder,
             package_name => "Mite::Attribute",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "predicate Mite::Attribute::has_builder", file => "lib/Mite/Attribute.pm", line => "115", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         );
         $ATTR{"builder"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -1033,6 +1087,7 @@ require "Mite/Attribute.pm";
     $ATTR{"clone"} = Moose::Meta::Attribute->new( "clone",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Attribute.pm", line => "120", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         is => "bare", 
         weak_ref => false,
         init_arg => "clone",
@@ -1047,7 +1102,7 @@ require "Mite/Attribute.pm";
             name => "cloner_method",
             body => \&Mite::Attribute::cloner_method,
             package_name => "Mite::Attribute",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::Attribute::cloner_method", file => "lib/Mite/Attribute.pm", line => "120", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         );
         $ATTR{"clone"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -1060,6 +1115,7 @@ require "Mite/Attribute.pm";
     $ATTR{"clone_on_read"} = Moose::Meta::Attribute->new( "clone_on_read",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Attribute.pm", line => "129", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         is => "ro", 
         weak_ref => false,
         init_arg => "clone_on_read",
@@ -1077,7 +1133,7 @@ require "Mite/Attribute.pm";
             name => "clone_on_read",
             body => \&Mite::Attribute::clone_on_read,
             package_name => "Mite::Attribute",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::Attribute::clone_on_read", file => "lib/Mite/Attribute.pm", line => "129", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         );
         $ATTR{"clone_on_read"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -1090,6 +1146,7 @@ require "Mite/Attribute.pm";
     $ATTR{"clone_on_write"} = Moose::Meta::Attribute->new( "clone_on_write",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Attribute.pm", line => "129", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         is => "ro", 
         weak_ref => false,
         init_arg => "clone_on_write",
@@ -1107,7 +1164,7 @@ require "Mite/Attribute.pm";
             name => "clone_on_write",
             body => \&Mite::Attribute::clone_on_write,
             package_name => "Mite::Attribute",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::Attribute::clone_on_write", file => "lib/Mite/Attribute.pm", line => "129", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         );
         $ATTR{"clone_on_write"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -1120,6 +1177,7 @@ require "Mite/Attribute.pm";
     $ATTR{"documentation"} = Moose::Meta::Attribute->new( "documentation",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Attribute.pm", line => "131", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         is => "rw", 
         weak_ref => false,
         init_arg => "documentation",
@@ -1134,7 +1192,7 @@ require "Mite/Attribute.pm";
             name => "documentation",
             body => \&Mite::Attribute::documentation,
             package_name => "Mite::Attribute",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "accessor Mite::Attribute::documentation", file => "lib/Mite/Attribute.pm", line => "131", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         );
         $ATTR{"documentation"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -1146,7 +1204,7 @@ require "Mite/Attribute.pm";
             name => "has_documentation",
             body => \&Mite::Attribute::has_documentation,
             package_name => "Mite::Attribute",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "predicate Mite::Attribute::has_documentation", file => "lib/Mite/Attribute.pm", line => "131", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         );
         $ATTR{"documentation"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -1159,6 +1217,7 @@ require "Mite/Attribute.pm";
     $ATTR{"handles"} = Moose::Meta::Attribute->new( "handles",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Attribute.pm", line => "135", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         is => "rw", 
         weak_ref => false,
         init_arg => "handles",
@@ -1175,7 +1234,7 @@ require "Mite/Attribute.pm";
             name => "handles",
             body => \&Mite::Attribute::handles,
             package_name => "Mite::Attribute",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "accessor Mite::Attribute::handles", file => "lib/Mite/Attribute.pm", line => "135", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         );
         $ATTR{"handles"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -1187,7 +1246,7 @@ require "Mite/Attribute.pm";
             name => "has_handles",
             body => \&Mite::Attribute::has_handles,
             package_name => "Mite::Attribute",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "predicate Mite::Attribute::has_handles", file => "lib/Mite/Attribute.pm", line => "135", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         );
         $ATTR{"handles"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -1200,6 +1259,7 @@ require "Mite/Attribute.pm";
     $ATTR{"alias"} = Moose::Meta::Attribute->new( "alias",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Attribute.pm", line => "145", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         is => "rw", 
         weak_ref => false,
         init_arg => "alias",
@@ -1217,7 +1277,7 @@ require "Mite/Attribute.pm";
             name => "alias",
             body => \&Mite::Attribute::alias,
             package_name => "Mite::Attribute",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "accessor Mite::Attribute::alias", file => "lib/Mite/Attribute.pm", line => "145", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         );
         $ATTR{"alias"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -1230,6 +1290,7 @@ require "Mite/Attribute.pm";
     $ATTR{"alias_is_for"} = Moose::Meta::Attribute->new( "alias_is_for",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Attribute.pm", line => "147", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         is => "ro", 
         weak_ref => false,
         init_arg => undef,
@@ -1244,7 +1305,7 @@ require "Mite/Attribute.pm";
             name => "alias_is_for",
             body => \&Mite::Attribute::alias_is_for,
             package_name => "Mite::Attribute",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::Attribute::alias_is_for", file => "lib/Mite/Attribute.pm", line => "147", package => "Mite::Attribute", toolkit => "Mite", type => "class" },
         );
         $ATTR{"alias_is_for"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -1265,6 +1326,7 @@ require "Mite/Class.pm";
     $ATTR{"extends"} = Moose::Meta::Attribute->new( "extends",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Class.pm", line => "32", package => "Mite::Class", toolkit => "Mite", type => "class" },
         is => "bare", 
         weak_ref => false,
         init_arg => "extends",
@@ -1282,7 +1344,7 @@ require "Mite/Class.pm";
             name => "superclasses",
             body => \&Mite::Class::superclasses,
             package_name => "Mite::Class",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "accessor Mite::Class::superclasses", file => "lib/Mite/Class.pm", line => "32", package => "Mite::Class", toolkit => "Mite", type => "class" },
         );
         $ATTR{"extends"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -1295,6 +1357,7 @@ require "Mite/Class.pm";
     $ATTR{"parents"} = Moose::Meta::Attribute->new( "parents",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Class.pm", line => "35", package => "Mite::Class", toolkit => "Mite", type => "class" },
         is => "ro", 
         weak_ref => false,
         init_arg => "parents",
@@ -1312,7 +1375,7 @@ require "Mite/Class.pm";
             name => "parents",
             body => \&Mite::Class::parents,
             package_name => "Mite::Class",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::Class::parents", file => "lib/Mite/Class.pm", line => "35", package => "Mite::Class", toolkit => "Mite", type => "class" },
         );
         $ATTR{"parents"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -1324,7 +1387,7 @@ require "Mite/Class.pm";
             name => "_clear_parents",
             body => \&Mite::Class::_clear_parents,
             package_name => "Mite::Class",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "clearer Mite::Class::_clear_parents", file => "lib/Mite/Class.pm", line => "35", package => "Mite::Class", toolkit => "Mite", type => "class" },
         );
         $ATTR{"parents"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -1345,6 +1408,7 @@ require "Mite/Compiled.pm";
     $ATTR{"file"} = Moose::Meta::Attribute->new( "file",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Compiled.pm", line => "23", package => "Mite::Compiled", toolkit => "Mite", type => "class" },
         is => "rw", 
         weak_ref => false,
         init_arg => "file",
@@ -1362,7 +1426,7 @@ require "Mite/Compiled.pm";
             name => "file",
             body => \&Mite::Compiled::file,
             package_name => "Mite::Compiled",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "accessor Mite::Compiled::file", file => "lib/Mite/Compiled.pm", line => "23", package => "Mite::Compiled", toolkit => "Mite", type => "class" },
         );
         $ATTR{"file"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -1375,6 +1439,7 @@ require "Mite/Compiled.pm";
     $ATTR{"source"} = Moose::Meta::Attribute->new( "source",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Compiled.pm", line => "25", package => "Mite::Compiled", toolkit => "Mite", type => "class" },
         is => "ro", 
         weak_ref => true,
         init_arg => "source",
@@ -1389,7 +1454,7 @@ require "Mite/Compiled.pm";
             name => "source",
             body => \&Mite::Compiled::source,
             package_name => "Mite::Compiled",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::Compiled::source", file => "lib/Mite/Compiled.pm", line => "25", package => "Mite::Compiled", toolkit => "Mite", type => "class" },
         );
         $ATTR{"source"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -1402,7 +1467,6 @@ require "Mite/Compiled.pm";
             curried_arguments => [],
             body => \&Mite::Compiled::class_order,
             package_name => "Mite::Compiled",
-            definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"source"}->associate_method( $DELEGATION );
         $PACKAGE->add_method( $DELEGATION->name, $DELEGATION );
@@ -1415,7 +1479,6 @@ require "Mite/Compiled.pm";
             curried_arguments => [],
             body => \&Mite::Compiled::classes,
             package_name => "Mite::Compiled",
-            definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"source"}->associate_method( $DELEGATION );
         $PACKAGE->add_method( $DELEGATION->name, $DELEGATION );
@@ -1436,6 +1499,7 @@ require "Mite/Config.pm";
     $ATTR{"mite_dir_name"} = Moose::Meta::Attribute->new( "mite_dir_name",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Config.pm", line => "11", package => "Mite::Config", toolkit => "Mite", type => "class" },
         is => "ro", 
         weak_ref => false,
         init_arg => "mite_dir_name",
@@ -1452,7 +1516,7 @@ require "Mite/Config.pm";
             name => "mite_dir_name",
             body => \&Mite::Config::mite_dir_name,
             package_name => "Mite::Config",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::Config::mite_dir_name", file => "lib/Mite/Config.pm", line => "11", package => "Mite::Config", toolkit => "Mite", type => "class" },
         );
         $ATTR{"mite_dir_name"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -1465,6 +1529,7 @@ require "Mite/Config.pm";
     $ATTR{"mite_dir"} = Moose::Meta::Attribute->new( "mite_dir",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Config.pm", line => "25", package => "Mite::Config", toolkit => "Mite", type => "class" },
         is => "ro", 
         weak_ref => false,
         init_arg => "mite_dir",
@@ -1482,7 +1547,7 @@ require "Mite/Config.pm";
             name => "mite_dir",
             body => \&Mite::Config::mite_dir,
             package_name => "Mite::Config",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::Config::mite_dir", file => "lib/Mite/Config.pm", line => "25", package => "Mite::Config", toolkit => "Mite", type => "class" },
         );
         $ATTR{"mite_dir"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -1495,6 +1560,7 @@ require "Mite/Config.pm";
     $ATTR{"config_file"} = Moose::Meta::Attribute->new( "config_file",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Config.pm", line => "35", package => "Mite::Config", toolkit => "Mite", type => "class" },
         is => "ro", 
         weak_ref => false,
         init_arg => "config_file",
@@ -1512,7 +1578,7 @@ require "Mite/Config.pm";
             name => "config_file",
             body => \&Mite::Config::config_file,
             package_name => "Mite::Config",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::Config::config_file", file => "lib/Mite/Config.pm", line => "35", package => "Mite::Config", toolkit => "Mite", type => "class" },
         );
         $ATTR{"config_file"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -1525,6 +1591,7 @@ require "Mite/Config.pm";
     $ATTR{"data"} = Moose::Meta::Attribute->new( "data",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Config.pm", line => "44", package => "Mite::Config", toolkit => "Mite", type => "class" },
         is => "rw", 
         weak_ref => false,
         init_arg => "data",
@@ -1541,7 +1608,7 @@ require "Mite/Config.pm";
             name => "data",
             body => \&Mite::Config::data,
             package_name => "Mite::Config",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "accessor Mite::Config::data", file => "lib/Mite/Config.pm", line => "44", package => "Mite::Config", toolkit => "Mite", type => "class" },
         );
         $ATTR{"data"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -1554,6 +1621,7 @@ require "Mite/Config.pm";
     $ATTR{"search_for_mite_dir"} = Moose::Meta::Attribute->new( "search_for_mite_dir",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Config.pm", line => "46", package => "Mite::Config", toolkit => "Mite", type => "class" },
         is => "rw", 
         weak_ref => false,
         init_arg => "search_for_mite_dir",
@@ -1570,7 +1638,7 @@ require "Mite/Config.pm";
             name => "search_for_mite_dir",
             body => \&Mite::Config::search_for_mite_dir,
             package_name => "Mite::Config",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "accessor Mite::Config::search_for_mite_dir", file => "lib/Mite/Config.pm", line => "46", package => "Mite::Config", toolkit => "Mite", type => "class" },
         );
         $ATTR{"search_for_mite_dir"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -1598,6 +1666,7 @@ require "Mite/Project.pm";
     $ATTR{"sources"} = Moose::Meta::Attribute->new( "sources",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Project.pm", line => "14", package => "Mite::Project", toolkit => "Mite", type => "class" },
         is => "ro", 
         weak_ref => false,
         init_arg => "sources",
@@ -1614,7 +1683,7 @@ require "Mite/Project.pm";
             name => "sources",
             body => \&Mite::Project::sources,
             package_name => "Mite::Project",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::Project::sources", file => "lib/Mite/Project.pm", line => "14", package => "Mite::Project", toolkit => "Mite", type => "class" },
         );
         $ATTR{"sources"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -1627,6 +1696,7 @@ require "Mite/Project.pm";
     $ATTR{"config"} = Moose::Meta::Attribute->new( "config",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Project.pm", line => "24", package => "Mite::Project", toolkit => "Mite", type => "class" },
         is => "ro", 
         weak_ref => false,
         init_arg => "config",
@@ -1643,7 +1713,7 @@ require "Mite/Project.pm";
             name => "config",
             body => \&Mite::Project::config,
             package_name => "Mite::Project",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::Project::config", file => "lib/Mite/Project.pm", line => "24", package => "Mite::Project", toolkit => "Mite", type => "class" },
         );
         $ATTR{"config"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -1656,6 +1726,7 @@ require "Mite/Project.pm";
     $ATTR{"_module_fakeout_namespace"} = Moose::Meta::Attribute->new( "_module_fakeout_namespace",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Project.pm", line => "26", package => "Mite::Project", toolkit => "Mite", type => "class" },
         is => "rw", 
         weak_ref => false,
         init_arg => "_module_fakeout_namespace",
@@ -1670,7 +1741,7 @@ require "Mite/Project.pm";
             name => "_module_fakeout_namespace",
             body => \&Mite::Project::_module_fakeout_namespace,
             package_name => "Mite::Project",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "accessor Mite::Project::_module_fakeout_namespace", file => "lib/Mite/Project.pm", line => "26", package => "Mite::Project", toolkit => "Mite", type => "class" },
         );
         $ATTR{"_module_fakeout_namespace"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -1683,6 +1754,7 @@ require "Mite/Project.pm";
     $ATTR{"debug"} = Moose::Meta::Attribute->new( "debug",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Project.pm", line => "30", package => "Mite::Project", toolkit => "Mite", type => "class" },
         is => "rw", 
         weak_ref => false,
         init_arg => "debug",
@@ -1699,7 +1771,7 @@ require "Mite/Project.pm";
             name => "debug",
             body => \&Mite::Project::debug,
             package_name => "Mite::Project",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "accessor Mite::Project::debug", file => "lib/Mite/Project.pm", line => "30", package => "Mite::Project", toolkit => "Mite", type => "class" },
         );
         $ATTR{"debug"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -1720,6 +1792,7 @@ require "Mite/Role.pm";
     $ATTR{"attributes"} = Moose::Meta::Attribute->new( "attributes",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Role.pm", line => "21", package => "Mite::Role", toolkit => "Mite", type => "class" },
         is => "ro", 
         weak_ref => false,
         init_arg => "attributes",
@@ -1736,7 +1809,7 @@ require "Mite/Role.pm";
             name => "attributes",
             body => \&Mite::Role::attributes,
             package_name => "Mite::Role",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::Role::attributes", file => "lib/Mite/Role.pm", line => "21", package => "Mite::Role", toolkit => "Mite", type => "class" },
         );
         $ATTR{"attributes"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -1749,6 +1822,7 @@ require "Mite/Role.pm";
     $ATTR{"name"} = Moose::Meta::Attribute->new( "name",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Role.pm", line => "23", package => "Mite::Role", toolkit => "Mite", type => "class" },
         is => "ro", 
         weak_ref => false,
         init_arg => "name",
@@ -1763,7 +1837,7 @@ require "Mite/Role.pm";
             name => "name",
             body => \&Mite::Role::name,
             package_name => "Mite::Role",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::Role::name", file => "lib/Mite/Role.pm", line => "23", package => "Mite::Role", toolkit => "Mite", type => "class" },
         );
         $ATTR{"name"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -1776,6 +1850,7 @@ require "Mite/Role.pm";
     $ATTR{"shim_name"} = Moose::Meta::Attribute->new( "shim_name",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Role.pm", line => "35", package => "Mite::Role", toolkit => "Mite", type => "class" },
         is => "rw", 
         weak_ref => false,
         init_arg => "shim_name",
@@ -1792,7 +1867,7 @@ require "Mite/Role.pm";
             name => "shim_name",
             body => \&Mite::Role::shim_name,
             package_name => "Mite::Role",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "accessor Mite::Role::shim_name", file => "lib/Mite/Role.pm", line => "35", package => "Mite::Role", toolkit => "Mite", type => "class" },
         );
         $ATTR{"shim_name"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -1805,6 +1880,7 @@ require "Mite/Role.pm";
     $ATTR{"source"} = Moose::Meta::Attribute->new( "source",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Role.pm", line => "37", package => "Mite::Role", toolkit => "Mite", type => "class" },
         is => "rw", 
         weak_ref => true,
         init_arg => "source",
@@ -1819,7 +1895,7 @@ require "Mite/Role.pm";
             name => "source",
             body => \&Mite::Role::source,
             package_name => "Mite::Role",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "accessor Mite::Role::source", file => "lib/Mite/Role.pm", line => "37", package => "Mite::Role", toolkit => "Mite", type => "class" },
         );
         $ATTR{"source"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -1832,6 +1908,7 @@ require "Mite/Role.pm";
     $ATTR{"roles"} = Moose::Meta::Attribute->new( "roles",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Role.pm", line => "46", package => "Mite::Role", toolkit => "Mite", type => "class" },
         is => "ro", 
         weak_ref => false,
         init_arg => "roles",
@@ -1848,7 +1925,7 @@ require "Mite/Role.pm";
             name => "roles",
             body => \&Mite::Role::roles,
             package_name => "Mite::Role",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::Role::roles", file => "lib/Mite/Role.pm", line => "46", package => "Mite::Role", toolkit => "Mite", type => "class" },
         );
         $ATTR{"roles"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -1861,6 +1938,7 @@ require "Mite/Role.pm";
     $ATTR{"imported_functions"} = Moose::Meta::Attribute->new( "imported_functions",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Role.pm", line => "51", package => "Mite::Role", toolkit => "Mite", type => "class" },
         is => "ro", 
         weak_ref => false,
         init_arg => "imported_functions",
@@ -1884,7 +1962,7 @@ require "Mite/Role.pm";
             name => "imported_functions",
             body => \&Mite::Role::imported_functions,
             package_name => "Mite::Role",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::Role::imported_functions", file => "lib/Mite/Role.pm", line => "51", package => "Mite::Role", toolkit => "Mite", type => "class" },
         );
         $ATTR{"imported_functions"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -1897,6 +1975,7 @@ require "Mite/Role.pm";
     $ATTR{"required_methods"} = Moose::Meta::Attribute->new( "required_methods",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Role.pm", line => "56", package => "Mite::Role", toolkit => "Mite", type => "class" },
         is => "ro", 
         weak_ref => false,
         init_arg => "required_methods",
@@ -1913,7 +1992,7 @@ require "Mite/Role.pm";
             name => "required_methods",
             body => \&Mite::Role::required_methods,
             package_name => "Mite::Role",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::Role::required_methods", file => "lib/Mite/Role.pm", line => "56", package => "Mite::Role", toolkit => "Mite", type => "class" },
         );
         $ATTR{"required_methods"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -1926,6 +2005,7 @@ require "Mite/Role.pm";
     $ATTR{"method_signatures"} = Moose::Meta::Attribute->new( "method_signatures",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Role.pm", line => "61", package => "Mite::Role", toolkit => "Mite", type => "class" },
         is => "ro", 
         weak_ref => false,
         init_arg => "method_signatures",
@@ -1949,7 +2029,7 @@ require "Mite/Role.pm";
             name => "method_signatures",
             body => \&Mite::Role::method_signatures,
             package_name => "Mite::Role",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::Role::method_signatures", file => "lib/Mite/Role.pm", line => "61", package => "Mite::Role", toolkit => "Mite", type => "class" },
         );
         $ATTR{"method_signatures"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -1977,6 +2057,7 @@ require "Mite/Signature.pm";
     $ATTR{"class"} = Moose::Meta::Attribute->new( "class",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Signature.pm", line => "11", package => "Mite::Signature", toolkit => "Mite", type => "class" },
         is => "ro", 
         weak_ref => true,
         init_arg => "class",
@@ -1991,7 +2072,7 @@ require "Mite/Signature.pm";
             name => "class",
             body => \&Mite::Signature::class,
             package_name => "Mite::Signature",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::Signature::class", file => "lib/Mite/Signature.pm", line => "11", package => "Mite::Signature", toolkit => "Mite", type => "class" },
         );
         $ATTR{"class"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -2004,6 +2085,7 @@ require "Mite/Signature.pm";
     $ATTR{"compiling_class"} = Moose::Meta::Attribute->new( "compiling_class",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Signature.pm", line => "16", package => "Mite::Signature", toolkit => "Mite", type => "class" },
         is => "rw", 
         weak_ref => false,
         init_arg => undef,
@@ -2017,7 +2099,7 @@ require "Mite/Signature.pm";
             name => "compiling_class",
             body => \&Mite::Signature::compiling_class,
             package_name => "Mite::Signature",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "accessor Mite::Signature::compiling_class", file => "lib/Mite/Signature.pm", line => "16", package => "Mite::Signature", toolkit => "Mite", type => "class" },
         );
         $ATTR{"compiling_class"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -2027,7 +2109,6 @@ require "Mite/Signature.pm";
             name => "locally_set_compiling_class",
             body => \&Mite::Signature::locally_set_compiling_class,
             package_name => "Mite::Signature",
-            definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"compiling_class"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -2040,6 +2121,7 @@ require "Mite/Signature.pm";
     $ATTR{"method_name"} = Moose::Meta::Attribute->new( "method_name",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Signature.pm", line => "22", package => "Mite::Signature", toolkit => "Mite", type => "class" },
         is => "ro", 
         weak_ref => false,
         init_arg => "method_name",
@@ -2054,7 +2136,7 @@ require "Mite/Signature.pm";
             name => "method_name",
             body => \&Mite::Signature::method_name,
             package_name => "Mite::Signature",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::Signature::method_name", file => "lib/Mite/Signature.pm", line => "22", package => "Mite::Signature", toolkit => "Mite", type => "class" },
         );
         $ATTR{"method_name"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -2067,6 +2149,7 @@ require "Mite/Signature.pm";
     $ATTR{"named"} = Moose::Meta::Attribute->new( "named",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Signature.pm", line => "27", package => "Mite::Signature", toolkit => "Mite", type => "class" },
         is => "ro", 
         weak_ref => false,
         init_arg => "named",
@@ -2095,7 +2178,7 @@ require "Mite/Signature.pm";
             name => "named",
             body => \&Mite::Signature::named,
             package_name => "Mite::Signature",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::Signature::named", file => "lib/Mite/Signature.pm", line => "27", package => "Mite::Signature", toolkit => "Mite", type => "class" },
         );
         $ATTR{"named"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -2107,7 +2190,7 @@ require "Mite/Signature.pm";
             name => "is_named",
             body => \&Mite::Signature::is_named,
             package_name => "Mite::Signature",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "predicate Mite::Signature::is_named", file => "lib/Mite/Signature.pm", line => "27", package => "Mite::Signature", toolkit => "Mite", type => "class" },
         );
         $ATTR{"named"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -2120,6 +2203,7 @@ require "Mite/Signature.pm";
     $ATTR{"positional"} = Moose::Meta::Attribute->new( "positional",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Signature.pm", line => "32", package => "Mite::Signature", toolkit => "Mite", type => "class" },
         is => "ro", 
         weak_ref => false,
         init_arg => "positional",
@@ -2135,7 +2219,7 @@ require "Mite/Signature.pm";
             name => "positional",
             body => \&Mite::Signature::positional,
             package_name => "Mite::Signature",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::Signature::positional", file => "lib/Mite/Signature.pm", line => "32", package => "Mite::Signature", toolkit => "Mite", type => "class" },
         );
         $ATTR{"positional"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -2147,7 +2231,7 @@ require "Mite/Signature.pm";
             name => "is_positional",
             body => \&Mite::Signature::is_positional,
             package_name => "Mite::Signature",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "predicate Mite::Signature::is_positional", file => "lib/Mite/Signature.pm", line => "32", package => "Mite::Signature", toolkit => "Mite", type => "class" },
         );
         $ATTR{"positional"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -2157,7 +2241,6 @@ require "Mite/Signature.pm";
             name => "pos",
             body => \&Mite::Signature::pos,
             package_name => "Mite::Signature",
-            definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"positional"}->associate_method( $ALIAS );
         $PACKAGE->add_method( $ALIAS->name, $ALIAS );
@@ -2170,6 +2253,7 @@ require "Mite/Signature.pm";
     $ATTR{"method"} = Moose::Meta::Attribute->new( "method",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Signature.pm", line => "38", package => "Mite::Signature", toolkit => "Mite", type => "class" },
         is => "ro", 
         weak_ref => false,
         init_arg => "method",
@@ -2186,7 +2270,7 @@ require "Mite/Signature.pm";
             name => "method",
             body => \&Mite::Signature::method,
             package_name => "Mite::Signature",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::Signature::method", file => "lib/Mite/Signature.pm", line => "38", package => "Mite::Signature", toolkit => "Mite", type => "class" },
         );
         $ATTR{"method"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -2199,6 +2283,7 @@ require "Mite/Signature.pm";
     $ATTR{"head"} = Moose::Meta::Attribute->new( "head",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Signature.pm", line => "46", package => "Mite::Signature", toolkit => "Mite", type => "class" },
         is => "ro", 
         weak_ref => false,
         init_arg => "head",
@@ -2215,7 +2300,7 @@ require "Mite/Signature.pm";
             name => "head",
             body => \&Mite::Signature::head,
             package_name => "Mite::Signature",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::Signature::head", file => "lib/Mite/Signature.pm", line => "46", package => "Mite::Signature", toolkit => "Mite", type => "class" },
         );
         $ATTR{"head"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -2228,6 +2313,7 @@ require "Mite/Signature.pm";
     $ATTR{"tail"} = Moose::Meta::Attribute->new( "tail",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Signature.pm", line => "48", package => "Mite::Signature", toolkit => "Mite", type => "class" },
         is => "ro", 
         weak_ref => false,
         init_arg => "tail",
@@ -2242,7 +2328,7 @@ require "Mite/Signature.pm";
             name => "tail",
             body => \&Mite::Signature::tail,
             package_name => "Mite::Signature",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::Signature::tail", file => "lib/Mite/Signature.pm", line => "48", package => "Mite::Signature", toolkit => "Mite", type => "class" },
         );
         $ATTR{"tail"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -2255,6 +2341,7 @@ require "Mite/Signature.pm";
     $ATTR{"named_to_list"} = Moose::Meta::Attribute->new( "named_to_list",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Signature.pm", line => "52", package => "Mite::Signature", toolkit => "Mite", type => "class" },
         is => "ro", 
         weak_ref => false,
         init_arg => "named_to_list",
@@ -2271,7 +2358,7 @@ require "Mite/Signature.pm";
             name => "named_to_list",
             body => \&Mite::Signature::named_to_list,
             package_name => "Mite::Signature",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::Signature::named_to_list", file => "lib/Mite/Signature.pm", line => "52", package => "Mite::Signature", toolkit => "Mite", type => "class" },
         );
         $ATTR{"named_to_list"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -2284,6 +2371,7 @@ require "Mite/Signature.pm";
     $ATTR{"compiler"} = Moose::Meta::Attribute->new( "compiler",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Signature.pm", line => "57", package => "Mite::Signature", toolkit => "Mite", type => "class" },
         is => "ro", 
         weak_ref => false,
         init_arg => undef,
@@ -2299,7 +2387,7 @@ require "Mite/Signature.pm";
             name => "compiler",
             body => \&Mite::Signature::compiler,
             package_name => "Mite::Signature",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::Signature::compiler", file => "lib/Mite/Signature.pm", line => "57", package => "Mite::Signature", toolkit => "Mite", type => "class" },
         );
         $ATTR{"compiler"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -2312,7 +2400,6 @@ require "Mite/Signature.pm";
             curried_arguments => [],
             body => \&Mite::Signature::has_head,
             package_name => "Mite::Signature",
-            definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"compiler"}->associate_method( $DELEGATION );
         $PACKAGE->add_method( $DELEGATION->name, $DELEGATION );
@@ -2325,7 +2412,6 @@ require "Mite/Signature.pm";
             curried_arguments => [],
             body => \&Mite::Signature::has_slurpy,
             package_name => "Mite::Signature",
-            definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"compiler"}->associate_method( $DELEGATION );
         $PACKAGE->add_method( $DELEGATION->name, $DELEGATION );
@@ -2338,7 +2424,6 @@ require "Mite/Signature.pm";
             curried_arguments => [],
             body => \&Mite::Signature::has_tail,
             package_name => "Mite::Signature",
-            definition_context => { toolkit => 'Mite' },
         );
         $ATTR{"compiler"}->associate_method( $DELEGATION );
         $PACKAGE->add_method( $DELEGATION->name, $DELEGATION );
@@ -2351,6 +2436,7 @@ require "Mite/Signature.pm";
     $ATTR{"should_bless"} = Moose::Meta::Attribute->new( "should_bless",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Signature.pm", line => "68", package => "Mite::Signature", toolkit => "Mite", type => "class" },
         is => "ro", 
         weak_ref => false,
         init_arg => undef,
@@ -2366,7 +2452,7 @@ require "Mite/Signature.pm";
             name => "should_bless",
             body => \&Mite::Signature::should_bless,
             package_name => "Mite::Signature",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::Signature::should_bless", file => "lib/Mite/Signature.pm", line => "68", package => "Mite::Signature", toolkit => "Mite", type => "class" },
         );
         $ATTR{"should_bless"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -2387,6 +2473,7 @@ require "Mite/Source.pm";
     $ATTR{"file"} = Moose::Meta::Attribute->new( "file",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Source.pm", line => "11", package => "Mite::Source", toolkit => "Mite", type => "class" },
         is => "ro", 
         weak_ref => false,
         init_arg => "file",
@@ -2402,7 +2489,7 @@ require "Mite/Source.pm";
             name => "file",
             body => \&Mite::Source::file,
             package_name => "Mite::Source",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::Source::file", file => "lib/Mite/Source.pm", line => "11", package => "Mite::Source", toolkit => "Mite", type => "class" },
         );
         $ATTR{"file"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -2415,6 +2502,7 @@ require "Mite/Source.pm";
     $ATTR{"classes"} = Moose::Meta::Attribute->new( "classes",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Source.pm", line => "20", package => "Mite::Source", toolkit => "Mite", type => "class" },
         is => "ro", 
         weak_ref => false,
         init_arg => "classes",
@@ -2431,7 +2519,7 @@ require "Mite/Source.pm";
             name => "classes",
             body => \&Mite::Source::classes,
             package_name => "Mite::Source",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::Source::classes", file => "lib/Mite/Source.pm", line => "20", package => "Mite::Source", toolkit => "Mite", type => "class" },
         );
         $ATTR{"classes"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -2444,6 +2532,7 @@ require "Mite/Source.pm";
     $ATTR{"class_order"} = Moose::Meta::Attribute->new( "class_order",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Source.pm", line => "25", package => "Mite::Source", toolkit => "Mite", type => "class" },
         is => "ro", 
         weak_ref => false,
         init_arg => "class_order",
@@ -2460,7 +2549,7 @@ require "Mite/Source.pm";
             name => "class_order",
             body => \&Mite::Source::class_order,
             package_name => "Mite::Source",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::Source::class_order", file => "lib/Mite/Source.pm", line => "25", package => "Mite::Source", toolkit => "Mite", type => "class" },
         );
         $ATTR{"class_order"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -2473,6 +2562,7 @@ require "Mite/Source.pm";
     $ATTR{"compiled"} = Moose::Meta::Attribute->new( "compiled",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Source.pm", line => "34", package => "Mite::Source", toolkit => "Mite", type => "class" },
         is => "ro", 
         weak_ref => false,
         init_arg => "compiled",
@@ -2489,7 +2579,7 @@ require "Mite/Source.pm";
             name => "compiled",
             body => \&Mite::Source::compiled,
             package_name => "Mite::Source",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "reader Mite::Source::compiled", file => "lib/Mite/Source.pm", line => "34", package => "Mite::Source", toolkit => "Mite", type => "class" },
         );
         $ATTR{"compiled"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -2502,6 +2592,7 @@ require "Mite/Source.pm";
     $ATTR{"project"} = Moose::Meta::Attribute->new( "project",
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/Mite/Source.pm", line => "36", package => "Mite::Source", toolkit => "Mite", type => "class" },
         is => "rw", 
         weak_ref => true,
         init_arg => "project",
@@ -2516,7 +2607,7 @@ require "Mite/Source.pm";
             name => "project",
             body => \&Mite::Source::project,
             package_name => "Mite::Source",
-            definition_context => { toolkit => 'Mite' },
+            definition_context => { context => "has declaration", description => "accessor Mite::Source::project", file => "lib/Mite/Source.pm", line => "36", package => "Mite::Source", toolkit => "Mite", type => "class" },
         );
         $ATTR{"project"}->associate_method( $ACCESSOR );
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );

@@ -17,6 +17,11 @@ has _order =>
   init_arg      => undef,
   builder       => sub { $order++ };
 
+has definition_context => 
+  is            => rw,
+  isa           => HashRef,
+  default       => \ '{}';
+
 has class =>
   is            => rw,
   isa           => MiteRole,
@@ -865,6 +870,16 @@ sub compile {
     return $code;
 }
 
+sub definition_context_to_string {
+    my $self = shift;
+    my %context = ( %{ $self->definition_context }, @_ );
+
+    return sprintf '{ %s }',
+        join q{, },
+        map sprintf( '%s => %s', $_, B::perlstring( $context{$_} ) ),
+        sort keys %context;
+}
+
 sub _compile_mop {
     my $self = shift;
 
@@ -879,6 +894,8 @@ sub _compile_mop {
     else {
         $opts_string .= $opts_indent . 'associated_role => $PACKAGE,';
     }
+
+    $opts_string .= $opts_indent . 'definition_context => ' . $self->definition_context_to_string . ',';
 
     {
         my %translate = ( ro => 'ro', rw => 'rw', rwp => 'ro', bare => 'bare', lazy => 'ro'  );
@@ -947,10 +964,11 @@ sub _compile_mop {
         my $name = $self->_expand_name( $self->$accessor );
         defined $name or next;
         my $qname = $self->_q( $name );
+        my $dfnctx = $self->definition_context_to_string( description => sprintf( '%s %s::%s', $accessor, $self->compiling_class->name, $name ) );
 
         $opts_string .= $opts_indent . sprintf( '%s => %s,', $accessor, $qname );
 
-        $accessors_code .= sprintf <<'CODE', $accessor, $self->_q_name, $qname, $self->compiling_class->name, $name, $self->_q($self->compiling_class->name), $self->_q_name;
+        $accessors_code .= sprintf <<'CODE', $accessor, $self->_q_name, $qname, $self->compiling_class->name, $name, $self->_q($self->compiling_class->name), $dfnctx, $self->_q_name;
 {
     my $ACCESSOR = Moose::Meta::Method::Accessor->new(
         accessor_type => '%s',
@@ -958,7 +976,7 @@ sub _compile_mop {
         name => %s,
         body => \&%s::%s,
         package_name => %s,
-        definition_context => { toolkit => 'Mite' },
+        definition_context => %s,
     );
     $ATTR{%s}->associate_method( $ACCESSOR );
     $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -977,7 +995,6 @@ CODE
         name => %s,
         body => \&%s::%s,
         package_name => %s,
-        definition_context => { toolkit => 'Mite' },
     );
     $ATTR{%s}->associate_method( $ACCESSOR );
     $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
@@ -1002,7 +1019,6 @@ CODE
         curried_arguments => [],
         body => \&%s::%s,
         package_name => %s,
-        definition_context => { toolkit => 'Mite' },
     );
     $ATTR{%s}->associate_method( $DELEGATION );
     $PACKAGE->add_method( $DELEGATION->name, $DELEGATION );
@@ -1022,7 +1038,6 @@ CODE
         name => %s,
         body => \&%s::%s,
         package_name => %s,
-        definition_context => { toolkit => 'Mite' },
     );
     $ATTR{%s}->associate_method( $ALIAS );
     $PACKAGE->add_method( $ALIAS->name, $ALIAS );

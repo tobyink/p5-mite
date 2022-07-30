@@ -97,6 +97,18 @@ signature_for inject_mite_functions => (
     named_to_list => true,
 );
 
+sub _definition_context {
+    my $level = shift;
+    my @info  = caller( $level );
+    return {
+        'toolkit' => 'Mite',
+        'package' => $info[0],
+        'file'    => $info[1],
+        'line'    => $info[2],
+        @_,
+    };
+}
+
 sub inject_mite_functions {
     my ( $self, $package, $file, $kind, $arg, $shim, $source, $pkg, $moresubs ) = @_;
     my $requested = sub { $arg->{$_[0]} ? 1 : $arg->{'!'.$_[0]} ? 0 : $arg->{'-all'} ? 1 : $_[1]; };
@@ -130,6 +142,7 @@ sub inject_mite_functions {
                 : ( is => ro, default => $default );
         }
         my %spec = @_;
+        $spec{definition_context} ||= _definition_context( 1, file => "$file", type => $kind, context => 'has declaration' );
 
         for my $name ( ref($names) ? @$names : $names ) {
            if( my $is_extension = $name =~ s{^\+}{} ) {
@@ -160,6 +173,7 @@ sub inject_mite_functions {
         my ( $names, %spec ) = @_;
         $spec{is} = ro unless exists $spec{is};
         $spec{required} = true unless exists $spec{required};
+        $spec{definition_context} ||= _definition_context( 1, file => "$file", type => $kind, context => 'param declaration' );
         $has->( $names, %spec );
     } if $requested->( param => 0 );
 
@@ -170,6 +184,7 @@ sub inject_mite_functions {
         if ( defined $spec{init_arg} and $spec{init_arg} !~ /^_/ ) {
             croak "A defined 'field.init_arg' must begin with an underscore: %s ", $spec{init_arg};
         }
+        $spec{definition_context} ||= _definition_context( 1, file => "$file", type => $kind, context => 'field declaration' );
         $has->( $names, %spec );
     } if $requested->( field => 0 );
 

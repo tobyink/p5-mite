@@ -37,6 +37,18 @@
         # Attribute _order
         $self->{"_order"} = $self->_build__order;
 
+        # Attribute definition_context (type: HashRef)
+        do {
+            my $value =
+              exists( $args->{"definition_context"} )
+              ? $args->{"definition_context"}
+              : {};
+            ( ref($value) eq 'HASH' )
+              or croak "Type check failed in constructor: %s should be %s",
+              "definition_context", "HashRef";
+            $self->{"definition_context"} = $value;
+        };
+
         # Attribute class (type: Mite::Role)
         if ( exists $args->{"class"} ) {
             blessed( $args->{"class"} ) && $args->{"class"}->isa("Mite::Role")
@@ -1459,7 +1471,7 @@
 
         # Unrecognized parameters
         my @unknown = grep not(
-/\A(?:_class_for_default|a(?:ccessor|lias)|builder|c(?:l(?:ass|earer|one(?:_on_(?:read|write))?)|o(?:deref_default_variable|erce))|d(?:efault|o(?:cumentation|es))|handles|i(?:nit_arg|sa?)|l(?:azy|ocal_writer|value)|name|predicate|re(?:ader|quired)|t(?:rigger|ype)|w(?:eak_ref|riter))\z/
+/\A(?:_class_for_default|a(?:ccessor|lias)|builder|c(?:l(?:ass|earer|one(?:_on_(?:read|write))?)|o(?:deref_default_variable|erce))|d(?:ef(?:ault|inition_context)|o(?:cumentation|es))|handles|i(?:nit_arg|sa?)|l(?:azy|ocal_writer|value)|name|predicate|re(?:ader|quired)|t(?:rigger|ype)|w(?:eak_ref|riter))\z/
         ), keys %{$args};
         @unknown
           and croak(
@@ -2349,6 +2361,19 @@
             $_[0];
           }
           : ( $_[0]{"default"} );
+    }
+
+    # Accessors for definition_context
+    sub definition_context {
+        @_ > 1
+          ? do {
+            ( ref( $_[1] ) eq 'HASH' )
+              or croak( "Type check failed in %s: value should be %s",
+                "accessor", "HashRef" );
+            $_[0]{"definition_context"} = $_[1];
+            $_[0];
+          }
+          : ( $_[0]{"definition_context"} );
     }
 
     # Accessors for documentation

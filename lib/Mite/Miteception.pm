@@ -21,7 +21,7 @@ sub import {
 		require Mite::Project;
 		Mite::Project->default->inject_mite_functions(
 			 package     => $caller,
-			 file        => $file,
+			 file        => $ENV{MITE_COMPILE_SELF},
 			 arg         => \%arg,
 			 kind        => ( $arg{'-role'} ? 'role' : 'class' ),
 			 shim        => 'Mite::Shim',
