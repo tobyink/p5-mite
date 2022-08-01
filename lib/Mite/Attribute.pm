@@ -9,12 +9,18 @@ our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.007006';
 
 use B ();
+use List::Util ();
 
 my $order = 0;
 has _order =>
   is            => rw,
   init_arg      => undef,
   builder       => sub { $order++ };
+
+has definition_context => 
+  is            => rw,
+  isa           => HashRef,
+  default       => \ '{}';
 
 has class =>
   is            => rw,
@@ -89,6 +95,7 @@ has coerce =>
 has default =>
   is            => rw,
   isa           => Undef | Str | CodeRef | ScalarRef | Dict[] | Tuple[],
+  documentation => 'We support more possibilities than Moose!',
   predicate     => true;
 
 has lazy =>
@@ -813,6 +820,7 @@ sub compile {
     }
 
     my $code = "# Accessors for $slot_name\n";
+    $code .= '# ' . $self->definition_context_to_pretty_string. "\n";
     if ( keys %want_xs ) {
         $code .= "if ( $xs_condition ) {\n";
         $code .= "    Class::XSAccessor->import(\n";
@@ -840,7 +848,8 @@ sub compile {
     $code .= "\n";
 
     if ( my $alias_is_for = $self->alias_is_for ) {
-        $code .= sprintf "# Aliases for for %s\n", $self->name;
+        $code .= sprintf "# Aliases for %s\n", $self->name;
+        $code .= '# ' . $self->definition_context_to_pretty_string. "\n";
         my $alias_target = $self->_expand_name( $self->$alias_is_for );
         for my $alias ( $self->_all_aliases ) {
             $code .= sprintf 'sub %s { shift->%s( @_ ) }' . "\n",
@@ -851,6 +860,7 @@ sub compile {
 
     if ( $self->has_handles ) {
         $code .= sprintf "# Delegated methods for %s\n", $self->name;
+        $code .= '# ' . $self->definition_context_to_pretty_string. "\n";
         my $assertion = $method_name{asserter};
         my %delegated = %{ $self->handles };
         for my $key ( sort keys %delegated ) {
@@ -861,6 +871,236 @@ sub compile {
     }
 
     return $code;
+}
+
+sub definition_context_to_string {
+    my $self = shift;
+    my %context = ( %{ $self->definition_context }, @_ );
+
+    return sprintf '{ %s }',
+        join q{, },
+        map sprintf( '%s => %s', $_, B::perlstring( $context{$_} ) ),
+        sort keys %context;
+}
+
+sub definition_context_to_pretty_string {
+    my $self = shift;
+    my %context = ( %{ $self->definition_context }, @_ );
+
+    return sprintf( '%s, file %s, line %d', $context{context}, $context{file}, $context{line} );
+}
+
+sub _compile_mop {
+    my $self = shift;
+
+    my $opts_string = '';
+    my $accessors_code = '';
+    my $opts_indent = "\n    ";
+
+    $opts_string .= $opts_indent . '__hack_no_process_options => true,';
+    if ( $self->compiling_class->isa('Mite::Class') ) {
+        $opts_string .= $opts_indent . 'associated_class => $PACKAGE,';
+    }
+    else {
+        $opts_string .= $opts_indent . 'associated_role => $PACKAGE,';
+    }
+
+    $opts_string .= $opts_indent . 'definition_context => ' . $self->definition_context_to_string . ',';
+
+    {
+        my %translate = ( ro => 'ro', rw => 'rw', rwp => 'ro', bare => 'bare', lazy => 'ro'  );
+        $opts_string .= $opts_indent . sprintf( 'is => "%s",', $translate{$self->is} || 'bare' );
+    }
+
+    $opts_string .= $opts_indent . sprintf( 'weak_ref => %s,', $self->weak_ref ? 'true' : 'false' );
+
+    {
+        my $init_arg = $self->init_arg;
+        if ( defined $init_arg ) {
+            $opts_string .= $opts_indent . sprintf( 'init_arg => %s,', $self->_q_init_arg );
+            $opts_string .= $opts_indent . sprintf( 'required => %s,', $self->required ? 'true' : 'false' );
+        }
+        else {
+            $opts_string .= $opts_indent . 'init_arg => undef,';
+        }
+    }
+
+    if ( my $type = $self->type ) {
+        # Easy case...
+        if ( $type->name and $type->library ) {
+            $opts_string .= $opts_indent . sprintf( 'type_constraint => do { require %s; %s::%s() },', $type->library, $type->library, $type->name );
+        }
+        elsif ( $type->isa( 'Type::Tiny::Union' ) and List::Util::all { $_->name and $_->library } @$type ) {
+            my $requires = join q{; }, List::Util::uniq( map sprintf( 'require %s', $_->library ), @$type );
+            my $union    = join q{ | }, List::Util::uniq( map sprintf( '%s::%s()', $_->library, $_->name ), @$type );
+            $opts_string .= $opts_indent . sprintf( 'type_constraint => do { %s; %s },', $requires, $union );
+        }
+        elsif ( $type->is_parameterized
+        and 1 == @{ $type->parameters }
+        and $type->parent->name
+        and $type->parent->library
+        and $type->type_parameter->name
+        and $type->type_parameter->library ) {
+            my $requires = join q{; }, List::Util::uniq( map sprintf( 'require %s', $_->library ), $type->parent, $type->type_parameter );
+            my $ptype    = sprintf( '%s::%s()->parameterize( %s::%s() )', $type->parent->library, $type->parent->name, $type->type_parameter->library, , $type->type_parameter->name );
+            $opts_string .= $opts_indent . sprintf( 'type_constraint => do { %s; %s },', $requires, $ptype );
+        }
+        else {
+            local $Type::Tiny::AvoidCallbacks = 1;
+            local $Type::Tiny::SafePackage = '';
+            $opts_string .= $opts_indent . 'type_constraint => do {';
+            $opts_string .= $opts_indent . '    require Type::Tiny;';
+            $opts_string .= $opts_indent . '    my $TYPE = Type::Tiny->new(';
+            $opts_string .= $opts_indent . sprintf '        display_name => %s,', B::perlstring( $type->display_name );
+            $opts_string .= $opts_indent . sprintf '        constraint   => sub { %s },', $type->inline_check( '$_' );
+            $opts_string .= $opts_indent . '    );';
+            if ( $type->has_coercion ) {
+                $opts_string .= $opts_indent . '    require Types::Standard;';
+                $opts_string .= $opts_indent . '    $TYPE->coercion->add_type_coercions(';
+                $opts_string .= $opts_indent . '        Types::Standard::Any(),';
+                $opts_string .= $opts_indent . sprintf '        sub { %s },', $type->coercion->inline_coercion( '$_' );
+                $opts_string .= $opts_indent . '    );';
+                $opts_string .= $opts_indent . '    $TYPE->coercion->freeze;';
+            }
+            $opts_string .= $opts_indent . '    $TYPE;';
+            $opts_string .= $opts_indent . '},';
+        }
+        if ( $type->has_coercion and $self->coerce ) {
+           $opts_string .= $opts_indent . 'coerce => true,';
+        }
+    }
+
+    for my $accessor ( qw/ reader writer accessor predicate clearer / ) {
+        my $name = $self->_expand_name( $self->$accessor );
+        defined $name or next;
+        my $qname = $self->_q( $name );
+        my $dfnctx = $self->definition_context_to_string( description => sprintf( '%s %s::%s', $accessor, $self->compiling_class->name, $name ) );
+
+        $opts_string .= $opts_indent . sprintf( '%s => %s,', $accessor, $qname );
+
+        $accessors_code .= sprintf <<'CODE', $accessor, $self->_q_name, $qname, $self->compiling_class->name, $name, $self->_q($self->compiling_class->name), $dfnctx, $self->_q_name;
+{
+    my $ACCESSOR = Moose::Meta::Method::Accessor->new(
+        accessor_type => '%s',
+        attribute => $ATTR{%s},
+        name => %s,
+        body => \&%s::%s,
+        package_name => %s,
+        definition_context => %s,
+    );
+    $ATTR{%s}->associate_method( $ACCESSOR );
+    $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
+}
+CODE
+    }
+
+    for my $accessor ( qw/ lvalue local_writer / ) {
+        my $name = $self->_expand_name( $self->$accessor );
+        defined $name or next;
+        my $qname = $self->_q( $name );
+
+        $accessors_code .= sprintf <<'CODE', $qname, $self->compiling_class->name, $name, $self->_q($self->compiling_class->name), $self->_q_name;
+{
+    my $ACCESSOR = Moose::Meta::Method->_new(
+        name => %s,
+        body => \&%s::%s,
+        package_name => %s,
+    );
+    $ATTR{%s}->associate_method( $ACCESSOR );
+    $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
+}
+CODE
+    }
+
+    {
+        my $h = $self->handles || {};
+        my $hstring = '';
+        for my $delegated ( sort keys %$h ) {
+            my $name = $self->_expand_name( $delegated );
+            my $qname = $self->_q( $name );
+            my $target = $h->{$delegated};
+            my $qtarget = $self->_q( $target );
+            $hstring .= ", $qname => $qtarget";
+
+            $accessors_code .= sprintf <<'CODE', $qname, $self->_q_name, $qtarget, $self->compiling_class->name, $name, $self->_q($self->compiling_class->name), $self->_q_name;
+{
+    my $DELEGATION = Moose::Meta::Method::Delegation->new(
+        name => %s,
+        attribute => $ATTR{%s},
+        delegate_to_method => %s,
+        curried_arguments => [],
+        body => \&%s::%s,
+        package_name => %s,
+    );
+    $ATTR{%s}->associate_method( $DELEGATION );
+    $PACKAGE->add_method( $DELEGATION->name, $DELEGATION );
+}
+CODE
+        }
+
+        if ( $hstring ) {
+            $hstring =~ s/^, //;
+            $opts_string .= $opts_indent . "handles => { $hstring },";
+        }
+    }
+
+    {
+        my @aliases = $self->_all_aliases;
+        for my $name ( sort @aliases ) {
+            my $qname = $self->_q( $name );
+
+            $accessors_code .= sprintf <<'CODE', $qname, $self->compiling_class->name, $name, $self->_q($self->compiling_class->name), $self->_q_name;
+{
+    my $ALIAS = Moose::Meta::Method->_new(
+        name => %s,
+        body => \&%s::%s,
+        package_name => %s,
+    );
+    $ATTR{%s}->associate_method( $ALIAS );
+    $PACKAGE->add_method( $ALIAS->name, $ALIAS );
+}
+CODE
+        }
+    }
+
+    if ( my $builder = $self->_expand_name( $self->builder ) ) {
+        $opts_string .= $opts_indent . sprintf( 'builder => %s,', $self->_q( $builder ) );
+    }
+    elsif ( $self->has_inline_default or $self->has_reference_default ) {
+        $opts_string .= $opts_indent . sprintf( 'default => sub { %s },', $self->_compile_default );
+    }
+    elsif ( $self->has_coderef_default ) {
+        $opts_string .= $opts_indent . sprintf( 'default => %s,', $self->coderef_default_variable );
+    }
+    elsif ( $self->has_default ) {
+        $opts_string .= $opts_indent . sprintf( 'default => %s,', $self->_compile_default );
+    }
+    if ( $self->has_default or $self->has_builder ) {
+        $opts_string .= $opts_indent . sprintf( 'lazy => %s,', $self->lazy ? 'true' : 'false' );
+    }
+
+    if ( my $trigger = $self->_expand_name( $self->trigger ) ) {
+        $opts_string .= $opts_indent . sprintf( 'trigger => sub { shift->%s( @_ ) },', $trigger );
+    }
+
+    if ( $self->has_documentation ) {
+        $opts_string .= $opts_indent . sprintf( 'documentation => %s,', $self->_q( $self->documentation ) );
+    }
+
+    if ( not $self->compiling_class->isa( 'Mite::Class' ) ) {
+        $accessors_code = sprintf "delete \$ATTR{%s}{original_options}{\$_} for qw( associated_role );\n",
+            $self->_q_name;
+    }
+
+    $opts_string .= "\n";
+    return sprintf <<'CODE', $self->_q_name, $self->compiling_class->_mop_attribute_metaclass, $self->_q_name, $opts_string, $accessors_code, $self->_q_name;
+$ATTR{%s} = %s->new( %s,%s);
+%sdo {
+	no warnings 'redefine';
+	local *Moose::Meta::Attribute::install_accessors = sub {};
+	$PACKAGE->add_attribute( $ATTR{%s} );
+};
+CODE
 }
 
 1;

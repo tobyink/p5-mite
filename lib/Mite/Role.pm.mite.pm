@@ -36,6 +36,7 @@
         my $no_build = delete $args->{__no_BUILD__};
 
         # Attribute attributes (type: HashRef[Mite::Attribute])
+        # has declaration, file lib/Mite/Role.pm, line 21
         do {
             my $value =
               exists( $args->{"attributes"} )
@@ -65,6 +66,7 @@
         };
 
         # Attribute name (type: ValidClassName)
+        # has declaration, file lib/Mite/Role.pm, line 23
         croak "Missing key in constructor: name" unless exists $args->{"name"};
         (
             (
@@ -89,6 +91,7 @@
         $self->{"name"} = $args->{"name"};
 
         # Attribute shim_name (type: ValidClassName)
+        # has declaration, file lib/Mite/Role.pm, line 35
         if ( exists $args->{"shim_name"} ) {
             (
                 (
@@ -115,6 +118,7 @@
         }
 
         # Attribute source (type: Mite::Source)
+        # has declaration, file lib/Mite/Role.pm, line 37
         if ( exists $args->{"source"} ) {
             blessed( $args->{"source"} )
               && $args->{"source"}->isa("Mite::Source")
@@ -126,6 +130,7 @@
           if ref $self->{"source"};
 
         # Attribute roles (type: ArrayRef[Mite::Role])
+        # has declaration, file lib/Mite/Role.pm, line 46
         do {
             my $value =
               exists( $args->{"roles"} )
@@ -155,6 +160,7 @@
         };
 
         # Attribute imported_functions (type: Map[MethodName,Str])
+        # has declaration, file lib/Mite/Role.pm, line 51
         do {
             my $value =
               exists( $args->{"imported_functions"} )
@@ -201,6 +207,7 @@
         };
 
         # Attribute required_methods (type: ArrayRef[MethodName])
+        # has declaration, file lib/Mite/Role.pm, line 56
         do {
             my $value =
               exists( $args->{"required_methods"} )
@@ -237,6 +244,7 @@
         };
 
         # Attribute method_signatures (type: Map[MethodName,Mite::Signature])
+        # has declaration, file lib/Mite/Role.pm, line 61
         do {
             my $value =
               exists( $args->{"method_signatures"} )
@@ -363,6 +371,7 @@
       && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
     # Accessors for attributes
+    # has declaration, file lib/Mite/Role.pm, line 21
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,
@@ -378,6 +387,7 @@
     }
 
     # Accessors for imported_functions
+    # has declaration, file lib/Mite/Role.pm, line 51
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,
@@ -394,6 +404,7 @@
     }
 
     # Accessors for method_signatures
+    # has declaration, file lib/Mite/Role.pm, line 61
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,
@@ -410,6 +421,7 @@
     }
 
     # Accessors for name
+    # has declaration, file lib/Mite/Role.pm, line 23
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,
@@ -425,6 +437,7 @@
     }
 
     # Accessors for required_methods
+    # has declaration, file lib/Mite/Role.pm, line 56
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,
@@ -441,6 +454,7 @@
     }
 
     # Accessors for roles
+    # has declaration, file lib/Mite/Role.pm, line 46
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,
@@ -456,6 +470,7 @@
     }
 
     # Accessors for shim_name
+    # has declaration, file lib/Mite/Role.pm, line 35
     sub shim_name {
         @_ > 1
           ? do {
@@ -520,6 +535,7 @@
     }
 
     # Accessors for source
+    # has declaration, file lib/Mite/Role.pm, line 37
     sub source {
         @_ > 1
           ? do {

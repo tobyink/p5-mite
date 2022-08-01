@@ -1,16 +1,11 @@
 {
-package Bad::Example::Class2;
+package MooseInteg::BaseClass;
 use strict;
 use warnings;
 
 our $USES_MITE = "Mite::Class";
-our $MITE_SHIM = "Bad::Example::Mite";
+our $MITE_SHIM = "MooseInteg::Mite";
 our $MITE_VERSION = "0.007006";
-
-BEGIN {
-    require Bad::Example::Role2;
-    our %DOES = ( "Bad::Example::Class2" => 1, "Bad::Example::Role2" => 1 );
-}
 
 # Standard Moose/Moo-style constructor
 sub new {
@@ -20,13 +15,15 @@ sub new {
     my $args  = $meta->{HAS_BUILDARGS} ? $class->BUILDARGS( @_ ) : { ( @_ == 1 ) ? %{$_[0]} : @_ };
     my $no_build = delete $args->{__no_BUILD__};
 
+    # Attribute foo (type: Int)
+    if ( exists $args->{"foo"} ) { (do { my $tmp = $args->{"foo"}; defined($tmp) and !ref($tmp) and $tmp =~ /\A-?[0-9]+\z/ }) or MooseInteg::Mite::croak "Type check failed in constructor: %s should be %s", "foo", "Int"; $self->{"foo"} = $args->{"foo"}; } ;
 
 
     # Call BUILD methods
     $self->BUILDALL( $args ) if ( ! $no_build and @{ $meta->{BUILD} || [] } );
 
     # Unrecognized parameters
-    my @unknown = grep not( do { package Bad::Example::Mite; defined($_) and do { ref(\$_) eq 'SCALAR' or ref(\(my $val = $_)) eq 'SCALAR' } } ), keys %{$args}; @unknown and Bad::Example::Mite::croak( "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
+    my @unknown = grep not( /\Afoo\z/ ), keys %{$args}; @unknown and MooseInteg::Mite::croak( "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
 
     return $self;
 }
@@ -78,6 +75,12 @@ sub __META__ {
     };
 }
 
+# Moose-compatibility method
+sub meta {
+    require MooseInteg::MOP;
+    Moose::Util::find_meta( $_[0] );
+}
+
 # See UNIVERSAL
 sub DOES {
     my ( $self, $role ) = @_;
@@ -91,6 +94,11 @@ sub DOES {
 sub does {
     shift->DOES( @_ );
 }
+
+my $__XS = !$ENV{MITE_PURE_PERL} && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
+
+# Accessors for foo
+sub foo { @_ > 1 ? do { (do { my $tmp = $_[1]; defined($tmp) and !ref($tmp) and $tmp =~ /\A-?[0-9]+\z/ }) or MooseInteg::Mite::croak( "Type check failed in %s: value should be %s", "accessor", "Int" ); $_[0]{"foo"} = $_[1]; $_[0]; } : ( $_[0]{"foo"} ) }
 
 
 1;

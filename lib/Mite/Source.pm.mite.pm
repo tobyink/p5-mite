@@ -36,6 +36,7 @@
         my $no_build = delete $args->{__no_BUILD__};
 
         # Attribute file (type: Path)
+        # has declaration, file lib/Mite/Source.pm, line 11
         croak "Missing key in constructor: file" unless exists $args->{"file"};
         do {
             my $coerced_value = do {
@@ -91,6 +92,7 @@
         };
 
         # Attribute classes (type: HashRef[Mite::Class])
+        # has declaration, file lib/Mite/Source.pm, line 20
         do {
             my $value =
               exists( $args->{"classes"} )
@@ -120,6 +122,7 @@
         };
 
         # Attribute class_order (type: ArrayRef[NonEmptyStr])
+        # has declaration, file lib/Mite/Source.pm, line 25
         do {
             my $value =
               exists( $args->{"class_order"} )
@@ -156,6 +159,7 @@
         };
 
         # Attribute compiled (type: Mite::Compiled)
+        # has declaration, file lib/Mite/Source.pm, line 34
         if ( exists $args->{"compiled"} ) {
             blessed( $args->{"compiled"} )
               && $args->{"compiled"}->isa("Mite::Compiled")
@@ -165,6 +169,7 @@
         }
 
         # Attribute project (type: Mite::Project)
+        # has declaration, file lib/Mite/Source.pm, line 36
         if ( exists $args->{"project"} ) {
             blessed( $args->{"project"} )
               && $args->{"project"}->isa("Mite::Project")
@@ -256,6 +261,7 @@
       && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
     # Accessors for class_order
+    # has declaration, file lib/Mite/Source.pm, line 25
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,
@@ -271,6 +277,7 @@
     }
 
     # Accessors for classes
+    # has declaration, file lib/Mite/Source.pm, line 20
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,
@@ -286,6 +293,7 @@
     }
 
     # Accessors for compiled
+    # has declaration, file lib/Mite/Source.pm, line 34
     sub compiled {
         @_ > 1
           ? croak("compiled is a read-only attribute of @{[ref $_[0]]}")
@@ -305,6 +313,7 @@
     }
 
     # Accessors for file
+    # has declaration, file lib/Mite/Source.pm, line 11
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,
@@ -320,6 +329,7 @@
     }
 
     # Accessors for project
+    # has declaration, file lib/Mite/Source.pm, line 36
     sub project {
         @_ > 1
           ? do {

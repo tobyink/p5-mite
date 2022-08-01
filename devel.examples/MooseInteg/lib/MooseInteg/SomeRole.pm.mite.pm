@@ -1,11 +1,37 @@
 {
-package Bad::Example::Role;
+package MooseInteg::SomeRole;
 use strict;
 use warnings;
 
 our $USES_MITE = "Mite::Role";
-our $MITE_SHIM = "Bad::Example::Mite";
+our $MITE_SHIM = "MooseInteg::Mite";
 our $MITE_VERSION = "0.007006";
+# Gather metadata for constructor and destructor
+sub __META__ {
+    no strict 'refs';
+    no warnings 'once';
+    my $class      = shift; $class = ref($class) || $class;
+    my $linear_isa = mro::get_linear_isa( $class );
+    return {
+        BUILD => [
+            map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
+            map { "$_\::BUILD" } reverse @$linear_isa
+        ],
+        DEMOLISH => [
+            map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
+            map { "$_\::DEMOLISH" } @$linear_isa
+        ],
+        HAS_BUILDARGS => $class->can('BUILDARGS'),
+        HAS_FOREIGNBUILDARGS => $class->can('FOREIGNBUILDARGS'),
+    };
+}
+
+# Moose-compatibility method
+sub meta {
+    require MooseInteg::MOP;
+    Moose::Util::find_meta( $_[0] );
+}
+
 # See UNIVERSAL
 sub DOES {
     my ( $self, $role ) = @_;
@@ -35,18 +61,18 @@ sub __FINALIZE_APPLICATION__ {
     return if $type ne 'Mite::Class';
 
     my @missing_methods;
-    @missing_methods = grep( !$target->can($_), "missing" )
-        and Bad::Example::Mite::croak( "$me requires $target to implement methods: " . join q[, ], @missing_methods );
+    @missing_methods = grep( !$target->can($_), "number" )
+        and MooseInteg::Mite::croak( "$me requires $target to implement methods: " . join q[, ], @missing_methods );
 
     my @roles = (  );
     my %nextargs = %{ $args || {} };
     ( $nextargs{-indirect} ||= 0 )++;
-    Bad::Example::Mite::croak( "PANIC!" ) if $nextargs{-indirect} > 100;
+    MooseInteg::Mite::croak( "PANIC!" ) if $nextargs{-indirect} > 100;
     for my $role ( @roles ) {
         $role->__FINALIZE_APPLICATION__( $target, { %nextargs } );
     }
 
-    my $shim = "Bad::Example::Mite";
+    my $shim = "MooseInteg::Mite";
     for my $modifier_rule ( @METHOD_MODIFIERS ) {
         my ( $modification, $names, $coderef ) = @$modifier_rule;
         $shim->$modification( $target, $names, $coderef );

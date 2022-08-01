@@ -97,6 +97,18 @@ signature_for inject_mite_functions => (
     named_to_list => true,
 );
 
+sub _definition_context {
+    my $level = shift;
+    my @info  = caller( $level );
+    return {
+        'toolkit' => 'Mite',
+        'package' => $info[0],
+        'file'    => $info[1],
+        'line'    => $info[2],
+        @_,
+    };
+}
+
 sub inject_mite_functions {
     my ( $self, $package, $file, $kind, $arg, $shim, $source, $pkg, $moresubs ) = @_;
     my $requested = sub { $arg->{$_[0]} ? 1 : $arg->{'!'.$_[0]} ? 0 : $arg->{'-all'} ? 1 : $_[1]; };
@@ -130,6 +142,7 @@ sub inject_mite_functions {
                 : ( is => ro, default => $default );
         }
         my %spec = @_;
+        $spec{definition_context} ||= _definition_context( 1, file => "$file", type => $kind, context => 'has declaration' );
 
         for my $name ( ref($names) ? @$names : $names ) {
            if( my $is_extension = $name =~ s{^\+}{} ) {
@@ -160,6 +173,7 @@ sub inject_mite_functions {
         my ( $names, %spec ) = @_;
         $spec{is} = ro unless exists $spec{is};
         $spec{required} = true unless exists $spec{required};
+        $spec{definition_context} ||= _definition_context( 1, file => "$file", type => $kind, context => 'param declaration' );
         $has->( $names, %spec );
     } if $requested->( param => 0 );
 
@@ -170,6 +184,7 @@ sub inject_mite_functions {
         if ( defined $spec{init_arg} and $spec{init_arg} !~ /^_/ ) {
             croak "A defined 'field.init_arg' must begin with an underscore: %s ", $spec{init_arg};
         }
+        $spec{definition_context} ||= _definition_context( 1, file => "$file", type => $kind, context => 'field declaration' );
         $has->( $names, %spec );
     } if $requested->( field => 0 );
 
@@ -264,6 +279,59 @@ sub write_mites {
     return;
 }
 
+sub _project_mopper_file {
+    my $self = shift;
+
+    my $config = $self->config;
+    my $mop_package = $config->data->{mop} or return;
+    my $mop_dir = $config->data->{source_from};
+
+    my $mop_file = $mop_package;
+    $mop_file =~ s{::}{/}g;
+    $mop_file .= ".pm";
+    return Path::Tiny::path($mop_dir, $mop_file);
+}
+
+sub write_mopper {
+    my $self = shift;
+
+    my $mop_file = $self->_project_mopper_file or return;
+
+    my $dir = Path::Tiny::path( $self->config->data->{source_from} );
+
+    my $code = $self->_compile_mop_header;
+    for my $source ( sort { $a->file cmp $b->file } values %{ $self->sources } ) {
+        my $relative_name = $source->file->relative($dir);
+        $code .= $source->_compile_mop( $relative_name );
+    }
+    for my $class ( sort { $a->name cmp $b->name } values %{ $self->classes } ) {
+        $code .= $class->_compile_mop_postamble;
+    }
+
+    if ( my $yuck = $self->_module_fakeout_namespace ) {
+        $code =~ s/$yuck\:://g;
+    }
+
+    $code .= "\ntrue;\n\n";
+
+    warn "Write MOP: $mop_file\n" if $self->debug;
+    $mop_file->spew( $code );
+
+    return;
+}
+
+sub _compile_mop_header {
+    return sprintf <<'CODE', shift->config->data->{mop};
+package %s;
+
+use Moose ();
+use Moose::Util ();
+use Moose::Util::TypeConstraints ();
+use constant { true => !!1, false => !!0 };
+
+CODE
+}
+
 signature_for load_files => (
     pos => [ ArrayRef, 0 ],
 );
@@ -283,6 +351,12 @@ sub load_files {
 
 sub _load_file {
     my ( $self, $file, $inc_dir ) = @_;
+
+    if ( defined $self->_project_mopper_file
+    and $file eq $self->_project_mopper_file ) {
+        warn "Skipping $file: it's the mop\n" if $self->debug;
+        return;
+    }
 
     warn "Load module: $file\n" if $self->debug;
 

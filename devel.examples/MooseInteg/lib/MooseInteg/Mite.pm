@@ -5,7 +5,7 @@ use warnings;
 # NOTE: Since the intention is to ship this file with a project, this file
 # cannot have any non-core dependencies.
 
-package Bad::Example::Mite;
+package MooseInteg::Mite;
 
 # Constants
 sub true  () { !!1 }
@@ -329,7 +329,7 @@ __END__
 
 =head1 NAME
 
-Bad::Example::Mite - shim to load .mite.pm files
+MooseInteg::Mite - shim to load .mite.pm files
 
 =head1 DESCRIPTION
 

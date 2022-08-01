@@ -85,6 +85,24 @@ sub class_for {
     return $self->classes->{$name};
 }
 
+sub _compile_mop {
+    my ( $self, $name ) = @_;
+
+    my $joined = join "\n",
+        map { $self->classes->{$_}->_compile_mop }
+        @{ $self->class_order };
+
+    while ( $joined =~ /\n\n/ ) {
+        $joined =~ s/\n\n/\n/g;
+    }
+
+    return sprintf <<'CODE', B::perlstring( "$name" ), $joined;
+require %s;
+
+%s
+CODE
+}
+
 1;
 
 __END__

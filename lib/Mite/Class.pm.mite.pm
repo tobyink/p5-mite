@@ -44,6 +44,7 @@
         my $no_build = delete $args->{__no_BUILD__};
 
         # Attribute attributes (type: HashRef[Mite::Attribute])
+        # has declaration, file lib/Mite/Role.pm, line 21
         do {
             my $value =
               exists( $args->{"attributes"} )
@@ -73,6 +74,7 @@
         };
 
         # Attribute name (type: ValidClassName)
+        # has declaration, file lib/Mite/Role.pm, line 23
         croak "Missing key in constructor: name" unless exists $args->{"name"};
         (
             (
@@ -97,6 +99,7 @@
         $self->{"name"} = $args->{"name"};
 
         # Attribute shim_name (type: ValidClassName)
+        # has declaration, file lib/Mite/Role.pm, line 35
         if ( exists $args->{"shim_name"} ) {
             (
                 (
@@ -123,6 +126,7 @@
         }
 
         # Attribute source (type: Mite::Source)
+        # has declaration, file lib/Mite/Role.pm, line 37
         if ( exists $args->{"source"} ) {
             blessed( $args->{"source"} )
               && $args->{"source"}->isa("Mite::Source")
@@ -134,6 +138,7 @@
           if ref $self->{"source"};
 
         # Attribute roles (type: ArrayRef[Mite::Role])
+        # has declaration, file lib/Mite/Role.pm, line 46
         do {
             my $value =
               exists( $args->{"roles"} )
@@ -163,6 +168,7 @@
         };
 
         # Attribute imported_functions (type: Map[MethodName,Str])
+        # has declaration, file lib/Mite/Role.pm, line 51
         do {
             my $value =
               exists( $args->{"imported_functions"} )
@@ -209,6 +215,7 @@
         };
 
         # Attribute required_methods (type: ArrayRef[MethodName])
+        # has declaration, file lib/Mite/Role.pm, line 56
         do {
             my $value =
               exists( $args->{"required_methods"} )
@@ -245,6 +252,7 @@
         };
 
         # Attribute method_signatures (type: Map[MethodName,Mite::Signature])
+        # has declaration, file lib/Mite/Role.pm, line 61
         do {
             my $value =
               exists( $args->{"method_signatures"} )
@@ -291,6 +299,7 @@
         };
 
         # Attribute extends (type: ArrayRef[ValidClassName])
+        # has declaration, file lib/Mite/Class.pm, line 32
         do {
             my $value =
               exists( $args->{"extends"} )
@@ -334,6 +343,7 @@
         };
 
         # Attribute parents (type: ArrayRef[Mite::Class])
+        # has declaration, file lib/Mite/Class.pm, line 35
         if ( exists $args->{"parents"} ) {
             (
                 do { package Mite::Shim; ref( $args->{"parents"} ) eq 'ARRAY' }
@@ -389,6 +399,7 @@
       && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
     # Accessors for extends
+    # has declaration, file lib/Mite/Class.pm, line 32
     sub superclasses {
         @_ > 1
           ? do {
@@ -434,6 +445,7 @@
     }
 
     # Accessors for parents
+    # has declaration, file lib/Mite/Class.pm, line 35
     sub _clear_parents { delete $_[0]{"parents"}; $_[0]; }
 
     sub parents {

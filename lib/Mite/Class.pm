@@ -448,6 +448,8 @@ sub _compile_init_attributes {
         if ( @lines ) {
             push @code, sprintf "# Attribute %s%s",
                $attr->name, $attr->type ? sprintf( ' (type: %s)', $attr->type->display_name ) : '';
+            push @code, sprintf '# %s',
+               $attr->definition_context_to_pretty_string;
             push @code, @lines;
             push @code, '';
         }
@@ -469,6 +471,41 @@ sub _compile_attribute_accessors {
     }
 
     return $code;
+}
+
+sub _mop_metaclass {
+    return 'Moose::Meta::Class';
+}
+
+sub _mop_attribute_metaclass {
+   return 'Moose::Meta::Attribute';
+}
+
+sub _compile_mop_postamble {
+    my $self = shift;
+
+    my $code = $self->SUPER::_compile_mop_postamble( @_ );
+
+    my @superclasses = @{ $self->superclasses || [] }
+        or return $code;
+    $code .= sprintf "Moose::Util::find_meta( %s )->superclasses( %s );\n",
+        B::perlstring( $self->name ),
+        join q{, }, map B::perlstring( $_ ), @superclasses;
+
+    return $code;
+}
+
+sub _compile_mop_required_methods {
+    return '';  # classes don't care
+}
+
+sub _compile_mop_modifiers {
+    return '';  # classes don't care
+}
+
+sub _compile_mop_tc {
+    return sprintf '    Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( %s );',
+        B::perlstring( shift->name );
 }
 
 1;

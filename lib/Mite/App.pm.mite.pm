@@ -36,6 +36,7 @@
         my $no_build = delete $args->{__no_BUILD__};
 
         # Attribute commands (type: HashRef[Object])
+        # has declaration, file lib/Mite/App.pm, line 22
         do {
             my $value =
               exists( $args->{"commands"} ) ? $args->{"commands"} : {};
@@ -64,6 +65,7 @@
         };
 
         # Attribute kingpin (type: Object)
+        # has declaration, file lib/Mite/App.pm, line 28
         if ( exists $args->{"kingpin"} ) {
             blessed( $args->{"kingpin"} )
               or croak "Type check failed in constructor: %s should be %s",
@@ -72,6 +74,7 @@
         }
 
         # Attribute project (type: Mite::Project)
+        # has declaration, file lib/Mite/App.pm, line 36
         if ( exists $args->{"project"} ) {
             blessed( $args->{"project"} )
               && $args->{"project"}->isa("Mite::Project")
@@ -160,6 +163,7 @@
       && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
     # Accessors for commands
+    # has declaration, file lib/Mite/App.pm, line 22
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,
@@ -175,6 +179,7 @@
     }
 
     # Accessors for kingpin
+    # has declaration, file lib/Mite/App.pm, line 28
     sub _assert_blessed_kingpin {
         my $object = do {
             (
@@ -211,9 +216,11 @@
     }
 
     # Delegated methods for kingpin
+    # has declaration, file lib/Mite/App.pm, line 28
     sub _parse_argv { shift->_assert_blessed_kingpin->parse(@_) }
 
     # Accessors for project
+    # has declaration, file lib/Mite/App.pm, line 36
     sub _assert_blessed_project {
         my $object = do {
             (
@@ -252,6 +259,7 @@
     }
 
     # Delegated methods for project
+    # has declaration, file lib/Mite/App.pm, line 36
     sub config { shift->_assert_blessed_project->config(@_) }
 
     1;

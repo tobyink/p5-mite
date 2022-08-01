@@ -56,7 +56,7 @@ jobs:
       matrix:
         os: ['ubuntu-latest' ]
         perl: [ '5.10.1', '5.12', '5.34', '5.36' ]
-        demo: [ 'Acme-Mitey-Cards', 'Bad-Example', 'Your-Project' ]
+        demo: [ 'Acme-Mitey-Cards', 'Bad-Example', 'MooseInteg', 'Your-Project' ]
     steps:
       - name: Get dist artifact
         uses: actions/download-artifact@v2
@@ -75,6 +75,10 @@ jobs:
         run: |
           cpanm -n setenv Class::XSAccessor Perl::Tidy Test2::V0
           cpanm -n --installdeps ./build
+      - name: Install Moose
+        if: matrix.demo == 'MooseInteg'
+        run: |
+          cpanm -n Moose
       - name: Configure Mite
         working-directory: ./build/
         run: perl Makefile.PL

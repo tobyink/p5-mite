@@ -108,6 +108,8 @@ sub _native_methods {
             or delete $methods{$name};
     }
 
+    delete $methods{meta};
+
     return \%methods;
 }
 
@@ -302,6 +304,7 @@ sub compilation_stages {
         _compile_uses_mite
         _compile_imported_functions
         _compile_with
+        _compile_meta_method
         _compile_does
         _compile_composed_methods
         _compile_method_signatures
@@ -424,7 +427,9 @@ CODE
 }
 
 sub _compile_meta_method {
-    return <<'CODE';
+    my $self = shift;
+
+    my $code = <<'CODE';
 # Gather metadata for constructor and destructor
 sub __META__ {
     no strict 'refs';
@@ -445,6 +450,19 @@ sub __META__ {
     };
 }
 CODE
+
+    if ( $self->project->config->data->{mop} ) {
+        $code .= sprintf <<'CODE', $self->project->config->data->{mop};
+
+# Moose-compatibility method
+sub meta {
+    require %s;
+    Moose::Util::find_meta( ref $_[0] or $_[0] );
+}
+CODE
+    }
+
+    return $code;
 }
 
 sub _compile_method_signatures {
@@ -528,6 +546,100 @@ sub __FINALIZE_APPLICATION__ {
     return;
 }
 CODE
+}
+
+sub _mop_metaclass {
+    return 'Moose::Meta::Role';
+}
+
+sub _mop_attribute_metaclass {
+   return 'Moose::Meta::Role::Attribute';
+}
+
+sub _compile_mop {
+    my $self = shift;
+
+    return sprintf <<'CODE', $self->_mop_metaclass, B::perlstring( $self->name ), B::perlstring( $self->name ), $self->_compile_mop_attributes, $self->_compile_mop_required_methods, $self->_compile_mop_modifiers, $self->_compile_mop_methods, $self->_compile_mop_tc;
+{
+    my $PACKAGE = %s->initialize( %s, package => %s );
+
+%s
+%s
+%s
+%s
+%s
+}
+CODE
+}
+
+sub _compile_mop_attributes {
+    my $self = shift;
+
+    my $code = '';
+
+    my @attrs =
+        sort { $a->_order <=> $b->_order }
+        values %{ $self->attributes };
+    if ( @attrs ) {
+        $code .= "    my \%ATTR;\n\n";
+        for my $attr ( @attrs ) {
+            my $guard = $attr->locally_set_compiling_class( $self );
+            my $attr_code = $attr->_compile_mop;
+            $attr_code =~ s/^/    /gm;
+            $code .= $attr_code . "\n";
+        }
+    }
+
+    return $code;
+}
+
+sub _compile_mop_modifiers {
+    my $self = shift;
+
+    return sprintf <<'CODE', $self->name;
+    for ( @%s::METHOD_MODIFIERS ) {
+        my ( $type, $names, $code ) = @$_;
+        $PACKAGE->${\"add_$type\_method_modifier"}( $_, $code ) for @$names;
+    }
+CODE
+}
+
+sub _compile_mop_methods {
+    my $self = shift;
+    return sprintf <<'CODE', $self->name, B::perlstring( $self->name );
+    $PACKAGE->add_method(
+        "meta" => Moose::Meta::Method::Meta->_new(
+            name => "meta",
+            body => \&%s::meta,
+            package_name => %s,
+        ),
+    );
+CODE
+}
+
+sub _compile_mop_required_methods {
+    my $self = shift;
+    my $code = '';
+    if ( my @req = @{ $self->required_methods } ) {
+        $code .= sprintf "    \$PACKAGE->add_required_methods( %s );\n", 
+            join( q{, }, map B::perlstring( $_ ), @req ),
+    }
+    return $code;
+}
+
+sub _compile_mop_postamble {
+    my $self = shift;
+    my $code = '';
+    for my $role ( @{ $self->roles } ) {
+        $code .= sprintf "\$PACKAGE->add_role( Moose::Util::find_meta( %s ) );\n",
+            B::perlstring( $role->name );
+    }
+    return $code;
+}
+
+sub _compile_mop_tc {
+    return sprintf '    Moose::Util::TypeConstraints::find_or_create_does_type_constraint( %s );',
+        B::perlstring( shift->name );
 }
 
 1;

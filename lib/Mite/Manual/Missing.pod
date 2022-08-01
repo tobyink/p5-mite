@@ -30,10 +30,6 @@ this will add an extra dependency to your project.
     
     1;
 
-=head2 The Meta-Object Protocol
-
-Upgrade to L<Moose> if you need this.
-
 =head2 Run-Time Class/Role Building
 
 Your constructor, destructor, and accessors are build on the developer's

@@ -36,6 +36,7 @@
         my $no_build = delete $args->{__no_BUILD__};
 
         # Attribute app (type: Object)
+        # has declaration, file lib/Mite/App/Command.pm, line 11
         croak "Missing key in constructor: app" unless exists $args->{"app"};
         blessed( $args->{"app"} )
           or croak "Type check failed in constructor: %s should be %s", "app",
@@ -45,6 +46,7 @@
           if ref $self->{"app"};
 
         # Attribute kingpin_command (type: Object)
+        # has declaration, file lib/Mite/App/Command.pm, line 19
         if ( exists $args->{"kingpin_command"} ) {
             blessed( $args->{"kingpin_command"} )
               or croak "Type check failed in constructor: %s should be %s",
@@ -131,6 +133,7 @@
       && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
     # Accessors for app
+    # has declaration, file lib/Mite/App/Command.pm, line 11
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,
@@ -152,11 +155,13 @@
     }
 
     # Delegated methods for app
+    # has declaration, file lib/Mite/App/Command.pm, line 11
     sub config  { shift->_assert_blessed_app->config(@_) }
     sub kingpin { shift->_assert_blessed_app->kingpin(@_) }
     sub project { shift->_assert_blessed_app->project(@_) }
 
     # Accessors for kingpin_command
+    # has declaration, file lib/Mite/App/Command.pm, line 19
     sub kingpin_command {
         @_ > 1
           ? croak("kingpin_command is a read-only attribute of @{[ref $_[0]]}")
