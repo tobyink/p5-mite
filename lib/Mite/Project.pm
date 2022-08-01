@@ -282,7 +282,7 @@ sub write_mites {
 sub _project_mopper_file {
     my $self = shift;
 
-    my $config = $self->config;
+    my $config = eval { $self->config } or return;
     my $mop_package = $config->data->{mop} or return;
     my $mop_dir = $config->data->{source_from};
 
