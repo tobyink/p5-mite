@@ -2,7 +2,6 @@
 compiled_to: lib
 project: Mite
 shim: Mite::Shim
-mop: Mite::MOP
 source_from: lib
 dogfood: 1
 perltidy: 1
