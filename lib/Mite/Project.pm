@@ -312,6 +312,8 @@ sub write_mopper {
         $code =~ s/$yuck\:://g;
     }
 
+    $code .= "\ntrue;\n\n";
+
     warn "Write MOP: $mop_file\n" if $self->debug;
     $mop_file->spew( $code );
 
@@ -319,7 +321,9 @@ sub write_mopper {
 }
 
 sub _compile_mop_header {
-    return <<'CODE';
+    return sprintf <<'CODE', shift->config->data->{mop};
+package %s;
+
 use Moose ();
 use Moose::Util ();
 use Moose::Util::TypeConstraints ();

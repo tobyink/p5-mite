@@ -142,6 +142,12 @@
         };
     }
 
+    # Moose-compatibility method
+    sub meta {
+        require Mite::MOP;
+        Moose::Util::find_meta( ref $_[0] or $_[0] );
+    }
+
     # See UNIVERSAL
     sub DOES {
         my ( $self, $role ) = @_;

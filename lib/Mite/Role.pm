@@ -457,7 +457,7 @@ CODE
 # Moose-compatibility method
 sub meta {
     require %s;
-    Moose::Util::find_meta( $_[0] );
+    Moose::Util::find_meta( ref $_[0] or $_[0] );
 }
 CODE
     }

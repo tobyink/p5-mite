@@ -1,3 +1,5 @@
+package Mite::MOP;
+
 use Moose ();
 use Moose::Util ();
 use Moose::Util::TypeConstraints ();
@@ -6,7 +8,7 @@ use constant { true => !!1, false => !!0 };
 require "Mite/App.pm";
 
 {
-    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::App" );
+    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::App", package => "Mite::App" );
     my %ATTR;
     $ATTR{"commands"} = Moose::Meta::Attribute->new( "commands",
         __hack_no_process_options => true,
@@ -48,6 +50,7 @@ require "Mite/App.pm";
         required => false,
         type_constraint => do { require Types::Standard; Types::Standard::Object() },
         reader => "kingpin",
+        handles => { "_parse_argv" => "parse" },
         builder => "_build_kingpin",
         lazy => true,
     );
@@ -90,6 +93,7 @@ require "Mite/App.pm";
         required => false,
         type_constraint => do { require Mite::Types; Mite::Types::MiteProject() },
         reader => "project",
+        handles => { "config" => "config" },
         builder => "_build_project",
         lazy => true,
     );
@@ -122,13 +126,20 @@ require "Mite/App.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"project"} );
     };
+    $PACKAGE->add_method(
+        "meta" => Moose::Meta::Method::Meta->_new(
+            name => "meta",
+            body => \&Mite::App::meta,
+            package_name => "Mite::App",
+        ),
+    );
     Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( "Mite::App" );
 }
 
 require "Mite/App/Command.pm";
 
 {
-    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::App::Command" );
+    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::App::Command", package => "Mite::App::Command" );
     my %ATTR;
     $ATTR{"app"} = Moose::Meta::Attribute->new( "app",
         __hack_no_process_options => true,
@@ -140,6 +151,7 @@ require "Mite/App/Command.pm";
         required => true,
         type_constraint => do { require Types::Standard; Types::Standard::Object() },
         reader => "app",
+        handles => { "config" => "config", "kingpin" => "kingpin", "project" => "project" },
     );
     {
         my $ACCESSOR = Moose::Meta::Method::Accessor->new(
@@ -224,41 +236,76 @@ require "Mite/App/Command.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"kingpin_command"} );
     };
+    $PACKAGE->add_method(
+        "meta" => Moose::Meta::Method::Meta->_new(
+            name => "meta",
+            body => \&Mite::App::Command::meta,
+            package_name => "Mite::App::Command",
+        ),
+    );
     Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( "Mite::App::Command" );
 }
 
 require "Mite/App/Command/clean.pm";
 
 {
-    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::App::Command::clean" );
+    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::App::Command::clean", package => "Mite::App::Command::clean" );
+    $PACKAGE->add_method(
+        "meta" => Moose::Meta::Method::Meta->_new(
+            name => "meta",
+            body => \&Mite::App::Command::clean::meta,
+            package_name => "Mite::App::Command::clean",
+        ),
+    );
     Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( "Mite::App::Command::clean" );
 }
 
 require "Mite/App/Command/compile.pm";
 
 {
-    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::App::Command::compile" );
+    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::App::Command::compile", package => "Mite::App::Command::compile" );
+    $PACKAGE->add_method(
+        "meta" => Moose::Meta::Method::Meta->_new(
+            name => "meta",
+            body => \&Mite::App::Command::compile::meta,
+            package_name => "Mite::App::Command::compile",
+        ),
+    );
     Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( "Mite::App::Command::compile" );
 }
 
 require "Mite/App/Command/init.pm";
 
 {
-    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::App::Command::init" );
+    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::App::Command::init", package => "Mite::App::Command::init" );
+    $PACKAGE->add_method(
+        "meta" => Moose::Meta::Method::Meta->_new(
+            name => "meta",
+            body => \&Mite::App::Command::init::meta,
+            package_name => "Mite::App::Command::init",
+        ),
+    );
     Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( "Mite::App::Command::init" );
 }
 
 require "Mite/App/Command/preview.pm";
 
 {
-    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::App::Command::preview" );
+    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::App::Command::preview", package => "Mite::App::Command::preview" );
+    $PACKAGE->add_method(
+        "meta" => Moose::Meta::Method::Meta->_new(
+            name => "meta",
+            body => \&Mite::App::Command::preview::meta,
+            package_name => "Mite::App::Command::preview",
+        ),
+    );
     Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( "Mite::App::Command::preview" );
 }
 
 require "Mite/Attribute.pm";
 
 {
-    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::Attribute" );
+    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::Attribute", package => "Mite::Attribute" );
     my %ATTR;
     $ATTR{"_order"} = Moose::Meta::Attribute->new( "_order",
         __hack_no_process_options => true,
@@ -1315,13 +1362,20 @@ require "Mite/Attribute.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"alias_is_for"} );
     };
+    $PACKAGE->add_method(
+        "meta" => Moose::Meta::Method::Meta->_new(
+            name => "meta",
+            body => \&Mite::Attribute::meta,
+            package_name => "Mite::Attribute",
+        ),
+    );
     Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( "Mite::Attribute" );
 }
 
 require "Mite/Class.pm";
 
 {
-    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::Class" );
+    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::Class", package => "Mite::Class" );
     my %ATTR;
     $ATTR{"extends"} = Moose::Meta::Attribute->new( "extends",
         __hack_no_process_options => true,
@@ -1397,13 +1451,20 @@ require "Mite/Class.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"parents"} );
     };
+    $PACKAGE->add_method(
+        "meta" => Moose::Meta::Method::Meta->_new(
+            name => "meta",
+            body => \&Mite::Class::meta,
+            package_name => "Mite::Class",
+        ),
+    );
     Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( "Mite::Class" );
 }
 
 require "Mite/Compiled.pm";
 
 {
-    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::Compiled" );
+    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::Compiled", package => "Mite::Compiled" );
     my %ATTR;
     $ATTR{"file"} = Moose::Meta::Attribute->new( "file",
         __hack_no_process_options => true,
@@ -1446,6 +1507,7 @@ require "Mite/Compiled.pm";
         required => true,
         type_constraint => do { require Mite::Types; Mite::Types::MiteSource() },
         reader => "source",
+        handles => { "class_order" => "class_order", "classes" => "classes" },
     );
     {
         my $ACCESSOR = Moose::Meta::Method::Accessor->new(
@@ -1488,13 +1550,20 @@ require "Mite/Compiled.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"source"} );
     };
+    $PACKAGE->add_method(
+        "meta" => Moose::Meta::Method::Meta->_new(
+            name => "meta",
+            body => \&Mite::Compiled::meta,
+            package_name => "Mite::Compiled",
+        ),
+    );
     Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( "Mite::Compiled" );
 }
 
 require "Mite/Config.pm";
 
 {
-    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::Config" );
+    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::Config", package => "Mite::Config" );
     my %ATTR;
     $ATTR{"mite_dir_name"} = Moose::Meta::Attribute->new( "mite_dir_name",
         __hack_no_process_options => true,
@@ -1648,20 +1717,34 @@ require "Mite/Config.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"search_for_mite_dir"} );
     };
+    $PACKAGE->add_method(
+        "meta" => Moose::Meta::Method::Meta->_new(
+            name => "meta",
+            body => \&Mite::Config::meta,
+            package_name => "Mite::Config",
+        ),
+    );
     Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( "Mite::Config" );
 }
 
 require "Mite/MakeMaker.pm";
 
 {
-    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::MakeMaker" );
+    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::MakeMaker", package => "Mite::MakeMaker" );
+    $PACKAGE->add_method(
+        "meta" => Moose::Meta::Method::Meta->_new(
+            name => "meta",
+            body => \&Mite::MakeMaker::meta,
+            package_name => "Mite::MakeMaker",
+        ),
+    );
     Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( "Mite::MakeMaker" );
 }
 
 require "Mite/Project.pm";
 
 {
-    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::Project" );
+    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::Project", package => "Mite::Project" );
     my %ATTR;
     $ATTR{"sources"} = Moose::Meta::Attribute->new( "sources",
         __hack_no_process_options => true,
@@ -1781,13 +1864,20 @@ require "Mite/Project.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"debug"} );
     };
+    $PACKAGE->add_method(
+        "meta" => Moose::Meta::Method::Meta->_new(
+            name => "meta",
+            body => \&Mite::Project::meta,
+            package_name => "Mite::Project",
+        ),
+    );
     Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( "Mite::Project" );
 }
 
 require "Mite/Role.pm";
 
 {
-    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::Role" );
+    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::Role", package => "Mite::Role" );
     my %ATTR;
     $ATTR{"attributes"} = Moose::Meta::Attribute->new( "attributes",
         __hack_no_process_options => true,
@@ -2039,20 +2129,34 @@ require "Mite/Role.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"method_signatures"} );
     };
+    $PACKAGE->add_method(
+        "meta" => Moose::Meta::Method::Meta->_new(
+            name => "meta",
+            body => \&Mite::Role::meta,
+            package_name => "Mite::Role",
+        ),
+    );
     Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( "Mite::Role" );
 }
 
 require "Mite/Role/Tiny.pm";
 
 {
-    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::Role::Tiny" );
+    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::Role::Tiny", package => "Mite::Role::Tiny" );
+    $PACKAGE->add_method(
+        "meta" => Moose::Meta::Method::Meta->_new(
+            name => "meta",
+            body => \&Mite::Role::Tiny::meta,
+            package_name => "Mite::Role::Tiny",
+        ),
+    );
     Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( "Mite::Role::Tiny" );
 }
 
 require "Mite/Signature.pm";
 
 {
-    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::Signature" );
+    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::Signature", package => "Mite::Signature" );
     my %ATTR;
     $ATTR{"class"} = Moose::Meta::Attribute->new( "class",
         __hack_no_process_options => true,
@@ -2377,6 +2481,7 @@ require "Mite/Signature.pm";
         init_arg => undef,
         type_constraint => do { require Types::Standard; Types::Standard::Object() },
         reader => "compiler",
+        handles => { "has_head" => "has_head", "has_slurpy" => "has_slurpy", "has_tail" => "has_tail" },
         builder => "_build_compiler",
         lazy => true,
     );
@@ -2462,13 +2567,20 @@ require "Mite/Signature.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"should_bless"} );
     };
+    $PACKAGE->add_method(
+        "meta" => Moose::Meta::Method::Meta->_new(
+            name => "meta",
+            body => \&Mite::Signature::meta,
+            package_name => "Mite::Signature",
+        ),
+    );
     Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( "Mite::Signature" );
 }
 
 require "Mite/Source.pm";
 
 {
-    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::Source" );
+    my $PACKAGE = Moose::Meta::Class->initialize( "Mite::Source", package => "Mite::Source" );
     my %ATTR;
     $ATTR{"file"} = Moose::Meta::Attribute->new( "file",
         __hack_no_process_options => true,
@@ -2617,6 +2729,13 @@ require "Mite/Source.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"project"} );
     };
+    $PACKAGE->add_method(
+        "meta" => Moose::Meta::Method::Meta->_new(
+            name => "meta",
+            body => \&Mite::Source::meta,
+            package_name => "Mite::Source",
+        ),
+    );
     Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( "Mite::Source" );
 }
 
@@ -2626,3 +2745,6 @@ Moose::Util::find_meta( "Mite::App::Command::init" )->superclasses( "Mite::App::
 Moose::Util::find_meta( "Mite::App::Command::preview" )->superclasses( "Mite::App::Command" );
 Moose::Util::find_meta( "Mite::Class" )->superclasses( "Mite::Role" );
 Moose::Util::find_meta( "Mite::Role::Tiny" )->superclasses( "Mite::Role" );
+
+true;
+
