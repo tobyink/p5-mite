@@ -1,6 +1,19 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.008000 cpan:TOBYINK`
+	issued  2022-08-01;
+	changeset [
+		item [
+			a dcs:Addition;
+			label "Mite can optionally write a Your::Project::MOP module which provides Moose integration for your classes and roles.";
+		];
+		item [
+			a dcs:Addition;
+			label "Mite attributes keep track of the file name and line number they were defined on, as well as some other context; this is included in comments in the generated .mite.pm file, and provided when building Moose-compatible metaobjects.";
+		];
+	].
+
 `Mite 0.007006 cpan:TOBYINK`
 	issued  2022-07-21;
 	changeset [
