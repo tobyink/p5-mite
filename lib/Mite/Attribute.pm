@@ -887,6 +887,9 @@ sub definition_context_to_pretty_string {
     my $self = shift;
     my %context = ( %{ $self->definition_context }, @_ );
 
+    ( $context{context} and $context{file} and $context{line} )
+        or return '(unknown definition context)';
+
     return sprintf( '%s, file %s, line %d', $context{context}, $context{file}, $context{line} );
 }
 
