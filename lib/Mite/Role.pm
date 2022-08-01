@@ -451,7 +451,7 @@ sub __META__ {
 }
 CODE
 
-    if ( $self->project->config->data->{mop} ) {
+    if ( eval { $self->project->config->data->{mop} } ) {
         $code .= sprintf <<'CODE', $self->project->config->data->{mop};
 
 # Moose-compatibility method
