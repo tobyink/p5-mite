@@ -899,7 +899,7 @@ sub _compile_mop {
 
     {
         my %translate = ( ro => 'ro', rw => 'rw', rwp => 'ro', bare => 'bare', lazy => 'ro'  );
-        $opts_string .= $opts_indent . sprintf( 'is => "%s", ', $translate{$self->is} );
+        $opts_string .= $opts_indent . sprintf( 'is => "%s",', $translate{$self->is} || 'bare' );
     }
 
     $opts_string .= $opts_indent . sprintf( 'weak_ref => %s,', $self->weak_ref ? 'true' : 'false' );
