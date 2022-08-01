@@ -1004,11 +1004,13 @@ CODE
 
     {
         my $h = $self->handles || {};
+        my $hstring = '';
         for my $delegated ( sort keys %$h ) {
             my $name = $self->_expand_name( $delegated );
             my $qname = $self->_q( $name );
             my $target = $h->{$delegated};
             my $qtarget = $self->_q( $target );
+            $hstring .= ", $qname => $qtarget";
 
             $accessors_code .= sprintf <<'CODE', $qname, $self->_q_name, $qtarget, $self->compiling_class->name, $name, $self->_q($self->compiling_class->name), $self->_q_name;
 {
@@ -1024,6 +1026,11 @@ CODE
     $PACKAGE->add_method( $DELEGATION->name, $DELEGATION );
 }
 CODE
+        }
+
+        if ( $hstring ) {
+            $hstring =~ s/^, //;
+            $opts_string .= $opts_indent . "handles => { $hstring },";
         }
     }
 

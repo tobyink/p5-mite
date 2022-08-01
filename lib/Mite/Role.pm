@@ -108,6 +108,8 @@ sub _native_methods {
             or delete $methods{$name};
     }
 
+    delete $methods{meta};
+
     return \%methods;
 }
 
@@ -302,6 +304,7 @@ sub compilation_stages {
         _compile_uses_mite
         _compile_imported_functions
         _compile_with
+        _compile_meta_method
         _compile_does
         _compile_composed_methods
         _compile_method_signatures
@@ -424,7 +427,9 @@ CODE
 }
 
 sub _compile_meta_method {
-    return <<'CODE';
+    my $self = shift;
+
+    my $code = <<'CODE';
 # Gather metadata for constructor and destructor
 sub __META__ {
     no strict 'refs';
@@ -445,6 +450,19 @@ sub __META__ {
     };
 }
 CODE
+
+    if ( $self->project->config->data->{mop} ) {
+        $code .= sprintf <<'CODE', $self->project->config->data->{mop};
+
+# Moose-compatibility method
+sub meta {
+    require %s;
+    Moose::Util::find_meta( $_[0] );
+}
+CODE
+    }
+
+    return $code;
 }
 
 sub _compile_method_signatures {
@@ -541,10 +559,11 @@ sub _mop_attribute_metaclass {
 sub _compile_mop {
     my $self = shift;
 
-    return sprintf <<'CODE', $self->_mop_metaclass, B::perlstring( $self->name ), $self->_compile_mop_attributes, $self->_compile_mop_required_methods, $self->_compile_mop_modifiers, $self->_compile_mop_tc;
+    return sprintf <<'CODE', $self->_mop_metaclass, B::perlstring( $self->name ), B::perlstring( $self->name ), $self->_compile_mop_attributes, $self->_compile_mop_required_methods, $self->_compile_mop_modifiers, $self->_compile_mop_methods, $self->_compile_mop_tc;
 {
-    my $PACKAGE = %s->initialize( %s );
+    my $PACKAGE = %s->initialize( %s, package => %s );
 
+%s
 %s
 %s
 %s
@@ -582,6 +601,19 @@ sub _compile_mop_modifiers {
         my ( $type, $names, $code ) = @$_;
         $PACKAGE->${\"add_$type\_method_modifier"}( $_, $code ) for @$names;
     }
+CODE
+}
+
+sub _compile_mop_methods {
+    my $self = shift;
+    return sprintf <<'CODE', $self->name, B::perlstring( $self->name );
+    $PACKAGE->add_method(
+        "meta" => Moose::Meta::Method::Meta->_new(
+            name => "meta",
+            body => \&%s::meta,
+            package_name => %s,
+        ),
+    );
 CODE
 }
 
