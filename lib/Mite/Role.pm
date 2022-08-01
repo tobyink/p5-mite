@@ -639,7 +639,7 @@ sub _compile_mop_postamble {
 
 sub _compile_mop_tc {
     return sprintf '    Moose::Util::TypeConstraints::find_or_create_does_type_constraint( %s );',
-        shift->name;
+        B::perlstring( shift->name );
 }
 
 1;

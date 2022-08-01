@@ -1077,12 +1077,15 @@ CODE
         $opts_string .= $opts_indent . sprintf( 'documentation => %s,', $self->_q( $self->documentation ) );
     }
 
-    $accessors_code =~ s/\n$//;
+    if ( not $self->compiling_class->isa( 'Mite::Class' ) ) {
+        $accessors_code = sprintf "delete \$ATTR{%s}{original_options}{\$_} for qw( associated_role );\n",
+            $self->_q_name;
+    }
+
     $opts_string .= "\n";
     return sprintf <<'CODE', $self->_q_name, $self->compiling_class->_mop_attribute_metaclass, $self->_q_name, $opts_string, $accessors_code, $self->_q_name;
 $ATTR{%s} = %s->new( %s,%s);
-%s
-do {
+%sdo {
 	no warnings 'redefine';
 	local *Moose::Meta::Attribute::install_accessors = sub {};
 	$PACKAGE->add_attribute( $ATTR{%s} );
