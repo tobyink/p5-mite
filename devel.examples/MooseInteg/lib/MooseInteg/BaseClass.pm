@@ -7,4 +7,10 @@ has foo => (
 	isa => 'Int',
 );
 
+sub number {
+	my ( $self, @args ) = @_;
+	require List::Util;
+	return List::Util::sum( @args );
+}
+
 1;

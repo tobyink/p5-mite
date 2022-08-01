@@ -4,7 +4,13 @@ use MooseInteg::Mite -role;
 
 has bar => (
 	is => 'rw',
-	isa => 'ArrayRef',
+	isa => 'Object',
+	handles => [ 'quux' ],
 );
+
+around number => sub {
+	my ( $next, $self ) = ( shift, shift );
+	10 * $self->$next( @_ );
+};
 
 1;

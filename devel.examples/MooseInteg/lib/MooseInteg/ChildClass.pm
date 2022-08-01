@@ -11,6 +11,11 @@ has baz => (
 	isa => 'HashRef',
 );
 
+around number => sub {
+	my ( $next, $self ) = ( shift, shift );
+	2 + $self->$next( @_ );
+};
+
 __PACKAGE__->meta->make_immutable( replace_constructor => 1 );
 
 1;

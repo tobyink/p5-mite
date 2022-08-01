@@ -59,8 +59,9 @@ require "MooseInteg/SomeRole.pm";
         weak_ref => false,
         init_arg => "bar",
         required => false,
-        type_constraint => do { require Types::Standard; Types::Standard::ArrayRef() },
+        type_constraint => do { require Types::Standard; Types::Standard::Object() },
         accessor => "bar",
+        handles => { "quux" => "quux" },
     );
     delete $ATTR{"bar"}{original_options}{$_} for qw( associated_role );
     do {
@@ -68,6 +69,7 @@ require "MooseInteg/SomeRole.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"bar"} );
     };
+    $PACKAGE->add_required_methods( "number" );
     for ( @MooseInteg::SomeRole::METHOD_MODIFIERS ) {
         my ( $type, $names, $code ) = @$_;
         $PACKAGE->${\"add_$type\_method_modifier"}( $_, $code ) for @$names;

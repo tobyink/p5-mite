@@ -61,7 +61,7 @@ sub __FINALIZE_APPLICATION__ {
     return if $type ne 'Mite::Class';
 
     my @missing_methods;
-    @missing_methods = ()
+    @missing_methods = grep( !$target->can($_), "number" )
         and MooseInteg::Mite::croak( "$me requires $target to implement methods: " . join q[, ], @missing_methods );
 
     my @roles = (  );
