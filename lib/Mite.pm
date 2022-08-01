@@ -117,6 +117,8 @@ L<Mite::Manual::Attributes> - options for defining attributes with Mite.
 
 L<Mite::Manual::Features> - other features provided by Mite.
 
+L<Mite::Manual::MOP> - integration with the Moose Meta-Object Protocol.
+
 L<Mite::Manual::Missing> - major Moose features not supported by Mite.
 
 L<Mite::Manual::Benchmarking> - comparing Mite with Moose, Moo, and Mouse.

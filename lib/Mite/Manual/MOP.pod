@@ -1,0 +1,87 @@
+=pod
+
+=head1 NAME
+
+Mite::Manual::MOP - integration with the Moose Meta-Object Protocol.
+
+=head1 MANUAL
+
+To enable Moose integration, you need to provide a "mop" setting in your
+F<.mite/config> file:
+
+    ---
+    project: Your::Project
+    source_from: lib
+    compiled_to: lib
+    shim: Your::Project::Shim
+    mop: Your::Project::MOP
+    types: Your::Project::Types
+    perltidy: 1
+
+Then when C<mite compile> is run, Mite will write a bunch of metadata about
+your classes and roles to F<lib/Your/Project/MOP.pm>.
+
+Now your project has Moose-compatibility!
+
+Loading C<Your::Project::MOP> will instantly "promote" all your classes and
+roles to Moose classes and roles.
+
+Third parties can now use Moose to extend your project.
+
+    package Third::Party::Widget;
+    
+    use Your::Project::MOP;
+    use Moose;
+    extends 'Your::Project::Widget';
+    
+    has sku => ( is => 'ro', isa => 'Str' );
+    
+    __PACKAGE__->meta->make_immutable( replace_constructor => 1 );
+
+Note that the C<replace_constructor> option is required, as Moose is otherwise
+reluctant to override a non-Moose constructor.
+
+=head2 Dependencies
+
+If you decide to enable Moose integration for your project, it will
+still have zero non-core dependencies for normal usage, but loading the
+F<MOP.pm> file will require L<Moose> and L<Type::Tiny>, plus any type
+libraries you used (such as L<Types::Standard>, L<Types::Common::String>,
+and L<Types::Common::Numeric>).
+
+Just try to make sure that in normal usage F<MOP.pm> never gets loaded.
+
+=head2 C<meta> Methods
+
+If Moose integration is enabled, all your classes and roles will have a
+C<meta> method, similar to the one provided by Moose.
+
+Calling C<< $class->meta >>, C<< $role->meta >>, or C<< $object->meta >>
+on any of your Mite classes/roles/objects will load F<MOP.pm>.
+
+=head1 BUGS
+
+Please report any bugs to L<https://github.com/tobyink/p5-mite/issues>.
+
+=head1 AUTHOR
+
+Michael G Schwern E<lt>mschwern@cpan.orgE<gt>.
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2011-2014 by Michael G Schwern.
+
+This software is copyright (c) 2022 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut
