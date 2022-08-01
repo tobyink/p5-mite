@@ -448,6 +448,8 @@ sub _compile_init_attributes {
         if ( @lines ) {
             push @code, sprintf "# Attribute %s%s",
                $attr->name, $attr->type ? sprintf( ' (type: %s)', $attr->type->display_name ) : '';
+            push @code, sprintf '# %s',
+               $attr->definition_context_to_pretty_string;
             push @code, @lines;
             push @code, '';
         }

@@ -36,6 +36,7 @@
         my $no_build = delete $args->{__no_BUILD__};
 
         # Attribute class (type: Mite::Class)
+        # has declaration, file lib/Mite/Signature.pm, line 11
         if ( exists $args->{"class"} ) {
             blessed( $args->{"class"} ) && $args->{"class"}->isa("Mite::Class")
               or croak "Type check failed in constructor: %s should be %s",
@@ -46,6 +47,7 @@
           if ref $self->{"class"};
 
         # Attribute method_name (type: Str)
+        # has declaration, file lib/Mite/Signature.pm, line 22
         croak "Missing key in constructor: method_name"
           unless exists $args->{"method_name"};
         do {
@@ -61,6 +63,7 @@
         $self->{"method_name"} = $args->{"method_name"};
 
         # Attribute named (type: ArrayRef)
+        # has declaration, file lib/Mite/Signature.pm, line 27
         if ( exists $args->{"named"} ) {
             do { package Mite::Shim; ref( $args->{"named"} ) eq 'ARRAY' }
               or croak "Type check failed in constructor: %s should be %s",
@@ -69,6 +72,7 @@
         }
 
         # Attribute positional (type: ArrayRef)
+        # has declaration, file lib/Mite/Signature.pm, line 32
         my $args_for_positional = {};
         for ( "positional", "pos" ) {
             next unless exists $args->{$_};
@@ -87,6 +91,7 @@
         }
 
         # Attribute method (type: Bool)
+        # has declaration, file lib/Mite/Signature.pm, line 38
         do {
             my $value = exists( $args->{"method"} ) ? $args->{"method"} : true;
             (
@@ -102,6 +107,7 @@
         };
 
         # Attribute head (type: ArrayRef|Int)
+        # has declaration, file lib/Mite/Signature.pm, line 46
         if ( exists $args->{"head"} ) {
             do {
 
@@ -124,6 +130,7 @@
         }
 
         # Attribute tail (type: ArrayRef|Int)
+        # has declaration, file lib/Mite/Signature.pm, line 48
         if ( exists $args->{"tail"} ) {
             do {
 
@@ -146,6 +153,7 @@
         }
 
         # Attribute named_to_list (type: Bool|ArrayRef)
+        # has declaration, file lib/Mite/Signature.pm, line 52
         do {
             my $value =
               exists( $args->{"named_to_list"} )
@@ -251,6 +259,7 @@
       && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
     # Accessors for class
+    # has declaration, file lib/Mite/Signature.pm, line 11
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,
@@ -266,6 +275,7 @@
     }
 
     # Accessors for compiler
+    # has declaration, file lib/Mite/Signature.pm, line 57
     sub _assert_blessed_compiler {
         my $object = do {
             (
@@ -302,11 +312,13 @@
     }
 
     # Delegated methods for compiler
+    # has declaration, file lib/Mite/Signature.pm, line 57
     sub has_head   { shift->_assert_blessed_compiler->has_head(@_) }
     sub has_slurpy { shift->_assert_blessed_compiler->has_slurpy(@_) }
     sub has_tail   { shift->_assert_blessed_compiler->has_tail(@_) }
 
     # Accessors for compiling_class
+    # has declaration, file lib/Mite/Signature.pm, line 16
     sub compiling_class {
         @_ > 1
           ? do {
@@ -339,6 +351,7 @@
     }
 
     # Accessors for head
+    # has declaration, file lib/Mite/Signature.pm, line 46
     sub head {
         @_ > 1 ? croak("head is a read-only attribute of @{[ref $_[0]]}") : (
             exists( $_[0]{"head"} ) ? $_[0]{"head"} : (
@@ -367,6 +380,7 @@
     }
 
     # Accessors for method
+    # has declaration, file lib/Mite/Signature.pm, line 38
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,
@@ -382,6 +396,7 @@
     }
 
     # Accessors for method_name
+    # has declaration, file lib/Mite/Signature.pm, line 22
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,
@@ -397,6 +412,7 @@
     }
 
     # Accessors for named
+    # has declaration, file lib/Mite/Signature.pm, line 27
     if ($__XS) {
         Class::XSAccessor->import(
             chained             => 1,
@@ -414,6 +430,7 @@
     }
 
     # Accessors for named_to_list
+    # has declaration, file lib/Mite/Signature.pm, line 52
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,
@@ -430,6 +447,7 @@
     }
 
     # Accessors for positional
+    # has declaration, file lib/Mite/Signature.pm, line 32
     if ($__XS) {
         Class::XSAccessor->import(
             chained             => 1,
@@ -446,10 +464,12 @@
         };
     }
 
-    # Aliases for for positional
+    # Aliases for positional
+    # has declaration, file lib/Mite/Signature.pm, line 32
     sub pos { shift->positional(@_) }
 
     # Accessors for should_bless
+    # has declaration, file lib/Mite/Signature.pm, line 68
     sub should_bless {
         @_ > 1
           ? croak("should_bless is a read-only attribute of @{[ref $_[0]]}")
@@ -473,6 +493,7 @@
     }
 
     # Accessors for tail
+    # has declaration, file lib/Mite/Signature.pm, line 48
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,

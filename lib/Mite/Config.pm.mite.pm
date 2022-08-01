@@ -36,6 +36,7 @@
         my $no_build = delete $args->{__no_BUILD__};
 
         # Attribute mite_dir_name (type: Str)
+        # has declaration, file lib/Mite/Config.pm, line 11
         do {
             my $value =
               exists( $args->{"mite_dir_name"} )
@@ -55,6 +56,7 @@
         };
 
         # Attribute mite_dir (type: Path)
+        # has declaration, file lib/Mite/Config.pm, line 25
         if ( exists $args->{"mite_dir"} ) {
             do {
                 my $coerced_value = do {
@@ -113,6 +115,7 @@
         }
 
         # Attribute config_file (type: Path)
+        # has declaration, file lib/Mite/Config.pm, line 35
         if ( exists $args->{"config_file"} ) {
             do {
                 my $coerced_value = do {
@@ -171,6 +174,7 @@
         }
 
         # Attribute data (type: HashRef)
+        # has declaration, file lib/Mite/Config.pm, line 44
         if ( exists $args->{"data"} ) {
             do { package Mite::Shim; ref( $args->{"data"} ) eq 'HASH' }
               or croak "Type check failed in constructor: %s should be %s",
@@ -179,6 +183,7 @@
         }
 
         # Attribute search_for_mite_dir (type: Bool)
+        # has declaration, file lib/Mite/Config.pm, line 46
         do {
             my $value =
               exists( $args->{"search_for_mite_dir"} )
@@ -277,6 +282,7 @@
       && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
     # Accessors for config_file
+    # has declaration, file lib/Mite/Config.pm, line 35
     sub config_file {
         @_ > 1
           ? croak("config_file is a read-only attribute of @{[ref $_[0]]}")
@@ -345,6 +351,7 @@
     }
 
     # Accessors for data
+    # has declaration, file lib/Mite/Config.pm, line 44
     sub data {
         @_ > 1
           ? do {
@@ -372,6 +379,7 @@
     }
 
     # Accessors for mite_dir
+    # has declaration, file lib/Mite/Config.pm, line 25
     sub mite_dir {
         @_ > 1
           ? croak("mite_dir is a read-only attribute of @{[ref $_[0]]}")
@@ -440,6 +448,7 @@
     }
 
     # Accessors for mite_dir_name
+    # has declaration, file lib/Mite/Config.pm, line 11
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,
@@ -456,6 +465,7 @@
     }
 
     # Accessors for search_for_mite_dir
+    # has declaration, file lib/Mite/Config.pm, line 46
     sub search_for_mite_dir {
         @_ > 1
           ? do {

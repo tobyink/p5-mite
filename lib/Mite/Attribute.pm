@@ -820,6 +820,7 @@ sub compile {
     }
 
     my $code = "# Accessors for $slot_name\n";
+    $code .= '# ' . $self->definition_context_to_pretty_string. "\n";
     if ( keys %want_xs ) {
         $code .= "if ( $xs_condition ) {\n";
         $code .= "    Class::XSAccessor->import(\n";
@@ -847,7 +848,8 @@ sub compile {
     $code .= "\n";
 
     if ( my $alias_is_for = $self->alias_is_for ) {
-        $code .= sprintf "# Aliases for for %s\n", $self->name;
+        $code .= sprintf "# Aliases for %s\n", $self->name;
+        $code .= '# ' . $self->definition_context_to_pretty_string. "\n";
         my $alias_target = $self->_expand_name( $self->$alias_is_for );
         for my $alias ( $self->_all_aliases ) {
             $code .= sprintf 'sub %s { shift->%s( @_ ) }' . "\n",
@@ -858,6 +860,7 @@ sub compile {
 
     if ( $self->has_handles ) {
         $code .= sprintf "# Delegated methods for %s\n", $self->name;
+        $code .= '# ' . $self->definition_context_to_pretty_string. "\n";
         my $assertion = $method_name{asserter};
         my %delegated = %{ $self->handles };
         for my $key ( sort keys %delegated ) {
@@ -878,6 +881,13 @@ sub definition_context_to_string {
         join q{, },
         map sprintf( '%s => %s', $_, B::perlstring( $context{$_} ) ),
         sort keys %context;
+}
+
+sub definition_context_to_pretty_string {
+    my $self = shift;
+    my %context = ( %{ $self->definition_context }, @_ );
+
+    return sprintf( '%s, file %s, line %d', $context{context}, $context{file}, $context{line} );
 }
 
 sub _compile_mop {

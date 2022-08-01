@@ -36,6 +36,7 @@
         my $no_build = delete $args->{__no_BUILD__};
 
         # Attribute file (type: Path)
+        # has declaration, file lib/Mite/Compiled.pm, line 23
         if ( exists $args->{"file"} ) {
             do {
                 my $coerced_value = do {
@@ -94,6 +95,7 @@
         }
 
         # Attribute source (type: Mite::Source)
+        # has declaration, file lib/Mite/Compiled.pm, line 25
         croak "Missing key in constructor: source"
           unless exists $args->{"source"};
         blessed( $args->{"source"} ) && $args->{"source"}->isa("Mite::Source")
@@ -182,6 +184,7 @@
       && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
     # Accessors for file
+    # has declaration, file lib/Mite/Compiled.pm, line 23
     sub file {
         @_ > 1
           ? do {
@@ -315,6 +318,7 @@
     }
 
     # Accessors for source
+    # has declaration, file lib/Mite/Compiled.pm, line 25
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,
@@ -336,6 +340,7 @@
     }
 
     # Delegated methods for source
+    # has declaration, file lib/Mite/Compiled.pm, line 25
     sub class_order { shift->_assert_blessed_source->class_order(@_) }
     sub classes     { shift->_assert_blessed_source->classes(@_) }
 

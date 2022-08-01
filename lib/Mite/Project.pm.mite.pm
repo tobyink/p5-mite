@@ -36,6 +36,7 @@
         my $no_build = delete $args->{__no_BUILD__};
 
         # Attribute sources (type: HashRef[Mite::Source])
+        # has declaration, file lib/Mite/Project.pm, line 14
         do {
             my $value =
               exists( $args->{"sources"} )
@@ -65,6 +66,7 @@
         };
 
         # Attribute config (type: Mite::Config)
+        # has declaration, file lib/Mite/Project.pm, line 24
         if ( exists $args->{"config"} ) {
             blessed( $args->{"config"} )
               && $args->{"config"}->isa("Mite::Config")
@@ -74,6 +76,7 @@
         }
 
         # Attribute _module_fakeout_namespace (type: Str|Undef)
+        # has declaration, file lib/Mite/Project.pm, line 26
         if ( exists $args->{"_module_fakeout_namespace"} ) {
             do {
 
@@ -107,6 +110,7 @@
         }
 
         # Attribute debug (type: Bool)
+        # has declaration, file lib/Mite/Project.pm, line 30
         do {
             my $value = exists( $args->{"debug"} ) ? $args->{"debug"} : false;
             (
@@ -202,6 +206,7 @@
       && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
     # Accessors for _module_fakeout_namespace
+    # has declaration, file lib/Mite/Project.pm, line 26
     sub _module_fakeout_namespace {
         @_ > 1
           ? do {
@@ -229,6 +234,7 @@
     }
 
     # Accessors for config
+    # has declaration, file lib/Mite/Project.pm, line 24
     sub config {
         @_ > 1 ? croak("config is a read-only attribute of @{[ref $_[0]]}") : (
             exists( $_[0]{"config"} ) ? $_[0]{"config"} : (
@@ -246,6 +252,7 @@
     }
 
     # Accessors for debug
+    # has declaration, file lib/Mite/Project.pm, line 30
     sub debug {
         @_ > 1
           ? do {
@@ -265,6 +272,7 @@
     }
 
     # Accessors for sources
+    # has declaration, file lib/Mite/Project.pm, line 14
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,
