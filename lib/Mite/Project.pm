@@ -348,7 +348,8 @@ sub load_files {
 sub _load_file {
     my ( $self, $file, $inc_dir ) = @_;
 
-    if ( $file eq $self->_project_mopper_file ) {
+    if ( defined $self->_project_mopper_file
+    and $file eq $self->_project_mopper_file ) {
         warn "Skipping $file: it's the mop\n" if $self->debug;
         return;
     }
