@@ -1,6 +1,19 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.008002 cpan:TOBYINK`
+	issued  2022-08-03;
+	changeset [
+		item [
+			a dcs:Addition;
+			label "Support enum => \@values as a shortcut to define enumerated attributes.";
+		];
+		item [
+			a dcs:Addition;
+			label "Support handles => 1 and handles => 2 for enumerated attributes, like MooseX::Enumeration and MooX::Enumeration.";
+		];
+	].
+
 `Mite 0.008001 cpan:TOBYINK`
 	issued  2022-08-03;
 	changeset [

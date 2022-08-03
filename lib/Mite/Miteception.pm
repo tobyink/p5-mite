@@ -5,7 +5,7 @@ use warnings;
 package Mite::Miteception;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.008001';
+our $VERSION   = '0.008002';
 
 use Import::Into;
 use Mite::Shim ();
