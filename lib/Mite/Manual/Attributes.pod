@@ -206,7 +206,7 @@ attribute.
 
 This is vaguely inspired by L<MooseX::LocalAttribute>.
 
-=head2 C<handles> B<< Map[ MethodNameTemplate, MethodName ] >>
+=head2 C<handles> B<< Map[ MethodNameTemplate, MethodName ] | Enum[ 1, 2 ] >>
 
 Delegated methods. Currying and native traits are not supported.
 
@@ -223,6 +223,39 @@ the name of the attribute.
             '%s_post' => 'post',
         },
     );
+
+If the attribute's type constraint is an enumeration, then the shortcuts
+C<< handles => 1 >> and C<< handles => 2 >> are also supported. These
+are inspired by L<MooseX::Enumeration> and L<MooX::Enumeration>.
+
+In this example, Mite creates methods C<< is_alive >> and C<< is_dead >>
+for you:
+
+    has status => (
+        enum     => [ 'alive', 'dead' ],
+        handles  => 1,
+        default  => 'alive',
+        writer   => '_set_status',
+    );
+    
+    sub kill {
+        my $self = shift;
+        croak "Already dead!" if $self->is_dead;
+        $self->_set_status( 'dead' );
+    }
+
+In this example, Mite creates C<< size_is_small >>, C<< size_is_medium >>,
+and C<< size_is_large >> for you.
+
+    has size => (
+        is       => 'rw',
+        isa      => 'Enum[ "small", "medium", "large" ]',
+        handles  => 2,
+    );
+
+Note that if C<handles> had been 1, then the methods would have just been
+called C<is_small>, C<is_medium>, and C<is_large>, without the C<size_> prefix
+at the start.
 
 =head2 C<init_arg> B<< NonEmptyStr | Undef >>
 
@@ -301,6 +334,12 @@ type library which Mite is able to use.
 
 Same as C<isa>, but if the type name is unrecognized, assumes it was a
 role name instead of assuming it was a class name.
+
+=head2 C<enum> B<< ArrayRef[NonEmptyStr] >>
+
+Shortcut for C<< isa => 'Enum["foo","bar","baz"]' >>.
+
+This feature is inspired by L<MooseX::Enumeration> and L<MooX::Enumeration>.
 
 =head2 C<coerce> B<Bool>
 

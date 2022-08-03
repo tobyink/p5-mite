@@ -84,6 +84,11 @@ has does =>
   isa           => Str|Ref,
   reader        => '_%s'; # collision with Mite's does method
 
+has enum =>
+  is            => rw,
+  isa           => ArrayRef[NonEmptyStr],
+  predicate     => true;
+
 has type =>
   is            => 'lazy',
   isa           => Object|Undef,
@@ -143,7 +148,7 @@ has documentation =>
 
 has handles =>
   is            => rw,
-  isa           => HandlesHash,
+  isa           => HandlesHash | Enum[ 1, 2 ],
   predicate     => true,
   coerce        => true;
 
@@ -355,6 +360,10 @@ sub _build_type {
         $string   = $does;
         $fallback = [ 'make_role_type' ];
     }
+    elsif ( $self->has_enum ) {
+        require Types::Standard;
+        return Types::Standard::Enum()->of( @{ $self->enum } );
+    }
     else {
         return undef;
     }
@@ -399,6 +408,33 @@ sub _build_type {
     }
 
     return $type;
+}
+
+sub possible_values {
+    my $self = shift;
+    
+    my $values;
+    if ( $self->has_enum ) {
+        $values = $self->enum;
+    }
+    if ( not $values and my $type = $self->type ) {
+        require Types::Standard;
+        my $enum = $type->find_parent( sub {
+            $_->isa( 'Type::Tiny::Enum' );
+        } );
+        if ( $enum ) {
+            $values = $enum->unique_values;
+        }
+    }
+
+    my %return = map {
+        my $label = $_;
+        my $value = $_;
+        $label =~ s/([\W])/sprintf('_%x', ord($1))/ge;
+        $label => $value;
+    } @$values;
+
+    return \%return;
 }
 
 sub has_coderef_default {
@@ -696,7 +732,7 @@ my %code_template;
         my %arg = @_;
         my $reader  = $code_template{reader}->( $self, no_croak => true );
         my $blessed = 'require Scalar::Util && Scalar::Util::blessed';
-        if ( $self->class and $self->class->imported_functions->{blessed} ) {
+        if ( $self->compiling_class and $self->compiling_class->imported_functions->{blessed} ) {
            $blessed = 'blessed';
         }
         return sprintf 'my $object = do { %s }; %s($object) or %s( "%s is not a blessed object" ); $object',
@@ -808,6 +844,44 @@ my %code_attr = (
     lvalue => ' :lvalue',
 );
 
+sub _compile_native_delegations {
+    my $self = shift;
+    my $prefix;
+    if ( $self->handles eq 1 ) {
+        $prefix = "is_";
+    }
+    elsif ( $self->handles eq 2 ) {
+        $prefix = $self->name . "_is_";
+    }
+
+    if ( defined $prefix ) {
+        my $needs_reader = 0;
+        my $reader;
+        if ( $self->lazy or $self->clone_on_read ) {
+            $reader = $self->_expand_name( $self->reader )
+                // $self->_expand_name( $self->accessor )
+                // $self->_expand_name( $self->lvalue )
+                // do { $needs_reader++; '_get_value_for_' . $self->name };
+        }
+        else {
+            $reader = sprintf '{%s}', $self->_q_name;
+        }
+         
+        my %values = %{ $self->possible_values };
+        my %native_delegations = map {
+            my $method_name = "$prefix$_";
+            my $value       = $values{$_};
+            $method_name => sprintf( '$_[0]->%s eq %s', $reader, $self->_q( $value ) );
+        } keys %values;
+        if ( $needs_reader ) {
+            $native_delegations{$reader} = $code_template{reader}->( $self, no_croak => true );
+        }
+        return \%native_delegations;
+    }
+
+    return {};
+}
+
 sub compile {
     my $self = shift;
     my %args = @_;
@@ -839,25 +913,29 @@ sub compile {
         $want_pp{$property} = 1;
     }
 
-    if ( $self->has_handles ) {
+    if ( $self->has_handles and ref $self->handles ) {
         $method_name{asserter} = sprintf '_assert_blessed_%s', $self->name;
         $want_pp{asserter} = 1;
     }
 
     # Class::XSAccessor can't do type checks, triggers, weaken, or cloning
-    if ( $self->type or $self->weak_ref or $self->trigger or $self->cloner_method ) {
+    if ( $self->type or $self->weak_ref or $self->trigger or $self->clone_on_write ) {
         delete $want_xs{writer};
         delete $want_xs{accessor};
     }
 
     # Class::XSAccessor can't do lazy builders checks or cloning
-    if ( $self->lazy or $self->cloner_method ) {
+    if ( $self->lazy or $self->clone_on_read ) {
         delete $want_xs{reader};
         delete $want_xs{accessor};
     }
 
-    my $code = "# Accessors for $slot_name\n";
-    $code .= '# ' . $self->definition_context_to_pretty_string. "\n";
+    my $code = '';
+    if ( keys %want_xs or keys %want_pp ) {
+        $code .= "# Accessors for $slot_name\n";
+        $code .= '# ' . $self->definition_context_to_pretty_string. "\n";
+    }
+
     if ( keys %want_xs ) {
         $code .= "if ( $xs_condition ) {\n";
         $code .= "    Class::XSAccessor->import(\n";
@@ -898,11 +976,20 @@ sub compile {
     if ( $self->has_handles ) {
         $code .= sprintf "# Delegated methods for %s\n", $self->name;
         $code .= '# ' . $self->definition_context_to_pretty_string. "\n";
-        my $assertion = $method_name{asserter};
-        my %delegated = %{ $self->handles };
-        for my $key ( sort keys %delegated ) {
-            $code .= sprintf 'sub %s { shift->%s->%s( @_ ) }' . "\n",
-                $self->_expand_name( $key ), $assertion, $delegated{$key};
+        if ( ref $self->handles ) {
+            my $assertion = $method_name{asserter};
+            my %delegated = %{ $self->handles };
+            for my $key ( sort keys %delegated ) {
+                $code .= sprintf 'sub %s { shift->%s->%s( @_ ) }' . "\n",
+                    $self->_expand_name( $key ), $assertion, $delegated{$key};
+            }
+        }
+        else {
+            my %native_delegations = %{ $self->_compile_native_delegations };
+            for my $method_name ( sort keys %native_delegations ) {
+                $code .= sprintf "sub %s { %s }\n",
+                    $method_name, $native_delegations{$method_name};
+            }
         }
         $code .= "\n";
     }
@@ -1052,8 +1139,8 @@ CODE
 CODE
     }
 
-    {
-        my $h = $self->handles || {};
+    if ( ref $self->handles ) {
+        my $h = $self->handles;
         my $hstring = '';
         for my $delegated ( sort keys %$h ) {
             my $name = $self->_expand_name( $delegated );
@@ -1081,6 +1168,23 @@ CODE
         if ( $hstring ) {
             $hstring =~ s/^, //;
             $opts_string .= $opts_indent . "handles => { $hstring },";
+        }
+    }
+    elsif ( $self->has_handles ) {
+        my %native_delegations = %{ $self->_compile_native_delegations };
+        for my $method_name ( sort keys %native_delegations ) {
+            my $qname = $self->_q( $method_name );
+            $accessors_code .= sprintf <<'CODE', $qname, $self->compiling_class->name, $method_name, $self->_q($self->compiling_class->name), $self->_q_name;
+{
+    my $DELEGATION = Moose::Meta::Method->_new(
+        name => %s,
+        body => \&%s::%s,
+        package_name => %s,
+    );
+    $ATTR{%s}->associate_method( $DELEGATION );
+    $PACKAGE->add_method( $DELEGATION->name, $DELEGATION );
+}
+CODE
         }
     }
 

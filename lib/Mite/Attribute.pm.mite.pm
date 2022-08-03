@@ -768,8 +768,40 @@
             $self->{"does"} = $args->{"does"};
         }
 
-        # Attribute type (type: Object|Undef)
+        # Attribute enum (type: ArrayRef[NonEmptyStr])
         # has declaration, file lib/Mite/Attribute.pm, line 87
+        if ( exists $args->{"enum"} ) {
+            (
+                do { package Mite::Shim; ref( $args->{"enum"} ) eq 'ARRAY' }
+                  and do {
+                    my $ok = 1;
+                    for my $i ( @{ $args->{"enum"} } ) {
+                        ( $ok = 0, last )
+                          unless (
+                            (
+                                do {
+
+                                    package Mite::Shim;
+                                    defined($i) and do {
+                                        ref( \$i ) eq 'SCALAR'
+                                          or ref( \( my $val = $i ) ) eq
+                                          'SCALAR';
+                                    }
+                                }
+                            )
+                            && ( length($i) > 0 )
+                          );
+                    };
+                    $ok;
+                }
+              )
+              or croak "Type check failed in constructor: %s should be %s",
+              "enum", "ArrayRef[NonEmptyStr]";
+            $self->{"enum"} = $args->{"enum"};
+        }
+
+        # Attribute type (type: Object|Undef)
+        # has declaration, file lib/Mite/Attribute.pm, line 92
         if ( exists $args->{"type"} ) {
             do {
 
@@ -791,7 +823,7 @@
         }
 
         # Attribute coerce (type: Bool)
-        # has declaration, file lib/Mite/Attribute.pm, line 92
+        # has declaration, file lib/Mite/Attribute.pm, line 97
         do {
             my $value = exists( $args->{"coerce"} ) ? $args->{"coerce"} : false;
             (
@@ -807,7 +839,7 @@
         };
 
         # Attribute default (type: Undef|Str|CodeRef|ScalarRef|Dict[]|Tuple[])
-        # has declaration, file lib/Mite/Attribute.pm, line 97
+        # has declaration, file lib/Mite/Attribute.pm, line 102
         if ( exists $args->{"default"} ) {
             do {
 
@@ -863,7 +895,7 @@
         }
 
         # Attribute default_is_trusted (type: Bool)
-        # has declaration, file lib/Mite/Attribute.pm, line 103
+        # has declaration, file lib/Mite/Attribute.pm, line 108
         do {
             my $value = exists( $args->{"default_is_trusted"} )
               ? do {
@@ -900,7 +932,7 @@
         };
 
         # Attribute default_does_trigger (type: Bool)
-        # has declaration, file lib/Mite/Attribute.pm, line 103
+        # has declaration, file lib/Mite/Attribute.pm, line 108
         do {
             my $value = exists( $args->{"default_does_trigger"} )
               ? do {
@@ -937,7 +969,7 @@
         };
 
         # Attribute lazy (type: Bool)
-        # has declaration, file lib/Mite/Attribute.pm, line 110
+        # has declaration, file lib/Mite/Attribute.pm, line 115
         do {
             my $value = exists( $args->{"lazy"} ) ? $args->{"lazy"} : false;
             (
@@ -953,7 +985,7 @@
         };
 
         # Attribute coderef_default_variable (type: NonEmptyStr)
-        # has declaration, file lib/Mite/Attribute.pm, line 122
+        # has declaration, file lib/Mite/Attribute.pm, line 127
         if ( exists $args->{"coderef_default_variable"} ) {
             (
                 (
@@ -985,7 +1017,7 @@
         }
 
         # Attribute trigger (type: MethodNameTemplate|One|CodeRef)
-        # has declaration, file lib/Mite/Attribute.pm, line 124
+        # has declaration, file lib/Mite/Attribute.pm, line 129
         if ( exists $args->{"trigger"} ) {
             do {
 
@@ -1060,7 +1092,7 @@
         }
 
         # Attribute builder (type: MethodNameTemplate|One|CodeRef)
-        # has declaration, file lib/Mite/Attribute.pm, line 124
+        # has declaration, file lib/Mite/Attribute.pm, line 129
         if ( exists $args->{"builder"} ) {
             do {
 
@@ -1135,7 +1167,7 @@
         }
 
         # Attribute clone (type: MethodNameTemplate|One|CodeRef|Undef)
-        # has declaration, file lib/Mite/Attribute.pm, line 129
+        # has declaration, file lib/Mite/Attribute.pm, line 134
         if ( exists $args->{"clone"} ) {
             do {
 
@@ -1205,7 +1237,7 @@
         }
 
         # Attribute clone_on_read (type: Bool)
-        # has declaration, file lib/Mite/Attribute.pm, line 138
+        # has declaration, file lib/Mite/Attribute.pm, line 143
         if ( exists $args->{"clone_on_read"} ) {
             do {
                 my $coerced_value = do {
@@ -1237,7 +1269,7 @@
         }
 
         # Attribute clone_on_write (type: Bool)
-        # has declaration, file lib/Mite/Attribute.pm, line 138
+        # has declaration, file lib/Mite/Attribute.pm, line 143
         if ( exists $args->{"clone_on_write"} ) {
             do {
                 my $coerced_value = do {
@@ -1269,13 +1301,13 @@
         }
 
         # Attribute documentation
-        # has declaration, file lib/Mite/Attribute.pm, line 140
+        # has declaration, file lib/Mite/Attribute.pm, line 145
         if ( exists $args->{"documentation"} ) {
             $self->{"documentation"} = $args->{"documentation"};
         }
 
-        # Attribute handles (type: HandlesHash)
-        # has declaration, file lib/Mite/Attribute.pm, line 144
+        # Attribute handles (type: HandlesHash|Enum["1","2"])
+        # has declaration, file lib/Mite/Attribute.pm, line 149
         if ( exists $args->{"handles"} ) {
             do {
                 my $coerced_value = do {
@@ -1284,9 +1316,133 @@
                         do {
 
                             package Mite::Shim;
-                            ( ref($to_coerce) eq 'HASH' ) and do {
+                            (
+                                do {
+
+                                    package Mite::Shim;
+                                    ( ref($to_coerce) eq 'HASH' ) and do {
+                                        my $ok = 1;
+                                        for my $v ( values %{$to_coerce} ) {
+                                            ( $ok = 0, last )
+                                              unless (
+                                                (
+                                                    do {
+
+                                                        package Mite::Shim;
+                                                        defined($v) and do {
+                                                            ref( \$v ) eq
+                                                              'SCALAR'
+                                                              or ref(
+                                                                \(
+                                                                    my $val =
+                                                                      $v
+                                                                )
+                                                              ) eq 'SCALAR';
+                                                        }
+                                                    }
+                                                )
+                                                && (
+                                                    do {
+                                                        local $_ = $v;
+                                                        /\A[^\W0-9]\w*\z/;
+                                                    }
+                                                )
+                                              );
+                                        };
+                                        for my $k ( keys %{$to_coerce} ) {
+                                            ( $ok = 0, last ) unless do {
+
+                                                package Mite::Shim;
+                                                (
+                                                    (
+                                                        (
+                                                            do {
+
+                                                                package Mite::Shim;
+                                                                defined($k)
+                                                                  and do {
+                                                                    ref( \$k )
+                                                                      eq
+                                                                      'SCALAR'
+                                                                      or ref(
+                                                                        \(
+                                                                            my $val
+                                                                              = $k
+                                                                        )
+                                                                      ) eq
+                                                                      'SCALAR';
+                                                                }
+                                                            }
+                                                        )
+                                                          && (
+                                                            do {
+                                                                local $_ = $k;
+/\A[^\W0-9]\w*\z/;
+                                                            }
+                                                          )
+                                                    )
+                                                      or (
+                                                        (
+                                                            do {
+
+                                                                package Mite::Shim;
+                                                                defined($k)
+                                                                  and do {
+                                                                    ref( \$k )
+                                                                      eq
+                                                                      'SCALAR'
+                                                                      or ref(
+                                                                        \(
+                                                                            my $val
+                                                                              = $k
+                                                                        )
+                                                                      ) eq
+                                                                      'SCALAR';
+                                                                }
+                                                            }
+                                                        )
+                                                        && (
+                                                            do {
+                                                                local $_ = $k;
+                                                                /\%/;
+                                                            }
+                                                        )
+                                                      )
+                                                );
+                                            }
+                                        };
+                                        $ok;
+                                    }
+                                  }
+                                  or do {
+
+                                    package Mite::Shim;
+                                    (         defined($to_coerce)
+                                          and !ref($to_coerce)
+                                          and $to_coerce =~ m{\A(?:[12])\z} );
+                                }
+                            );
+                        }
+                      )
+                      ? $to_coerce
+                      : ( ( ref($to_coerce) eq 'ARRAY' ) ) ? scalar(
+                        do {
+                            local $_ = $to_coerce;
+                            +{ map { $_ => $_ } @$_ };
+                        }
+                      )
+                      : $to_coerce;
+                };
+                do {
+
+                    package Mite::Shim;
+                    (
+                        do {
+
+                            package Mite::Shim;
+                            ( ref($coerced_value) eq 'HASH' ) and do {
                                 my $ok = 1;
-                                for my $v ( values %{$to_coerce} ) {
+                                for my $v ( values %{$coerced_value} ) {
                                     ( $ok = 0, last )
                                       unless (
                                         (
@@ -1309,7 +1465,7 @@
                                         )
                                       );
                                 };
-                                for my $k ( keys %{$to_coerce} ) {
+                                for my $k ( keys %{$coerced_value} ) {
                                     ( $ok = 0, last ) unless do {
 
                                         package Mite::Shim;
@@ -1363,93 +1519,24 @@
                                 };
                                 $ok;
                             }
+                          }
+                          or do {
+
+                            package Mite::Shim;
+                            (         defined($coerced_value)
+                                  and !ref($coerced_value)
+                                  and $coerced_value =~ m{\A(?:[12])\z} );
                         }
-                      )
-                      ? $to_coerce
-                      : ( ( ref($to_coerce) eq 'ARRAY' ) ) ? scalar(
-                        do {
-                            local $_ = $to_coerce;
-                            +{ map { $_ => $_ } @$_ };
-                        }
-                      )
-                      : $to_coerce;
-                };
-                do {
-
-                    package Mite::Shim;
-                    ( ref($coerced_value) eq 'HASH' ) and do {
-                        my $ok = 1;
-                        for my $v ( values %{$coerced_value} ) {
-                            ( $ok = 0, last )
-                              unless (
-                                (
-                                    do {
-
-                                        package Mite::Shim;
-                                        defined($v) and do {
-                                            ref( \$v ) eq 'SCALAR'
-                                              or ref( \( my $val = $v ) ) eq
-                                              'SCALAR';
-                                        }
-                                    }
-                                )
-                                && ( do { local $_ = $v; /\A[^\W0-9]\w*\z/ } )
-                              );
-                        };
-                        for my $k ( keys %{$coerced_value} ) {
-                            ( $ok = 0, last ) unless do {
-
-                                package Mite::Shim;
-                                (
-                                    (
-                                        (
-                                            do {
-
-                                                package Mite::Shim;
-                                                defined($k) and do {
-                                                    ref( \$k ) eq 'SCALAR'
-                                                      or
-                                                      ref( \( my $val = $k ) )
-                                                      eq 'SCALAR';
-                                                }
-                                            }
-                                        )
-                                          && (
-                                            do {
-                                                local $_ = $k;
-                                                /\A[^\W0-9]\w*\z/;
-                                            }
-                                          )
-                                    )
-                                      or (
-                                        (
-                                            do {
-
-                                                package Mite::Shim;
-                                                defined($k) and do {
-                                                    ref( \$k ) eq 'SCALAR'
-                                                      or
-                                                      ref( \( my $val = $k ) )
-                                                      eq 'SCALAR';
-                                                }
-                                            }
-                                        )
-                                        && ( do { local $_ = $k; /\%/ } )
-                                      )
-                                );
-                            }
-                        };
-                        $ok;
-                    }
+                    );
                   }
                   or croak "Type check failed in constructor: %s should be %s",
-                  "handles", "HandlesHash";
+                  "handles", "HandlesHash|Enum[\"1\",\"2\"]";
                 $self->{"handles"} = $coerced_value;
             };
         }
 
         # Attribute alias (type: AliasList)
-        # has declaration, file lib/Mite/Attribute.pm, line 154
+        # has declaration, file lib/Mite/Attribute.pm, line 159
         do {
             my $value =
               exists( $args->{"alias"} )
@@ -1596,7 +1683,7 @@
 
         # Unrecognized parameters
         my @unknown = grep not(
-/\A(?:_class_for_default|a(?:ccessor|lias)|builder|c(?:l(?:ass|earer|one(?:_on_(?:read|write))?)|o(?:deref_default_variable|erce))|d(?:ef(?:ault(?:_(?:does_trigger|is_trusted))?|inition_context)|o(?:cumentation|es))|handles|i(?:nit_arg|sa?)|l(?:azy|ocal_writer|value)|name|predicate|re(?:ader|quired)|t(?:rigger|ype)|w(?:eak_ref|riter))\z/
+/\A(?:_class_for_default|a(?:ccessor|lias)|builder|c(?:l(?:ass|earer|one(?:_on_(?:read|write))?)|o(?:deref_default_variable|erce))|d(?:ef(?:ault(?:_(?:does_trigger|is_trusted))?|inition_context)|o(?:cumentation|es))|enum|handles|i(?:nit_arg|sa?)|l(?:azy|ocal_writer|value)|name|predicate|re(?:ader|quired)|t(?:rigger|ype)|w(?:eak_ref|riter))\z/
         ), keys %{$args};
         @unknown
           and croak(
@@ -1870,7 +1957,7 @@
     }
 
     # Accessors for alias
-    # has declaration, file lib/Mite/Attribute.pm, line 154
+    # has declaration, file lib/Mite/Attribute.pm, line 159
     sub alias {
         @_ > 1
           ? do {
@@ -1997,7 +2084,7 @@
     }
 
     # Accessors for alias_is_for
-    # has declaration, file lib/Mite/Attribute.pm, line 156
+    # has declaration, file lib/Mite/Attribute.pm, line 161
     sub alias_is_for {
         @_ > 1
           ? croak("alias_is_for is a read-only attribute of @{[ref $_[0]]}")
@@ -2007,7 +2094,7 @@
     }
 
     # Accessors for builder
-    # has declaration, file lib/Mite/Attribute.pm, line 124
+    # has declaration, file lib/Mite/Attribute.pm, line 129
     if ($__XS) {
         Class::XSAccessor->import(
             chained             => 1,
@@ -2247,7 +2334,7 @@
     }
 
     # Accessors for clone
-    # has declaration, file lib/Mite/Attribute.pm, line 129
+    # has declaration, file lib/Mite/Attribute.pm, line 134
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,
@@ -2263,7 +2350,7 @@
     }
 
     # Accessors for clone_on_read
-    # has declaration, file lib/Mite/Attribute.pm, line 138
+    # has declaration, file lib/Mite/Attribute.pm, line 143
     sub clone_on_read {
         @_ > 1
           ? croak("clone_on_read is a read-only attribute of @{[ref $_[0]]}")
@@ -2301,7 +2388,7 @@
     }
 
     # Accessors for clone_on_write
-    # has declaration, file lib/Mite/Attribute.pm, line 138
+    # has declaration, file lib/Mite/Attribute.pm, line 143
     sub clone_on_write {
         @_ > 1
           ? croak("clone_on_write is a read-only attribute of @{[ref $_[0]]}")
@@ -2339,7 +2426,7 @@
     }
 
     # Accessors for coderef_default_variable
-    # has declaration, file lib/Mite/Attribute.pm, line 122
+    # has declaration, file lib/Mite/Attribute.pm, line 127
     sub coderef_default_variable {
         @_ > 1
           ? do {
@@ -2401,7 +2488,7 @@
     }
 
     # Accessors for coerce
-    # has declaration, file lib/Mite/Attribute.pm, line 92
+    # has declaration, file lib/Mite/Attribute.pm, line 97
     sub coerce {
         @_ > 1
           ? do {
@@ -2454,7 +2541,7 @@
     }
 
     # Accessors for default
-    # has declaration, file lib/Mite/Attribute.pm, line 97
+    # has declaration, file lib/Mite/Attribute.pm, line 102
     if ($__XS) {
         Class::XSAccessor->import(
             chained             => 1,
@@ -2504,7 +2591,7 @@
     }
 
     # Accessors for default_does_trigger
-    # has declaration, file lib/Mite/Attribute.pm, line 103
+    # has declaration, file lib/Mite/Attribute.pm, line 108
     sub default_does_trigger {
         @_ > 1
           ? do {
@@ -2538,7 +2625,7 @@
     }
 
     # Accessors for default_is_trusted
-    # has declaration, file lib/Mite/Attribute.pm, line 103
+    # has declaration, file lib/Mite/Attribute.pm, line 108
     sub default_is_trusted {
         @_ > 1
           ? do {
@@ -2586,7 +2673,7 @@
     }
 
     # Accessors for documentation
-    # has declaration, file lib/Mite/Attribute.pm, line 140
+    # has declaration, file lib/Mite/Attribute.pm, line 145
     if ($__XS) {
         Class::XSAccessor->import(
             chained             => 1,
@@ -2619,8 +2706,56 @@
         };
     }
 
+    # Accessors for enum
+    # has declaration, file lib/Mite/Attribute.pm, line 87
+    if ($__XS) {
+        Class::XSAccessor->import(
+            chained             => 1,
+            "exists_predicates" => { "has_enum" => "enum" },
+        );
+    }
+    else {
+        *has_enum = sub { exists $_[0]{"enum"} };
+    }
+
+    sub enum {
+        @_ > 1
+          ? do {
+            do {
+
+                package Mite::Shim;
+                ( ref( $_[1] ) eq 'ARRAY' ) and do {
+                    my $ok = 1;
+                    for my $i ( @{ $_[1] } ) {
+                        ( $ok = 0, last )
+                          unless (
+                            (
+                                do {
+
+                                    package Mite::Shim;
+                                    defined($i) and do {
+                                        ref( \$i ) eq 'SCALAR'
+                                          or ref( \( my $val = $i ) ) eq
+                                          'SCALAR';
+                                    }
+                                }
+                            )
+                            && ( length($i) > 0 )
+                          );
+                    };
+                    $ok;
+                }
+              }
+              or croak( "Type check failed in %s: value should be %s",
+                "accessor", "ArrayRef[NonEmptyStr]" );
+            $_[0]{"enum"} = $_[1];
+            $_[0];
+          }
+          : ( $_[0]{"enum"} );
+    }
+
     # Accessors for handles
-    # has declaration, file lib/Mite/Attribute.pm, line 144
+    # has declaration, file lib/Mite/Attribute.pm, line 149
     if ($__XS) {
         Class::XSAccessor->import(
             chained             => 1,
@@ -2640,9 +2775,121 @@
                     do {
 
                         package Mite::Shim;
-                        ( ref($to_coerce) eq 'HASH' ) and do {
+                        (
+                            do {
+
+                                package Mite::Shim;
+                                ( ref($to_coerce) eq 'HASH' ) and do {
+                                    my $ok = 1;
+                                    for my $v ( values %{$to_coerce} ) {
+                                        ( $ok = 0, last )
+                                          unless (
+                                            (
+                                                do {
+
+                                                    package Mite::Shim;
+                                                    defined($v) and do {
+                                                        ref( \$v ) eq 'SCALAR'
+                                                          or ref(
+                                                            \( my $val = $v ) )
+                                                          eq 'SCALAR';
+                                                    }
+                                                }
+                                            )
+                                            && (
+                                                do {
+                                                    local $_ = $v;
+                                                    /\A[^\W0-9]\w*\z/;
+                                                }
+                                            )
+                                          );
+                                    };
+                                    for my $k ( keys %{$to_coerce} ) {
+                                        ( $ok = 0, last ) unless do {
+
+                                            package Mite::Shim;
+                                            (
+                                                (
+                                                    (
+                                                        do {
+
+                                                            package Mite::Shim;
+                                                            defined($k) and do {
+                                                                ref( \$k ) eq
+                                                                  'SCALAR'
+                                                                  or ref(
+                                                                    \(
+                                                                        my $val
+                                                                          = $k
+                                                                    )
+                                                                  ) eq 'SCALAR';
+                                                            }
+                                                        }
+                                                    )
+                                                      && (
+                                                        do {
+                                                            local $_ = $k;
+                                                            /\A[^\W0-9]\w*\z/;
+                                                        }
+                                                      )
+                                                )
+                                                  or (
+                                                    (
+                                                        do {
+
+                                                            package Mite::Shim;
+                                                            defined($k) and do {
+                                                                ref( \$k ) eq
+                                                                  'SCALAR'
+                                                                  or ref(
+                                                                    \(
+                                                                        my $val
+                                                                          = $k
+                                                                    )
+                                                                  ) eq 'SCALAR';
+                                                            }
+                                                        }
+                                                    )
+                                                    && (
+                                                        do {
+                                                            local $_ = $k;
+                                                            /\%/;
+                                                        }
+                                                    )
+                                                  )
+                                            );
+                                        }
+                                    };
+                                    $ok;
+                                }
+                              }
+                              or do {
+
+                                package Mite::Shim;
+                                (         defined($to_coerce)
+                                      and !ref($to_coerce)
+                                      and $to_coerce =~ m{\A(?:[12])\z} );
+                            }
+                        );
+                    }
+                ) ? $to_coerce : ( ( ref($to_coerce) eq 'ARRAY' ) ) ? scalar(
+                    do {
+                        local $_ = $to_coerce;
+                        +{ map { $_ => $_ } @$_ };
+                    }
+                  )
+                  : $to_coerce;
+            };
+            do {
+
+                package Mite::Shim;
+                (
+                    do {
+
+                        package Mite::Shim;
+                        ( ref($value) eq 'HASH' ) and do {
                             my $ok = 1;
-                            for my $v ( values %{$to_coerce} ) {
+                            for my $v ( values %{$value} ) {
                                 ( $ok = 0, last )
                                   unless (
                                     (
@@ -2660,7 +2907,7 @@
                                     )
                                   );
                             };
-                            for my $k ( keys %{$to_coerce} ) {
+                            for my $k ( keys %{$value} ) {
                                 ( $ok = 0, last ) unless do {
 
                                     package Mite::Shim;
@@ -2705,80 +2952,18 @@
                             };
                             $ok;
                         }
+                      }
+                      or do {
+
+                        package Mite::Shim;
+                        (         defined($value)
+                              and !ref($value)
+                              and $value =~ m{\A(?:[12])\z} );
                     }
-                ) ? $to_coerce : ( ( ref($to_coerce) eq 'ARRAY' ) ) ? scalar(
-                    do {
-                        local $_ = $to_coerce;
-                        +{ map { $_ => $_ } @$_ };
-                    }
-                  )
-                  : $to_coerce;
-            };
-            do {
-
-                package Mite::Shim;
-                ( ref($value) eq 'HASH' ) and do {
-                    my $ok = 1;
-                    for my $v ( values %{$value} ) {
-                        ( $ok = 0, last )
-                          unless (
-                            (
-                                do {
-
-                                    package Mite::Shim;
-                                    defined($v) and do {
-                                        ref( \$v ) eq 'SCALAR'
-                                          or ref( \( my $val = $v ) ) eq
-                                          'SCALAR';
-                                    }
-                                }
-                            )
-                            && ( do { local $_ = $v; /\A[^\W0-9]\w*\z/ } )
-                          );
-                    };
-                    for my $k ( keys %{$value} ) {
-                        ( $ok = 0, last ) unless do {
-
-                            package Mite::Shim;
-                            (
-                                (
-                                    (
-                                        do {
-
-                                            package Mite::Shim;
-                                            defined($k) and do {
-                                                ref( \$k ) eq 'SCALAR'
-                                                  or ref( \( my $val = $k ) )
-                                                  eq 'SCALAR';
-                                            }
-                                        }
-                                    )
-                                      && (
-                                        do { local $_ = $k; /\A[^\W0-9]\w*\z/ }
-                                      )
-                                )
-                                  or (
-                                    (
-                                        do {
-
-                                            package Mite::Shim;
-                                            defined($k) and do {
-                                                ref( \$k ) eq 'SCALAR'
-                                                  or ref( \( my $val = $k ) )
-                                                  eq 'SCALAR';
-                                            }
-                                        }
-                                    )
-                                    && ( do { local $_ = $k; /\%/ } )
-                                  )
-                            );
-                        }
-                    };
-                    $ok;
-                }
+                );
               }
               or croak( "Type check failed in %s: value should be %s",
-                "accessor", "HandlesHash" );
+                "accessor", "HandlesHash|Enum[\"1\",\"2\"]" );
             $_[0]{"handles"} = $value;
             $_[0];
           }
@@ -2895,7 +3080,7 @@
     }
 
     # Accessors for lazy
-    # has declaration, file lib/Mite/Attribute.pm, line 110
+    # has declaration, file lib/Mite/Attribute.pm, line 115
     sub lazy {
         @_ > 1
           ? do {
@@ -3574,7 +3759,7 @@
     }
 
     # Accessors for trigger
-    # has declaration, file lib/Mite/Attribute.pm, line 124
+    # has declaration, file lib/Mite/Attribute.pm, line 129
     if ($__XS) {
         Class::XSAccessor->import(
             chained             => 1,
@@ -3649,7 +3834,7 @@
     }
 
     # Accessors for type
-    # has declaration, file lib/Mite/Attribute.pm, line 87
+    # has declaration, file lib/Mite/Attribute.pm, line 92
     sub type {
         @_ > 1 ? croak("type is a read-only attribute of @{[ref $_[0]]}") : (
             exists( $_[0]{"type"} ) ? $_[0]{"type"} : (
