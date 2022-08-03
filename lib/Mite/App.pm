@@ -6,7 +6,7 @@ package Mite::App;
 use Mite::Miteception -all;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.008000';
+our $VERSION   = '0.008001';
 
 use Module::Pluggable
     search_path => [ 'Mite::App::Command' ],

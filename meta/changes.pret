@@ -1,6 +1,19 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.008001 cpan:TOBYINK`
+	issued  2022-08-03;
+	changeset [
+		item [
+			a dcs:Addition;
+			label "Mite can now optionally skip type checks/coercions on attribute values supplied by defaults/builders.";
+		];
+		item [
+			a dcs:Addition;
+			label "Mite can now optionally call triggers when an attribute value is supplied by defaults/builders.";
+		];
+	].
+
 `Mite 0.008000 cpan:TOBYINK`
 	issued  2022-08-01;
 	changeset [
