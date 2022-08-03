@@ -19,6 +19,7 @@ has extends =>
   accessor      => 'superclasses',
   isa           => ArrayRef[ValidClassName],
   default       => sub { [] },
+  default_does_trigger => true,
   trigger       => sub {
       my $self = shift;
 
@@ -39,13 +40,6 @@ has parents =>
   lazy          => true,
   builder       => '_build_parents',
   clearer       => '_clear_parents';
-
-sub BUILD {
-    my $self = shift;
-
-    $self->_trigger_extends( $self->superclasses )
-        if $self->can('_trigger_extends');
-}
 
 sub class {
     my ( $self, $name ) = ( shift, @_ );

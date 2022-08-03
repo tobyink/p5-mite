@@ -299,7 +299,7 @@
         };
 
         # Attribute extends (type: ArrayRef[ValidClassName])
-        # has declaration, file lib/Mite/Class.pm, line 32
+        # has declaration, file lib/Mite/Class.pm, line 33
         do {
             my $value =
               exists( $args->{"extends"} )
@@ -338,12 +338,11 @@
               or croak "Type check failed in constructor: %s should be %s",
               "extends", "ArrayRef[ValidClassName]";
             $self->{"extends"} = $value;
-            $self->_trigger_extends( $self->{"extends"} )
-              if exists $args->{"extends"};
+            $self->_trigger_extends( $self->{"extends"} );
         };
 
         # Attribute parents (type: ArrayRef[Mite::Class])
-        # has declaration, file lib/Mite/Class.pm, line 35
+        # has declaration, file lib/Mite/Class.pm, line 36
         if ( exists $args->{"parents"} ) {
             (
                 do { package Mite::Shim; ref( $args->{"parents"} ) eq 'ARRAY' }
@@ -399,7 +398,7 @@
       && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
     # Accessors for extends
-    # has declaration, file lib/Mite/Class.pm, line 32
+    # has declaration, file lib/Mite/Class.pm, line 33
     sub superclasses {
         @_ > 1
           ? do {
@@ -445,7 +444,7 @@
     }
 
     # Accessors for parents
-    # has declaration, file lib/Mite/Class.pm, line 35
+    # has declaration, file lib/Mite/Class.pm, line 36
     sub _clear_parents { delete $_[0]{"parents"}; $_[0]; }
 
     sub parents {

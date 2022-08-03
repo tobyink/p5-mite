@@ -311,9 +311,9 @@ the type constraint.
 
 If set to a string, is the name of a method to call whenever a new
 attribute value is set. This is I<not> called when an attribute is
-defaulted. If set to "1", will assume a trigger called "_trigger_foo"
-if your attribute is called "foo" and "_trigger__foo" if your
-attribute is called "_foo".
+defaulted. (However, see the C<default_does_trigger> option.) If set
+to "1", will assume a trigger called "_trigger_foo" if your attribute
+is called "foo" and "_trigger__foo" if your attribute is called "_foo".
 
 If set to a coderef, acts like it was set to "1" but installs the
 coderef into your class with that name.
@@ -402,6 +402,21 @@ unless you used C<< is => "lazy" >>.
 An eager (non-lazy) default or builder is applied by the constructor
 when the object is constructed. A lazy default or builder is applied
 by the reader/accessor if and when the attribute is accessed.
+
+=head2 C<default_is_trusted> B<Bool>
+
+Defaults to false (which is how Moose and Moo work), but if set to true,
+Mite will skip type checks and coercions when the attribute is set by the
+default or builder. If you trust that the default is always going to be
+a valid value, then it may make sense to only do type checks and coercions
+when a value is passed in by your caller. This may make your accessors and
+constructor a little faster.
+
+=head2 C<default_does_trigger> B<Bool>
+
+Defaults to false (which is how Moose and Moo work), but if set to true,
+Mite will also call your trigger if the attribute's default is used.
+Normally triggers are only called when an attribute is set explicitly.
 
 =head2 C<documentation> B<Any>
 

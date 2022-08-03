@@ -54,7 +54,9 @@ has init_arg =>
 has required =>
   is            => rw,
   isa           => Bool,
-  default       => false;
+  coerce        => true,
+  default       => false,
+  default_is_trusted => true;
 
 has weak_ref =>
   is            => rw,
@@ -97,6 +99,13 @@ has default =>
   isa           => Undef | Str | CodeRef | ScalarRef | Dict[] | Tuple[],
   documentation => 'We support more possibilities than Moose!',
   predicate     => true;
+
+has [ 'default_is_trusted', 'default_does_trigger' ] =>
+  is            => rw,
+  isa           => Bool,
+  coerce        => true,
+  default       => false,
+  default_is_trusted => true;
 
 has lazy =>
   is            => rw,
@@ -463,6 +472,7 @@ sub _compile_checked_default {
     my ( $self, $selfvar ) = @_;
 
     my $default = $self->_compile_default( $selfvar );
+    return $default if $self->default_is_trusted;
     my $type = $self->type or return $default;
 
     if ( $self->coerce ) {
@@ -551,6 +561,7 @@ sub compile_init {
         my $code;
         my $valuevar = sprintf '%s->{%s}', $argvar, $self->_q_init_arg;
         my $postamble = '';
+        my $needs_check = 1;
 
         if ( $self->clone_on_write ) {
             push @code, sprintf '%s = %s if exists( %s );',
@@ -558,7 +569,24 @@ sub compile_init {
         }
 
         if ( $self->has_default || $self->has_builder and not $self->lazy ) {
-            if ( $self->type ) {
+            if ( $self->default_is_trusted and my $type = $self->type ) {
+                my $coerce_and_check;
+                local $Type::Tiny::AvoidCallbacks = 1;
+                if ( $type->has_coercion ) {
+                    $coerce_and_check = sprintf 'do { my $coerced_value = %s; ( %s ) ? $coerced_value : %s( "Type check failed in constructor: %%s should be %%s", %s, %s ) }',
+                        $self->_compile_coercion( $valuevar ), $type->inline_check( '$coerced_value' ), $self->_function_for_croak, $self->_q_init_arg, $self->_q( $type->display_name );
+                }
+                else {
+                    $coerce_and_check = sprintf '( ( %s ) ? %s : %s( "Type check failed in constructor: %%s should be %%s", %s, %s ) )',
+                        $type->inline_check( $valuevar ), $valuevar, $self->_function_for_croak, $self->_q_init_arg, $self->_q( $type->display_name );
+                }
+                $code .= sprintf 'do { my $value = exists( %s ) ? %s : %s; ',
+                    $valuevar, $coerce_and_check, $self->_compile_default( $selfvar );
+                $valuevar = '$value';
+                $postamble = "}; $postamble";
+                $needs_check = 0;
+            }
+            elsif ( $self->type ) {
                 $code .= sprintf 'do { my $value = exists( %s ) ? %s : %s; ',
                     $valuevar, $valuevar, $self->_compile_default( $selfvar );
                 $valuevar = '$value';
@@ -569,11 +597,15 @@ sub compile_init {
                     $valuevar, $valuevar, $self->_compile_default( $selfvar );
             }
 
+            my $trigger_condition_code =
+                ( $self->default_does_trigger and ! $self->lazy and $self->has_default || $self->has_builder )
+                ? '; '
+                : sprintf( ' if exists %s->{%s}; ', $argvar, $self->_q_init_arg );
             my $trigger_code = $self->trigger
                 ? $self->_compile_trigger(
                     $selfvar,
                     sprintf( '%s->{%s}', $selfvar, $self->_q_name ),
-                ) . sprintf( ' if exists %s->{%s}; ', $argvar, $self->_q_init_arg )
+                ) . $trigger_condition_code
                 : '';
             $postamble = $trigger_code . $postamble;
         }
@@ -594,7 +626,7 @@ sub compile_init {
             $postamble = "$trigger_code} $postamble";
         }
 
-        if ( my $type = $self->type ) {
+        if ( $needs_check and my $type = $self->type ) {
             if ( $self->coerce ) {
                 $code .= sprintf 'do { my $coerced_value = %s; ', $self->_compile_coercion( $valuevar );
                 $valuevar = '$coerced_value';
@@ -642,8 +674,13 @@ my %code_template;
         my %arg = @_;
         my $code = sprintf '$_[0]{%s}', $self->_q_name;
         if ( $self->lazy ) {
+            my $checked_default = $self->_compile_checked_default( '$_[0]' );
+            if ( $self->default_does_trigger ) {
+                $checked_default = sprintf 'do { my $default = %s; %s; $default }',
+                    $checked_default, $self->_compile_trigger( '$_[0]', '$default' );
+            }
             $code = sprintf '( exists($_[0]{%s}) ? $_[0]{%s} : ( $_[0]{%s} = %s ) )',
-                $self->_q_name, $self->_q_name, $self->_q_name, $self->_compile_checked_default( '$_[0]' );
+                $self->_q_name, $self->_q_name, $self->_q_name, $checked_default;
         }
         if ( $self->clone_on_read ) {
             $code = $self->_compile_clone( '$_[0]', $code );
