@@ -65,7 +65,7 @@ has weak_ref =>
 
 has is =>
   is            => rw,
-  isa           => Enum[ ro, rw, rwp, 'lazy', bare ],
+  enum          => [ ro, rw, rwp, 'lazy', bare ],
   default       => bare;
 
 has [ 'reader', 'writer', 'accessor', 'clearer', 'predicate', 'lvalue', 'local_writer' ] =>
