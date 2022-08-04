@@ -74,6 +74,15 @@ sub BUILD {
         if $self->is_named && $self->is_positional;
 }
 
+sub use_strict_mode {
+    my $self = shift;
+
+    my $class = $self->compiling_class || $self->class;
+    return if not $class;
+    return if not $class->project->config->data->{use_strict_mode};
+    return sprintf '%s::STRICT', $class->project->config->data->{shim};
+}
+
 sub _build_compiler {
     my $self = shift;
 
@@ -89,6 +98,7 @@ sub _build_compiler {
             ( $self->head ? ( head => $self->head ) : () ),
             ( $self->tail ? ( tail => $self->tail ) : () ),
             named_to_list  => $self->named_to_list,
+            strictness     => scalar( $self->use_strict_mode // 1 ),
             mite_signature => $self,
             $self->should_bless
                 ? ( bless => sprintf '%s::__NAMED_ARGUMENTS__::%s', $self->class->name, $self->method_name )

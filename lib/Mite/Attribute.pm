@@ -475,23 +475,34 @@ sub has_simple_default {
 sub _compile_check {
     my ( $self, $varname ) = @_;
 
-    my $type  = $self->type;
+    my $type = $self->type
+        or return ( $self->imported_functions->{true} ? 'true' : '!!1' );
+
+    my $code = undef;
 
     if ( $self->compiling_class
     and  $self->compiling_class->imported_functions->{blessed} ) {
         my $ctype = $type->find_constraining_type;
 
         if ( $ctype == Object ) {
-            return "blessed( $varname )";
+            $code = "blessed( $varname )";
         }
         elsif ( $ctype->isa( 'Type::Tiny::Class' ) ) {
-            return sprintf 'blessed( %s ) && %s->isa( %s )',
+            $code = sprintf 'blessed( %s ) && %s->isa( %s )',
                 $varname, $varname, $self->_q( $ctype->class );
         }
     }
 
-    local $Type::Tiny::AvoidCallbacks = 1;
-    return $type->inline_check( $varname );
+    $code //= do {
+        local $Type::Tiny::AvoidCallbacks = 1;
+        $type->inline_check( $varname );
+    };
+
+    if ( my $use_strict_mode = $self->use_strict_mode ) {
+        $code = "( !$use_strict_mode or $code )";
+    }
+
+    return $code;
 }
 
 sub _compile_coercion {
@@ -709,6 +720,7 @@ sub use_strict_mode {
     if ( my $class = $self->compiling_class ) {
         return $class->use_strict_mode;
     }
+    return if not $self->class;
     return if not $self->class->project->config->data->{use_strict_mode};
     return sprintf '%s::STRICT', $self->class->project->config->data->{shim};
 }
