@@ -49,6 +49,8 @@ Multiple attributes can be defined using an arrayref.
         writer => 1,
     );
 
+=head2 Extending attributes
+
 Like in Moose, you can use a plus sign to modify an attribute definition
 from a role or parent class:
 
@@ -58,12 +60,18 @@ from a role or parent class:
 
 When modifying an attribute, you cannot use the C<is> option.
 
+=head2 Attribute storage
+
 Mite objects are always blessed hashrefs, and the name of the attribute
-is the hash key used to store the attribute. It is the maintainer of Mite's
-opinion that it is acceptable for an object method to directly access its
-own attributes this way, but not attributes defined in roles, parent classes,
-etc. Bypassing accessors will cause type checks, lazy defaults, triggers, etc
-to be ignored, so should be done with caution.
+is the hash key used to store the attribute.
+
+It is the maintainer of Mite's opinion that it is acceptable for an object
+method to directly access its own attributes this way, but not attributes
+defined in roles, parent classes, etc. Bypassing accessors will cause type
+checks, lazy defaults, triggers, etc to be ignored, so should be done with
+caution.
+
+=head2 Attribute options
 
 The following options are supported. (Expected types for the value of
 each option are also provided. A B<MethodName> is any valid Perl sub
@@ -71,7 +79,7 @@ name; a B<MethodNameTemplate> may also contain "%s" as a placeholder;
 B<One> means the literal string "1". Other type constraints are
 self-explanatory.)
 
-=head2 C<is> B<< Enum[ "ro", "rw", "bare", "rwp", "lazy" ] >>
+=head3 C<is> B<< Enum[ "ro", "rw", "bare", "rwp", "lazy" ] >>
 
 Supported values for C<is> include "ro", "rw", and "bare" like Moose,
 but also "rwp" and "lazy" like Moo. These are all just shortcuts for
@@ -79,7 +87,7 @@ defining other options.
 
 The default is C<< is => 'bare' >>.
 
-=head2 C<reader> B<< MethodNameTemplate | One | Undef >>
+=head3 C<reader> B<< MethodNameTemplate | One | Undef >>
 
 The name of the attribute reader method to generate. If set to "1",
 will generate a reader called "get_foo" if your attribute is called
@@ -97,7 +105,7 @@ attribute. This allows:
         reader   => 'fetch_%s',
     );
 
-=head2 C<writer> B<< MethodNameTemplate | One | Undef >>
+=head3 C<writer> B<< MethodNameTemplate | One | Undef >>
 
 The name of the attribute writer method to generate. If set to "1",
 will generate a writer called "set_foo" if your attribute is called
@@ -114,7 +122,7 @@ writer methods return C<< $self >>, allowing them to be chained:
 
     $object->set_bar( 42 )->set_baz( 99 );
 
-=head2 C<accessor> B<< MethodNameTemplate | One | Undef >>
+=head3 C<accessor> B<< MethodNameTemplate | One | Undef >>
 
 The name of the dual-purpose attribute reader/writer method to generate.
 If set to "1", will generate a reader called "foo" if your attribute is
@@ -132,7 +140,7 @@ to be chained:
 
     $object->bar( 42 )->baz( 99 );
 
-=head2 C<clearer> B<< MethodNameTemplate | One | Undef >>
+=head3 C<clearer> B<< MethodNameTemplate | One | Undef >>
 
 The name of the attribute clearer method to generate. If set to "1",
 will generate a clearer called "clear_foo" if your attribute is called
@@ -146,7 +154,7 @@ clearer methods return C<< $self >>, allowing them to be chained:
 
     $object->clear_foo->clear_bar->clear_baz;
 
-=head2 C<predicate> B<< MethodNameTemplate | One | Undef >>
+=head3 C<predicate> B<< MethodNameTemplate | One | Undef >>
 
 The name of the attribute predicate method to generate. If set to "1",
 will generate a predicate called "has_foo" if your attribute is called
@@ -155,7 +163,7 @@ will generate a predicate called "has_foo" if your attribute is called
 If your predicate contains "%s" this will be replaced by the name of the
 attribute.
 
-=head2 C<lvalue> B<< MethodNameTemplate | One | Undef >>
+=head3 C<lvalue> B<< MethodNameTemplate | One | Undef >>
 
 The name of the dual-purpose lvalue reader/writer method to generate.
 If set to "1", will generate a reader called "foo" if your attribute is
@@ -177,7 +185,7 @@ uses a type contraint or coercions, has a trigger, or uses weak_ref.
 This is roughly (but not exactly) the same functionality as
 L<MooseX::LvalueAttribute>.
 
-=head2 C<local_writer> B<< MethodNameTemplate | One | Undef >>
+=head3 C<local_writer> B<< MethodNameTemplate | One | Undef >>
 
 The name of the dynamically scoped writer method to generate. These work like
 this:
@@ -206,7 +214,7 @@ attribute.
 
 This is vaguely inspired by L<MooseX::LocalAttribute>.
 
-=head2 C<skip_argc_check> B<Bool>
+=head3 C<skip_argc_check> B<Bool>
 
 Mite includes sanity checks on the number of arguments passed to accessors.
 For example, if you call a reader and pass it a value as if it were a writer,
@@ -218,7 +226,7 @@ being used, these checks will still be done in XS mode, so C<skip_argc_check>
 shouldn't be used as a way to allow the wrong number of arguments to be passed
 to a function, just as an optimization.
 
-=head2 C<handles> B<< Map[ MethodNameTemplate, MethodName ] | Enum[ 1, 2 ] >>
+=head3 C<handles> B<< Map[ MethodNameTemplate, MethodName ] | Int >>
 
 Delegated methods. Currying and native traits are not supported.
 
@@ -269,7 +277,7 @@ Note that if C<handles> had been 1, then the methods would have just been
 called C<is_small>, C<is_medium>, and C<is_large>, without the C<size_> prefix
 at the start.
 
-=head2 C<init_arg> B<< NonEmptyStr | Undef >>
+=head3 C<init_arg> B<< NonEmptyStr | Undef >>
 
 The parameter expected to be passed to the constructor to initialize this
 attribute. May be undef if the attribute should not be intitialized in the
@@ -280,12 +288,12 @@ Defaults to the attribute's name.
 If your init_arg contains "%s" this will be replaced by the name of the
 attribute.
 
-=head2 C<required> B<Bool>
+=head3 C<required> B<Bool>
 
-Indicates whether the attribute is required in the parameter. If the
+Indicates whether the attribute is required in the constructor. If the
 attribute has a non-lazy default, this is ignored.
 
-=head2 C<alias> B<< ArrayRef[ MethodNameTemplate ] >>
+=head3 C<alias> B<< ArrayRef[ MethodNameTemplate ] >>
 
 A list of aliases for the attibutes. If the attribute has an init_arg
 (including a default one), this provides alternative initialization
@@ -314,7 +322,7 @@ then as a last resort the alias will be an alias for the writer.
 Aliases are not natively supported by Moose, but this feature is
 analagous to L<MooseX::Aliases>.
 
-=head2 C<isa> B<< Str | Ref >>
+=head3 C<isa> B<< Str | Ref >>
 
 A string type name from L<Types::Standard>, L<Types::Common::String>,
 or L<Types::Common::Numeric>, or a blessed L<Type::Tiny> object.
@@ -342,23 +350,23 @@ your project will not have a dependency on Type::Library.
 L<Type::Library::Compiler> is an alternative way to create a zero-dependency
 type library which Mite is able to use.
 
-=head2 C<does> B<< Str | Ref >>
+=head3 C<does> B<< Str | Ref >>
 
 Same as C<isa>, but if the type name is unrecognized, assumes it was a
 role name instead of assuming it was a class name.
 
-=head2 C<enum> B<< ArrayRef[NonEmptyStr] >>
+=head3 C<enum> B<< ArrayRef[ NonEmptyStr ] >>
 
 Shortcut for C<< isa => 'Enum["foo","bar","baz"]' >>.
 
 This feature is inspired by L<MooseX::Enumeration> and L<MooX::Enumeration>.
 
-=head2 C<coerce> B<Bool>
+=head3 C<coerce> B<Bool>
 
 Indicates that the attribute should attempt to coerce values to fit
 the type constraint.
 
-=head2 C<trigger> B<< MethodNameTemplate | One | CodeRef >>
+=head3 C<trigger> B<< MethodNameTemplate | One | CodeRef >>
 
 If set to a string, is the name of a method to call whenever a new
 attribute value is set. This is I<not> called when an attribute is
@@ -372,12 +380,12 @@ coderef into your class with that name.
 If your trigger method name contains "%s" this will be replaced by
 the name of the attribute.
 
-=head2 C<weak_ref> B<Bool>
+=head3 C<weak_ref> B<Bool>
 
 Indicates that the attribute should weaken its reference to the
 attribute value.
 
-=head2 C<clone> B<< MethodNameTemplate | One | CodeRef | Undef >>
+=head3 C<clone> B<< MethodNameTemplate | One | CodeRef | Undef >>
 
 Stolen from L<MooseX::Extended>. Set to "1" to make a deep clone of
 the attribute value using L<Storable> whenever the attribute is read
@@ -411,7 +419,7 @@ a clone method set will clone both incoming and outgoing references.
         clone_on_read  => false,
     );
 
-=head2 C<default> B<< CodeRef | ScalarRef | Str | Undef | Dict[] | Tuple[] >>
+=head3 C<default> B<< CodeRef | ScalarRef | Str | Undef | Dict[] | Tuple[] >>
 
 A default value for the attribute, or a coderef called as a method
 to generate that default value.
@@ -430,7 +438,7 @@ overhead of a sub call.
 
 An I<empty> arrayref or I<empty> hashref is also allowed as a default.
 
-=head2 C<builder> B<< MethodNameTemplate | One | CodeRef >>
+=head3 C<builder> B<< MethodNameTemplate | One | CodeRef >>
 
 If set to a string, is the name of a method to call to build the
 default attribute value. If set to "1", will assume a builder called
@@ -445,7 +453,7 @@ coderef into your class with that name.
 If your builder method name contains "%s" this will be replaced by
 the name of the attribute.
 
-=head2 C<lazy> B<Bool>
+=head3 C<lazy> B<Bool>
 
 Indicates that the default should be set lazily. Defaults to false
 unless you used C<< is => "lazy" >>.
@@ -454,7 +462,7 @@ An eager (non-lazy) default or builder is applied by the constructor
 when the object is constructed. A lazy default or builder is applied
 by the reader/accessor if and when the attribute is accessed.
 
-=head2 C<default_is_trusted> B<Bool>
+=head3 C<default_is_trusted> B<Bool>
 
 Defaults to false (which is how Moose and Moo work), but if set to true,
 Mite will skip type checks and coercions when the attribute is set by the
@@ -463,13 +471,13 @@ a valid value, then it may make sense to only do type checks and coercions
 when a value is passed in by your caller. This may make your accessors and
 constructor a little faster.
 
-=head2 C<default_does_trigger> B<Bool>
+=head3 C<default_does_trigger> B<Bool>
 
 Defaults to false (which is how Moose and Moo work), but if set to true,
 Mite will also call your trigger if the attribute's default is used.
 Normally triggers are only called when an attribute is set explicitly.
 
-=head2 C<documentation> B<Any>
+=head3 C<documentation> B<Any>
 
 This option is ignored, but you can set it to a documentation string
 for your attribute.
@@ -478,6 +486,47 @@ for your attribute.
         is => 'rwp',
         isa => 'Str',
         documentation => 'First name and surname',
+    );
+
+=head2 How to...
+
+=head3 C<< is => 'wo' >> (write-only attributes)
+
+There are use cases for write-only attributes. For example:
+
+    package Your::Project::ApiClient;
+    use Your::Project::Mite;
+    has user_agent => (
+        is      => 'wo',
+        isa     => 'Object',
+        handles => [ 'get', 'post' ],
+        builder => sub { require HTTP::Tiny; HTTP::Tiny->new },
+    );
+    ...
+    
+    $client->user_agent( HTTP::Tiny::WithLogging->new );
+    $client->post( ... );
+    $client->user_agent();  # dies, because it's a writer
+
+However, Mite doesn't support C<< is => 'wo' >>. (Neither do L<Moose>,
+L<Mouse>, or L<Moo>!) So how can this be accomplished?
+
+This will provide a writer method called C<user_agent>:
+
+    has user_agent => (
+        writer  => '%s',
+        isa     => 'Object',
+        handles => [ 'get', 'post' ],
+        builder => sub { require HTTP::Tiny; HTTP::Tiny->new },
+    );
+
+Alternatively, this will provide a writer method called C<set_user_agent>:
+
+    has user_agent => (
+        writer  => 1,
+        isa     => 'Object',
+        handles => [ 'get', 'post' ],
+        builder => sub { require HTTP::Tiny; HTTP::Tiny->new },
     );
 
 =head1 BUGS
