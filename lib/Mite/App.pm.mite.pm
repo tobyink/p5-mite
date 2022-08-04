@@ -172,9 +172,8 @@
     }
     else {
         *commands = sub {
-            @_ > 1
-              ? croak("commands is a read-only attribute of @{[ref $_[0]]}")
-              : $_[0]{"commands"};
+            @_ == 1 or croak('Reader "commands" usage: $self->commands()');
+            $_[0]{"commands"};
         };
     }
 
@@ -200,9 +199,8 @@
     }
 
     sub kingpin {
-        @_ > 1
-          ? croak("kingpin is a read-only attribute of @{[ref $_[0]]}")
-          : (
+        @_ == 1 or croak('Reader "kingpin" usage: $self->kingpin()');
+        (
             exists( $_[0]{"kingpin"} ) ? $_[0]{"kingpin"} : (
                 $_[0]{"kingpin"} = do {
                     my $default_value = $_[0]->_build_kingpin;
@@ -212,7 +210,7 @@
                     $default_value;
                 }
             )
-          );
+        );
     }
 
     # Delegated methods for kingpin
@@ -242,9 +240,8 @@
     }
 
     sub project {
-        @_ > 1
-          ? croak("project is a read-only attribute of @{[ref $_[0]]}")
-          : (
+        @_ == 1 or croak('Reader "project" usage: $self->project()');
+        (
             exists( $_[0]{"project"} ) ? $_[0]{"project"} : (
                 $_[0]{"project"} = do {
                     my $default_value = $_[0]->_build_project;
@@ -255,7 +252,7 @@
                     $default_value;
                 }
             )
-          );
+        );
     }
 
     # Delegated methods for project

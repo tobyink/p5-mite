@@ -284,9 +284,8 @@
     # Accessors for config_file
     # has declaration, file lib/Mite/Config.pm, line 35
     sub config_file {
-        @_ > 1
-          ? croak("config_file is a read-only attribute of @{[ref $_[0]]}")
-          : (
+        @_ == 1 or croak('Reader "config_file" usage: $self->config_file()');
+        (
             exists( $_[0]{"config_file"} ) ? $_[0]{"config_file"} : (
                 $_[0]{"config_file"} = do {
                     my $default_value = do {
@@ -347,7 +346,7 @@
                     $default_value;
                 }
             )
-          );
+        );
     }
 
     # Accessors for data
@@ -381,9 +380,8 @@
     # Accessors for mite_dir
     # has declaration, file lib/Mite/Config.pm, line 25
     sub mite_dir {
-        @_ > 1
-          ? croak("mite_dir is a read-only attribute of @{[ref $_[0]]}")
-          : (
+        @_ == 1 or croak('Reader "mite_dir" usage: $self->mite_dir()');
+        (
             exists( $_[0]{"mite_dir"} ) ? $_[0]{"mite_dir"} : (
                 $_[0]{"mite_dir"} = do {
                     my $default_value = do {
@@ -444,7 +442,7 @@
                     $default_value;
                 }
             )
-          );
+        );
     }
 
     # Accessors for mite_dir_name
@@ -457,10 +455,9 @@
     }
     else {
         *mite_dir_name = sub {
-            @_ > 1
-              ? croak(
-                "mite_dir_name is a read-only attribute of @{[ref $_[0]]}")
-              : $_[0]{"mite_dir_name"};
+            @_ == 1
+              or croak('Reader "mite_dir_name" usage: $self->mite_dir_name()');
+            $_[0]{"mite_dir_name"};
         };
     }
 

@@ -236,7 +236,8 @@
     # Accessors for config
     # has declaration, file lib/Mite/Project.pm, line 24
     sub config {
-        @_ > 1 ? croak("config is a read-only attribute of @{[ref $_[0]]}") : (
+        @_ == 1 or croak('Reader "config" usage: $self->config()');
+        (
             exists( $_[0]{"config"} ) ? $_[0]{"config"} : (
                 $_[0]{"config"} = do {
                     my $default_value =
@@ -281,9 +282,8 @@
     }
     else {
         *sources = sub {
-            @_ > 1
-              ? croak("sources is a read-only attribute of @{[ref $_[0]]}")
-              : $_[0]{"sources"};
+            @_ == 1 or croak('Reader "sources" usage: $self->sources()');
+            $_[0]{"sources"};
         };
     }
 

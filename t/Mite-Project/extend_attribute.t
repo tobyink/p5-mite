@@ -27,7 +27,7 @@ CODE
     my $child = new_ok "C1";
     is $child->foo, "child default";
     like dies { $child->foo(23) },
-              qr{(foo is a read-only attribute|Usage: C1::foo\(self\))};
+              qr{usage:}i;
 };
 
 done_testing;

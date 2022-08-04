@@ -327,9 +327,8 @@
     }
     else {
         *source = sub {
-            @_ > 1
-              ? croak("source is a read-only attribute of @{[ref $_[0]]}")
-              : $_[0]{"source"};
+            @_ == 1 or croak('Reader "source" usage: $self->source()');
+            $_[0]{"source"};
         };
     }
 

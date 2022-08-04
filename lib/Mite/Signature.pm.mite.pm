@@ -268,9 +268,8 @@
     }
     else {
         *class = sub {
-            @_ > 1
-              ? croak("class is a read-only attribute of @{[ref $_[0]]}")
-              : $_[0]{"class"};
+            @_ == 1 or croak('Reader "class" usage: $self->class()');
+            $_[0]{"class"};
         };
     }
 
@@ -296,9 +295,8 @@
     }
 
     sub compiler {
-        @_ > 1
-          ? croak("compiler is a read-only attribute of @{[ref $_[0]]}")
-          : (
+        @_ == 1 or croak('Reader "compiler" usage: $self->compiler()');
+        (
             exists( $_[0]{"compiler"} ) ? $_[0]{"compiler"} : (
                 $_[0]{"compiler"} = do {
                     my $default_value = $_[0]->_build_compiler;
@@ -308,7 +306,7 @@
                     $default_value;
                 }
             )
-          );
+        );
     }
 
     # Delegated methods for compiler
@@ -353,7 +351,8 @@
     # Accessors for head
     # has declaration, file lib/Mite/Signature.pm, line 46
     sub head {
-        @_ > 1 ? croak("head is a read-only attribute of @{[ref $_[0]]}") : (
+        @_ == 1 or croak('Reader "head" usage: $self->head()');
+        (
             exists( $_[0]{"head"} ) ? $_[0]{"head"} : (
                 $_[0]{"head"} = do {
                     my $default_value = $_[0]->_build_head;
@@ -389,9 +388,8 @@
     }
     else {
         *method = sub {
-            @_ > 1
-              ? croak("method is a read-only attribute of @{[ref $_[0]]}")
-              : $_[0]{"method"};
+            @_ == 1 or croak('Reader "method" usage: $self->method()');
+            $_[0]{"method"};
         };
     }
 
@@ -405,9 +403,9 @@
     }
     else {
         *method_name = sub {
-            @_ > 1
-              ? croak("method_name is a read-only attribute of @{[ref $_[0]]}")
-              : $_[0]{"method_name"};
+            @_ == 1
+              or croak('Reader "method_name" usage: $self->method_name()');
+            $_[0]{"method_name"};
         };
     }
 
@@ -421,11 +419,13 @@
         );
     }
     else {
-        *is_named = sub { exists $_[0]{"named"} };
-        *named    = sub {
-            @_ > 1
-              ? croak("named is a read-only attribute of @{[ref $_[0]]}")
-              : $_[0]{"named"};
+        *is_named = sub {
+            @_ == 1 or croak('Predicate "is_named" usage: $self->is_named()');
+            exists $_[0]{"named"};
+        };
+        *named = sub {
+            @_ == 1 or croak('Reader "named" usage: $self->named()');
+            $_[0]{"named"};
         };
     }
 
@@ -439,10 +439,9 @@
     }
     else {
         *named_to_list = sub {
-            @_ > 1
-              ? croak(
-                "named_to_list is a read-only attribute of @{[ref $_[0]]}")
-              : $_[0]{"named_to_list"};
+            @_ == 1
+              or croak('Reader "named_to_list" usage: $self->named_to_list()');
+            $_[0]{"named_to_list"};
         };
     }
 
@@ -456,11 +455,15 @@
         );
     }
     else {
-        *is_positional = sub { exists $_[0]{"positional"} };
-        *positional    = sub {
-            @_ > 1
-              ? croak("positional is a read-only attribute of @{[ref $_[0]]}")
-              : $_[0]{"positional"};
+        *is_positional = sub {
+            @_ == 1
+              or
+              croak('Predicate "is_positional" usage: $self->is_positional()');
+            exists $_[0]{"positional"};
+        };
+        *positional = sub {
+            @_ == 1 or croak('Reader "positional" usage: $self->positional()');
+            $_[0]{"positional"};
         };
     }
 
@@ -471,9 +474,8 @@
     # Accessors for should_bless
     # has declaration, file lib/Mite/Signature.pm, line 68
     sub should_bless {
-        @_ > 1
-          ? croak("should_bless is a read-only attribute of @{[ref $_[0]]}")
-          : (
+        @_ == 1 or croak('Reader "should_bless" usage: $self->should_bless()');
+        (
             exists( $_[0]{"should_bless"} ) ? $_[0]{"should_bless"} : (
                 $_[0]{"should_bless"} = do {
                     my $default_value = $_[0]->_build_should_bless;
@@ -489,7 +491,7 @@
                     $default_value;
                 }
             )
-          );
+        );
     }
 
     # Accessors for tail
@@ -502,9 +504,8 @@
     }
     else {
         *tail = sub {
-            @_ > 1
-              ? croak("tail is a read-only attribute of @{[ref $_[0]]}")
-              : $_[0]{"tail"};
+            @_ == 1 or croak('Reader "tail" usage: $self->tail()');
+            $_[0]{"tail"};
         };
     }
 

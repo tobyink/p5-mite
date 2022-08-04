@@ -142,9 +142,8 @@
     }
     else {
         *app = sub {
-            @_ > 1
-              ? croak("app is a read-only attribute of @{[ref $_[0]]}")
-              : $_[0]{"app"};
+            @_ == 1 or croak('Reader "app" usage: $self->app()');
+            $_[0]{"app"};
         };
     }
 
@@ -163,9 +162,9 @@
     # Accessors for kingpin_command
     # has declaration, file lib/Mite/App/Command.pm, line 19
     sub kingpin_command {
-        @_ > 1
-          ? croak("kingpin_command is a read-only attribute of @{[ref $_[0]]}")
-          : (
+        @_ == 1
+          or croak('Reader "kingpin_command" usage: $self->kingpin_command()');
+        (
             exists( $_[0]{"kingpin_command"} ) ? $_[0]{"kingpin_command"} : (
                 $_[0]{"kingpin_command"} = do {
                     my $default_value = $_[0]->_build_kingpin_command;
@@ -175,7 +174,7 @@
                     $default_value;
                 }
             )
-          );
+        );
     }
 
     1;

@@ -445,12 +445,16 @@
 
     # Accessors for parents
     # has declaration, file lib/Mite/Class.pm, line 36
-    sub _clear_parents { delete $_[0]{"parents"}; $_[0]; }
+    sub _clear_parents {
+        @_ == 1
+          or croak('Clearer "_clear_parents" usage: $self->_clear_parents()');
+        delete $_[0]{"parents"};
+        $_[0];
+    }
 
     sub parents {
-        @_ > 1
-          ? croak("parents is a read-only attribute of @{[ref $_[0]]}")
-          : (
+        @_ == 1 or croak('Reader "parents" usage: $self->parents()');
+        (
             exists( $_[0]{"parents"} ) ? $_[0]{"parents"} : (
                 $_[0]{"parents"} = do {
                     my $default_value = $_[0]->_build_parents;
@@ -477,7 +481,7 @@
                     $default_value;
                 }
             )
-          );
+        );
     }
 
     1;

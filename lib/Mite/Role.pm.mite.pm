@@ -380,9 +380,8 @@
     }
     else {
         *attributes = sub {
-            @_ > 1
-              ? croak("attributes is a read-only attribute of @{[ref $_[0]]}")
-              : $_[0]{"attributes"};
+            @_ == 1 or croak('Reader "attributes" usage: $self->attributes()');
+            $_[0]{"attributes"};
         };
     }
 
@@ -396,10 +395,11 @@
     }
     else {
         *imported_functions = sub {
-            @_ > 1
-              ? croak(
-                "imported_functions is a read-only attribute of @{[ref $_[0]]}")
-              : $_[0]{"imported_functions"};
+            @_ == 1
+              or croak(
+                'Reader "imported_functions" usage: $self->imported_functions()'
+              );
+            $_[0]{"imported_functions"};
         };
     }
 
@@ -413,10 +413,10 @@
     }
     else {
         *method_signatures = sub {
-            @_ > 1
-              ? croak(
-                "method_signatures is a read-only attribute of @{[ref $_[0]]}")
-              : $_[0]{"method_signatures"};
+            @_ == 1
+              or croak(
+                'Reader "method_signatures" usage: $self->method_signatures()');
+            $_[0]{"method_signatures"};
         };
     }
 
@@ -430,9 +430,8 @@
     }
     else {
         *name = sub {
-            @_ > 1
-              ? croak("name is a read-only attribute of @{[ref $_[0]]}")
-              : $_[0]{"name"};
+            @_ == 1 or croak('Reader "name" usage: $self->name()');
+            $_[0]{"name"};
         };
     }
 
@@ -446,10 +445,10 @@
     }
     else {
         *required_methods = sub {
-            @_ > 1
-              ? croak(
-                "required_methods is a read-only attribute of @{[ref $_[0]]}")
-              : $_[0]{"required_methods"};
+            @_ == 1
+              or croak(
+                'Reader "required_methods" usage: $self->required_methods()');
+            $_[0]{"required_methods"};
         };
     }
 
@@ -463,9 +462,8 @@
     }
     else {
         *roles = sub {
-            @_ > 1
-              ? croak("roles is a read-only attribute of @{[ref $_[0]]}")
-              : $_[0]{"roles"};
+            @_ == 1 or croak('Reader "roles" usage: $self->roles()');
+            $_[0]{"roles"};
         };
     }
 

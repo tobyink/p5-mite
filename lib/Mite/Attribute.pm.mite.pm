@@ -968,6 +968,43 @@
             $self->{"default_does_trigger"} = $value;
         };
 
+        # Attribute skip_argc_check (type: Bool)
+        # has declaration, file lib/Mite/Attribute.pm, line 108
+        do {
+            my $value = exists( $args->{"skip_argc_check"} )
+              ? do {
+                my $coerced_value = do {
+                    my $to_coerce = $args->{"skip_argc_check"};
+                    (
+                        (
+                            !ref $to_coerce
+                              and (!defined $to_coerce
+                                or $to_coerce eq q()
+                                or $to_coerce eq '0'
+                                or $to_coerce eq '1' )
+                        )
+                      ) ? $to_coerce
+                      : ( ( !!1 ) )
+                      ? scalar( do { local $_ = $to_coerce; !!$_ } )
+                      : $to_coerce;
+                };
+                (
+                    (
+                        !ref $coerced_value
+                          and (!defined $coerced_value
+                            or $coerced_value eq q()
+                            or $coerced_value eq '0'
+                            or $coerced_value eq '1' )
+                    )
+                  )
+                  ? $coerced_value
+                  : croak( "Type check failed in constructor: %s should be %s",
+                    "skip_argc_check", "Bool" );
+              }
+              : false;
+            $self->{"skip_argc_check"} = $value;
+        };
+
         # Attribute lazy (type: Bool)
         # has declaration, file lib/Mite/Attribute.pm, line 115
         do {
@@ -1683,7 +1720,7 @@
 
         # Unrecognized parameters
         my @unknown = grep not(
-/\A(?:_class_for_default|a(?:ccessor|lias)|builder|c(?:l(?:ass|earer|one(?:_on_(?:read|write))?)|o(?:deref_default_variable|erce))|d(?:ef(?:ault(?:_(?:does_trigger|is_trusted))?|inition_context)|o(?:cumentation|es))|enum|handles|i(?:nit_arg|sa?)|l(?:azy|ocal_writer|value)|name|predicate|re(?:ader|quired)|t(?:rigger|ype)|w(?:eak_ref|riter))\z/
+/\A(?:_class_for_default|a(?:ccessor|lias)|builder|c(?:l(?:ass|earer|one(?:_on_(?:read|write))?)|o(?:deref_default_variable|erce))|d(?:ef(?:ault(?:_(?:does_trigger|is_trusted))?|inition_context)|o(?:cumentation|es))|enum|handles|i(?:nit_arg|sa?)|l(?:azy|ocal_writer|value)|name|predicate|re(?:ader|quired)|skip_argc_check|t(?:rigger|ype)|w(?:eak_ref|riter))\z/
         ), keys %{$args};
         @unknown
           and croak(
@@ -2086,10 +2123,10 @@
     # Accessors for alias_is_for
     # has declaration, file lib/Mite/Attribute.pm, line 161
     sub alias_is_for {
-        @_ > 1
-          ? croak("alias_is_for is a read-only attribute of @{[ref $_[0]]}")
-          : (
-            exists( $_[0]{"alias_is_for"} ) ? $_[0]{"alias_is_for"}
+        @_ == 1 or croak('Reader "alias_is_for" usage: $self->alias_is_for()');
+        (
+            exists( $_[0]{"alias_is_for"} )
+            ? $_[0]{"alias_is_for"}
             : ( $_[0]{"alias_is_for"} = $_[0]->_build_alias_is_for ) );
     }
 
@@ -2102,7 +2139,11 @@
         );
     }
     else {
-        *has_builder = sub { exists $_[0]{"builder"} };
+        *has_builder = sub {
+            @_ == 1
+              or croak('Predicate "has_builder" usage: $self->has_builder()');
+            exists $_[0]{"builder"};
+        };
     }
 
     sub builder {
@@ -2343,18 +2384,18 @@
     }
     else {
         *cloner_method = sub {
-            @_ > 1
-              ? croak("clone is a read-only attribute of @{[ref $_[0]]}")
-              : $_[0]{"clone"};
+            @_ == 1
+              or croak('Reader "cloner_method" usage: $self->cloner_method()');
+            $_[0]{"clone"};
         };
     }
 
     # Accessors for clone_on_read
     # has declaration, file lib/Mite/Attribute.pm, line 143
     sub clone_on_read {
-        @_ > 1
-          ? croak("clone_on_read is a read-only attribute of @{[ref $_[0]]}")
-          : (
+        @_ == 1
+          or croak('Reader "clone_on_read" usage: $self->clone_on_read()');
+        (
             exists( $_[0]{"clone_on_read"} ) ? $_[0]{"clone_on_read"} : (
                 $_[0]{"clone_on_read"} = do {
                     my $default_value = do {
@@ -2384,15 +2425,15 @@
                     $default_value;
                 }
             )
-          );
+        );
     }
 
     # Accessors for clone_on_write
     # has declaration, file lib/Mite/Attribute.pm, line 143
     sub clone_on_write {
-        @_ > 1
-          ? croak("clone_on_write is a read-only attribute of @{[ref $_[0]]}")
-          : (
+        @_ == 1
+          or croak('Reader "clone_on_write" usage: $self->clone_on_write()');
+        (
             exists( $_[0]{"clone_on_write"} ) ? $_[0]{"clone_on_write"} : (
                 $_[0]{"clone_on_write"} = do {
                     my $default_value = do {
@@ -2422,7 +2463,7 @@
                     $default_value;
                 }
             )
-          );
+        );
     }
 
     # Accessors for coderef_default_variable
@@ -2549,7 +2590,11 @@
         );
     }
     else {
-        *has_default = sub { exists $_[0]{"default"} };
+        *has_default = sub {
+            @_ == 1
+              or croak('Predicate "has_default" usage: $self->has_default()');
+            exists $_[0]{"default"};
+        };
     }
 
     sub default {
@@ -2687,7 +2732,13 @@
               ? do { $_[0]{"documentation"} = $_[1]; $_[0]; }
               : ( $_[0]{"documentation"} );
         };
-        *has_documentation = sub { exists $_[0]{"documentation"} };
+        *has_documentation = sub {
+            @_ == 1
+              or croak(
+'Predicate "has_documentation" usage: $self->has_documentation()'
+              );
+            exists $_[0]{"documentation"};
+        };
     }
 
     # Accessors for does
@@ -2700,9 +2751,8 @@
     }
     else {
         *_does = sub {
-            @_ > 1
-              ? croak("does is a read-only attribute of @{[ref $_[0]]}")
-              : $_[0]{"does"};
+            @_ == 1 or croak('Reader "_does" usage: $self->_does()');
+            $_[0]{"does"};
         };
     }
 
@@ -2715,7 +2765,10 @@
         );
     }
     else {
-        *has_enum = sub { exists $_[0]{"enum"} };
+        *has_enum = sub {
+            @_ == 1 or croak('Predicate "has_enum" usage: $self->has_enum()');
+            exists $_[0]{"enum"};
+        };
     }
 
     sub enum {
@@ -2763,7 +2816,11 @@
         );
     }
     else {
-        *has_handles = sub { exists $_[0]{"handles"} };
+        *has_handles = sub {
+            @_ == 1
+              or croak('Predicate "has_handles" usage: $self->has_handles()');
+            exists $_[0]{"handles"};
+        };
     }
 
     sub handles {
@@ -3073,9 +3130,8 @@
     }
     else {
         *_isa = sub {
-            @_ > 1
-              ? croak("isa is a read-only attribute of @{[ref $_[0]]}")
-              : $_[0]{"isa"};
+            @_ == 1 or croak('Reader "_isa" usage: $self->_isa()');
+            $_[0]{"isa"};
         };
     }
 
@@ -3758,6 +3814,40 @@
           : ( $_[0]{"required"} );
     }
 
+    # Accessors for skip_argc_check
+    # has declaration, file lib/Mite/Attribute.pm, line 108
+    sub skip_argc_check {
+        @_ > 1
+          ? do {
+            my $value = do {
+                my $to_coerce = $_[1];
+                (
+                    (
+                        !ref $to_coerce
+                          and (!defined $to_coerce
+                            or $to_coerce eq q()
+                            or $to_coerce eq '0'
+                            or $to_coerce eq '1' )
+                    )
+                  ) ? $to_coerce
+                  : ( ( !!1 ) ) ? scalar( do { local $_ = $to_coerce; !!$_ } )
+                  :               $to_coerce;
+            };
+            (
+                !ref $value
+                  and (!defined $value
+                    or $value eq q()
+                    or $value eq '0'
+                    or $value eq '1' )
+              )
+              or croak( "Type check failed in %s: value should be %s",
+                "accessor", "Bool" );
+            $_[0]{"skip_argc_check"} = $value;
+            $_[0];
+          }
+          : ( $_[0]{"skip_argc_check"} );
+    }
+
     # Accessors for trigger
     # has declaration, file lib/Mite/Attribute.pm, line 129
     if ($__XS) {
@@ -3767,7 +3857,11 @@
         );
     }
     else {
-        *has_trigger = sub { exists $_[0]{"trigger"} };
+        *has_trigger = sub {
+            @_ == 1
+              or croak('Predicate "has_trigger" usage: $self->has_trigger()');
+            exists $_[0]{"trigger"};
+        };
     }
 
     sub trigger {
@@ -3836,7 +3930,8 @@
     # Accessors for type
     # has declaration, file lib/Mite/Attribute.pm, line 92
     sub type {
-        @_ > 1 ? croak("type is a read-only attribute of @{[ref $_[0]]}") : (
+        @_ == 1 or croak('Reader "type" usage: $self->type()');
+        (
             exists( $_[0]{"type"} ) ? $_[0]{"type"} : (
                 $_[0]{"type"} = do {
                     my $default_value = $_[0]->_build_type;

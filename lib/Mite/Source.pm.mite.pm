@@ -270,9 +270,9 @@
     }
     else {
         *class_order = sub {
-            @_ > 1
-              ? croak("class_order is a read-only attribute of @{[ref $_[0]]}")
-              : $_[0]{"class_order"};
+            @_ == 1
+              or croak('Reader "class_order" usage: $self->class_order()');
+            $_[0]{"class_order"};
         };
     }
 
@@ -286,18 +286,16 @@
     }
     else {
         *classes = sub {
-            @_ > 1
-              ? croak("classes is a read-only attribute of @{[ref $_[0]]}")
-              : $_[0]{"classes"};
+            @_ == 1 or croak('Reader "classes" usage: $self->classes()');
+            $_[0]{"classes"};
         };
     }
 
     # Accessors for compiled
     # has declaration, file lib/Mite/Source.pm, line 34
     sub compiled {
-        @_ > 1
-          ? croak("compiled is a read-only attribute of @{[ref $_[0]]}")
-          : (
+        @_ == 1 or croak('Reader "compiled" usage: $self->compiled()');
+        (
             exists( $_[0]{"compiled"} ) ? $_[0]{"compiled"} : (
                 $_[0]{"compiled"} = do {
                     my $default_value =
@@ -309,7 +307,7 @@
                     $default_value;
                 }
             )
-          );
+        );
     }
 
     # Accessors for file
@@ -322,9 +320,8 @@
     }
     else {
         *file = sub {
-            @_ > 1
-              ? croak("file is a read-only attribute of @{[ref $_[0]]}")
-              : $_[0]{"file"};
+            @_ == 1 or croak('Reader "file" usage: $self->file()');
+            $_[0]{"file"};
         };
     }
 

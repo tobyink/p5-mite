@@ -105,7 +105,7 @@ has default =>
   documentation => 'We support more possibilities than Moose!',
   predicate     => true;
 
-has [ 'default_is_trusted', 'default_does_trigger' ] =>
+has [ 'default_is_trusted', 'default_does_trigger', 'skip_argc_check' ] =>
   is            => rw,
   isa           => Bool,
   coerce        => true,
@@ -221,19 +221,19 @@ sub BUILD {
         croak "Attribute cannot have both default and builder.";
     }
 
-    for my $property ( 'builder', 'trigger' ) {
-        if ( CodeRef->check( $self->$property ) ) {
-            $self->$property( true );
+    for my $method_type ( 'builder', 'trigger' ) {
+        if ( CodeRef->check( $self->$method_type ) ) {
+            $self->$method_type( true );
         }
     }
 
-    for my $property ( 'reader', 'writer', 'accessor', 'clearer', 'predicate', 'builder', 'trigger', 'lvalue', 'local_writer' ) {
-        my $name = $self->$property;
+    for my $method_type ( 'reader', 'writer', 'accessor', 'clearer', 'predicate', 'builder', 'trigger', 'lvalue', 'local_writer' ) {
+        my $name = $self->$method_type;
         if ( defined $name and $name eq true ) {
-            my $gen = $method_name_generator[$self->is_private]{$property};
+            my $gen = $method_name_generator[$self->is_private]{$method_type};
             local $_ = $self->name;
             my $newname = $gen->( $_ );
-            $self->$property( $newname );
+            $self->$method_type( $newname );
         }
     }
 
@@ -703,6 +703,19 @@ sub compile_init {
     return @code;
 }
 
+my $make_usage = sub {
+    my ( $self, $code, $check, $usage_info, %arg ) = @_;
+    $arg{skip_argc_check} and return $code;
+    $self->skip_argc_check and return $code;
+
+    my $label = ucfirst $arg{label};
+    $label .= sprintf ' "%s"', $arg{name}
+        if defined $arg{name};
+
+    return sprintf q{%s or %s( '%s usage: $self->%s(%s)' ); %s},
+        $check, $self->_function_for_croak, $label, $arg{name} || '$METHOD', $usage_info, $code;
+};
+
 my %code_template;
 %code_template = (
     reader => sub {
@@ -721,16 +734,12 @@ my %code_template;
         if ( $self->clone_on_read ) {
             $code = $self->_compile_clone( '$_[0]', $code );
         }
-        unless ( $arg{no_croak} ) {
-            $code = sprintf '@_ > 1 ? %s( "%s is a read-only attribute of @{[ref $_[0]]}" ) : %s',
-                $self->_function_for_croak, $self->name, $code;
-        }
-        return $code;
+        return $make_usage->( $self, $code, '@_ == 1', '', label => 'reader', %arg );
     },
     asserter => sub {
         my $self = shift;
         my %arg = @_;
-        my $reader  = $code_template{reader}->( $self, no_croak => true );
+        my $reader  = $code_template{reader}->( $self, skip_argc_check => true );
         my $blessed = 'require Scalar::Util && Scalar::Util::blessed';
         if ( $self->compiling_class and $self->compiling_class->imported_functions->{blessed} ) {
            $blessed = 'blessed';
@@ -775,49 +784,55 @@ my %code_template;
                 $self->_q_name, $self->_q_name;
         }
         $code .= '$_[0];';
-        return $code;
+        return $make_usage->( $self, $code, '@_ == 2', ' $newvalue ', label => 'writer', %arg );
     },
     accessor => sub {
         my $self = shift;
         my %arg = @_;
         my @parts = (
-            $code_template{writer}->( $self, label => 'accessor' ),
-            $code_template{reader}->( $self, no_croak => true ),
+            $code_template{writer}->( $self, skip_argc_check => true, label => 'accessor' ),
+            $code_template{reader}->( $self, skip_argc_check => true ),
         );
         for my $i ( 0 .. 1 ) {
             $parts[$i] = $parts[$i] =~ /\;/
                 ? "do { $parts[$i] }"
                 : "( $parts[$i] )"
         }
-        sprintf '@_ > 1 ? %s : %s', @parts;
+        my $code = sprintf '@_ > 1 ? %s : %s', @parts;
     },
     clearer => sub {
         my $self = shift;
         my %arg = @_;
-        sprintf 'delete $_[0]{%s}; $_[0];', $self->_q_name;
+        my $code = sprintf 'delete $_[0]{%s}; $_[0];', $self->_q_name;
+        return $make_usage->( $self, $code, '@_ == 1', '', label => 'clearer', %arg );
     },
     predicate => sub {
         my $self = shift;
-        sprintf 'exists $_[0]{%s}', $self->_q_name;
+        my %arg = @_;
+        my $code = sprintf 'exists $_[0]{%s}', $self->_q_name;
+        return $make_usage->( $self, $code, '@_ == 1', '', label => 'predicate', %arg );
     },
     lvalue => sub {
         my $self = shift;
-        sprintf '$_[0]{%s}', $self->_q_name;
+        my %arg = @_;
+        my $code = sprintf '$_[0]{%s}', $self->_q_name;
+        return $make_usage->( $self, $code, '@_ == 1', '', label => 'lvalue', %arg );
     },
     local_writer => sub {
         my $self = shift;
+        my %arg = @_;
 
         my $CROAK = $self->_function_for_croak;
         my $GET = $self->reader ? $self->_q( $self->_expand_name( $self->reader ) )
             : $self->accessor ? $self->_q( $self->_expand_name( $self->accessor ) )
-            : sprintf( 'sub { %s }', $code_template{reader}->( $self, no_croak => true ) );
+            : sprintf( 'sub { %s }', $code_template{reader}->( $self, skip_argc_check => true ) );
         my $SET = $self->writer ? $self->_q( $self->_expand_name( $self->writer ) )
             : $self->accessor ? $self->_q( $self->_expand_name( $self->accessor ) )
-            : sprintf( 'sub { %s }', $code_template{writer}->( $self, label => 'local writer' ) );
+            : sprintf( 'sub { %s }', $code_template{writer}->( $self, skip_argc_check => true, label => 'local writer' ) );
         my $HAS = $self->predicate ? $self->_q( $self->_expand_name( $self->predicate ) )
-            : sprintf( 'sub { %s }', $code_template{predicate}->( $self ) );
+            : sprintf( 'sub { %s }', $code_template{predicate}->( $self, skip_argc_check => true ) );
         my $CLEAR = $self->clearer ? $self->_q( $self->_expand_name( $self->clearer ) )
-            : sprintf( 'sub { %s }', $code_template{clearer}->( $self ) );
+            : sprintf( 'sub { %s }', $code_template{clearer}->( $self, skip_argc_check => true ) );
         my $GUARD_NS = $self->compiling_class->imported_functions->{guard} ? ''
             : ( eval { $self->compiling_class->shim_name } || eval { $self->class->shim_name } || die() );
         $GUARD_NS .= '::' if $GUARD_NS;
@@ -874,7 +889,7 @@ sub _compile_native_delegations {
             $method_name => sprintf( '$_[0]->%s eq %s', $reader, $self->_q( $value ) );
         } keys %values;
         if ( $needs_reader ) {
-            $native_delegations{$reader} = $code_template{reader}->( $self, no_croak => true );
+            $native_delegations{$reader} = $code_template{reader}->( $self, name => $reader, skip_argc_check => true );
         }
         return \%native_delegations;
     }
@@ -902,15 +917,15 @@ sub compile {
     my %want_pp;
     my %method_name;
 
-    for my $property ( keys %code_template ) {
-        my $method_name = $self->can($property) ? $self->$property : undef;
+    for my $method_type ( keys %code_template ) {
+        my $method_name = $self->can($method_type) ? $self->$method_type : undef;
         next unless defined $method_name;
 
-        $method_name{$property} = $self->_expand_name( $method_name );
-        if ( $xs_option_name{$property} ) {
-            $want_xs{$property} = 1;
+        $method_name{$method_type} = $self->_expand_name( $method_name );
+        if ( $xs_option_name{$method_type} ) {
+            $want_xs{$method_type} = 1;
         }
-        $want_pp{$property} = 1;
+        $want_pp{$method_type} = 1;
     }
 
     if ( $self->has_handles and ref $self->handles ) {
@@ -940,24 +955,24 @@ sub compile {
         $code .= "if ( $xs_condition ) {\n";
         $code .= "    Class::XSAccessor->import(\n";
         $code .= "        chained => 1,\n";
-        for my $property ( sort keys %want_xs ) {
+        for my $method_type ( sort keys %want_xs ) {
             $code .= sprintf "        %s => { %s => %s },\n",
-                $self->_q( $xs_option_name{$property} ), $self->_q( $method_name{$property} ), $self->_q_name;
+                $self->_q( $xs_option_name{$method_type} ), $self->_q( $method_name{$method_type} ), $self->_q_name;
         }
         $code .= "    );\n";
         $code .= "}\n";
         $code .= "else {\n";
-        for my $property ( sort keys %want_xs ) {
+        for my $method_type ( sort keys %want_xs ) {
             $code .= sprintf '    *%s = sub%s { %s };' . "\n",
-                $method_name{$property}, $code_attr{$property} || '', $code_template{$property}->($self);
-            delete $want_pp{$property};
+                $method_name{$method_type}, $code_attr{$method_type} || '', $code_template{$method_type}->( $self, name => $method_name{$method_type} );
+            delete $want_pp{$method_type};
         }
         $code .= "}\n";
     }
 
-    for my $property ( sort keys %want_pp ) {
+    for my $method_type ( sort keys %want_pp ) {
         $code .= sprintf 'sub %s%s { %s }' . "\n",
-            $method_name{$property}, $code_attr{$property} || '', $code_template{$property}->($self);
+            $method_name{$method_type}, $code_attr{$method_type} || '', $code_template{$method_type}->( $self, name => $method_name{$method_type} );
     }
 
     $code .= "\n";

@@ -23,7 +23,7 @@ tests "Basic read-only" => sub {
     my $obj = new_ok 'Foo', [foo => 23];
     is $obj->foo, 23;
     like dies { $obj->foo("Flower child") },
-        qr{(foo is a read-only attribute of Foo|Usage: Foo::foo\(self\))};
+        qr{usage:}i;
 };
 
 tests "Various tricky values" => sub {

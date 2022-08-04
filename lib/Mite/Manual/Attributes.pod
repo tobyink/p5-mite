@@ -206,6 +206,18 @@ attribute.
 
 This is vaguely inspired by L<MooseX::LocalAttribute>.
 
+=head2 C<skip_argc_check> B<Bool>
+
+Mite includes sanity checks on the number of arguments passed to accessors.
+For example, if you call a reader and pass it a value as if it were a writer,
+it will die with a message explaining the problem.
+
+You can set C<skip_argc_check> to true to skip these checks for an attribute's
+accessors, making it run a little faster. If Class::XSAccessor is installed and
+being used, these checks will still be done in XS mode, so C<skip_argc_check>
+shouldn't be used as a way to allow the wrong number of arguments to be passed
+to a function, just as an optimization.
+
 =head2 C<handles> B<< Map[ MethodNameTemplate, MethodName ] | Enum[ 1, 2 ] >>
 
 Delegated methods. Currying and native traits are not supported.
