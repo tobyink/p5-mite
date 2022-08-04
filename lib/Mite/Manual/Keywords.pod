@@ -269,6 +269,25 @@ C<blessed> from L<Scalar::Util> can also be imported.
 
     use Your::Project::Mite qw( blessed );
 
+=head2 C<STRICT>
+
+A function similar to C<STRICT> from L<Devel::StrictMode> can be imported.
+
+This allows you to do things like:
+
+    sub my_method {
+        my $self = shift;
+        croak "Should be called as an object method!"
+            if STRICT && ! blessed( $self );
+        
+        ...;
+    }
+
+The C<STRICT> constant will be true if running under author testing, but
+usually false when running on end user's machines. This allows you to catch
+errors on your own machine but avoid slow error checking on the end user's
+machine.
+
 =head2 C<guard>
 
 A function similar to C<guard> from L<Scope::Guard> can be imported.

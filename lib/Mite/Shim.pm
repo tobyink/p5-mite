@@ -36,9 +36,9 @@ sub croak   { unshift @_, 'croak'  ; goto \&_error_handler }
 sub confess { unshift @_, 'confess'; goto \&_error_handler }
 
 BEGIN {
-    *_HAS_AUTOCLEAN = eval { require namespace::autoclean }
-        ? \&true
-        : \&false
+    my @bool = ( \&false, \&true );
+    *_HAS_AUTOCLEAN = $bool[ 0+!! eval { require namespace::autoclean } ];
+    *STRICT         = $bool[ 0+!! ( $ENV{PERL_STRICT} || $ENV{EXTENDED_TESTING} || $ENV{AUTHOR_TESTING} || $ENV{RELEASE_TESTING} ) ];
 };
 
 if ( $] < 5.009005 ) {

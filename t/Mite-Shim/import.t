@@ -37,7 +37,7 @@ use Mite::Shim qw( -all -unclean );
 1;
 CODE
 
-    for my $func ( qw/ has extends with before after around true false rw ro rwp bare lazy carp croak confess blessed / ) {
+    for my $func ( qw/ has extends with before after around true false rw ro rwp bare lazy carp croak confess blessed guard STRICT / ) {
         ok MyTestAll->can( $func ), "MyTestAll can $func";
     }
     

@@ -10,6 +10,7 @@
 
     BEGIN {
         require Scalar::Util;
+        *STRICT  = \&Mite::Shim::STRICT;
         *bare    = \&Mite::Shim::bare;
         *blessed = \&Scalar::Util::blessed;
         *carp    = \&Mite::Shim::carp;
@@ -473,7 +474,7 @@
 "Type check failed in signature for inject_mite_functions: %s should be %s",
                 "\$_{\"x_source\"}", "Optional[Object]"
               );
-            $out{"x_source"} = $in{"x_source"} if exists( $in{"x_source"} );
+            $out{"x_source"} = $in{"x_source"};
             delete( $in{"x_source"} );
         }
 
@@ -491,7 +492,7 @@
 "Type check failed in signature for inject_mite_functions: %s should be %s",
                 "\$_{\"x_pkg\"}", "Optional[Object]"
               );
-            $out{"x_pkg"} = $in{"x_pkg"} if exists( $in{"x_pkg"} );
+            $out{"x_pkg"} = $in{"x_pkg"};
             delete( $in{"x_pkg"} );
         }
 

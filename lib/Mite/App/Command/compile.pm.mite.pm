@@ -10,6 +10,7 @@
 
     BEGIN {
         require Scalar::Util;
+        *STRICT  = \&Mite::Shim::STRICT;
         *bare    = \&Mite::Shim::bare;
         *blessed = \&Scalar::Util::blessed;
         *carp    = \&Mite::Shim::carp;
