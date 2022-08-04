@@ -610,11 +610,11 @@ sub compile_init {
                 local $Type::Tiny::AvoidCallbacks = 1;
                 if ( $type->has_coercion ) {
                     $coerce_and_check = sprintf 'do { my $coerced_value = %s; ( %s ) ? $coerced_value : %s( "Type check failed in constructor: %%s should be %%s", %s, %s ) }',
-                        $self->_compile_coercion( $valuevar ), $type->inline_check( '$coerced_value' ), $self->_function_for_croak, $self->_q_init_arg, $self->_q( $type->display_name );
+                        $self->_compile_coercion( $valuevar ), $self->_compile_check( '$coerced_value' ), $self->_function_for_croak, $self->_q_init_arg, $self->_q( $type->display_name );
                 }
                 else {
                     $coerce_and_check = sprintf '( ( %s ) ? %s : %s( "Type check failed in constructor: %%s should be %%s", %s, %s ) )',
-                        $type->inline_check( $valuevar ), $valuevar, $self->_function_for_croak, $self->_q_init_arg, $self->_q( $type->display_name );
+                        $self->_compile_check( $valuevar ), $valuevar, $self->_function_for_croak, $self->_q_init_arg, $self->_q( $type->display_name );
                 }
                 $code .= sprintf 'do { my $value = exists( %s ) ? %s : %s; ',
                     $valuevar, $coerce_and_check, $self->_compile_default( $selfvar );
