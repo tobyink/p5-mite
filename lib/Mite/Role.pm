@@ -170,6 +170,17 @@ sub project {
     return $self->source->project;
 }
 
+sub use_strict_mode {
+    my $self = shift;
+
+    return undef
+        if not $self->project->config->data->{use_strict_mode};
+
+    return $self->imported_functions->{STRICT}
+        ? 'STRICT'
+        : sprintf( '%s::STRICT', $self->project->config->data->{shim} );
+}
+
 signature_for add_attributes => (
     pos => [ slurpy ArrayRef[InstanceOf['Mite::Attribute']] ],
 );

@@ -703,6 +703,16 @@ sub compile_init {
     return @code;
 }
 
+sub use_strict_mode {
+    my $self = shift;
+
+    if ( my $class = $self->compiling_class ) {
+        return $class->use_strict_mode;
+    }
+    return if not $self->class->project->config->data->{use_strict_mode};
+    return sprintf '%s::STRICT', $self->class->project->config->data->{shim};
+}
+
 my $make_usage = sub {
     my ( $self, $code, $check, $usage_info, %arg ) = @_;
     $arg{skip_argc_check} and return $code;
@@ -711,6 +721,10 @@ my $make_usage = sub {
     my $label = ucfirst $arg{label};
     $label .= sprintf ' "%s"', $arg{name}
         if defined $arg{name};
+
+    if ( my $use_strict_mode = $self->use_strict_mode ) {
+        $check = "!$use_strict_mode or $check"
+    }
 
     return sprintf q{%s or %s( '%s usage: $self->%s(%s)' ); %s},
         $check, $self->_function_for_croak, $label, $arg{name} || '$METHOD', $usage_info, $code;
