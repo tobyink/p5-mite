@@ -174,7 +174,7 @@ sub autolax {
     my $self = shift;
 
     return undef
-        if not $self->project->config->data->{autolax};
+        if not eval { $self->project->config->data->{autolax} };
 
     return $self->imported_functions->{STRICT}
         ? 'STRICT'

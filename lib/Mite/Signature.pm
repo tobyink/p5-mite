@@ -79,7 +79,7 @@ sub autolax {
 
     my $class = $self->compiling_class || $self->class;
     return if not $class;
-    return if not $class->project->config->data->{autolax};
+    return if not eval { $class->project->config->data->{autolax} };
     return sprintf '%s::STRICT', $class->project->config->data->{shim};
 }
 

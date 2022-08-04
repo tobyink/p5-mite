@@ -721,7 +721,7 @@ sub autolax {
         return $class->autolax;
     }
     return if not $self->class;
-    return if not $self->class->project->config->data->{autolax};
+    return if not eval { $self->class->project->config->data->{autolax} };
     return sprintf '%s::STRICT', $self->class->project->config->data->{shim};
 }
 
