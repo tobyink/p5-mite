@@ -82,6 +82,58 @@ To force it to I<not> be used:
 
     use Your::Project::Mite qw( -unclean );
 
+=head2 Autolax
+
+Autolax mode can be enabled in your F<.mite/config> file:
+
+    autolax: 1
+
+If you do that and recompile your project, then many of the sanity checks Mite
+builds into your constructors, accessors, and method signatures will be
+disabled by default. In lax mode, these checks will be disabled:
+
+=over
+
+=item *
+
+MooseX::StrictConstructor-style checks for unknown named parameters passed
+to your constructor.
+
+=item *
+
+Checks for unknown named parameters passed to method signatures.
+
+=item *
+
+Type checks in your constructor, except as part of coercion.
+
+=item *
+
+Type checks in accessors and writers, except as part of coercion.
+
+=item *
+
+Type checks in method signatures, except as part of coercion.
+
+=item *
+
+Argument count checks in readers, writers, accessors, lvalue accessors,
+clearers, and predicates.
+
+=item *
+
+Argument count checks in method signatures.
+
+=back
+
+However, while the checks become disabled, they can be re-enabled by the end
+user by setting the C<PERL_STRICT> environment variable, or any other
+environment variable supported by L<Devel::StrictMode>.
+
+The idea is that if your project uses autolax, you can set C<PERL_STRICT> in
+your testing environment to get more rigorous checks, fix any errors you find,
+and then run your code without C<PERL_STRICT> in your production environment.
+
 =head1 BUGS
 
 Please report any bugs to L<https://github.com/tobyink/p5-mite/issues>.
