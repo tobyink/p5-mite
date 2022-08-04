@@ -7,7 +7,7 @@ use Mite::Miteception -all;
 extends qw(Mite::App::Command);
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.008002';
+our $VERSION   = '0.008003';
 
 sub abstract {
     return "Remove compiled mite files.";

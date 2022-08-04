@@ -1,6 +1,23 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.008003 cpan:TOBYINK`
+	issued  2022-08-05;
+	changeset [
+		item [
+			a dcs:Addition;
+			label "Add STRICT_MODE like Devel::StrictMode to the Mite shim exports.";
+		];
+		item [
+			a dcs:Addition;
+			label "Add an autolax mode (configurable in .mite/config) which makes a lot of argument checking dependent on environment variables, running fast and loose by default if enabled. I don't necessarily recommend using this feature, but it now exists.";
+		];
+		item [
+			a dcs:Addition;
+			label "Non-XS readers, writers, accessors, clearers, and predicates now check argument count, though there's also a skip_argc_check attribute option to disable this. (The XS versions mostly do check though!)";
+		];
+	].
+
 `Mite 0.008002 cpan:TOBYINK`
 	issued  2022-08-03;
 	changeset [
