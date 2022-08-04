@@ -170,11 +170,11 @@ sub project {
     return $self->source->project;
 }
 
-sub use_strict_mode {
+sub autolax {
     my $self = shift;
 
     return undef
-        if not $self->project->config->data->{use_strict_mode};
+        if not $self->project->config->data->{autolax};
 
     return $self->imported_functions->{STRICT}
         ? 'STRICT'

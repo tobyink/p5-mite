@@ -498,8 +498,8 @@ sub _compile_check {
         $type->inline_check( $varname );
     };
 
-    if ( my $use_strict_mode = $self->use_strict_mode ) {
-        $code = "( !$use_strict_mode or $code )";
+    if ( my $autolax = $self->autolax ) {
+        $code = "( !$autolax or $code )";
     }
 
     return $code;
@@ -714,14 +714,14 @@ sub compile_init {
     return @code;
 }
 
-sub use_strict_mode {
+sub autolax {
     my $self = shift;
 
     if ( my $class = $self->compiling_class ) {
-        return $class->use_strict_mode;
+        return $class->autolax;
     }
     return if not $self->class;
-    return if not $self->class->project->config->data->{use_strict_mode};
+    return if not $self->class->project->config->data->{autolax};
     return sprintf '%s::STRICT', $self->class->project->config->data->{shim};
 }
 
@@ -734,8 +734,8 @@ my $make_usage = sub {
     $label .= sprintf ' "%s"', $arg{name}
         if defined $arg{name};
 
-    if ( my $use_strict_mode = $self->use_strict_mode ) {
-        $check = "!$use_strict_mode or $check"
+    if ( my $autolax = $self->autolax ) {
+        $check = "!$autolax or $check"
     }
 
     return sprintf q{%s or %s( '%s usage: $self->%s(%s)' ); %s},

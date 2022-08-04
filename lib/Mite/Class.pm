@@ -364,8 +364,8 @@ sub _compile_strict_constructor {
 
     my $code = sprintf 'my @unknown = grep not( %s ), keys %%{%s}; @unknown and %s( "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );',
         $check, $argvar, $self->_function_for_croak;
-    if ( my $use_strict_mode = $self->use_strict_mode ) {
-        $code = "if ( $use_strict_mode ) { $code }";
+    if ( my $autolax = $self->autolax ) {
+        $code = "if ( $autolax ) { $code }";
     }
     return $code;
 }
