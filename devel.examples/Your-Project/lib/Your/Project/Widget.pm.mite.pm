@@ -1,11 +1,14 @@
 {
 
     package Your::Project::Widget;
-    our $USES_MITE = "Mite::Class";
-    our $MITE_SHIM = "Your::Project::Mite";
     use strict;
     use warnings;
 
+    our $USES_MITE    = "Mite::Class";
+    our $MITE_SHIM    = "Your::Project::Mite";
+    our $MITE_VERSION = "0.008003";
+
+    # Standard Moose/Moo-style constructor
     sub new {
         my $class = ref( $_[0] ) ? ref(shift) : shift;
         my $meta  = ( $Mite::META{$class} ||= $class->__META__ );
@@ -16,7 +19,8 @@
           : { ( @_ == 1 ) ? %{ $_[0] } : @_ };
         my $no_build = delete $args->{__no_BUILD__};
 
-        # Attribute: name
+        # Attribute name (type: Str)
+        # has declaration, file lib/Your/Project/Widget.pm, line 4
         if ( exists $args->{"name"} ) {
             do {
 
@@ -32,24 +36,26 @@
             $self->{"name"} = $args->{"name"};
         }
 
-        # Enforce strict constructor
+        # Call BUILD methods
+        $self->BUILDALL($args) if ( !$no_build and @{ $meta->{BUILD} || [] } );
+
+        # Unrecognized parameters
         my @unknown = grep not(/\Aname\z/), keys %{$args};
         @unknown
           and Your::Project::Mite::croak(
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
 
-        # Call BUILD methods
-        $self->BUILDALL($args) if ( !$no_build and @{ $meta->{BUILD} || [] } );
-
         return $self;
     }
 
+    # Used by constructor to call BUILD methods
     sub BUILDALL {
         my $class = ref( $_[0] );
         my $meta  = ( $Mite::META{$class} ||= $class->__META__ );
         $_->(@_) for @{ $meta->{BUILD} || [] };
     }
 
+    # Destructor should call DEMOLISH methods
     sub DESTROY {
         my $self  = shift;
         my $class = ref($self) || $self;
@@ -70,6 +76,7 @@
         return;
     }
 
+    # Gather metadata for constructor and destructor
     sub __META__ {
         no strict 'refs';
         no warnings 'once';
@@ -90,6 +97,7 @@
         };
     }
 
+    # See UNIVERSAL
     sub DOES {
         my ( $self, $role ) = @_;
         our %DOES;
@@ -98,6 +106,7 @@
         return $self->SUPER::DOES($role);
     }
 
+    # Alias for Moose/Moo-compatibility
     sub does {
         shift->DOES(@_);
     }
@@ -106,6 +115,7 @@
       && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
     # Accessors for name
+    # has declaration, file lib/Your/Project/Widget.pm, line 4
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,
@@ -114,10 +124,10 @@
     }
     else {
         *name = sub {
-            @_ > 1
-              ? Your::Project::Mite::croak(
-                "name is a read-only attribute of @{[ref $_[0]]}")
-              : $_[0]{"name"};
+            @_ == 1
+              or
+              Your::Project::Mite::croak('Reader "name" usage: $self->name()');
+            $_[0]{"name"};
         };
     }
 
