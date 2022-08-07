@@ -1013,11 +1013,20 @@ sub _compile_delegations_via {
         $method_name = $self->_expand_name( $method_name );
         my $result = $gen->_generate_ec_args_for_handler( $method_name => $handler );
         if ( keys %{ $result->{environment} } ) {
-            croak "Delegation '%s' tried to close over: %s",
-                $method_name, join q{, }, sort keys %{ $result->{environment} };
+            require Data::Dumper;
+            my %env = %{ $result->{environment} };
+            my $dd = Data::Dumper->new( [ \%env ], [ 'ENVIRONMENT' ] );
+            my $env_dump = 'my ' . $dd->Purity( true )->Deparse( true )->Dump;
+            $code .= sprintf "do {\n\t%s;%s\t*%s = %s;\n};\n",
+                $env_dump,
+                join( '', map { sprintf "\tmy %s = %s{\$ENVIRONMENT->{'%s'}};\n", $_, substr( $_, 0, 1 ), $_ } sort keys %env),
+                $method_name,
+                join( "\n", @{ $result->{source} } );
         }
-        $code .= sprintf "*%s = %s;\n",
-            $method_name, join( "\n", @{ $result->{source} } );
+        else {
+            $code .= sprintf "*%s = %s;\n",
+                $method_name, join( "\n", @{ $result->{source} } );
+        }
     }
 
     return $code;

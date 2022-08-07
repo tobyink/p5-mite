@@ -1361,31 +1361,41 @@
                                     ( ref($to_coerce) eq 'HASH' ) and do {
                                         my $ok = 1;
                                         for my $v ( values %{$to_coerce} ) {
-                                            ( $ok = 0, last )
-                                              unless (
-                                                (
-                                                    do {
+                                            ( $ok = 0, last ) unless do {
 
-                                                        package Mite::Shim;
-                                                        defined($v) and do {
-                                                            ref( \$v ) eq
-                                                              'SCALAR'
-                                                              or ref(
-                                                                \(
-                                                                    my $val =
-                                                                      $v
-                                                                )
-                                                              ) eq 'SCALAR';
-                                                        }
-                                                    }
-                                                )
-                                                && (
-                                                    do {
-                                                        local $_ = $v;
-                                                        /\A[^\W0-9]\w*\z/;
-                                                    }
-                                                )
-                                              );
+                                                package Mite::Shim;
+                                                (
+                                                    (
+                                                        (
+                                                            do {
+
+                                                                package Mite::Shim;
+                                                                defined($v)
+                                                                  and do {
+                                                                    ref( \$v )
+                                                                      eq
+                                                                      'SCALAR'
+                                                                      or ref(
+                                                                        \(
+                                                                            my $val
+                                                                              = $v
+                                                                        )
+                                                                      ) eq
+                                                                      'SCALAR';
+                                                                }
+                                                            }
+                                                        )
+                                                          && (
+                                                            do {
+                                                                local $_ = $v;
+/\A[^\W0-9]\w*\z/;
+                                                            }
+                                                          )
+                                                    )
+                                                      or ( ref($v) eq 'ARRAY' )
+                                                      or ( ref($v) eq 'CODE' )
+                                                );
+                                            }
                                         };
                                         for my $k ( keys %{$to_coerce} ) {
                                             ( $ok = 0, last ) unless do {
@@ -1481,27 +1491,38 @@
                             ( ref($coerced_value) eq 'HASH' ) and do {
                                 my $ok = 1;
                                 for my $v ( values %{$coerced_value} ) {
-                                    ( $ok = 0, last )
-                                      unless (
-                                        (
-                                            do {
+                                    ( $ok = 0, last ) unless do {
 
-                                                package Mite::Shim;
-                                                defined($v) and do {
-                                                    ref( \$v ) eq 'SCALAR'
-                                                      or
-                                                      ref( \( my $val = $v ) )
-                                                      eq 'SCALAR';
-                                                }
-                                            }
-                                        )
-                                        && (
-                                            do {
-                                                local $_ = $v;
-                                                /\A[^\W0-9]\w*\z/;
-                                            }
-                                        )
-                                      );
+                                        package Mite::Shim;
+                                        (
+                                            (
+                                                (
+                                                    do {
+
+                                                        package Mite::Shim;
+                                                        defined($v) and do {
+                                                            ref( \$v ) eq
+                                                              'SCALAR'
+                                                              or ref(
+                                                                \(
+                                                                    my $val =
+                                                                      $v
+                                                                )
+                                                              ) eq 'SCALAR';
+                                                        }
+                                                    }
+                                                )
+                                                  && (
+                                                    do {
+                                                        local $_ = $v;
+                                                        /\A[^\W0-9]\w*\z/;
+                                                    }
+                                                  )
+                                            )
+                                              or ( ref($v) eq 'ARRAY' )
+                                              or ( ref($v) eq 'CODE' )
+                                        );
+                                    }
                                 };
                                 for my $k ( keys %{$coerced_value} ) {
                                     ( $ok = 0, last ) unless do {
@@ -2904,27 +2925,38 @@
                                 ( ref($to_coerce) eq 'HASH' ) and do {
                                     my $ok = 1;
                                     for my $v ( values %{$to_coerce} ) {
-                                        ( $ok = 0, last )
-                                          unless (
-                                            (
-                                                do {
+                                        ( $ok = 0, last ) unless do {
 
-                                                    package Mite::Shim;
-                                                    defined($v) and do {
-                                                        ref( \$v ) eq 'SCALAR'
-                                                          or ref(
-                                                            \( my $val = $v ) )
-                                                          eq 'SCALAR';
-                                                    }
-                                                }
-                                            )
-                                            && (
-                                                do {
-                                                    local $_ = $v;
-                                                    /\A[^\W0-9]\w*\z/;
-                                                }
-                                            )
-                                          );
+                                            package Mite::Shim;
+                                            (
+                                                (
+                                                    (
+                                                        do {
+
+                                                            package Mite::Shim;
+                                                            defined($v) and do {
+                                                                ref( \$v ) eq
+                                                                  'SCALAR'
+                                                                  or ref(
+                                                                    \(
+                                                                        my $val
+                                                                          = $v
+                                                                    )
+                                                                  ) eq 'SCALAR';
+                                                            }
+                                                        }
+                                                    )
+                                                      && (
+                                                        do {
+                                                            local $_ = $v;
+                                                            /\A[^\W0-9]\w*\z/;
+                                                        }
+                                                      )
+                                                )
+                                                  or ( ref($v) eq 'ARRAY' )
+                                                  or ( ref($v) eq 'CODE' )
+                                            );
+                                        }
                                     };
                                     for my $k ( keys %{$to_coerce} ) {
                                         ( $ok = 0, last ) unless do {
@@ -3012,22 +3044,34 @@
                         ( ref($value) eq 'HASH' ) and do {
                             my $ok = 1;
                             for my $v ( values %{$value} ) {
-                                ( $ok = 0, last )
-                                  unless (
-                                    (
-                                        do {
+                                ( $ok = 0, last ) unless do {
 
-                                            package Mite::Shim;
-                                            defined($v) and do {
-                                                ref( \$v ) eq 'SCALAR'
-                                                  or ref( \( my $val = $v ) )
-                                                  eq 'SCALAR';
-                                            }
-                                        }
-                                    )
-                                    && ( do { local $_ = $v; /\A[^\W0-9]\w*\z/ }
-                                    )
-                                  );
+                                    package Mite::Shim;
+                                    (
+                                        (
+                                            (
+                                                do {
+
+                                                    package Mite::Shim;
+                                                    defined($v) and do {
+                                                        ref( \$v ) eq 'SCALAR'
+                                                          or ref(
+                                                            \( my $val = $v ) )
+                                                          eq 'SCALAR';
+                                                    }
+                                                }
+                                            )
+                                              && (
+                                                do {
+                                                    local $_ = $v;
+                                                    /\A[^\W0-9]\w*\z/;
+                                                }
+                                              )
+                                        )
+                                          or ( ref($v) eq 'ARRAY' )
+                                          or ( ref($v) eq 'CODE' )
+                                    );
+                                }
                             };
                             for my $k ( keys %{$value} ) {
                                 ( $ok = 0, last ) unless do {

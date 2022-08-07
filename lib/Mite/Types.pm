@@ -87,7 +87,7 @@ __PACKAGE__->add_type(
 
 __PACKAGE__->add_type(
 	name      => HandlesHash,
-	parent    => Map[ MethodNameTemplate, MethodName ],
+	parent    => Map[ MethodNameTemplate, MethodName | ArrayRef | CodeRef ],
 )->coercion->add_type_coercions(
 	ArrayRef, q{ +{ map { $_ => $_ } @$_ } },
 );
