@@ -1,6 +1,19 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.009000 cpan:TOBYINK`
+	issued  2022-08-07;
+	changeset [
+		item [
+			a dcs:Addition;
+			label "Integrate Sub::HandlesVia support.";
+		];
+		item [
+			a dcs:Packaging;
+			label "Require a newer Type::Params, which supports the strictness option.";
+		];
+	].
+
 `Mite 0.008003 cpan:TOBYINK`
 	issued  2022-08-05;
 	changeset [
