@@ -58,7 +58,7 @@ or do {
 {
     no strict 'refs';
     my $GUARD_PACKAGE = __PACKAGE__ . '::Guard';
-    *{"$GUARD_PACKAGE\::DESTROY"} = sub { $_[0][1]->() unless $_[0][0] };
+    *{"$GUARD_PACKAGE\::DESTROY"} = sub { $_[0][0] or $_[0][1]->() };
     *{"$GUARD_PACKAGE\::restore"} = sub { $_[0]->DESTROY; $_[0][0] = true };
     *{"$GUARD_PACKAGE\::dismiss"} = sub {                 $_[0][0] = true };
     *{"$GUARD_PACKAGE\::peek"}    = sub { $_[0][2] };
