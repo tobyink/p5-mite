@@ -6,30 +6,6 @@ Mite::Manual::Missing - major Moose features not supported by Mite
 
 =head1 MANUAL
 
-=head2 Native Attribute Traits
-
-Mite doesn't support native attribute traits (i.e. delegating to non-objects).
-However, you can accomplish this by using L<Sub::HandlesVia> 0.026 or above.
-You need to make sure the Mite shim is loaded I<before> Sub::HandlesVia, and
-this will add an extra dependency to your project.
-
-    package Your::Project::Class;
-    use Your::Project::Mite;
-    use Sub::HandlesVia;
-    
-    has numbers => (
-        is          => 'lazy',
-        builder     => sub { [] },
-        isa         => 'ArrayRef[Int]',
-        handles_via => 'Array',
-        handles     => {
-            add_number => 'push',
-            pop_number => 'pop',
-        },
-    );
-    
-    1;
-
 =head2 Run-Time Class/Role Building
 
 Your constructor, destructor, and accessors are build on the developer's
