@@ -291,9 +291,9 @@ hashrefs.
         handles     => {
             '%s'          => 'all',
             monkey_count  => 'count',
-            add_monkey    => 'push',
+            add_monkey    => 'push...',
             find_monkeys  => 'grep',
-            clear_monkeys => 'clear',
+            clear_monkeys => 'clear...',
         },
     );
     
@@ -308,6 +308,8 @@ hashrefs.
     for my $monkey ( $zoo->monkeys ) {
         say $monkey->name;
     }
+
+Most L<Sub::HandlesVia> features should be supported.
 
 =head3 C<init_arg> B<< NonEmptyStr | Undef >>
 
