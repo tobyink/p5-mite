@@ -9,6 +9,7 @@
 	:runtime-requirement    [ :on "Module::Pluggable 5.2"^^:CpanId ];
 	:runtime-requirement    [ :on "Import::Into 0"^^:CpanId ];
 	:runtime-requirement    [ :on "Path::Tiny 0.052"^^:CpanId ];
+	:runtime-requirement    [ :on "Sub::HandlesVia 0.033"^^:CpanId ];
 	:runtime-requirement    [ :on "Types::Path::Tiny 0"^^:CpanId ];
 	:runtime-requirement    [ :on "Types::Standard 1.016007"^^:CpanId ];
 	:runtime-requirement    [ :on "YAML::XS 0.41"^^:CpanId ];

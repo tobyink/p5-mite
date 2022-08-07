@@ -152,6 +152,12 @@ has handles =>
   predicate     => true,
   coerce        => true;
 
+has handles_via =>
+  is            => rw,
+  isa           => ArrayRef->of( Str )->plus_coercions( Str, q{ [$_] } ),
+  predicate     => true,
+  coerce        => true;
+
 has alias =>
   is            => rw,
   isa           => AliasList,
@@ -923,6 +929,15 @@ sub _compile_native_delegations {
     return {};
 }
 
+sub _compile_delegations_via {
+    my $self = shift;
+
+    require Sub::HandlesVia::Handler;
+    require Sub::HandlesVia::CodeGenerator;
+
+    die 'todo';
+}
+
 sub _compile_delegations {
     my ( $self, $asserter ) = @_;
 
@@ -931,7 +946,10 @@ sub _compile_delegations {
     my $code = sprintf "# Delegated methods for %s\n", $self->name;
     $code .= '# ' . $self->definition_context_to_pretty_string. "\n";
 
-    if ( ref $self->handles ) {
+    if ( $self->has_handles_via ) {
+        return $self->_compile_d_compile_delegations_viaelegations_via;
+    }
+    elsif ( ref $self->handles ) {
         my %delegated = %{ $self->handles };
         for my $key ( sort keys %delegated ) {
             $code .= sprintf 'sub %s { shift->%s->%s( @_ ) }' . "\n",
@@ -981,7 +999,7 @@ sub compile {
         $want_pp{$method_type} = 1;
     }
 
-    if ( $self->has_handles and ref $self->handles ) {
+    if ( $self->has_handles and !$self->has_handles_via and ref $self->handles ) {
         $method_name{asserter} = sprintf '_assert_blessed_%s', $self->name;
         $want_pp{asserter} = 1;
     }
