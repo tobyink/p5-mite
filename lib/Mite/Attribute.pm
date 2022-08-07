@@ -923,6 +923,33 @@ sub _compile_native_delegations {
     return {};
 }
 
+sub _compile_delegations {
+    my ( $self, $asserter ) = @_;
+
+    $self->has_handles or return '';
+
+    my $code = sprintf "# Delegated methods for %s\n", $self->name;
+    $code .= '# ' . $self->definition_context_to_pretty_string. "\n";
+
+    if ( ref $self->handles ) {
+        my %delegated = %{ $self->handles };
+        for my $key ( sort keys %delegated ) {
+            $code .= sprintf 'sub %s { shift->%s->%s( @_ ) }' . "\n",
+                $self->_expand_name( $key ), $asserter, $delegated{$key};
+        }
+    }
+    else {
+        my %native_delegations = %{ $self->_compile_native_delegations };
+        for my $method_name ( sort keys %native_delegations ) {
+            $code .= sprintf "sub %s { %s }\n",
+                $method_name, $native_delegations{$method_name};
+        }
+    }
+    $code .= "\n";
+
+    return $code;
+}
+
 sub compile {
     my $self = shift;
     my %args = @_;
@@ -1014,26 +1041,7 @@ sub compile {
         $code .= "\n";
     }
 
-    if ( $self->has_handles ) {
-        $code .= sprintf "# Delegated methods for %s\n", $self->name;
-        $code .= '# ' . $self->definition_context_to_pretty_string. "\n";
-        if ( ref $self->handles ) {
-            my $assertion = $method_name{asserter};
-            my %delegated = %{ $self->handles };
-            for my $key ( sort keys %delegated ) {
-                $code .= sprintf 'sub %s { shift->%s->%s( @_ ) }' . "\n",
-                    $self->_expand_name( $key ), $assertion, $delegated{$key};
-            }
-        }
-        else {
-            my %native_delegations = %{ $self->_compile_native_delegations };
-            for my $method_name ( sort keys %native_delegations ) {
-                $code .= sprintf "sub %s { %s }\n",
-                    $method_name, $native_delegations{$method_name};
-            }
-        }
-        $code .= "\n";
-    }
+    $code .= $self->_compile_delegations( $method_name{asserter} );
 
     return $code;
 }
