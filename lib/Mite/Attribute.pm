@@ -951,7 +951,7 @@ sub _shv_codegen {
         coerce                => $self->coerce,
         get_is_lvalue         => ! defined( $reader_method ),
         set_checks_isa        => defined( $writer_method ),
-        set_strictly          => false,
+        set_strictly          => $self->clone_on_read || $self->clone_on_write || $self->trigger,
         generator_for_get     => sub {
             my ( $gen ) = @_;
             if ( defined $reader_method ) {
