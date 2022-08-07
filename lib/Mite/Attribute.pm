@@ -152,6 +152,12 @@ has handles =>
   predicate     => true,
   coerce        => true;
 
+has handles_via =>
+  is            => rw,
+  isa           => ArrayRef->of( Str )->plus_coercions( Str, q{ [$_] } ),
+  predicate     => true,
+  coerce        => true;
+
 has alias =>
   is            => rw,
   isa           => AliasList,
@@ -923,6 +929,139 @@ sub _compile_native_delegations {
     return {};
 }
 
+sub _shv_codegen {
+    my $self = shift;
+
+    my $reader_method = $self->_expand_name(
+        $self->reader // $self->accessor // $self->lvalue
+    );
+    my $writer_method = $self->_expand_name(
+        $self->writer // $self->accessor
+    );
+
+    require Sub::HandlesVia::CodeGenerator;
+
+    return 'Sub::HandlesVia::CodeGenerator'->new(
+        toolkit               => '__DUMMY__',
+        sandboxing_package    => undef,
+        target                => ( $self->compiling_class || $self->class )->name,
+        attribute             => $self->name,
+        env                   => {},
+        isa                   => $self->type,
+        coerce                => $self->coerce,
+        get_is_lvalue         => ! defined( $reader_method ),
+        set_checks_isa        => defined( $writer_method ),
+        set_strictly          => $self->clone_on_read || $self->clone_on_write || $self->trigger,
+        generator_for_get     => sub {
+            my ( $gen ) = @_;
+            if ( defined $reader_method ) {
+                return sprintf '%s->%s', $gen->generate_self, $reader_method;
+            }
+            else {
+                return sprintf '%s->{%s}', $gen->generate_self, $self->_q_name;
+            }
+        },
+        generator_for_set     => sub {
+            my ( $gen, $newvalue ) = @_;
+            if ( defined $writer_method ) {
+                return sprintf '%s->%s( %s )', $gen->generate_self, $writer_method, $newvalue;
+            }
+            else {
+                return sprintf '( %s->{%s} = %s )', $gen->generate_self, $self->_q_name, $newvalue;
+            }
+        },
+        generator_for_slot    => sub {
+            my ( $gen ) = @_;
+            return sprintf '%s->{%s}', $gen->generate_self, $self->_q_name;
+        },
+        generator_for_default => sub {
+            my ( $gen ) = @_;
+            return $self->_compile_default( $gen->generate_self );
+        },
+        generator_for_type_assertion => sub {
+            local $Type::Tiny::AvoidCallbacks = 1;
+            my ( $gen, $env, $type, $varname ) = @_;
+            if ( $gen->coerce and $type->{uniq} == Bool->{uniq} ) {
+                return sprintf '%s = !!%s;', $varname, $varname;
+            }
+            if ( $gen->coerce and $type->has_coercion ) {
+                return sprintf 'do { my $coerced = %s; %s or %s("Type check failed after coercion in delegated method: expected %%s, got value %%s", %s, $coerced); $coerced };',
+                    $type->coercion->inline_coercion( $varname ), $type->inline_check( '$coerced' ), $self->_function_for_croak, $self->_q( $type->display_name );
+            }
+            return sprintf 'do { %s or %s("Type check failed in delegated method: expected %%s, got value %%s", %s, %s); %s };',
+                $type->inline_check( $varname ), $self->_function_for_croak, $self->_q( $type->display_name ), $varname, $varname;
+        },
+    );
+}
+
+sub _compile_delegations_via {
+    my $self = shift;
+
+    my $code    = '';
+    my $via     = $self->handles_via;
+    my %handles = %{ $self->handles } or return $code;
+    my $gen     = $self->_shv_codegen;
+
+    require Sub::HandlesVia::Handler;
+    local $Type::Tiny::AvoidCallbacks = 1;
+
+    for my $method_name ( sort keys %handles ) {
+        my $handler = 'Sub::HandlesVia::Handler'->lookup(
+            $handles{$method_name},
+            $via,
+        );
+        $method_name = $self->_expand_name( $method_name );
+        my $result = $gen->_generate_ec_args_for_handler( $method_name => $handler );
+        if ( keys %{ $result->{environment} } ) {
+            require Data::Dumper;
+            my %env = %{ $result->{environment} };
+            my $dd = Data::Dumper->new( [ \%env ], [ 'ENVIRONMENT' ] );
+            my $env_dump = 'my ' . $dd->Purity( true )->Deparse( true )->Dump;
+            $code .= sprintf "do {\n\t%s;%s\t*%s = %s;\n};\n",
+                $env_dump,
+                join( '', map { sprintf "\tmy %s = %s{\$ENVIRONMENT->{'%s'}};\n", $_, substr( $_, 0, 1 ), $_ } sort keys %env),
+                $method_name,
+                join( "\n", @{ $result->{source} } );
+        }
+        else {
+            $code .= sprintf "*%s = %s;\n",
+                $method_name, join( "\n", @{ $result->{source} } );
+        }
+    }
+
+    return $code;
+}
+
+sub _compile_delegations {
+    my ( $self, $asserter ) = @_;
+
+    $self->has_handles or return '';
+
+    my $code = sprintf "# Delegated methods for %s\n", $self->name;
+    $code .= '# ' . $self->definition_context_to_pretty_string. "\n";
+
+    if ( $self->has_handles_via ) {
+        return $code . $self->_compile_delegations_via;
+    }
+    elsif ( ref $self->handles ) {
+        my %delegated = %{ $self->handles };
+        for my $key ( sort keys %delegated ) {
+            $code .= sprintf 'sub %s { shift->%s->%s( @_ ) }' . "\n",
+                $self->_expand_name( $key ), $asserter, $delegated{$key};
+        }
+    }
+    else {
+        my %native_delegations = %{ $self->_compile_native_delegations };
+        for my $method_name ( sort keys %native_delegations ) {
+            $code .= sprintf "sub %s { %s }\n",
+                $method_name, $native_delegations{$method_name};
+        }
+    }
+    $code .= "\n";
+
+    return $code;
+}
+
 sub compile {
     my $self = shift;
     my %args = @_;
@@ -954,7 +1093,7 @@ sub compile {
         $want_pp{$method_type} = 1;
     }
 
-    if ( $self->has_handles and ref $self->handles ) {
+    if ( $self->has_handles and !$self->has_handles_via and ref $self->handles ) {
         $method_name{asserter} = sprintf '_assert_blessed_%s', $self->name;
         $want_pp{asserter} = 1;
     }
@@ -1014,26 +1153,7 @@ sub compile {
         $code .= "\n";
     }
 
-    if ( $self->has_handles ) {
-        $code .= sprintf "# Delegated methods for %s\n", $self->name;
-        $code .= '# ' . $self->definition_context_to_pretty_string. "\n";
-        if ( ref $self->handles ) {
-            my $assertion = $method_name{asserter};
-            my %delegated = %{ $self->handles };
-            for my $key ( sort keys %delegated ) {
-                $code .= sprintf 'sub %s { shift->%s->%s( @_ ) }' . "\n",
-                    $self->_expand_name( $key ), $assertion, $delegated{$key};
-            }
-        }
-        else {
-            my %native_delegations = %{ $self->_compile_native_delegations };
-            for my $method_name ( sort keys %native_delegations ) {
-                $code .= sprintf "sub %s { %s }\n",
-                    $method_name, $native_delegations{$method_name};
-            }
-        }
-        $code .= "\n";
-    }
+    $code .= $self->_compile_delegations( $method_name{asserter} );
 
     return $code;
 }

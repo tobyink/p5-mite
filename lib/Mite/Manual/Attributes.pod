@@ -277,6 +277,40 @@ Note that if C<handles> had been 1, then the methods would have just been
 called C<is_small>, C<is_medium>, and C<is_large>, without the C<size_> prefix
 at the start.
 
+=head3 C<handles_via> B<< ArrayRef[Str] | Str >>
+
+If C<handles_via> is set, then Mite will use L<Sub::HandlesVia> for dealing
+with the C<handles> option instead of trying to deal with it internally. This
+allows a rich set of delegations to native Perl types like arrayrefs and
+hashrefs.
+
+    has monkeys => (
+        is          => 'bare',
+        isa         => 'ArrayRef[Object]',
+        handles_via => 'Array',
+        handles     => {
+            '%s'          => 'all',
+            monkey_count  => 'count',
+            add_monkey    => 'push...',
+            find_monkeys  => 'grep',
+            clear_monkeys => 'clear...',
+        },
+    );
+    
+    ...
+    
+    $zoo->clear_monkeys();
+    $zoo->add_monkey( $bobo );
+    $zoo->add_monkey( $momo );
+    if ( $zoo->monkey_count == 0 ) {
+        say "No monkeys!";
+    }
+    for my $monkey ( $zoo->monkeys ) {
+        say $monkey->name;
+    }
+
+Most L<Sub::HandlesVia> features should be supported.
+
 =head3 C<init_arg> B<< NonEmptyStr | Undef >>
 
 The parameter expected to be passed to the constructor to initialize this
