@@ -1,6 +1,19 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.009002 cpan:TOBYINK`
+	issued  2022-08-08;
+	changeset [
+		item [
+			a dcs:Change;
+			label "Ensure that Sub::HandlesVia delegated methods are included when building MOP.";
+		];
+		item [
+			a dcs:Bugfix;
+			label "Eliminate some void warnings.";
+		];
+	].
+
 `Mite 0.009001 cpan:TOBYINK`
 	issued  2022-08-08;
 	changeset [
