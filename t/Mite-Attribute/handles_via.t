@@ -36,4 +36,19 @@ CODE
     );
 };
 
+tests "handles_via => String" => sub {
+    mite_load <<'CODE';
+package Thingy2;
+use Mite::Shim;
+has xyz =>
+  handles_via => 'String',
+  handles => { add_xyz => 'append' };
+1;
+CODE
+
+    my $thing = Thingy2->new( 'xyz' => 123 );
+    is( $thing->add_xyz(456), '123456' );
+    is $thing->{xyz}, '123456';
+};
+
 done_testing;

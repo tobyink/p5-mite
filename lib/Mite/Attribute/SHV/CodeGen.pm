@@ -19,7 +19,6 @@ sub _handle_sigcheck {
 		# We also need to close over the signature.
 		#
 		require Mite::Signature::Compiler;
-		$env->{'$__signature'} = \0;
 		
 		my $compiler = 'Mite::Signature::Compiler'->new_from_compile(
 			positional => {
@@ -30,13 +29,20 @@ sub _handle_sigcheck {
 			},
 			$state->{shifted_self}
 				? @{ $handler->signature }
-				: ( 1, @{ $handler->signature } ),
+				: ( Types::Standard::Object(), @{ $handler->signature } ),
 		);
 		
 		my $sigcode = $compiler->coderef->code;
 		$sigcode =~ s/^\s+|\s+$//gs;
-		push @$code, sprintf '$__signature ||= %s;', $sigcode;
-		push @$code, '@_ = &$__signature;';
+		if ( $sigcode =~ /return/ ) {
+			push @$code, sprintf '$__signature ||= %s;', $sigcode;
+			push @$code, '@_ = &$__signature;';
+			$env->{'$__signature'} = \0;
+		}
+		else {
+			$sigcode =~ s/^sub/do/;
+			push @$code, sprintf '@_ = %s;', $sigcode;
+		}
 		
 		# As we've now inserted a signature check, we can stop worrying
 		# about signature checks.
