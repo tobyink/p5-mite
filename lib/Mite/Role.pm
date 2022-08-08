@@ -489,6 +489,7 @@ sub _compile_pragmas {
     return <<'CODE';
 use strict;
 use warnings;
+no warnings qw( once void );
 CODE
 }
 

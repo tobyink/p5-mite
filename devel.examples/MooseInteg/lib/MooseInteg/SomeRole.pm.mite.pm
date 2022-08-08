@@ -2,6 +2,7 @@
 package MooseInteg::SomeRole;
 use strict;
 use warnings;
+no warnings qw( once void );
 
 our $USES_MITE = "Mite::Role";
 our $MITE_SHIM = "MooseInteg::Mite";
