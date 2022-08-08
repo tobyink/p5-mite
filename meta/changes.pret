@@ -1,6 +1,15 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.009003 cpan:TOBYINK`
+	issued  2022-08-08;
+	changeset [
+		item [
+			a dcs:Change;
+			label "Major improvements to how Type::Params-style signatures are inlined when generating code for Sub::HandlesVia.";
+		];
+	].
+
 `Mite 0.009002 cpan:TOBYINK`
 	issued  2022-08-08;
 	changeset [

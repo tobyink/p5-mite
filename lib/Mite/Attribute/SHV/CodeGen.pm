@@ -4,9 +4,11 @@ use warnings;
 
 package Mite::Attribute::SHV::CodeGen;
 
-use Sub::HandlesVia::CodeGenerator 0.034 ();
-
-our @ISA = 'Sub::HandlesVia::CodeGenerator';
+if ( ! $ENV{MITE_COMPILE_SELF} ) {
+	# SHV uses Mite, so cannot be required by Mite during bootstrapping
+	require Sub::HandlesVia::CodeGenerator;
+	our @ISA = 'Sub::HandlesVia::CodeGenerator';
+}
 
 sub _handle_sigcheck {
 	my ( $self, $method_name, $handler, $env, $code, $state ) = @_;
