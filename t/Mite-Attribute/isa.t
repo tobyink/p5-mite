@@ -110,4 +110,27 @@ CODE
     like $e, qr/Type check failed in accessor/;
 };
 
+tests "StrMatch" => sub {
+    mite_load <<'CODE';
+package FooMatch;
+use Mite::Shim;
+use Types::Standard qw( StrMatch );
+has attr =>
+   is => 'rw',
+   isa => StrMatch[ qr/A/i ];
+1;
+CODE
+
+    my $obj = FooMatch->new( attr => 'apple' );
+    $obj->attr( 'banana' );
+    is $obj->attr, 'banana';
+
+    local $@;
+    eval {
+        $obj->attr( 'cucumber' );
+    };
+    my $e = $@;
+    like $e, qr/Type check failed in accessor/;
+};
+
 done_testing;
