@@ -99,6 +99,7 @@ sub _build_compiler {
             ( $self->tail ? ( tail => $self->tail ) : () ),
             named_to_list  => $self->named_to_list,
             strictness     => scalar( $self->autolax // 1 ),
+            is_wrapper     => true,
             mite_signature => $self,
             $self->should_bless
                 ? ( bless => sprintf '%s::__NAMED_ARGUMENTS__::%s', $self->class->name, $self->method_name )

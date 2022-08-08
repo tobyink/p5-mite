@@ -21,16 +21,25 @@ sub BUILD {
 }
 
 sub _coderef_start_extra {
-	my ( $self, $coderef ) = @_;
+	my ( $self, $coderef ) = ( shift, @_ );
 
-	$coderef->add_line( 'my $__NEXT__ = shift;' );
-	$coderef->add_gap;
+	if ( $self->{is_wrapper} ) {
+		$coderef->add_line( 'my $__NEXT__ = shift;' );
+		$coderef->add_gap;
+		return $self;
+	}
+
+	return $self->SUPER::_coderef_start_extra( @_ );
 }
 
 sub _make_return_expression {
-	my ( $self, $coderef ) = @_;
+	my $self = shift;
 
-	sprintf 'return( &$__NEXT__( %s ) )', join( q{, }, $self->_make_return_list );
+	if ( $self->{is_wrapper} ) {
+		return sprintf 'return( &$__NEXT__( %s ) )', join( q{, }, $self->_make_return_list );
+	}
+
+	return $self->SUPER::_make_return_expression( @_ );
 }
 
 sub _make_general_fail {

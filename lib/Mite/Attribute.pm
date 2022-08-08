@@ -939,9 +939,9 @@ sub _shv_codegen {
         $self->writer // $self->accessor
     );
 
-    require Sub::HandlesVia::CodeGenerator;
+    require Mite::Attribute::SHV::CodeGen;
 
-    return 'Sub::HandlesVia::CodeGenerator'->new(
+    my $codegen = 'Mite::Attribute::SHV::CodeGen'->new(
         toolkit               => '__DUMMY__',
         sandboxing_package    => undef,
         target                => ( $self->compiling_class || $self->class )->name,
@@ -992,6 +992,8 @@ sub _shv_codegen {
                 $type->inline_check( $varname ), $self->_function_for_croak, $self->_q( $type->display_name ), $varname, $varname;
         },
     );
+    $codegen->{mite_attribute} = $self;
+    return $codegen;
 }
 
 sub _compile_delegations_via {
