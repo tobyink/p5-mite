@@ -70,8 +70,12 @@ Declares the parent classes for your class.
 
 You cannot use C<extends> from within roles.
 
-Options hashrefs, including the C<< -version >> option supported by Moose
-are not implemented.
+Like Moose, you can require a minimum version of a parent class:
+
+    extends(
+        'Your::Project::SomeClass  => { -version => '1.000' },
+        'Your::Project::OtherClass => { -version => '2.000' },
+    );
 
 Multiple inheritance is supported if you're inheriting from Mite classes
 within your project. Single inheritance is supported if you're inheriting
@@ -92,7 +96,20 @@ Roles must be Mite roles created in your own project, or Role::Tiny roles.
 Mite does not support using roles from other projects, or using role
 implementations other than Mite and Role::Tiny.
 
-Options hashrefs, including the C<< -version >> option are not implemented.
+Like Moose, you can require a minimum version of a role:
+
+    with(
+        'Your::Project::SomeRole  => { -version => '1.000' },
+        'Your::Project::OtherRole => { -version => '2.000' },
+    );
+
+You can also alias and exclude methods (but not attributes) provided by
+roles:
+
+    with 'Your::Project::Mouth' => {
+        -excludes => [ 'speak' ],
+        -alias    => { 'belch' => 'burp' },
+    };
 
 =head2 C<param> and C<field>
 

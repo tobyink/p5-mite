@@ -32,6 +32,11 @@ has extends =>
       $self->_clear_parents;
   };
 
+has superclass_args =>
+  is            => rw,
+  isa           => Map[ NonEmptyStr, HashRef|Undef ],
+  builder       => sub { {} };
+
 # Super classes as Mite::Classes populated from $self->superclasses
 has parents =>
   is            => ro,
@@ -80,6 +85,22 @@ sub linear_parents {
     my $project = $self->project;
 
     return grep defined, map { $project->class($_) } $self->linear_isa;
+}
+
+sub handle_extends_keyword {
+    my $self = shift;
+
+    my ( @extends, %extends_args );
+    while ( @_ ) {
+        my $class = shift;
+        my $args  = Str->check( $_[0] ) ? undef : shift;
+        push @extends, $class;
+        $extends_args{$class} = $args;
+    }
+    $self->superclasses( \@extends );
+    $self->superclass_args( \%extends_args );
+
+    return;
 }
 
 sub chained_attributes {
@@ -264,17 +285,28 @@ sub _compile_extends {
     my $source = $self->source;
 
     my $require_list = join "\n\t",
-                            map  { "require $_;" }
-                            # Don't require a class from the same source
-                            grep { !$source || !$source->has_class($_) }
-                            @$extends;
+        map  { "require $_;" }
+        # Don't require a class from the same source
+        grep { !$source || !$source->has_class($_) }
+        @$extends;
 
-    my $isa_list     = join ", ", map B::perlstring($_), @$extends;
+    my $version_tests = join "\n\t",
+        map { sprintf '%s->VERSION( %s );',
+            B::perlstring( $_ ),
+            B::perlstring( $self->superclass_args->{$_}{'-version'} )
+        }
+        grep {
+            $self->superclass_args->{$_}
+            and $self->superclass_args->{$_}{'-version'}
+        }
+        @$extends;
+
+    my $isa_list = join ", ", map B::perlstring($_), @$extends;
 
     return <<"END";
 BEGIN {
     $require_list
-
+    $version_tests
     use mro 'c3';
     our \@ISA;
     push \@ISA, $isa_list;

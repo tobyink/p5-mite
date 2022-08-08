@@ -168,8 +168,52 @@
             $self->{"roles"} = $value;
         };
 
-        # Attribute imported_functions (type: Map[MethodName,Str])
+        # Attribute role_args (type: Map[NonEmptyStr,HashRef|Undef])
         # has declaration, file lib/Mite/Role.pm, line 51
+        do {
+            my $value =
+              exists( $args->{"role_args"} )
+              ? $args->{"role_args"}
+              : $self->_build_role_args;
+            do {
+
+                package Mite::Shim;
+                ( ref($value) eq 'HASH' ) and do {
+                    my $ok = 1;
+                    for my $v ( values %{$value} ) {
+                        ( $ok = 0, last ) unless do {
+
+                            package Mite::Shim;
+                            ( ( ref($v) eq 'HASH' ) or ( !defined($v) ) );
+                        }
+                    };
+                    for my $k ( keys %{$value} ) {
+                        ( $ok = 0, last )
+                          unless (
+                            (
+                                do {
+
+                                    package Mite::Shim;
+                                    defined($k) and do {
+                                        ref( \$k ) eq 'SCALAR'
+                                          or ref( \( my $val = $k ) ) eq
+                                          'SCALAR';
+                                    }
+                                }
+                            )
+                            && ( length($k) > 0 )
+                          );
+                    };
+                    $ok;
+                }
+              }
+              or croak "Type check failed in constructor: %s should be %s",
+              "role_args", "Map[NonEmptyStr,HashRef|Undef]";
+            $self->{"role_args"} = $value;
+        };
+
+        # Attribute imported_functions (type: Map[MethodName,Str])
+        # has declaration, file lib/Mite/Role.pm, line 56
         do {
             my $value =
               exists( $args->{"imported_functions"} )
@@ -216,7 +260,7 @@
         };
 
         # Attribute required_methods (type: ArrayRef[MethodName])
-        # has declaration, file lib/Mite/Role.pm, line 56
+        # has declaration, file lib/Mite/Role.pm, line 61
         do {
             my $value =
               exists( $args->{"required_methods"} )
@@ -253,7 +297,7 @@
         };
 
         # Attribute method_signatures (type: Map[MethodName,Mite::Signature])
-        # has declaration, file lib/Mite/Role.pm, line 61
+        # has declaration, file lib/Mite/Role.pm, line 66
         do {
             my $value =
               exists( $args->{"method_signatures"} )
@@ -342,8 +386,52 @@
             $self->_trigger_extends( $self->{"extends"} );
         };
 
+        # Attribute superclass_args (type: Map[NonEmptyStr,HashRef|Undef])
+        # has declaration, file lib/Mite/Class.pm, line 38
+        do {
+            my $value =
+              exists( $args->{"superclass_args"} )
+              ? $args->{"superclass_args"}
+              : $self->_build_superclass_args;
+            do {
+
+                package Mite::Shim;
+                ( ref($value) eq 'HASH' ) and do {
+                    my $ok = 1;
+                    for my $v ( values %{$value} ) {
+                        ( $ok = 0, last ) unless do {
+
+                            package Mite::Shim;
+                            ( ( ref($v) eq 'HASH' ) or ( !defined($v) ) );
+                        }
+                    };
+                    for my $k ( keys %{$value} ) {
+                        ( $ok = 0, last )
+                          unless (
+                            (
+                                do {
+
+                                    package Mite::Shim;
+                                    defined($k) and do {
+                                        ref( \$k ) eq 'SCALAR'
+                                          or ref( \( my $val = $k ) ) eq
+                                          'SCALAR';
+                                    }
+                                }
+                            )
+                            && ( length($k) > 0 )
+                          );
+                    };
+                    $ok;
+                }
+              }
+              or croak "Type check failed in constructor: %s should be %s",
+              "superclass_args", "Map[NonEmptyStr,HashRef|Undef]";
+            $self->{"superclass_args"} = $value;
+        };
+
         # Attribute parents (type: ArrayRef[Mite::Class])
-        # has declaration, file lib/Mite/Class.pm, line 36
+        # has declaration, file lib/Mite/Class.pm, line 41
         if ( exists $args->{"parents"} ) {
             (
                 do { package Mite::Shim; ref( $args->{"parents"} ) eq 'ARRAY' }
@@ -372,7 +460,7 @@
 
         # Unrecognized parameters
         my @unknown = grep not(
-/\A(?:attributes|extends|imported_functions|method_signatures|name|parents|r(?:equired_methods|oles)|s(?:him_name|ource))\z/
+/\A(?:attributes|extends|imported_functions|method_signatures|name|parents|r(?:equired_methods|ole(?:_args|s))|s(?:him_name|ource|uperclass_args))\z/
         ), keys %{$args};
         @unknown
           and croak(
@@ -445,7 +533,7 @@
     }
 
     # Accessors for parents
-    # has declaration, file lib/Mite/Class.pm, line 36
+    # has declaration, file lib/Mite/Class.pm, line 41
     sub _clear_parents {
         @_ == 1
           or croak('Clearer "_clear_parents" usage: $self->_clear_parents()');
@@ -483,6 +571,51 @@
                 }
             )
         );
+    }
+
+    # Accessors for superclass_args
+    # has declaration, file lib/Mite/Class.pm, line 38
+    sub superclass_args {
+        @_ > 1
+          ? do {
+            do {
+
+                package Mite::Shim;
+                ( ref( $_[1] ) eq 'HASH' ) and do {
+                    my $ok = 1;
+                    for my $v ( values %{ $_[1] } ) {
+                        ( $ok = 0, last ) unless do {
+
+                            package Mite::Shim;
+                            ( ( ref($v) eq 'HASH' ) or ( !defined($v) ) );
+                        }
+                    };
+                    for my $k ( keys %{ $_[1] } ) {
+                        ( $ok = 0, last )
+                          unless (
+                            (
+                                do {
+
+                                    package Mite::Shim;
+                                    defined($k) and do {
+                                        ref( \$k ) eq 'SCALAR'
+                                          or ref( \( my $val = $k ) ) eq
+                                          'SCALAR';
+                                    }
+                                }
+                            )
+                            && ( length($k) > 0 )
+                          );
+                    };
+                    $ok;
+                }
+              }
+              or croak( "Type check failed in %s: value should be %s",
+                "accessor", "Map[NonEmptyStr,HashRef|Undef]" );
+            $_[0]{"superclass_args"} = $_[1];
+            $_[0];
+          }
+          : ( $_[0]{"superclass_args"} );
     }
 
     1;

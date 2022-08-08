@@ -189,12 +189,11 @@ sub inject_mite_functions {
     } if $requested->( field => 0 );
 
     *{ $package .'::with' } = sub {
-        $pkg->add_roles_by_name(
+        return $pkg->handle_with_keyword(
             defined( $fake_ns )
-                ? ( map "$fake_ns\::$_", @_ )
+                ? ( map Str->check($_) ? "$fake_ns\::$_" : $_, @_ )
                 : @_
         );
-        return;
     } if $requested->( 'with', 1 );
 
     *{ $package .'::signature_for' } = sub {
@@ -210,12 +209,11 @@ sub inject_mite_functions {
     } if $requested->( 'signature_for', 1 );
 
     *{ $package .'::extends' } = sub {
-        $pkg->superclasses(
+        return $pkg->handle_extends_keyword(
             defined( $fake_ns )
-                ? [ map "$fake_ns\::$_", @_ ]
-                : [ @_ ]
+                ? map Str->check($_) ? "$fake_ns\::$_" : $_, @_
+                : @_
         );
-        return;
     } if $kind eq 'class' && $requested->( 'extends', 1 );
 
     *{ $package .'::requires' } = sub {

@@ -27,7 +27,7 @@
 
     BEGIN {
         require Mite::App::Command;
-
+        "Mite::App::Command"->VERSION("0.009000");
         use mro 'c3';
         our @ISA;
         push @ISA, "Mite::App::Command";

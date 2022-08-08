@@ -4,7 +4,7 @@ use warnings;
 
 package Mite::App::Command::compile;
 use Mite::Miteception -all;
-extends qw(Mite::App::Command);
+extends 'Mite::App::Command' => { -version => '0.009000' };
 
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.009000';

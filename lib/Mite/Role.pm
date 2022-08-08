@@ -41,9 +41,14 @@ has source =>
   weak_ref      => true;
 
 has roles =>
-  is            => ro,
+  is            => rw,
   isa           => ArrayRef[MiteRole],
   builder       => sub { [] };
+
+has role_args =>
+  is            => rw,
+  isa           => Map[ NonEmptyStr, HashRef|Undef ],
+  builder       => sub { {} };
 
 has imported_functions =>
   is            => ro,
@@ -118,7 +123,8 @@ sub methods_to_import_from_roles {
 
     my %methods;
     for my $role ( @{ $self->roles } ) {
-        my %exported = %{ $role->methods_to_export };
+        my $role_args = $self->role_args->{ $role->name } || {};
+        my %exported  = %{ $role->methods_to_export( $role_args ) };
         for my $name ( sort keys %exported ) {
             if ( defined $methods{$name} and  $methods{$name} ne $exported{$name} ) {
                 croak "Conflict between %s and %s; %s must implement %s\n",
@@ -151,7 +157,7 @@ sub methods_to_import_from_roles {
 }
 
 sub methods_to_export {
-    my $self = shift;
+    my ( $self, $role_args ) = @_;
 
     my %methods = %{ $self->methods_to_import_from_roles };
     my %native  = %{ $self->_native_methods };
@@ -159,6 +165,19 @@ sub methods_to_export {
 
     for my $name ( keys %native ) {
         $methods{$name} = "$package\::$name";
+    }
+
+    if ( my $excludes = $role_args->{'-excludes'} ) {
+        for my $excluded ( ref( $excludes ) ? @$excludes : $excludes ) {
+            delete $methods{$excluded};
+        }
+    }
+
+    if ( my $alias = $role_args->{'-alias'} ) {
+        for my $oldname ( sort keys %$alias ) {
+            my $newname = $alias->{$oldname};
+            $methods{$newname} = delete $methods{$oldname};
+        }
     }
 
     return \%methods;
@@ -189,6 +208,8 @@ sub add_attributes {
     my ( $self, $attributes ) = @_;
 
     for my $attribute (@$attributes) {
+        croak '%s already has an attribute called %s', $self->name, $attribute->_q_name
+            if $self->attributes->{ $attribute->name };
         $self->attributes->{ $attribute->name } = $attribute;
     }
 
@@ -237,7 +258,12 @@ sub add_method_signature {
 sub add_role {
     my ( $self, $role ) = @_;
 
-    $self->add_attributes( values %{ $role->attributes } );
+    my @attr = sort { $a->_order <=> $b->_order }
+        values %{ $role->attributes };
+    for my $attr ( @attr ) {
+        $self->add_attribute( $attr )
+            unless $self->attributes->{ $attr->name };
+    }
     push @{ $self->roles }, $role;
 
     return;
@@ -296,6 +322,23 @@ sub does_list {
     );
 }
 
+sub handle_extends_keyword {
+    croak "Cannot extend roles";
+}
+
+sub handle_with_keyword {
+    my $self = shift;
+
+    while ( @_ ) {
+        my $role = shift;
+        my $args = Str->check( $_[0] ) ? undef : shift;
+        $self->role_args->{$role} = $args;
+        $self->add_roles_by_name( $role );
+    }
+
+    return;
+}
+
 for my $function ( qw/ carp croak confess / ) {
     no strict 'refs';
     *{"_function_for_$function"} = sub {
@@ -345,16 +388,28 @@ sub _compile_with {
     my $source = $self->source;
 
     my $require_list = join "\n\t",
-                            map  { "require $_;" }
-                            # Don't require a role from the same source
-                            grep { !$source || !$source->has_class($_) }
-                            @$roles;
+        map  { "require $_;" }
+        # Don't require a role from the same source
+        grep { !$source || !$source->has_class($_) }
+        @$roles;
+
+    my $version_tests = join "\n\t",
+        map { sprintf '%s->VERSION( %s );',
+            B::perlstring( $_ ),
+            B::perlstring( $self->role_args->{$_}{'-version'} )
+        }
+        grep {
+            $self->role_args->{$_}
+            and $self->role_args->{$_}{'-version'}
+        }
+        @$roles;
 
     my $does_hash = join ", ", map sprintf( "%s => 1", B::perlstring($_) ), $self->does_list;
 
     return <<"END";
 BEGIN {
     $require_list
+    $version_tests
     our \%DOES = ( $does_hash );
 }
 END
