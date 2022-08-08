@@ -1300,7 +1300,26 @@ CODE
 CODE
     }
 
-    if ( ref $self->handles ) {
+    if ( $self->has_handles_via ) {
+        my $h = $self->handles;
+        for my $delegated ( sort keys %$h ) {
+            my $name = $self->_expand_name( $delegated );
+            my $qname = $self->_q( $name );
+
+            $accessors_code .= sprintf <<'CODE', $qname, $self->compiling_class->name, $name, $self->_q($self->compiling_class->name), $self->_q_name;
+{
+    my $DELEGATION = Moose::Meta::Method->_new(
+        name => %s,
+        body => \&%s::%s,
+        package_name => %s,
+    );
+    $ATTR{%s}->associate_method( $DELEGATION );
+    $PACKAGE->add_method( $DELEGATION->name, $DELEGATION );
+}
+CODE
+        }
+    }
+    elsif ( ref $self->handles ) {
         my $h = $self->handles;
         my $hstring = '';
         for my $delegated ( sort keys %$h ) {

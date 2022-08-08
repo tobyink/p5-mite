@@ -5,7 +5,7 @@ use warnings;
 
 our $USES_MITE = "Mite::Class";
 our $MITE_SHIM = "MooseInteg::Mite";
-our $MITE_VERSION = "0.007006";
+our $MITE_VERSION = "0.009001";
 
 # Standard Moose/Moo-style constructor
 sub new {
@@ -16,14 +16,19 @@ sub new {
     my $no_build = delete $args->{__no_BUILD__};
 
     # Attribute foo (type: Int)
+    # has declaration, file lib/MooseInteg/BaseClass.pm, line 5
     if ( exists $args->{"foo"} ) { (do { my $tmp = $args->{"foo"}; defined($tmp) and !ref($tmp) and $tmp =~ /\A-?[0-9]+\z/ }) or MooseInteg::Mite::croak "Type check failed in constructor: %s should be %s", "foo", "Int"; $self->{"foo"} = $args->{"foo"}; } ;
+
+    # Attribute hashy (type: HashRef[Int])
+    # has declaration, file lib/MooseInteg/BaseClass.pm, line 10
+    do { my $value = exists( $args->{"hashy"} ) ? $args->{"hashy"} : {}; do { package MooseInteg::Mite; (ref($value) eq 'HASH') and do { my $ok = 1; for my $i (values %{$value}) { ($ok = 0, last) unless (do { my $tmp = $i; defined($tmp) and !ref($tmp) and $tmp =~ /\A-?[0-9]+\z/ }) }; $ok } } or MooseInteg::Mite::croak "Type check failed in constructor: %s should be %s", "hashy", "HashRef[Int]"; $self->{"hashy"} = $value; }; 
 
 
     # Call BUILD methods
     $self->BUILDALL( $args ) if ( ! $no_build and @{ $meta->{BUILD} || [] } );
 
     # Unrecognized parameters
-    my @unknown = grep not( /\Afoo\z/ ), keys %{$args}; @unknown and MooseInteg::Mite::croak( "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
+    my @unknown = grep not( /\A(?:foo|hashy)\z/ ), keys %{$args}; @unknown and MooseInteg::Mite::croak( "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
 
     return $self;
 }
@@ -78,7 +83,7 @@ sub __META__ {
 # Moose-compatibility method
 sub meta {
     require MooseInteg::MOP;
-    Moose::Util::find_meta( $_[0] );
+    Moose::Util::find_meta( ref $_[0] or $_[0] );
 }
 
 # See UNIVERSAL
@@ -98,8 +103,29 @@ sub does {
 my $__XS = !$ENV{MITE_PURE_PERL} && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
 # Accessors for foo
+# has declaration, file lib/MooseInteg/BaseClass.pm, line 5
 sub foo { @_ > 1 ? do { (do { my $tmp = $_[1]; defined($tmp) and !ref($tmp) and $tmp =~ /\A-?[0-9]+\z/ }) or MooseInteg::Mite::croak( "Type check failed in %s: value should be %s", "accessor", "Int" ); $_[0]{"foo"} = $_[1]; $_[0]; } : ( $_[0]{"foo"} ) }
 
+# Accessors for hashy
+# has declaration, file lib/MooseInteg/BaseClass.pm, line 10
+if ( $__XS ) {
+    Class::XSAccessor->import(
+        chained => 1,
+        "getters" => { "hashy" => "hashy" },
+    );
+}
+else {
+    *hashy = sub { @_ == 1 or MooseInteg::Mite::croak( 'Reader "hashy" usage: $self->hashy()' ); $_[0]{"hashy"} };
+}
+
+# Delegated methods for hashy
+# has declaration, file lib/MooseInteg/BaseClass.pm, line 10
+*hashy_set = sub {
+@_ >= 3 or do { require Carp; Carp::croak("Wrong number of parameters; usage: "."\$instance->hashy_set(\$key, \$value, ...)") };
+my $shv_self=shift;
+my $shv_ref_invocant = do { $shv_self->hashy };
+my (@shv_params) = @_; scalar(@shv_params) % 2 and do { require Carp; Carp::croak("Wrong number of parameters; expected even-sized list of keys and values") };my (@shv_keys_idx) = grep(!($_ % 2), 0..$#shv_params); my (@shv_values_idx) = grep(($_ % 2), 0..$#shv_params); grep(!defined, @shv_params[@shv_keys_idx]) and do { require Carp; Carp::croak("Undef did not pass type constraint; keys must be defined") };for my $shv_tmp (@shv_keys_idx) { do { do { package MooseInteg::Mite; defined($shv_params[$shv_tmp]) and do { ref(\$shv_params[$shv_tmp]) eq 'SCALAR' or ref(\(my $val = $shv_params[$shv_tmp])) eq 'SCALAR' } } or MooseInteg::Mite::croak("Type check failed in delegated method: expected %s, got value %s", "Str", $shv_params[$shv_tmp]); $shv_params[$shv_tmp] }; }; for my $shv_tmp (@shv_values_idx) { do { (do { my $tmp = $shv_params[$shv_tmp]; defined($tmp) and !ref($tmp) and $tmp =~ /\A-?[0-9]+\z/ }) or MooseInteg::Mite::croak("Type check failed in delegated method: expected %s, got value %s", "Int", $shv_params[$shv_tmp]); $shv_params[$shv_tmp] }; };; @{$shv_ref_invocant}{@shv_params[@shv_keys_idx]} = @shv_params[@shv_values_idx];wantarray ? @{$shv_ref_invocant}{@shv_params[@shv_keys_idx]} : ($shv_ref_invocant)->{$shv_params[$shv_keys_idx[0]]}
+};
 
 1;
 }

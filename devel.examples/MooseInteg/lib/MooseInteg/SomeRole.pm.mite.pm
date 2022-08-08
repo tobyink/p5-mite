@@ -5,7 +5,7 @@ use warnings;
 
 our $USES_MITE = "Mite::Role";
 our $MITE_SHIM = "MooseInteg::Mite";
-our $MITE_VERSION = "0.007006";
+our $MITE_VERSION = "0.009001";
 # Gather metadata for constructor and destructor
 sub __META__ {
     no strict 'refs';
@@ -29,7 +29,7 @@ sub __META__ {
 # Moose-compatibility method
 sub meta {
     require MooseInteg::MOP;
-    Moose::Util::find_meta( $_[0] );
+    Moose::Util::find_meta( ref $_[0] or $_[0] );
 }
 
 # See UNIVERSAL

@@ -1,3 +1,5 @@
+package MooseInteg::MOP;
+
 use Moose ();
 use Moose::Util ();
 use Moose::Util::TypeConstraints ();
@@ -12,7 +14,7 @@ require "MooseInteg/BaseClass.pm";
         __hack_no_process_options => true,
         associated_class => $PACKAGE,
         definition_context => { context => "has declaration", file => "lib/MooseInteg/BaseClass.pm", line => "5", package => "MooseInteg::BaseClass", toolkit => "Mite", type => "class" },
-        is => "rw", 
+        is => "rw",
         weak_ref => false,
         init_arg => "foo",
         required => false,
@@ -36,6 +38,45 @@ require "MooseInteg/BaseClass.pm";
     	local *Moose::Meta::Attribute::install_accessors = sub {};
     	$PACKAGE->add_attribute( $ATTR{"foo"} );
     };
+    $ATTR{"hashy"} = Moose::Meta::Attribute->new( "hashy",
+        __hack_no_process_options => true,
+        associated_class => $PACKAGE,
+        definition_context => { context => "has declaration", file => "lib/MooseInteg/BaseClass.pm", line => "10", package => "MooseInteg::BaseClass", toolkit => "Mite", type => "class" },
+        is => "ro",
+        weak_ref => false,
+        init_arg => "hashy",
+        required => false,
+        type_constraint => do { require Types::Standard; Types::Standard::HashRef()->parameterize( Types::Standard::Int() ) },
+        reader => "hashy",
+        default => sub { {} },
+        lazy => false,
+    );
+    {
+        my $ACCESSOR = Moose::Meta::Method::Accessor->new(
+            accessor_type => 'reader',
+            attribute => $ATTR{"hashy"},
+            name => "hashy",
+            body => \&MooseInteg::BaseClass::hashy,
+            package_name => "MooseInteg::BaseClass",
+            definition_context => { context => "has declaration", description => "reader MooseInteg::BaseClass::hashy", file => "lib/MooseInteg/BaseClass.pm", line => "10", package => "MooseInteg::BaseClass", toolkit => "Mite", type => "class" },
+        );
+        $ATTR{"hashy"}->associate_method( $ACCESSOR );
+        $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
+    }
+    {
+        my $DELEGATION = Moose::Meta::Method->_new(
+            name => "hashy_set",
+            body => \&MooseInteg::BaseClass::hashy_set,
+            package_name => "MooseInteg::BaseClass",
+        );
+        $ATTR{"hashy"}->associate_method( $DELEGATION );
+        $PACKAGE->add_method( $DELEGATION->name, $DELEGATION );
+    }
+    do {
+    	no warnings 'redefine';
+    	local *Moose::Meta::Attribute::install_accessors = sub {};
+    	$PACKAGE->add_attribute( $ATTR{"hashy"} );
+    };
     $PACKAGE->add_method(
         "meta" => Moose::Meta::Method::Meta->_new(
             name => "meta",
@@ -55,7 +96,7 @@ require "MooseInteg/SomeRole.pm";
         __hack_no_process_options => true,
         associated_role => $PACKAGE,
         definition_context => { context => "has declaration", file => "lib/MooseInteg/SomeRole.pm", line => "5", package => "MooseInteg::SomeRole", toolkit => "Mite", type => "role" },
-        is => "rw", 
+        is => "rw",
         weak_ref => false,
         init_arg => "bar",
         required => false,
@@ -83,4 +124,7 @@ require "MooseInteg/SomeRole.pm";
     );
     Moose::Util::TypeConstraints::find_or_create_does_type_constraint( "MooseInteg::SomeRole" );
 }
+
+
+true;
 
