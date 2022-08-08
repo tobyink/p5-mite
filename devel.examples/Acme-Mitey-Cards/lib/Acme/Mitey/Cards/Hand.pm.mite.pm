@@ -3,13 +3,15 @@
     package Acme::Mitey::Cards::Hand;
     use strict;
     use warnings;
+    no warnings qw( once void );
 
     our $USES_MITE    = "Mite::Class";
     our $MITE_SHIM    = "Acme::Mitey::Cards::Mite";
-    our $MITE_VERSION = "0.007003";
+    our $MITE_VERSION = "0.009001";
 
     BEGIN {
         require Scalar::Util;
+        *STRICT  = \&Acme::Mitey::Cards::Mite::STRICT;
         *bare    = \&Acme::Mitey::Cards::Mite::bare;
         *blessed = \&Scalar::Util::blessed;
         *carp    = \&Acme::Mitey::Cards::Mite::carp;
@@ -32,6 +34,7 @@
         push @ISA, "Acme::Mitey::Cards::Set";
     }
 
+    # Standard Moose/Moo-style constructor
     sub new {
         my $class = ref( $_[0] ) ? ref(shift) : shift;
         my $meta  = ( $Mite::META{$class} ||= $class->__META__ );
@@ -42,7 +45,8 @@
           : { ( @_ == 1 ) ? %{ $_[0] } : @_ };
         my $no_build = delete $args->{__no_BUILD__};
 
-        # Attribute: cards
+        # Attribute cards (type: CardArray)
+        # has declaration, file lib/Acme/Mitey/Cards/Set.pm, line 11
         if ( exists $args->{"cards"} ) {
             (
                 do {
@@ -70,7 +74,8 @@
             $self->{"cards"} = $args->{"cards"};
         }
 
-        # Attribute: owner
+        # Attribute owner (type: Str|Object)
+        # has declaration, file lib/Acme/Mitey/Cards/Hand.pm, line 11
         if ( exists $args->{"owner"} ) {
             do {
 
@@ -100,18 +105,19 @@
             $self->{"owner"} = $args->{"owner"};
         }
 
-        # Enforce strict constructor
+        # Call BUILD methods
+        $self->BUILDALL($args) if ( !$no_build and @{ $meta->{BUILD} || [] } );
+
+        # Unrecognized parameters
         my @unknown = grep not(/\A(?:cards|owner)\z/), keys %{$args};
         @unknown
           and croak(
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
 
-        # Call BUILD methods
-        $self->BUILDALL($args) if ( !$no_build and @{ $meta->{BUILD} || [] } );
-
         return $self;
     }
 
+    # See UNIVERSAL
     sub DOES {
         my ( $self, $role ) = @_;
         our %DOES;
@@ -120,6 +126,7 @@
         return $self->SUPER::DOES($role);
     }
 
+    # Alias for Moose/Moo-compatibility
     sub does {
         shift->DOES(@_);
     }
@@ -128,6 +135,7 @@
       && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
     # Accessors for owner
+    # has declaration, file lib/Acme/Mitey/Cards/Hand.pm, line 11
     sub owner {
         @_ > 1
           ? do {

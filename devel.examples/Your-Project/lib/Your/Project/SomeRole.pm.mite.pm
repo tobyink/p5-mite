@@ -3,10 +3,11 @@
     package Your::Project::SomeRole;
     use strict;
     use warnings;
+    no warnings qw( once void );
 
     our $USES_MITE    = "Mite::Role";
     our $MITE_SHIM    = "Your::Project::Mite";
-    our $MITE_VERSION = "0.008003";
+    our $MITE_VERSION = "0.009001";
 
     # Gather metadata for constructor and destructor
     sub __META__ {

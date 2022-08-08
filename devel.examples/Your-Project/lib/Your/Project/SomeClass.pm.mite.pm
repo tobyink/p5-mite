@@ -3,13 +3,15 @@
     package Your::Project::SomeClass;
     use strict;
     use warnings;
+    no warnings qw( once void );
 
     our $USES_MITE    = "Mite::Class";
     our $MITE_SHIM    = "Your::Project::Mite";
-    our $MITE_VERSION = "0.008003";
+    our $MITE_VERSION = "0.009001";
 
     BEGIN {
         require Your::Project::SomeRole;
+
         our %DOES =
           ( "Your::Project::SomeClass" => 1, "Your::Project::SomeRole" => 1 );
     }

@@ -2,13 +2,15 @@
 package Bad::Example::Class2;
 use strict;
 use warnings;
+no warnings qw( once void );
 
 our $USES_MITE = "Mite::Class";
 our $MITE_SHIM = "Bad::Example::Mite";
-our $MITE_VERSION = "0.007006";
+our $MITE_VERSION = "0.009001";
 
 BEGIN {
     require Bad::Example::Role2;
+    
     our %DOES = ( "Bad::Example::Class2" => 1, "Bad::Example::Role2" => 1 );
 }
 

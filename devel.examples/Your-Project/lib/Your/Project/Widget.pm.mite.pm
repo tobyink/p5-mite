@@ -3,10 +3,11 @@
     package Your::Project::Widget;
     use strict;
     use warnings;
+    no warnings qw( once void );
 
     our $USES_MITE    = "Mite::Class";
     our $MITE_SHIM    = "Your::Project::Mite";
-    our $MITE_VERSION = "0.008003";
+    our $MITE_VERSION = "0.009001";
 
     # Standard Moose/Moo-style constructor
     sub new {
