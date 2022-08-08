@@ -1,6 +1,31 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.009001 cpan:TOBYINK`
+	issued  2022-08-08;
+	changeset [
+		item [
+			a dcs:Packaging;
+			label "Add Regexp::Util dependency. Type::Tiny can inline certain type constraints better when it's installed.";
+		];
+		item [
+			a dcs:Change;
+			label "When extending a class or consuming a role, you can now specify a minimum version.";
+		];
+		item [
+			a dcs:Change;
+			label "When consuming a role, you can now alias methods.";
+		];
+		item [
+			a dcs:Change;
+			label "When consuming a role, you can now exclude methods.";
+		];
+		item [
+			a dcs:Change;
+			label "Options hashrefs are now supported by the `extends` keyword. They were already supported by `with` though that wasn't documented.";
+		];
+	].
+
 `Mite 0.009000 cpan:TOBYINK`
 	issued  2022-08-07;
 	changeset [
