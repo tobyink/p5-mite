@@ -24,18 +24,18 @@ has definition_context =>
 
 has class =>
   is            => rw,
-  isa           => MiteRole,
+  isa           => 'Mite::Package',
   weak_ref      => true;
 
 has compiling_class =>
   init_arg      => undef,
   is            => rw,
-  isa           => MiteRole,
+  isa           => 'Mite::Package',
   local_writer  => true;
 
 has _class_for_default =>
   is            => rw,
-  isa           => MiteRole,
+  isa           => 'Mite::Package',
   weak_ref      => true,
   lazy          => true,
   builder       => sub { $_[0]->class || $_[0]->compiling_class };

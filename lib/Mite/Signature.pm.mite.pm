@@ -37,12 +37,13 @@
           : { ( @_ == 1 ) ? %{ $_[0] } : @_ };
         my $no_build = delete $args->{__no_BUILD__};
 
-        # Attribute class (type: Mite::Class)
+        # Attribute class (type: InstanceOf["Mite::Package"])
         # has declaration, file lib/Mite/Signature.pm, line 11
         if ( exists $args->{"class"} ) {
-            blessed( $args->{"class"} ) && $args->{"class"}->isa("Mite::Class")
+            blessed( $args->{"class"} )
+              && $args->{"class"}->isa("Mite::Package")
               or croak "Type check failed in constructor: %s should be %s",
-              "class", "Mite::Class";
+              "class", "InstanceOf[\"Mite::Package\"]";
             $self->{"class"} = $args->{"class"};
         }
         require Scalar::Util && Scalar::Util::weaken( $self->{"class"} )
@@ -322,9 +323,9 @@
     sub compiling_class {
         @_ > 1
           ? do {
-            blessed( $_[1] ) && $_[1]->isa("Mite::Role")
+            blessed( $_[1] ) && $_[1]->isa("Mite::Package")
               or croak( "Type check failed in %s: value should be %s",
-                "accessor", "Mite::Role" );
+                "accessor", "InstanceOf[\"Mite::Package\"]" );
             $_[0]{"compiling_class"} = $_[1];
             $_[0];
           }

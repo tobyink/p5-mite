@@ -4,7 +4,18 @@ use warnings;
 
 package Mite::Class;
 use Mite::Miteception -all;
-extends qw(Mite::Role);
+extends qw(
+    Mite::Package
+);
+with qw(
+    Mite::Trait::HasSuperclasses
+    Mite::Trait::HasConstructor
+    Mite::Trait::HasDestructor
+    Mite::Trait::HasAttributes
+    Mite::Trait::HasRoles
+    Mite::Trait::HasMethods
+    Mite::Trait::HasMOP
+);
 
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.009003';
@@ -13,94 +24,10 @@ use Path::Tiny;
 use mro;
 use B ();
 
-# Super classes as class names
-has extends =>
-  is            => bare,
-  accessor      => 'superclasses',
-  isa           => ArrayRef[ValidClassName],
-  default       => sub { [] },
-  default_does_trigger => true,
-  trigger       => sub {
-      my $self = shift;
-
-      return if !$self->name; # called from constructor
-
-      # Set up our @ISA so we can use mro to calculate the class hierarchy
-      $self->_set_isa;
-
-      # Allow $self->parents to recalculate itself
-      $self->_clear_parents;
-  };
-
-has superclass_args =>
-  is            => rw,
-  isa           => Map[ NonEmptyStr, HashRef|Undef ],
-  builder       => sub { {} };
-
-# Super classes as Mite::Classes populated from $self->superclasses
-has parents =>
-  is            => ro,
-  isa           => ArrayRef[MiteClass],
-  # Build on demand to allow the project to load all the classes first
-  lazy          => true,
-  builder       => '_build_parents',
-  clearer       => '_clear_parents';
-
 sub class {
     my ( $self, $name ) = ( shift, @_ );
 
     return $self->project->class($name);
-}
-
-sub _set_isa {
-    my $self = shift;
-
-    my $name = $self->name;
-
-    mro::set_mro($name, "c3");
-    no strict 'refs';
-    @{$name.'::ISA'} = @{$self->superclasses};
-
-    return;
-}
-
-sub get_isa {
-    my $self = shift;
-
-    my $name = $self->name;
-
-    no strict 'refs';
-    return @{$name.'::ISA'};
-}
-
-sub linear_isa {
-    my $self = shift;
-
-    return @{mro::get_linear_isa($self->name)};
-}
-
-sub linear_parents {
-    my $self = shift;
-
-    my $project = $self->project;
-
-    return grep defined, map { $project->class($_) } $self->linear_isa;
-}
-
-sub handle_extends_keyword {
-    my $self = shift;
-
-    my ( @extends, %extends_args );
-    while ( @_ ) {
-        my $class = shift;
-        my $args  = Str->check( $_[0] ) ? undef : shift;
-        push @extends, $class;
-        $extends_args{$class} = $args;
-    }
-    $self->superclasses( \@extends );
-    $self->superclass_args( \%extends_args );
-
-    return;
 }
 
 sub chained_attributes {
@@ -116,12 +43,14 @@ sub chained_attributes {
     return \%attributes;
 }
 
-sub all_attributes {
-    my $self = shift;
+around all_attributes => sub {
+    my ( $next, $self ) = ( shift, shift );
 
-    return $self->attributes unless @{ $self->superclasses || [] };
-    return $self->chained_attributes($self->linear_parents);
-}
+    return $self->$next
+        if not @{ $self->superclasses || [] };
+
+    return $self->chained_attributes( $self->linear_parents );
+};
 
 sub parents_attributes {
     my $self = shift;
@@ -157,45 +86,13 @@ sub extend_method_signature {
     return;
 }
 
-sub _build_parents {
-    my $self = shift;
-
-    my $extends = $self->superclasses;
-    return [] if !@$extends;
-
-    # Load each parent and store its Mite::Class
-    my @parents;
-    for my $parent_name (@$extends) {
-        push @parents, $self->_get_parent($parent_name);
-    }
-
-    return \@parents;
-}
-
-sub _get_parent {
-    my ( $self, $parent_name ) = ( shift, @_ );
-
-    my $project = $self->project;
-
-    # See if it's already loaded
-    my $parent = $project->class($parent_name);
-    return $parent if $parent;
-
-    # If not, try to load it
-    eval "require $parent_name;";
-    $parent = $project->class($parent_name);
-    return $parent if $parent;
-
-    return;
-}
-
-sub extend_attribute {
-    my ($self, %attr_args) = ( shift, @_ );
+around extend_attribute => sub {
+    my ( $next, $self, %attr_args ) = ( shift, shift, @_ );
 
     my $name = delete $attr_args{name};
 
     if ( $self->attributes->{$name} ) {
-        return $self->SUPER::extend_attribute( name => $name, %attr_args );
+        return $self->$next( name => $name, %attr_args );
     }
 
     my $parent_attr = $self->parents_attributes->{$name};
@@ -210,297 +107,10 @@ ERROR
     $self->add_attribute($parent_attr->clone(%attr_args));
 
     return;
-}
+};
 
-sub methods_to_export {
-    return {};
-}
-
-sub compilation_stages {
-    my $self = shift;
-
-    # Check if we are inheriting from a Mite class in this project
-    my $inherit_from_mite = do {
-        # First parent
-        my $first_isa = do {
-            my @isa = $self->linear_isa;
-            shift @isa;
-            shift @isa;
-        };
-        !! ( $first_isa and $self->_get_parent( $first_isa ) );
-    };
-
-    # Always need these stages
-    my @stages = qw(
-        _compile_package
-        _compile_pragmas
-        _compile_uses_mite
-        _compile_load_storable
-        _compile_imported_functions
-        _compile_extends
-        _compile_with
-    );
-
-    # Need a constructor if we're not inheriting from Mite,
-    # or if we define any new attributes.
-    push @stages, '_compile_new'
-        if !$inherit_from_mite
-        || keys %{ $self->attributes };
-
-    # Only need these stages if not already inheriting from Mite
-    push @stages, qw(
-        _compile_buildall_method
-        _compile_destroy
-        _compile_meta_method
-    ) unless $inherit_from_mite;
-
-    # Always need these stages
-    push @stages, qw(
-        _compile_does
-        _compile_attribute_accessors
-        _compile_composed_methods
-        _compile_method_signatures
-    );
-
-    return @stages;
-}
-
-sub _compile_load_storable {
-    my $self = shift;
-
-    return unless
-        grep   { defined($_) and $_ eq true }
-        map    { $_->cloner_method }
-        values %{ $self->all_attributes };
-
-    return "use Storable ();\n";
-}
-
-sub _compile_extends {
-    my $self = shift;
-
-    my $extends = $self->superclasses;
-    return '' unless @$extends;
-
-    my $source = $self->source;
-
-    my $require_list = join "\n\t",
-        map  { "require $_;" }
-        # Don't require a class from the same source
-        grep { !$source || !$source->has_class($_) }
-        @$extends;
-
-    my $version_tests = join "\n\t",
-        map { sprintf '%s->VERSION( %s );',
-            B::perlstring( $_ ),
-            B::perlstring( $self->superclass_args->{$_}{'-version'} )
-        }
-        grep {
-            $self->superclass_args->{$_}
-            and $self->superclass_args->{$_}{'-version'}
-        }
-        @$extends;
-
-    my $isa_list = join ", ", map B::perlstring($_), @$extends;
-
-    return <<"END";
-BEGIN {
-    $require_list
-    $version_tests
-    use mro 'c3';
-    our \@ISA;
-    push \@ISA, $isa_list;
-}
-END
-}
-
-sub _compile_new {
-    my $self = shift;
-    my @vars = ('$class', '$self', '$args', '$meta');
-
-    return sprintf <<'CODE', $self->_compile_meta(@vars), $self->_compile_bless(@vars), $self->_compile_buildargs(@vars), $self->_compile_init_attributes(@vars), $self->_compile_buildall(@vars, '$no_build'), $self->_compile_strict_constructor(@vars);
-# Standard Moose/Moo-style constructor
-sub new {
-    my $class = ref($_[0]) ? ref(shift) : shift;
-    my $meta  = %s;
-    my $self  = %s;
-    my $args  = %s;
-    my $no_build = delete $args->{__no_BUILD__};
-
-%s
-
-    # Call BUILD methods
-    %s
-
-    # Unrecognized parameters
-    %s
-
-    return $self;
-}
-CODE
-}
-
-sub _compile_bless {
-    my ( $self, $classvar, $selfvar, $argvar, $metavar ) = @_;
-
-    my $simple_bless = "bless {}, $classvar";
-
-    # Force parents to be loaded
-    $self->parents;
-
-    # First parent with &new
-    my ( $first_isa ) = do {
-        my @isa = $self->linear_isa;
-        shift @isa;
-        no strict 'refs';
-        grep +(defined &{$_.'::new'}), @isa;
-    };
-
-    # If we're not inheriting from anything with a constructor: simple case
-    $first_isa or return $simple_bless;
-
-    # Inheriting from a Mite class in this project: simple case
-    my $first_parent = $self->_get_parent( $first_isa )
-        and return $simple_bless;
-
-    # Inheriting from a Moose/Moo/Mite/Class::Tiny class:
-    #   call buildargs
-    #   set $args->{__no_BUILD__}
-    #   call parent class constructor
-    if ( $first_isa->can( 'BUILDALL' ) ) {
-        return sprintf 'do { my %s = %s; %s->{__no_BUILD__} = 1; %s->SUPER::new( %s ) }',
-            $argvar, $self->_compile_buildargs($classvar, $selfvar, $argvar, $metavar), $argvar, $classvar, $argvar;
-    }
-
-    # Inheriting from some random class
-    #    call FOREIGNBUILDARGS if it exists
-    #    pass return value or @_ to parent class constructor
-    return sprintf '%s->SUPER::new( %s->{HAS_FOREIGNBUILDARGS} ? %s->FOREIGNBUILDARGS( @_ ) : @_ )',
-        $classvar, $metavar, $classvar;
-}
-
-sub _compile_strict_constructor {
-    my ( $self, $classvar, $selfvar, $argvar, $metavar ) = @_;
-
-    my @allowed =
-        grep { defined $_ }
-        map { ( $_->init_arg, $_->_all_aliases ) }
-        values %{ $self->all_attributes };
-    my $check = do {
-        local $Type::Tiny::AvoidCallbacks = 1;
-        my $enum = Enum->of( @allowed );
-        $enum->can( '_regexp' )  # not part of official API
-            ? sprintf( '/\\A%s\\z/', $enum->_regexp )
-            : $enum->inline_check( '$_' );
-    };
-
-    my $code = sprintf 'my @unknown = grep not( %s ), keys %%{%s}; @unknown and %s( "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );',
-        $check, $argvar, $self->_function_for_croak;
-    if ( my $autolax = $self->autolax ) {
-        $code = "if ( $autolax ) { $code }";
-    }
-    return $code;
-}
-
-sub _compile_buildargs {
-    my ( $self, $classvar, $selfvar, $argvar, $metavar ) = @_;
-    return sprintf '%s->{HAS_BUILDARGS} ? %s->BUILDARGS( @_ ) : { ( @_ == 1 ) ? %%{$_[0]} : @_ }',
-        $metavar, $classvar;
-}
-
-sub _compile_buildall {
-    my ( $self, $classvar, $selfvar, $argvar, $metavar, $nobuildvar ) = @_;
-    return sprintf '%s->BUILDALL( %s ) if ( ! %s and @{ %s->{BUILD} || [] } );',
-        $selfvar, $argvar, $nobuildvar, $metavar;
-}
-
-sub _compile_buildall_method {
-    my $self = shift;
-
-    return sprintf <<'CODE', $self->_compile_meta( '$class', '$_[0]', '$_[1]', '$meta' ),
-# Used by constructor to call BUILD methods
-sub BUILDALL {
-    my $class = ref( $_[0] );
-    my $meta  = %s;
-    $_->( @_ ) for @{ $meta->{BUILD} || [] };
-}
-CODE
-}
-
-sub _compile_destroy {
-    my $self = shift;
-    sprintf <<'CODE', $self->_compile_meta( '$class', '$self' );
-# Destructor should call DEMOLISH methods
-sub DESTROY {
-    my $self  = shift;
-    my $class = ref( $self ) || $self;
-    my $meta  = %s;
-    my $in_global_destruction = defined ${^GLOBAL_PHASE}
-        ? ${^GLOBAL_PHASE} eq 'DESTRUCT'
-        : Devel::GlobalDestruction::in_global_destruction();
-    for my $demolisher ( @{ $meta->{DEMOLISH} || [] } ) {
-        my $e = do {
-            local ( $?, $@ );
-            eval { $demolisher->( $self, $in_global_destruction ) };
-            $@;
-        };
-        no warnings 'misc'; # avoid (in cleanup) warnings
-        die $e if $e;       # rethrow
-    }
-    return;
-}
-CODE
-}
-
-sub _compile_meta {
-    my ( $self, $classvar, $selfvar, $argvar, $metavar ) = @_;
-    return sprintf '( $Mite::META{%s} ||= %s->__META__ )',
-        $classvar, $classvar;
-}
-
-sub _compile_init_attributes {
-    my ( $self, $classvar, $selfvar, $argvar, $metavar ) = @_;
-
-    my @code;
-    my $depth = 1;
-    my %depth = map { $_ => $depth++; } $self->linear_isa;
-    my @attributes = do {
-        no warnings;
-        sort {
-            eval { $depth{$b->class->name} <=> $depth{$a->class->name} }
-            or $a->_order <=> $b->_order;
-        }
-        values %{ $self->all_attributes };
-    };
-    for my $attr ( @attributes ) {
-        my $guard = $attr->locally_set_compiling_class( $self );
-        my @lines = grep !!$_, $attr->compile_init( $selfvar, $argvar );
-        if ( @lines ) {
-            push @code, sprintf "# Attribute %s%s",
-               $attr->name, $attr->type ? sprintf( ' (type: %s)', $attr->type->display_name ) : '';
-            push @code, sprintf '# %s',
-               $attr->definition_context_to_pretty_string;
-            push @code, @lines;
-            push @code, '';
-        }
-    }
-
-    return join "\n", map { /\S/ ? "    $_" : '' } @code;
-}
-
-sub _compile_attribute_accessors {
-    my $self = shift;
-
-    my $attributes = $self->attributes;
-    keys %$attributes or return '';
-
-    my $code = 'my $__XS = !$ENV{MITE_PURE_PERL} && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };' . "\n\n";
-    for my $name ( sort keys %$attributes ) {
-        my $guard = $attributes->{$name}->locally_set_compiling_class( $self );
-        $code .= $attributes->{$name}->compile( xs_condition => '$__XS' );
-    }
-
-    return $code;
+sub _needs_accessors {
+    return true;
 }
 
 sub _mop_metaclass {
@@ -512,9 +122,9 @@ sub _mop_attribute_metaclass {
 }
 
 sub _compile_mop_postamble {
-    my $self = shift;
+    my ( $next, $self ) = ( shift, shift );
 
-    my $code = $self->SUPER::_compile_mop_postamble( @_ );
+    my $code = $self->$next( @_ );
 
     my @superclasses = @{ $self->superclasses || [] }
         or return $code;
@@ -523,19 +133,6 @@ sub _compile_mop_postamble {
         join q{, }, map B::perlstring( $_ ), @superclasses;
 
     return $code;
-}
-
-sub _compile_mop_required_methods {
-    return '';  # classes don't care
-}
-
-sub _compile_mop_modifiers {
-    return '';  # classes don't care
-}
-
-sub _compile_mop_tc {
-    return sprintf '    Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( %s );',
-        B::perlstring( shift->name );
 }
 
 1;

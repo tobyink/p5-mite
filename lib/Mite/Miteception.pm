@@ -50,7 +50,12 @@ sub load_mite_file {
 		 require $mite_file;
 	}
 
-	'Mite::Shim'->_inject_mite_functions( $caller, $file, 'class', \%arg );
+	'Mite::Shim'->_inject_mite_functions(
+		$caller,
+		$file,
+		( $arg{'-role'} ? 'role' : 'class' ),
+		\%arg,
+	);
 }
 
 1;

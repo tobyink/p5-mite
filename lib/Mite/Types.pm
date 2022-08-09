@@ -11,7 +11,7 @@ use Type::Library 1.012
 	-declare => qw(
 		One MethodName MethodNameTemplate ValidClassName HandlesHash AliasList
 		MiteRole MiteClass MiteAttribute MiteProject MiteSource MiteCompiled
-		MiteConfig MiteSignature
+		MiteConfig MiteSignature MitePackage
 	);
 
 use Types::Standard 'slurpy';
@@ -77,6 +77,12 @@ __PACKAGE__->add_type(
 	name      => MiteClass,
 	parent    => InstanceOf[ 'Mite::Class' ],
 	display_name => 'Mite::Class',
+);
+
+__PACKAGE__->add_type(
+	name      => MitePackage,
+	parent    => InstanceOf[ 'Mite::Package' ],
+	display_name => 'Mite::Package',
 );
 
 __PACKAGE__->add_type(

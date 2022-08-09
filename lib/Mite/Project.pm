@@ -228,7 +228,7 @@ sub inject_mite_functions {
                 or croak "Expected a coderef method modifier";
             ArrayRef->of(Str)->check( $names ) && @$names
                 or croak "Expected a list of method names to modify";
-            $pkg->add_required_methods( @$names );
+            $pkg->add_required_methods( @$names ) if $kind eq 'role';
             return;
         } if $requested->( $modifier, 1 );
     }
@@ -354,6 +354,11 @@ sub load_files {
 
 sub _load_file {
     my ( $self, $file, $inc_dir ) = @_;
+
+    if ( $self->{_already}{$file}++ ) {
+        warn "Skipping $file: already loaded\n" if $self->debug;
+        return;
+    }
 
     if ( defined $self->_project_mopper_file
     and $file eq $self->_project_mopper_file ) {

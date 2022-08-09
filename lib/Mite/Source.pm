@@ -75,6 +75,7 @@ sub class_for {
     $metaclass ||= 'Mite::Class';
 
     if ( not $self->classes->{$name} ) {
+        eval "require $metaclass";
         $self->classes->{$name} = $metaclass->new(
             name    => $name,
             source  => $self,

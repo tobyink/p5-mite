@@ -10,13 +10,13 @@ our $VERSION   = '0.009003';
 
 has class =>
   is            => ro,
-  isa           => MiteClass,
+  isa           => 'Mite::Package',
   weak_ref      => true;
 
 has compiling_class =>
   init_arg      => undef,
   is            => rw,
-  isa           => MiteRole,
+  isa           => 'Mite::Package',
   local_writer  => true;
 
 has method_name =>

@@ -26,6 +26,31 @@
         *true    = \&Mite::Shim::true;
     }
 
+    BEGIN {
+        require Mite::Package;
+
+        use mro 'c3';
+        our @ISA;
+        push @ISA, "Mite::Package";
+    }
+
+    BEGIN {
+        require Mite::Trait::HasRequiredMethods;
+        require Mite::Trait::HasAttributes;
+        require Mite::Trait::HasRoles;
+        require Mite::Trait::HasMethods;
+        require Mite::Trait::HasMOP;
+
+        our %DOES = (
+            "Mite::Role"                      => 1,
+            "Mite::Trait::HasRequiredMethods" => 1,
+            "Mite::Trait::HasAttributes"      => 1,
+            "Mite::Trait::HasRoles"           => 1,
+            "Mite::Trait::HasMethods"         => 1,
+            "Mite::Trait::HasMOP"             => 1
+        );
+    }
+
     # Standard Moose/Moo-style constructor
     sub new {
         my $class = ref( $_[0] ) ? ref(shift) : shift;
@@ -37,38 +62,8 @@
           : { ( @_ == 1 ) ? %{ $_[0] } : @_ };
         my $no_build = delete $args->{__no_BUILD__};
 
-        # Attribute attributes (type: HashRef[Mite::Attribute])
-        # has declaration, file lib/Mite/Role.pm, line 21
-        do {
-            my $value =
-              exists( $args->{"attributes"} )
-              ? $args->{"attributes"}
-              : $Mite::Role::__attributes_DEFAULT__->($self);
-            do {
-
-                package Mite::Shim;
-                ( ref($value) eq 'HASH' ) and do {
-                    my $ok = 1;
-                    for my $i ( values %{$value} ) {
-                        ( $ok = 0, last )
-                          unless (
-                            do {
-                                use Scalar::Util ();
-                                Scalar::Util::blessed($i)
-                                  and $i->isa(q[Mite::Attribute]);
-                            }
-                          );
-                    };
-                    $ok;
-                }
-              }
-              or croak "Type check failed in constructor: %s should be %s",
-              "attributes", "HashRef[Mite::Attribute]";
-            $self->{"attributes"} = $value;
-        };
-
         # Attribute name (type: ValidClassName)
-        # has declaration, file lib/Mite/Role.pm, line 23
+        # has declaration, file lib/Mite/Package.pm, line 11
         croak "Missing key in constructor: name" unless exists $args->{"name"};
         (
             (
@@ -93,7 +88,7 @@
         $self->{"name"} = $args->{"name"};
 
         # Attribute shim_name (type: ValidClassName)
-        # has declaration, file lib/Mite/Role.pm, line 35
+        # has declaration, file lib/Mite/Package.pm, line 23
         if ( exists $args->{"shim_name"} ) {
             (
                 (
@@ -120,7 +115,7 @@
         }
 
         # Attribute source (type: Mite::Source)
-        # has declaration, file lib/Mite/Role.pm, line 37
+        # has declaration, file lib/Mite/Package.pm, line 25
         if ( exists $args->{"source"} ) {
             blessed( $args->{"source"} )
               && $args->{"source"}->isa("Mite::Source")
@@ -131,82 +126,8 @@
         require Scalar::Util && Scalar::Util::weaken( $self->{"source"} )
           if ref $self->{"source"};
 
-        # Attribute roles (type: ArrayRef[Mite::Role])
-        # has declaration, file lib/Mite/Role.pm, line 46
-        do {
-            my $value =
-              exists( $args->{"roles"} )
-              ? $args->{"roles"}
-              : $self->_build_roles;
-            do {
-
-                package Mite::Shim;
-                ( ref($value) eq 'ARRAY' ) and do {
-                    my $ok = 1;
-                    for my $i ( @{$value} ) {
-                        ( $ok = 0, last )
-                          unless (
-                            do {
-                                use Scalar::Util ();
-                                Scalar::Util::blessed($i)
-                                  and $i->isa(q[Mite::Role]);
-                            }
-                          );
-                    };
-                    $ok;
-                }
-              }
-              or croak "Type check failed in constructor: %s should be %s",
-              "roles", "ArrayRef[Mite::Role]";
-            $self->{"roles"} = $value;
-        };
-
-        # Attribute role_args (type: Map[NonEmptyStr,HashRef|Undef])
-        # has declaration, file lib/Mite/Role.pm, line 51
-        do {
-            my $value =
-              exists( $args->{"role_args"} )
-              ? $args->{"role_args"}
-              : $self->_build_role_args;
-            do {
-
-                package Mite::Shim;
-                ( ref($value) eq 'HASH' ) and do {
-                    my $ok = 1;
-                    for my $v ( values %{$value} ) {
-                        ( $ok = 0, last ) unless do {
-
-                            package Mite::Shim;
-                            ( ( ref($v) eq 'HASH' ) or ( !defined($v) ) );
-                        }
-                    };
-                    for my $k ( keys %{$value} ) {
-                        ( $ok = 0, last )
-                          unless (
-                            (
-                                do {
-
-                                    package Mite::Shim;
-                                    defined($k) and do {
-                                        ref( \$k ) eq 'SCALAR'
-                                          or ref( \( my $val = $k ) ) eq
-                                          'SCALAR';
-                                    }
-                                }
-                            )
-                            && ( length($k) > 0 )
-                          );
-                    };
-                    $ok;
-                }
-              }
-              or croak "Type check failed in constructor: %s should be %s",
-              "role_args", "Map[NonEmptyStr,HashRef|Undef]";
-            $self->{"role_args"} = $value;
-        };
-
         # Attribute imported_functions (type: Map[MethodName,Str])
-        # has declaration, file lib/Mite/Role.pm, line 56
+        # has declaration, file lib/Mite/Package.pm, line 34
         do {
             my $value =
               exists( $args->{"imported_functions"} )
@@ -252,13 +173,44 @@
             $self->{"imported_functions"} = $value;
         };
 
-        # Attribute required_methods (type: ArrayRef[MethodName])
-        # has declaration, file lib/Mite/Role.pm, line 61
+        # Attribute attributes (type: HashRef[Mite::Attribute])
+        # has declaration, file lib/Mite/Trait/HasAttributes.pm, line 16
         do {
             my $value =
-              exists( $args->{"required_methods"} )
-              ? $args->{"required_methods"}
-              : $self->_build_required_methods;
+              exists( $args->{"attributes"} )
+              ? $args->{"attributes"}
+              : $Mite::Trait::HasAttributes::__attributes_DEFAULT__
+              ->($self);
+            do {
+
+                package Mite::Shim;
+                ( ref($value) eq 'HASH' ) and do {
+                    my $ok = 1;
+                    for my $i ( values %{$value} ) {
+                        ( $ok = 0, last )
+                          unless (
+                            do {
+                                use Scalar::Util ();
+                                Scalar::Util::blessed($i)
+                                  and $i->isa(q[Mite::Attribute]);
+                            }
+                          );
+                    };
+                    $ok;
+                }
+              }
+              or croak "Type check failed in constructor: %s should be %s",
+              "attributes", "HashRef[Mite::Attribute]";
+            $self->{"attributes"} = $value;
+        };
+
+        # Attribute roles (type: ArrayRef[Mite::Role])
+        # has declaration, file lib/Mite/Trait/HasRoles.pm, line 19
+        do {
+            my $value =
+              exists( $args->{"roles"} )
+              ? $args->{"roles"}
+              : $self->_build_roles;
             do {
 
                 package Mite::Shim;
@@ -267,30 +219,67 @@
                     for my $i ( @{$value} ) {
                         ( $ok = 0, last )
                           unless (
-                            (
-                                do {
-
-                                    package Mite::Shim;
-                                    defined($i) and do {
-                                        ref( \$i ) eq 'SCALAR'
-                                          or ref( \( my $val = $i ) ) eq
-                                          'SCALAR';
-                                    }
-                                }
-                            )
-                            && ( do { local $_ = $i; /\A[^\W0-9]\w*\z/ } )
+                            do {
+                                use Scalar::Util ();
+                                Scalar::Util::blessed($i)
+                                  and $i->isa(q[Mite::Role]);
+                            }
                           );
                     };
                     $ok;
                 }
               }
               or croak "Type check failed in constructor: %s should be %s",
-              "required_methods", "ArrayRef[MethodName]";
-            $self->{"required_methods"} = $value;
+              "roles", "ArrayRef[Mite::Role]";
+            $self->{"roles"} = $value;
+        };
+
+        # Attribute role_args (type: Map[NonEmptyStr,HashRef|Undef])
+        # has declaration, file lib/Mite/Trait/HasRoles.pm, line 24
+        do {
+            my $value =
+              exists( $args->{"role_args"} )
+              ? $args->{"role_args"}
+              : $self->_build_role_args;
+            do {
+
+                package Mite::Shim;
+                ( ref($value) eq 'HASH' ) and do {
+                    my $ok = 1;
+                    for my $v ( values %{$value} ) {
+                        ( $ok = 0, last ) unless do {
+
+                            package Mite::Shim;
+                            ( ( ref($v) eq 'HASH' ) or ( !defined($v) ) );
+                        }
+                    };
+                    for my $k ( keys %{$value} ) {
+                        ( $ok = 0, last )
+                          unless (
+                            (
+                                do {
+
+                                    package Mite::Shim;
+                                    defined($k) and do {
+                                        ref( \$k ) eq 'SCALAR'
+                                          or ref( \( my $val = $k ) ) eq
+                                          'SCALAR';
+                                    }
+                                }
+                            )
+                            && ( length($k) > 0 )
+                          );
+                    };
+                    $ok;
+                }
+              }
+              or croak "Type check failed in constructor: %s should be %s",
+              "role_args", "Map[NonEmptyStr,HashRef|Undef]";
+            $self->{"role_args"} = $value;
         };
 
         # Attribute method_signatures (type: Map[MethodName,Mite::Signature])
-        # has declaration, file lib/Mite/Role.pm, line 66
+        # has declaration, file lib/Mite/Trait/HasMethods.pm, line 20
         do {
             my $value =
               exists( $args->{"method_signatures"} )
@@ -336,6 +325,43 @@
             $self->{"method_signatures"} = $value;
         };
 
+        # Attribute required_methods (type: ArrayRef[MethodName])
+        # has declaration, file lib/Mite/Trait/HasRequiredMethods.pm, line 14
+        do {
+            my $value =
+              exists( $args->{"required_methods"} )
+              ? $args->{"required_methods"}
+              : $self->_build_required_methods;
+            do {
+
+                package Mite::Shim;
+                ( ref($value) eq 'ARRAY' ) and do {
+                    my $ok = 1;
+                    for my $i ( @{$value} ) {
+                        ( $ok = 0, last )
+                          unless (
+                            (
+                                do {
+
+                                    package Mite::Shim;
+                                    defined($i) and do {
+                                        ref( \$i ) eq 'SCALAR'
+                                          or ref( \( my $val = $i ) ) eq
+                                          'SCALAR';
+                                    }
+                                }
+                            )
+                            && ( do { local $_ = $i; /\A[^\W0-9]\w*\z/ } )
+                          );
+                    };
+                    $ok;
+                }
+              }
+              or croak "Type check failed in constructor: %s should be %s",
+              "required_methods", "ArrayRef[MethodName]";
+            $self->{"required_methods"} = $value;
+        };
+
         # Call BUILD methods
         $self->BUILDALL($args) if ( !$no_build and @{ $meta->{BUILD} || [] } );
 
@@ -348,55 +374,6 @@
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
 
         return $self;
-    }
-
-    # Used by constructor to call BUILD methods
-    sub BUILDALL {
-        my $class = ref( $_[0] );
-        my $meta  = ( $Mite::META{$class} ||= $class->__META__ );
-        $_->(@_) for @{ $meta->{BUILD} || [] };
-    }
-
-    # Destructor should call DEMOLISH methods
-    sub DESTROY {
-        my $self  = shift;
-        my $class = ref($self) || $self;
-        my $meta  = ( $Mite::META{$class} ||= $class->__META__ );
-        my $in_global_destruction =
-          defined ${^GLOBAL_PHASE}
-          ? ${^GLOBAL_PHASE} eq 'DESTRUCT'
-          : Devel::GlobalDestruction::in_global_destruction();
-        for my $demolisher ( @{ $meta->{DEMOLISH} || [] } ) {
-            my $e = do {
-                local ( $?, $@ );
-                eval { $demolisher->( $self, $in_global_destruction ) };
-                $@;
-            };
-            no warnings 'misc';    # avoid (in cleanup) warnings
-            die $e if $e;          # rethrow
-        }
-        return;
-    }
-
-    # Gather metadata for constructor and destructor
-    sub __META__ {
-        no strict 'refs';
-        no warnings 'once';
-        my $class = shift;
-        $class = ref($class) || $class;
-        my $linear_isa = mro::get_linear_isa($class);
-        return {
-            BUILD => [
-                map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
-                map { "$_\::BUILD" } reverse @$linear_isa
-            ],
-            DEMOLISH => [
-                map   { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
-                  map { "$_\::DEMOLISH" } @$linear_isa
-            ],
-            HAS_BUILDARGS        => $class->can('BUILDARGS'),
-            HAS_FOREIGNBUILDARGS => $class->can('FOREIGNBUILDARGS'),
-        };
     }
 
     # See UNIVERSAL
@@ -417,7 +394,7 @@
       && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
     # Accessors for attributes
-    # has declaration, file lib/Mite/Role.pm, line 21
+    # has declaration, file lib/Mite/Trait/HasAttributes.pm, line 16
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,
@@ -431,26 +408,8 @@
         };
     }
 
-    # Accessors for imported_functions
-    # has declaration, file lib/Mite/Role.pm, line 56
-    if ($__XS) {
-        Class::XSAccessor->import(
-            chained   => 1,
-            "getters" => { "imported_functions" => "imported_functions" },
-        );
-    }
-    else {
-        *imported_functions = sub {
-            @_ == 1
-              or croak(
-                'Reader "imported_functions" usage: $self->imported_functions()'
-              );
-            $_[0]{"imported_functions"};
-        };
-    }
-
     # Accessors for method_signatures
-    # has declaration, file lib/Mite/Role.pm, line 66
+    # has declaration, file lib/Mite/Trait/HasMethods.pm, line 20
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,
@@ -466,23 +425,8 @@
         };
     }
 
-    # Accessors for name
-    # has declaration, file lib/Mite/Role.pm, line 23
-    if ($__XS) {
-        Class::XSAccessor->import(
-            chained   => 1,
-            "getters" => { "name" => "name" },
-        );
-    }
-    else {
-        *name = sub {
-            @_ == 1 or croak('Reader "name" usage: $self->name()');
-            $_[0]{"name"};
-        };
-    }
-
     # Accessors for required_methods
-    # has declaration, file lib/Mite/Role.pm, line 61
+    # has declaration, file lib/Mite/Trait/HasRequiredMethods.pm, line 14
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,
@@ -499,7 +443,7 @@
     }
 
     # Accessors for role_args
-    # has declaration, file lib/Mite/Role.pm, line 51
+    # has declaration, file lib/Mite/Trait/HasRoles.pm, line 24
     sub role_args {
         @_ > 1
           ? do {
@@ -544,7 +488,7 @@
     }
 
     # Accessors for roles
-    # has declaration, file lib/Mite/Role.pm, line 46
+    # has declaration, file lib/Mite/Trait/HasRoles.pm, line 19
     sub roles {
         @_ > 1
           ? do {
@@ -574,140 +518,105 @@
           : ( $_[0]{"roles"} );
     }
 
-    # Accessors for shim_name
-    # has declaration, file lib/Mite/Role.pm, line 35
-    sub shim_name {
-        @_ > 1
-          ? do {
-            (
-                (
-                    do {
+    # Methods from roles
+    sub _all_subs { goto \&Mite::Trait::HasMethods::_all_subs; }
 
-                        package Mite::Shim;
-                        defined( $_[1] ) and do {
-                            ref( \$_[1] ) eq 'SCALAR'
-                              or ref( \( my $val = $_[1] ) ) eq 'SCALAR';
-                        }
-                    }
-                )
-                  && (
-                    do { local $_ = $_[1]; /\A[^\W0-9]\w*(?:::[^\W0-9]\w*)*\z/ }
-                  )
-              )
-              or croak(
-                "Type check failed in %s: value should be %s",
-                "accessor",
-                "ValidClassName"
-              );
-            $_[0]{"shim_name"} = $_[1];
-            $_[0];
-          }
-          : do {
-            (
-                exists( $_[0]{"shim_name"} ) ? $_[0]{"shim_name"} : (
-                    $_[0]{"shim_name"} = do {
-                        my $default_value = $_[0]->_build_shim_name;
-                        (
-                            (
-                                do {
-
-                                    package Mite::Shim;
-                                    defined($default_value) and do {
-                                        ref( \$default_value ) eq 'SCALAR'
-                                          or
-                                          ref( \( my $val = $default_value ) )
-                                          eq 'SCALAR';
-                                    }
-                                }
-                            )
-                              && (
-                                do {
-                                    local $_ = $default_value;
-                                    /\A[^\W0-9]\w*(?:::[^\W0-9]\w*)*\z/;
-                                }
-                              )
-                          )
-                          or croak(
-                            "Type check failed in default: %s should be %s",
-                            "shim_name",
-                            "ValidClassName"
-                          );
-                        $default_value;
-                    }
-                )
-            )
-        }
+    sub _build_method_signatures {
+        goto \&Mite::Trait::HasMethods::_build_method_signatures;
     }
 
-    # Accessors for source
-    # has declaration, file lib/Mite/Role.pm, line 37
-    sub source {
-        @_ > 1
-          ? do {
-            blessed( $_[1] ) && $_[1]->isa("Mite::Source")
-              or croak( "Type check failed in %s: value should be %s",
-                "accessor", "Mite::Source" );
-            $_[0]{"source"} = $_[1];
-            require Scalar::Util && Scalar::Util::weaken( $_[0]{"source"} )
-              if ref $_[0]{"source"};
-            $_[0];
-          }
-          : ( $_[0]{"source"} );
+    sub _build_required_methods {
+        goto
+          \&Mite::Trait::HasRequiredMethods::_build_required_methods;
     }
 
-    # Method signatures
-    our %SIGNATURE_FOR;
+    sub _build_role_args {
+        goto \&Mite::Trait::HasRoles::_build_role_args;
+    }
+    sub _build_roles { goto \&Mite::Trait::HasRoles::_build_roles; }
 
-    $SIGNATURE_FOR{"add_attributes"} = sub {
-        my $__NEXT__ = shift;
+    sub _compile_attribute_accessors {
+        goto
+          \&Mite::Trait::HasAttributes::_compile_attribute_accessors;
+    }
 
-        my ( @out, %tmp, $tmp, $dtmp, @head );
+    sub _compile_composed_methods {
+        goto \&Mite::Trait::HasRoles::_compile_composed_methods;
+    }
+    sub _compile_does { goto \&Mite::Trait::HasRoles::_compile_does; }
 
-        @_ >= 1
-          or
-          croak( "Wrong number of parameters in signature for %s: got %d, %s",
-            "add_attributes", scalar(@_), "expected exactly 1 parameters" );
+    sub _compile_init_attributes {
+        goto \&Mite::Trait::HasAttributes::_compile_init_attributes;
+    }
 
-        @head = splice( @_, 0, 1 );
+    sub _compile_method_signatures {
+        goto \&Mite::Trait::HasMethods::_compile_method_signatures;
+    }
+    sub _compile_mop { goto \&Mite::Trait::HasMOP::_compile_mop; }
 
-        # Parameter invocant (type: Defined)
-        ( defined( $head[0] ) )
-          or croak(
-"Type check failed in signature for add_attributes: %s should be %s",
-            "\$_[0]", "Defined"
-          );
+    sub _compile_mop_attributes {
+        goto \&Mite::Trait::HasMOP::_compile_mop_attributes;
+    }
 
-        my $SLURPY = [ @_[ 0 .. $#_ ] ];
+    sub _compile_mop_methods {
+        goto \&Mite::Trait::HasMOP::_compile_mop_methods;
+    }
 
-     # Parameter $SLURPY (type: Slurpy[ArrayRef[InstanceOf["Mite::Attribute"]]])
-        (
-            do {
+    sub _compile_mop_postamble {
+        goto \&Mite::Trait::HasMOP::_compile_mop_postamble;
+    }
 
-                package Mite::Shim;
-                ( ref($SLURPY) eq 'ARRAY' ) and do {
-                    my $ok = 1;
-                    for my $i ( @{$SLURPY} ) {
-                        ( $ok = 0, last )
-                          unless (
-                            do {
-                                use Scalar::Util ();
-                                Scalar::Util::blessed($i)
-                                  and $i->isa(q[Mite::Attribute]);
-                            }
-                          );
-                    };
-                    $ok;
-                }
-            }
-          )
-          or croak(
-"Type check failed in signature for add_attributes: %s should be %s",
-            "\$SLURPY", "ArrayRef[InstanceOf[\"Mite::Attribute\"]]"
-          );
-        push( @out, $SLURPY );
+    sub _compile_mop_required_methods {
+        goto \&Mite::Trait::HasMOP::_compile_mop_required_methods;
+    }
+    sub _compile_with { goto \&Mite::Trait::HasRoles::_compile_with; }
+    sub _get_role     { goto \&Mite::Trait::HasRoles::_get_role; }
 
-        return ( &$__NEXT__( @head, @out ) );
-    };
+    sub _needs_accessors {
+        goto \&Mite::Trait::HasAttributes::_needs_accessors;
+    }
+
+    sub add_attribute {
+        goto \&Mite::Trait::HasAttributes::add_attribute;
+    }
+
+    sub add_attributes {
+        goto \&Mite::Trait::HasAttributes::add_attributes;
+    }
+
+    sub add_method_signature {
+        goto \&Mite::Trait::HasMethods::add_method_signature;
+    }
+
+    sub add_required_methods {
+        goto \&Mite::Trait::HasRequiredMethods::add_required_methods;
+    }
+    sub add_role { goto \&Mite::Trait::HasRoles::add_role; }
+
+    sub add_roles_by_name {
+        goto \&Mite::Trait::HasRoles::add_roles_by_name;
+    }
+
+    sub all_attributes {
+        goto \&Mite::Trait::HasAttributes::all_attributes;
+    }
+    sub does_list { goto \&Mite::Trait::HasRoles::does_list; }
+
+    sub extend_attribute {
+        goto \&Mite::Trait::HasAttributes::extend_attribute;
+    }
+
+    sub handle_with_keyword {
+        goto \&Mite::Trait::HasRoles::handle_with_keyword;
+    }
+
+    sub methods_to_import_from_roles {
+        goto \&Mite::Trait::HasRoles::methods_to_import_from_roles;
+    }
+
+    sub native_methods {
+        goto \&Mite::Trait::HasMethods::native_methods;
+    }
 
     1;
 }
