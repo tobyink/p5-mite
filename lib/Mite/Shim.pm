@@ -323,37 +323,3 @@ AROUND
 }
 
 1;
-__END__
-
-=pod
-
-=head1 NAME
-
-Mite::Shim - shim to load .mite.pm files
-
-=head1 DESCRIPTION
-
-This is a copy of L<Mite::Shim>.
-
-=head1 AUTHOR
-
-Michael G Schwern E<lt>mschwern@cpan.orgE<gt>.
-
-Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
-
-=head1 COPYRIGHT AND LICENCE
-
-This software is copyright (c) 2011-2014 by Michael G Schwern.
-
-This software is copyright (c) 2022 by Toby Inkster.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=head1 DISCLAIMER OF WARRANTIES
-
-THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
-WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
-MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-
-=cut
