@@ -122,9 +122,9 @@ sub _mop_attribute_metaclass {
 }
 
 sub _compile_mop_postamble {
-    my ( $next, $self ) = ( shift, shift );
+    my ( $self ) = ( shift );
 
-    my $code = $self->$next( @_ );
+    my $code = '';
 
     my @superclasses = @{ $self->superclasses || [] }
         or return $code;
