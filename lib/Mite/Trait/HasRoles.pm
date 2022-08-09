@@ -96,7 +96,16 @@ sub _get_role {
     return $role if $role;
 
     # If not, try to load it
-    eval "require $role_name;";
+    eval "require $role_name; 1"
+        or do {
+            my $file_name = $role_name;
+            if ( my $yuck = $project->_module_fakeout_namespace ) {
+                $file_name =~ s/$yuck\:://g;
+            }
+            $file_name =~ s/::/\//g;
+            $file_name = "lib/$file_name.pm";
+            $project->_load_file( $file_name );
+        };
     if ( $INC{'Role/Tiny.pm'} and 'Role::Tiny'->is_role( $role_name ) ) {
         require Mite::Role::Tiny;
         $role = 'Mite::Role::Tiny'->inhale( $role_name );

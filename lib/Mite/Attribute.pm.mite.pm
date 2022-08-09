@@ -25,6 +25,27 @@
         *true    = \&Mite::Shim::true;
     }
 
+    # Gather metadata for constructor and destructor
+    sub __META__ {
+        no strict 'refs';
+        no warnings 'once';
+        my $class = shift;
+        $class = ref($class) || $class;
+        my $linear_isa = mro::get_linear_isa($class);
+        return {
+            BUILD => [
+                map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
+                map { "$_\::BUILD" } reverse @$linear_isa
+            ],
+            DEMOLISH => [
+                map   { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
+                  map { "$_\::DEMOLISH" } @$linear_isa
+            ],
+            HAS_BUILDARGS        => $class->can('BUILDARGS'),
+            HAS_FOREIGNBUILDARGS => $class->can('FOREIGNBUILDARGS'),
+        };
+    }
+
     # Standard Moose/Moo-style constructor
     sub new {
         my $class = ref( $_[0] ) ? ref(shift) : shift;
@@ -53,25 +74,25 @@
             $self->{"definition_context"} = $value;
         };
 
-        # Attribute class (type: InstanceOf["Mite::Package"])
+        # Attribute class (type: Mite::Package)
         # has declaration, file lib/Mite/Attribute.pm, line 25
         if ( exists $args->{"class"} ) {
             blessed( $args->{"class"} )
               && $args->{"class"}->isa("Mite::Package")
               or croak "Type check failed in constructor: %s should be %s",
-              "class", "InstanceOf[\"Mite::Package\"]";
+              "class", "Mite::Package";
             $self->{"class"} = $args->{"class"};
         }
         require Scalar::Util && Scalar::Util::weaken( $self->{"class"} )
           if ref $self->{"class"};
 
-        # Attribute _class_for_default (type: InstanceOf["Mite::Package"])
+        # Attribute _class_for_default (type: Mite::Package)
         # has declaration, file lib/Mite/Attribute.pm, line 41
         if ( exists $args->{"_class_for_default"} ) {
             blessed( $args->{"_class_for_default"} )
               && $args->{"_class_for_default"}->isa("Mite::Package")
               or croak "Type check failed in constructor: %s should be %s",
-              "_class_for_default", "InstanceOf[\"Mite::Package\"]";
+              "_class_for_default", "Mite::Package";
             $self->{"_class_for_default"} = $args->{"_class_for_default"};
         }
         require Scalar::Util
@@ -1845,41 +1866,6 @@
         return;
     }
 
-    # Gather metadata for constructor and destructor
-    sub __META__ {
-        no strict 'refs';
-        no warnings 'once';
-        my $class = shift;
-        $class = ref($class) || $class;
-        my $linear_isa = mro::get_linear_isa($class);
-        return {
-            BUILD => [
-                map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
-                map { "$_\::BUILD" } reverse @$linear_isa
-            ],
-            DEMOLISH => [
-                map   { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
-                  map { "$_\::DEMOLISH" } @$linear_isa
-            ],
-            HAS_BUILDARGS        => $class->can('BUILDARGS'),
-            HAS_FOREIGNBUILDARGS => $class->can('FOREIGNBUILDARGS'),
-        };
-    }
-
-    # See UNIVERSAL
-    sub DOES {
-        my ( $self, $role ) = @_;
-        our %DOES;
-        return $DOES{$role} if exists $DOES{$role};
-        return 1            if $role eq __PACKAGE__;
-        return $self->SUPER::DOES($role);
-    }
-
-    # Alias for Moose/Moo-compatibility
-    sub does {
-        shift->DOES(@_);
-    }
-
     my $__XS = !$ENV{MITE_PURE_PERL}
       && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
@@ -1890,7 +1876,7 @@
           ? do {
             blessed( $_[1] ) && $_[1]->isa("Mite::Package")
               or croak( "Type check failed in %s: value should be %s",
-                "accessor", "InstanceOf[\"Mite::Package\"]" );
+                "accessor", "Mite::Package" );
             $_[0]{"_class_for_default"} = $_[1];
             require Scalar::Util
               && Scalar::Util::weaken( $_[0]{"_class_for_default"} )
@@ -1909,7 +1895,7 @@
                           or croak(
                             "Type check failed in default: %s should be %s",
                             "_class_for_default",
-                            "InstanceOf[\"Mite::Package\"]"
+                            "Mite::Package"
                           );
                         $default_value;
                     }
@@ -2306,7 +2292,7 @@
           ? do {
             blessed( $_[1] ) && $_[1]->isa("Mite::Package")
               or croak( "Type check failed in %s: value should be %s",
-                "accessor", "InstanceOf[\"Mite::Package\"]" );
+                "accessor", "Mite::Package" );
             $_[0]{"class"} = $_[1];
             require Scalar::Util && Scalar::Util::weaken( $_[0]{"class"} )
               if ref $_[0]{"class"};
@@ -2645,7 +2631,7 @@
           ? do {
             blessed( $_[1] ) && $_[1]->isa("Mite::Package")
               or croak( "Type check failed in %s: value should be %s",
-                "accessor", "InstanceOf[\"Mite::Package\"]" );
+                "accessor", "Mite::Package" );
             $_[0]{"compiling_class"} = $_[1];
             $_[0];
           }
@@ -4317,6 +4303,20 @@
                 )
             )
         }
+    }
+
+    # See UNIVERSAL
+    sub DOES {
+        my ( $self, $role ) = @_;
+        our %DOES;
+        return $DOES{$role} if exists $DOES{$role};
+        return 1            if $role eq __PACKAGE__;
+        return $self->SUPER::DOES($role);
+    }
+
+    # Alias for Moose/Moo-compatibility
+    sub does {
+        shift->DOES(@_);
     }
 
     1;

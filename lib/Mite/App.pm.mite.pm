@@ -26,6 +26,27 @@
         *true    = \&Mite::Shim::true;
     }
 
+    # Gather metadata for constructor and destructor
+    sub __META__ {
+        no strict 'refs';
+        no warnings 'once';
+        my $class = shift;
+        $class = ref($class) || $class;
+        my $linear_isa = mro::get_linear_isa($class);
+        return {
+            BUILD => [
+                map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
+                map { "$_\::BUILD" } reverse @$linear_isa
+            ],
+            DEMOLISH => [
+                map   { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
+                  map { "$_\::DEMOLISH" } @$linear_isa
+            ],
+            HAS_BUILDARGS        => $class->can('BUILDARGS'),
+            HAS_FOREIGNBUILDARGS => $class->can('FOREIGNBUILDARGS'),
+        };
+    }
+
     # Standard Moose/Moo-style constructor
     sub new {
         my $class = ref( $_[0] ) ? ref(shift) : shift;
@@ -124,41 +145,6 @@
             die $e if $e;          # rethrow
         }
         return;
-    }
-
-    # Gather metadata for constructor and destructor
-    sub __META__ {
-        no strict 'refs';
-        no warnings 'once';
-        my $class = shift;
-        $class = ref($class) || $class;
-        my $linear_isa = mro::get_linear_isa($class);
-        return {
-            BUILD => [
-                map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
-                map { "$_\::BUILD" } reverse @$linear_isa
-            ],
-            DEMOLISH => [
-                map   { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
-                  map { "$_\::DEMOLISH" } @$linear_isa
-            ],
-            HAS_BUILDARGS        => $class->can('BUILDARGS'),
-            HAS_FOREIGNBUILDARGS => $class->can('FOREIGNBUILDARGS'),
-        };
-    }
-
-    # See UNIVERSAL
-    sub DOES {
-        my ( $self, $role ) = @_;
-        our %DOES;
-        return $DOES{$role} if exists $DOES{$role};
-        return 1            if $role eq __PACKAGE__;
-        return $self->SUPER::DOES($role);
-    }
-
-    # Alias for Moose/Moo-compatibility
-    sub does {
-        shift->DOES(@_);
     }
 
     my $__XS = !$ENV{MITE_PURE_PERL}
@@ -260,6 +246,20 @@
     # Delegated methods for project
     # has declaration, file lib/Mite/App.pm, line 36
     sub config { shift->_assert_blessed_project->config(@_) }
+
+    # See UNIVERSAL
+    sub DOES {
+        my ( $self, $role ) = @_;
+        our %DOES;
+        return $DOES{$role} if exists $DOES{$role};
+        return 1            if $role eq __PACKAGE__;
+        return $self->SUPER::DOES($role);
+    }
+
+    # Alias for Moose/Moo-compatibility
+    sub does {
+        shift->DOES(@_);
+    }
 
     1;
 }

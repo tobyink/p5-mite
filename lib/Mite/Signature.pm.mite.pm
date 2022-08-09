@@ -26,6 +26,27 @@
         *true    = \&Mite::Shim::true;
     }
 
+    # Gather metadata for constructor and destructor
+    sub __META__ {
+        no strict 'refs';
+        no warnings 'once';
+        my $class = shift;
+        $class = ref($class) || $class;
+        my $linear_isa = mro::get_linear_isa($class);
+        return {
+            BUILD => [
+                map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
+                map { "$_\::BUILD" } reverse @$linear_isa
+            ],
+            DEMOLISH => [
+                map   { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
+                  map { "$_\::DEMOLISH" } @$linear_isa
+            ],
+            HAS_BUILDARGS        => $class->can('BUILDARGS'),
+            HAS_FOREIGNBUILDARGS => $class->can('FOREIGNBUILDARGS'),
+        };
+    }
+
     # Standard Moose/Moo-style constructor
     sub new {
         my $class = ref( $_[0] ) ? ref(shift) : shift;
@@ -37,13 +58,13 @@
           : { ( @_ == 1 ) ? %{ $_[0] } : @_ };
         my $no_build = delete $args->{__no_BUILD__};
 
-        # Attribute class (type: InstanceOf["Mite::Package"])
+        # Attribute class (type: Mite::Package)
         # has declaration, file lib/Mite/Signature.pm, line 11
         if ( exists $args->{"class"} ) {
             blessed( $args->{"class"} )
               && $args->{"class"}->isa("Mite::Package")
               or croak "Type check failed in constructor: %s should be %s",
-              "class", "InstanceOf[\"Mite::Package\"]";
+              "class", "Mite::Package";
             $self->{"class"} = $args->{"class"};
         }
         require Scalar::Util && Scalar::Util::weaken( $self->{"class"} )
@@ -223,41 +244,6 @@
         return;
     }
 
-    # Gather metadata for constructor and destructor
-    sub __META__ {
-        no strict 'refs';
-        no warnings 'once';
-        my $class = shift;
-        $class = ref($class) || $class;
-        my $linear_isa = mro::get_linear_isa($class);
-        return {
-            BUILD => [
-                map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
-                map { "$_\::BUILD" } reverse @$linear_isa
-            ],
-            DEMOLISH => [
-                map   { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
-                  map { "$_\::DEMOLISH" } @$linear_isa
-            ],
-            HAS_BUILDARGS        => $class->can('BUILDARGS'),
-            HAS_FOREIGNBUILDARGS => $class->can('FOREIGNBUILDARGS'),
-        };
-    }
-
-    # See UNIVERSAL
-    sub DOES {
-        my ( $self, $role ) = @_;
-        our %DOES;
-        return $DOES{$role} if exists $DOES{$role};
-        return 1            if $role eq __PACKAGE__;
-        return $self->SUPER::DOES($role);
-    }
-
-    # Alias for Moose/Moo-compatibility
-    sub does {
-        shift->DOES(@_);
-    }
-
     my $__XS = !$ENV{MITE_PURE_PERL}
       && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
@@ -325,7 +311,7 @@
           ? do {
             blessed( $_[1] ) && $_[1]->isa("Mite::Package")
               or croak( "Type check failed in %s: value should be %s",
-                "accessor", "InstanceOf[\"Mite::Package\"]" );
+                "accessor", "Mite::Package" );
             $_[0]{"compiling_class"} = $_[1];
             $_[0];
           }
@@ -510,6 +496,20 @@
             @_ == 1 or croak('Reader "tail" usage: $self->tail()');
             $_[0]{"tail"};
         };
+    }
+
+    # See UNIVERSAL
+    sub DOES {
+        my ( $self, $role ) = @_;
+        our %DOES;
+        return $DOES{$role} if exists $DOES{$role};
+        return 1            if $role eq __PACKAGE__;
+        return $self->SUPER::DOES($role);
+    }
+
+    # Alias for Moose/Moo-compatibility
+    sub does {
+        shift->DOES(@_);
     }
 
     1;

@@ -145,22 +145,29 @@ sub inject_mite_functions {
         $spec{definition_context} ||= _definition_context( 1, file => "$file", type => $kind, context => 'has declaration' );
 
         for my $name ( ref($names) ? @$names : $names ) {
-           if( my $is_extension = $name =~ s{^\+}{} ) {
-               $pkg->extend_attribute(
-                   class   => $pkg,
-                   name    => $name,
-                   %spec
-               );
-           }
-           else {
-               require Mite::Attribute;
-               my $attribute = Mite::Attribute->new(
-                   class   => $pkg,
-                   name    => $name,
-                   %spec
-               );
-               $pkg->add_attribute($attribute);
-           }
+            if( my $is_extension = $name =~ s{^\+}{} ) {
+                $pkg->extend_attribute(
+                    class   => $pkg,
+                    name    => $name,
+                    %spec
+                );
+            }
+            else {
+                require Mite::Attribute;
+                my $attribute = Mite::Attribute->new(
+                    class   => $pkg,
+                    name    => $name,
+                    %spec
+                );
+                $pkg->add_attribute($attribute);
+            }
+            my $code;
+            'CODE' eq ref( $code = $spec{builder} )
+                and *{"$package\::_build_$name"} = $code;
+            'CODE' eq ref( $code = $spec{trigger} )
+                and *{"$package\::_trigger_$name"} = $code;
+            'CODE' eq ref( $code = $spec{clone} )
+                and *{"$package\::_clone_$name"} = $code;
         }
 
         return;

@@ -26,29 +26,33 @@
         *true    = \&Mite::Shim::true;
     }
 
+    # Gather metadata for constructor and destructor
+    sub __META__ {
+        no strict 'refs';
+        no warnings 'once';
+        my $class = shift;
+        $class = ref($class) || $class;
+        my $linear_isa = mro::get_linear_isa($class);
+        return {
+            BUILD => [
+                map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
+                map { "$_\::BUILD" } reverse @$linear_isa
+            ],
+            DEMOLISH => [
+                map   { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
+                  map { "$_\::DEMOLISH" } @$linear_isa
+            ],
+            HAS_BUILDARGS        => $class->can('BUILDARGS'),
+            HAS_FOREIGNBUILDARGS => $class->can('FOREIGNBUILDARGS'),
+        };
+    }
+
     BEGIN {
         require Mite::Package;
 
         use mro 'c3';
         our @ISA;
         push @ISA, "Mite::Package";
-    }
-
-    BEGIN {
-        require Mite::Trait::HasRequiredMethods;
-        require Mite::Trait::HasAttributes;
-        require Mite::Trait::HasRoles;
-        require Mite::Trait::HasMethods;
-        require Mite::Trait::HasMOP;
-
-        our %DOES = (
-            "Mite::Role"                      => 1,
-            "Mite::Trait::HasRequiredMethods" => 1,
-            "Mite::Trait::HasAttributes"      => 1,
-            "Mite::Trait::HasRoles"           => 1,
-            "Mite::Trait::HasMethods"         => 1,
-            "Mite::Trait::HasMOP"             => 1
-        );
     }
 
     # Standard Moose/Moo-style constructor
@@ -376,20 +380,6 @@
         return $self;
     }
 
-    # See UNIVERSAL
-    sub DOES {
-        my ( $self, $role ) = @_;
-        our %DOES;
-        return $DOES{$role} if exists $DOES{$role};
-        return 1            if $role eq __PACKAGE__;
-        return $self->SUPER::DOES($role);
-    }
-
-    # Alias for Moose/Moo-compatibility
-    sub does {
-        shift->DOES(@_);
-    }
-
     my $__XS = !$ENV{MITE_PURE_PERL}
       && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
@@ -516,6 +506,37 @@
             $_[0];
           }
           : ( $_[0]{"roles"} );
+    }
+
+    BEGIN {
+        require Mite::Trait::HasRequiredMethods;
+        require Mite::Trait::HasAttributes;
+        require Mite::Trait::HasRoles;
+        require Mite::Trait::HasMethods;
+        require Mite::Trait::HasMOP;
+
+        our %DOES = (
+            "Mite::Role"                      => 1,
+            "Mite::Trait::HasRequiredMethods" => 1,
+            "Mite::Trait::HasAttributes"      => 1,
+            "Mite::Trait::HasRoles"           => 1,
+            "Mite::Trait::HasMethods"         => 1,
+            "Mite::Trait::HasMOP"             => 1
+        );
+    }
+
+    # See UNIVERSAL
+    sub DOES {
+        my ( $self, $role ) = @_;
+        our %DOES;
+        return $DOES{$role} if exists $DOES{$role};
+        return 1            if $role eq __PACKAGE__;
+        return $self->SUPER::DOES($role);
+    }
+
+    # Alias for Moose/Moo-compatibility
+    sub does {
+        shift->DOES(@_);
     }
 
     # Methods from roles
