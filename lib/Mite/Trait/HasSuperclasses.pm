@@ -131,6 +131,25 @@ around compilation_stages => sub {
     return @stages;
 };
 
+around _compile_meta_method => sub {
+    my ( $next, $self ) = ( shift, shift );
+
+    # Check if we are inheriting from a Mite class in this project
+    my $inherit_from_mite = do {
+        # First parent
+        my $first_isa = do {
+            my @isa = $self->linear_isa;
+            shift @isa;
+            shift @isa;
+        };
+        !! ( $first_isa and $self->_get_parent( $first_isa ) );
+    };
+
+    return '' if $inherit_from_mite;
+
+    return $self->$next( @_ );
+};
+
 sub _compile_extends {
     my $self = shift;
 
