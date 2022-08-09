@@ -7,7 +7,7 @@ use Mite::Miteception -all;
 extends qw(Mite::App::Command);
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.010000';
+our $VERSION   = '0.010001';
 
 sub abstract {
     return "Begin using mite with your project.";
