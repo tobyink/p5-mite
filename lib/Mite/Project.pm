@@ -77,12 +77,6 @@ sub source_for {
     );
 }
 
-my $parse_mm_args = sub {
-    my $coderef = pop;
-    my $names   = [ map { ref($_) eq 'ARRAY' ? @$_ : $_ } @_ ];
-    ( $names, $coderef );
-};
-
 # This is the shim Mite.pm uses when compiling.
 signature_for inject_mite_functions => (
     named => [
@@ -97,21 +91,8 @@ signature_for inject_mite_functions => (
     named_to_list => true,
 );
 
-sub _definition_context {
-    my $level = shift;
-    my @info  = caller( $level );
-    return {
-        'toolkit' => 'Mite',
-        'package' => $info[0],
-        'file'    => $info[1],
-        'line'    => $info[2],
-        @_,
-    };
-}
-
 sub inject_mite_functions {
-    my ( $self, $package, $file, $kind, $arg, $shim, $source, $pkg, $moresubs ) = @_;
-    my $requested = sub { $arg->{$_[0]} ? 1 : $arg->{'!'.$_[0]} ? 0 : $arg->{'-all'} ? 1 : $_[1]; };
+    my ( $self, $package, $file, $kind, $arg, $shim, $source, $pkg ) = @_;
 
     my $fake_ns = $self->can('_module_fakeout_namespace') && $self->_module_fakeout_namespace;
     if ( defined( $fake_ns ) and not $package =~ /^\Q$fake_ns/ ) {
@@ -123,152 +104,12 @@ sub inject_mite_functions {
     $source //= $self->source_for(
         Path::Tiny::path( $ENV{MITE_COMPILE_SELF} // $file )
     );
-    $pkg    //= $source->class_for(
+    $pkg //= $source->class_for(
         $package,
         $kind eq 'role' ? 'Mite::Role' : 'Mite::Class',
     );
     $pkg->shim_name( $shim );
-
-    no strict 'refs';
-    ${ $package .'::USES_MITE' } = ref( $pkg );
-    ${ $package .'::MITE_SHIM' } = ref( $shim );
-
-    my $has = sub {
-        my $names = shift;
-        if ( @_ % 2 ) {
-            my $default = shift;
-            unshift @_, ( 'CODE' eq ref( $default ) )
-                ? ( is => lazy, builder => $default )
-                : ( is => ro, default => $default );
-        }
-        my %spec = @_;
-        $spec{definition_context} ||= _definition_context( 1, file => "$file", type => $kind, context => 'has declaration' );
-
-        for my $name ( ref($names) ? @$names : $names ) {
-            if( my $is_extension = $name =~ s{^\+}{} ) {
-                $pkg->extend_attribute(
-                    class   => $pkg,
-                    name    => $name,
-                    %spec
-                );
-            }
-            else {
-                require Mite::Attribute;
-                my $attribute = Mite::Attribute->new(
-                    class   => $pkg,
-                    name    => $name,
-                    %spec
-                );
-                $pkg->add_attribute($attribute);
-            }
-            my $code;
-            'CODE' eq ref( $code = $spec{builder} )
-                and *{"$package\::_build_$name"} = $code;
-            'CODE' eq ref( $code = $spec{trigger} )
-                and *{"$package\::_trigger_$name"} = $code;
-            'CODE' eq ref( $code = $spec{clone} )
-                and *{"$package\::_clone_$name"} = $code;
-        }
-
-        return;
-    };
-
-    *{ $package .'::has' } = $has
-        if $requested->( 'has', 1 );
-
-    *{"$package\::param"} = sub {
-        my ( $names, %spec ) = @_;
-        $spec{is} = ro unless exists $spec{is};
-        $spec{required} = true unless exists $spec{required};
-        $spec{definition_context} ||= _definition_context( 1, file => "$file", type => $kind, context => 'param declaration' );
-        $has->( $names, %spec );
-    } if $requested->( param => 0 );
-
-    *{"$package\::field"} = sub {
-        my ( $names, %spec ) = @_;
-        $spec{is} ||= ( $spec{builder} || exists $spec{default} ) ? lazy : rwp;
-        $spec{init_arg} = undef unless exists $spec{init_arg};
-        if ( defined $spec{init_arg} and $spec{init_arg} !~ /^_/ ) {
-            croak "A defined 'field.init_arg' must begin with an underscore: %s ", $spec{init_arg};
-        }
-        $spec{definition_context} ||= _definition_context( 1, file => "$file", type => $kind, context => 'field declaration' );
-        $has->( $names, %spec );
-    } if $requested->( field => 0 );
-
-    *{ $package .'::with' } = sub {
-        return $pkg->handle_with_keyword(
-            defined( $fake_ns )
-                ? ( map Str->check($_) ? "$fake_ns\::$_" : $_, @_ )
-                : @_
-        );
-    } if $requested->( 'with', 1 );
-
-    *{ $package .'::signature_for' } = sub {
-        my $name = shift;
-        if ( $name =~ /^\+/ ) {
-            $name =~ s/^\+//;
-            $pkg->extend_method_signature( $name, @_ );
-        }
-        else {
-            $pkg->add_method_signature( $name, @_ );
-        }
-        return;
-    } if $requested->( 'signature_for', 1 );
-
-    *{ $package .'::extends' } = sub {
-        return $pkg->handle_extends_keyword(
-            defined( $fake_ns )
-                ? map Str->check($_) ? "$fake_ns\::$_" : $_, @_
-                : @_
-        );
-    } if $kind eq 'class' && $requested->( 'extends', 1 );
-
-    *{ $package .'::requires' } = sub {
-        $pkg->add_required_methods( @_ );
-        return;
-    } if $kind eq 'role' && $requested->( 'requires', 1 );
-
-    for my $modifier ( qw( before after around ) ) {
-        *{ $package .'::'. $modifier } = sub {
-            my ( $names, $coderef ) = &$parse_mm_args;
-            CodeRef->check( $coderef )
-                or croak "Expected a coderef method modifier";
-            ArrayRef->of(Str)->check( $names ) && @$names
-                or croak "Expected a list of method names to modify";
-            $pkg->add_required_methods( @$names ) if $kind eq 'role';
-            return;
-        } if $requested->( $modifier, 1 );
-    }
-
-    my $want_bool = $requested->( '-bool', 0 );
-    my $want_is   = $requested->( '-is',   0 );
-    for my $f ( qw/ true false / ) {
-        next unless $requested->( $f, $want_bool );
-        *{"$package\::$f"} = \&{"$shim\::$f"};
-        $pkg->imported_functions->{$f} = "$shim\::$f";
-    }
-    for my $f ( qw/ ro rw rwp lazy bare / ) {
-        next unless $requested->( $f, $want_is );
-        *{"$package\::$f"} = \&{"$shim\::$f"};
-        $pkg->imported_functions->{$f} = "$shim\::$f";
-    }
-    for my $f ( qw/ carp croak confess guard STRICT / ) {
-        next unless $requested->( $f, false );
-        *{"$package\::$f"} = \&{"$shim\::$f"};
-        $pkg->imported_functions->{$f} = "$shim\::$f";
-    }
-    if ( $requested->( blessed => false ) ) {
-        require Scalar::Util;
-        *{"$package\::blessed"} = \&Scalar::Util::blessed;
-        $pkg->imported_functions->{blessed} = "Scalar::Util::blessed";
-    }
-
-    if ( our %MORE_SUBS ) {
-        no warnings 'redefine';
-        for my $f ( keys %MORE_SUBS ) {
-            *{"$package\::$f"} = $MORE_SUBS{$f};
-        }
-    }
+    $pkg->inject_mite_functions( $file, $arg );
 }
 
 sub write_mites {

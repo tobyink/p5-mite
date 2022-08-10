@@ -33,6 +33,8 @@ has imported_functions =>
   isa           => Map[ MethodName, Str ],
   builder       => sub { {} };
 
+sub kind { 'package' }
+
 sub BUILD {
     my $self = shift;
 
@@ -50,6 +52,42 @@ sub project {
     my $self = shift;
 
     return $self->source->project;
+}
+
+sub inject_mite_functions {
+    my ( $self, $file, $arg ) = ( shift, @_ );
+
+    my $requested = sub { $arg->{$_[0]} ? 1 : $arg->{'!'.$_[0]} ? 0 : $arg->{'-all'} ? 1 : $_[1]; };
+    my $shim      = $self->shim_name;
+    my $package   = $self->name;
+    my $ctxt      = $shim->can( '_definition_context' );
+
+    no strict 'refs';
+    ${ $package .'::USES_MITE' } = ref( $self );
+    ${ $package .'::MITE_SHIM' } = $shim;
+
+    my $want_bool = $requested->( '-bool', 0 );
+    my $want_is   = $requested->( '-is',   0 );
+    for my $f ( qw/ true false / ) {
+        next unless $requested->( $f, $want_bool );
+        *{"$package\::$f"} = \&{"$shim\::$f"};
+        $self->imported_functions->{$f} = "$shim\::$f";
+    }
+    for my $f ( qw/ ro rw rwp lazy bare / ) {
+        next unless $requested->( $f, $want_is );
+        *{"$package\::$f"} = \&{"$shim\::$f"};
+        $self->imported_functions->{$f} = "$shim\::$f";
+    }
+    for my $f ( qw/ carp croak confess guard STRICT / ) {
+        next unless $requested->( $f, false );
+        *{"$package\::$f"} = \&{"$shim\::$f"};
+        $self->imported_functions->{$f} = "$shim\::$f";
+    }
+    if ( $requested->( blessed => false ) ) {
+        require Scalar::Util;
+        *{"$package\::blessed"} = \&Scalar::Util::blessed;
+        $self->imported_functions->{blessed} = "Scalar::Util::blessed";
+    }
 }
 
 sub autolax {

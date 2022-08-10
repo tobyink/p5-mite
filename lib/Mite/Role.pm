@@ -21,6 +21,8 @@ our $VERSION   = '0.010001';
 use Path::Tiny;
 use B ();
 
+sub kind { 'role' }
+
 sub methods_to_export {
     my ( $self, $role_args ) = @_;
 

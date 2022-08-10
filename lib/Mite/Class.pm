@@ -24,6 +24,8 @@ use Path::Tiny;
 use mro;
 use B ();
 
+sub kind { 'class' }
+
 sub class {
     my ( $self, $name ) = ( shift, @_ );
 

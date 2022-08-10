@@ -75,6 +75,42 @@ sub native_methods {
     return \%methods;
 }
 
+before inject_mite_functions => sub {
+    my ( $self, $file, $arg ) = ( shift, @_ );
+
+    my $requested = sub { $arg->{$_[0]} ? 1 : $arg->{'!'.$_[0]} ? 0 : $arg->{'-all'} ? 1 : $_[1]; };
+    my $shim      = $self->shim_name;
+    my $package   = $self->name;
+    my $kind      = $self->kind;
+    my $parse_mm_args = $shim->can( 'parse_mm_args' );
+
+    no strict 'refs';
+
+    *{ $package .'::signature_for' } = sub {
+        my $name = shift;
+        if ( $name =~ /^\+/ ) {
+            $name =~ s/^\+//;
+            $self->extend_method_signature( $name, @_ );
+        }
+        else {
+            $self->add_method_signature( $name, @_ );
+        }
+        return;
+    } if $requested->( 'signature_for', 1 );
+
+    for my $modifier ( qw( before after around ) ) {
+        *{ $package .'::'. $modifier } = sub {
+            my ( $names, $coderef ) = &$parse_mm_args;
+            CodeRef->check( $coderef )
+                or croak "Expected a coderef method modifier";
+            ArrayRef->of(Str)->check( $names ) && @$names
+                or croak "Expected a list of method names to modify";
+            $self->add_required_methods( @$names ) if $kind eq 'role';
+            return;
+        } if $requested->( $modifier, 1 );
+    }
+};
+
 around compilation_stages => sub {
     my ( $next, $self ) = ( shift, shift );
     my @stages = $self->$next( @_ );

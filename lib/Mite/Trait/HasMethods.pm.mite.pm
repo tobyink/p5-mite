@@ -76,8 +76,9 @@
         return if $type ne 'Mite::Class';
 
         my @missing_methods;
-        @missing_methods =
-          grep( !$target->can($_), "_function_for_croak", "compilation_stages" )
+        @missing_methods = grep( !$target->can($_),
+            "_function_for_croak", "compilation_stages",
+            "inject_mite_functions" )
           and croak( "$me requires $target to implement methods: " . join q[, ],
             @missing_methods );
 

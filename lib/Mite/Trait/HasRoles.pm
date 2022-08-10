@@ -142,6 +142,25 @@ sub handle_with_keyword {
     return;
 }
 
+before inject_mite_functions => sub {
+    my ( $self, $file, $arg ) = ( shift, @_ );
+
+    my $requested = sub { $arg->{$_[0]} ? 1 : $arg->{'!'.$_[0]} ? 0 : $arg->{'-all'} ? 1 : $_[1]; };
+    my $shim      = $self->shim_name;
+    my $package   = $self->name;
+    my $fake_ns   = $self->project->can('_module_fakeout_namespace') && $self->project->_module_fakeout_namespace;
+
+    no strict 'refs';
+
+    *{ $package .'::with' } = sub {
+        return $self->handle_with_keyword(
+            defined( $fake_ns )
+                ? ( map Str->check($_) ? "$fake_ns\::$_" : $_, @_ )
+                : @_
+        );
+    } if $requested->( 'with', 1 );
+};
+
 around compilation_stages => sub {
     my ( $next, $self ) = ( shift, shift );
     my @stages = $self->$next( @_ );

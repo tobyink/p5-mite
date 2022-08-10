@@ -65,11 +65,11 @@ or do {
     *guard = sub (&) { bless [ 0, @_ ] => $GUARD_PACKAGE };
 }
 
-my $parse_mm_args = sub {
+sub parse_mm_args {
     my $coderef = pop;
     my $names   = [ map { ref($_) ? @$_ : $_ } @_ ];
     ( $names, $coderef );
-};
+}
 
 sub _is_compiling {
     return !! $ENV{MITE_COMPILE};
@@ -153,7 +153,7 @@ sub _inject_mite_functions {
         }
         else {
             *{"$caller\::$modifier"} = sub {
-                my ( $names, $coderef ) = &$parse_mm_args;
+                my ( $names, $coderef ) = &parse_mm_args;
                 push @$MM, [ $modifier, $names, $coderef ];
                 return;
             };
@@ -256,7 +256,7 @@ sub _make_with {
 
     sub before {
         my ( $me, $caller ) = ( shift, shift );
-        my ( $names, $coderef ) = &$parse_mm_args;
+        my ( $names, $coderef ) = &parse_mm_args;
         for my $name ( @$names ) {
             my $orig = $get_orig->( $caller, $name );
             local $@;
@@ -275,7 +275,7 @@ BEFORE
 
     sub after {
         my ( $me, $caller ) = ( shift, shift );
-        my ( $names, $coderef ) = &$parse_mm_args;
+        my ( $names, $coderef ) = &parse_mm_args;
         for my $name ( @$names ) {
             my $orig = $get_orig->( $caller, $name );
             local $@;
@@ -305,7 +305,7 @@ AFTER
 
     sub around {
         my ( $me, $caller ) = ( shift, shift );
-        my ( $names, $coderef ) = &$parse_mm_args;
+        my ( $names, $coderef ) = &parse_mm_args;
         for my $name ( @$names ) {
             my $orig = $get_orig->( $caller, $name );
             local $@;

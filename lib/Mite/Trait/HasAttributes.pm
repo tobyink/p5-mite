@@ -58,6 +58,90 @@ ERROR
     return;
 }
 
+before inject_mite_functions => sub {
+    my ( $self, $file, $arg ) = ( shift, @_ );
+
+    my $requested = sub { $arg->{$_[0]} ? 1 : $arg->{'!'.$_[0]} ? 0 : $arg->{'-all'} ? 1 : $_[1]; };
+    my $shim      = $self->shim_name;
+    my $package   = $self->name;
+    my $kind      = $self->kind;
+    my $ctxt      = sub {
+        my $level = shift;
+        my @info  = caller( $level );
+        return {
+            'toolkit' => 'Mite',
+            'package' => $info[0],
+            'file'    => $info[1],
+            'line'    => $info[2],
+            @_,
+        };
+    };
+
+    no strict 'refs';
+
+    my $has = sub {
+        my $names = shift;
+        if ( @_ % 2 ) {
+            my $default = shift;
+            unshift @_, ( 'CODE' eq ref( $default ) )
+                ? ( is => lazy, builder => $default )
+                : ( is => ro, default => $default );
+        }
+        my %spec = @_;
+        $spec{definition_context} ||= $ctxt->( 1, file => "$file", type => $kind, context => 'has declaration' );
+
+        for my $name ( ref($names) ? @$names : $names ) {
+            if( my $is_extension = $name =~ s{^\+}{} ) {
+                $self->extend_attribute(
+                    class   => $self,
+                    name    => $name,
+                    %spec
+                );
+            }
+            else {
+                require Mite::Attribute;
+                my $attribute = Mite::Attribute->new(
+                    class   => $self,
+                    name    => $name,
+                    %spec
+                );
+                $self->add_attribute($attribute);
+            }
+            my $code;
+            'CODE' eq ref( $code = $spec{builder} )
+                and *{"$package\::_build_$name"} = $code;
+            'CODE' eq ref( $code = $spec{trigger} )
+                and *{"$package\::_trigger_$name"} = $code;
+            'CODE' eq ref( $code = $spec{clone} )
+                and *{"$package\::_clone_$name"} = $code;
+        }
+
+        return;
+    };
+
+    *{ $package .'::has' } = $has
+        if $requested->( 'has', 1 );
+
+    *{"$package\::param"} = sub {
+        my ( $names, %spec ) = @_;
+        $spec{is} = ro unless exists $spec{is};
+        $spec{required} = true unless exists $spec{required};
+        $spec{definition_context} ||= $ctxt->( 1, file => "$file", type => $kind, context => 'param declaration' );
+        $has->( $names, %spec );
+    } if $requested->( param => 0 );
+
+    *{"$package\::field"} = sub {
+        my ( $names, %spec ) = @_;
+        $spec{is} ||= ( $spec{builder} || exists $spec{default} ) ? lazy : rwp;
+        $spec{init_arg} = undef unless exists $spec{init_arg};
+        if ( defined $spec{init_arg} and $spec{init_arg} !~ /^_/ ) {
+            croak "A defined 'field.init_arg' must begin with an underscore: %s ", $spec{init_arg};
+        }
+        $spec{definition_context} ||= $ctxt->( 1, file => "$file", type => $kind, context => 'field declaration' );
+        $has->( $names, %spec );
+    } if $requested->( field => 0 );
+};
+
 sub _compile_init_attributes {
     my ( $self, $classvar, $selfvar, $argvar, $metavar ) = @_;
 
