@@ -9,6 +9,32 @@
     our $MITE_SHIM    = "Mite::Shim";
     our $MITE_VERSION = "0.010001";
 
+    # Mite keywords
+    BEGIN {
+        my $CALLER = "Mite::Package";
+        (
+            *after, *around, *before,        *extends, *field,
+            *has,   *param,  *signature_for, *with
+          )
+          = do {
+
+            package Mite::Shim;
+            no warnings 'redefine';
+            (
+                sub { __PACKAGE__->HANDLE_after( $CALLER, "class", @_ ) },
+                sub { __PACKAGE__->HANDLE_around( $CALLER, "class", @_ ) },
+                sub { __PACKAGE__->HANDLE_before( $CALLER, "class", @_ ) },
+                sub { },
+                sub { __PACKAGE__->HANDLE_has( $CALLER, field => @_ ) },
+                sub { __PACKAGE__->HANDLE_has( $CALLER, has   => @_ ) },
+                sub { __PACKAGE__->HANDLE_has( $CALLER, param => @_ ) },
+                sub { __PACKAGE__->HANDLE_signature_for( $CALLER, @_ ) },
+                sub { __PACKAGE__->HANDLE_with( $CALLER, @_ ) },
+            );
+          };
+    }
+
+    # Mite imports
     BEGIN {
         require Scalar::Util;
         *STRICT  = \&Mite::Shim::STRICT;
@@ -169,12 +195,59 @@
             $self->{"imported_functions"} = $value;
         };
 
+        # Attribute imported_keywords (type: Map[MethodName,Str])
+        # has declaration, file lib/Mite/Package.pm, line 39
+        do {
+            my $value =
+              exists( $args->{"imported_keywords"} )
+              ? $args->{"imported_keywords"}
+              : $self->_build_imported_keywords;
+            do {
+
+                package Mite::Shim;
+                ( ref($value) eq 'HASH' ) and do {
+                    my $ok = 1;
+                    for my $v ( values %{$value} ) {
+                        ( $ok = 0, last ) unless do {
+
+                            package Mite::Shim;
+                            defined($v) and do {
+                                ref( \$v ) eq 'SCALAR'
+                                  or ref( \( my $val = $v ) ) eq 'SCALAR';
+                            }
+                        }
+                    };
+                    for my $k ( keys %{$value} ) {
+                        ( $ok = 0, last )
+                          unless (
+                            (
+                                do {
+
+                                    package Mite::Shim;
+                                    defined($k) and do {
+                                        ref( \$k ) eq 'SCALAR'
+                                          or ref( \( my $val = $k ) ) eq
+                                          'SCALAR';
+                                    }
+                                }
+                            )
+                            && ( do { local $_ = $k; /\A[^\W0-9]\w*\z/ } )
+                          );
+                    };
+                    $ok;
+                }
+              }
+              or croak "Type check failed in constructor: %s should be %s",
+              "imported_keywords", "Map[MethodName,Str]";
+            $self->{"imported_keywords"} = $value;
+        };
+
         # Call BUILD methods
         $self->BUILDALL($args) if ( !$no_build and @{ $meta->{BUILD} || [] } );
 
         # Unrecognized parameters
-        my @unknown =
-          grep not(/\A(?:imported_functions|name|s(?:him_name|ource))\z/),
+        my @unknown = grep not(
+            /\A(?:imported_(?:functions|keywords)|name|s(?:him_name|ource))\z/),
           keys %{$args};
         @unknown
           and croak(
@@ -229,6 +302,23 @@
                 'Reader "imported_functions" usage: $self->imported_functions()'
               );
             $_[0]{"imported_functions"};
+        };
+    }
+
+    # Accessors for imported_keywords
+    # has declaration, file lib/Mite/Package.pm, line 39
+    if ($__XS) {
+        Class::XSAccessor->import(
+            chained   => 1,
+            "getters" => { "imported_keywords" => "imported_keywords" },
+        );
+    }
+    else {
+        *imported_keywords = sub {
+            @_ == 1
+              or croak(
+                'Reader "imported_keywords" usage: $self->imported_keywords()');
+            $_[0]{"imported_keywords"};
         };
     }
 

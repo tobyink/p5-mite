@@ -9,6 +9,32 @@
     our $MITE_SHIM    = "Mite::Shim";
     our $MITE_VERSION = "0.010001";
 
+    # Mite keywords
+    BEGIN {
+        my $CALLER = "Mite::Class";
+        (
+            *after, *around, *before,        *extends, *field,
+            *has,   *param,  *signature_for, *with
+          )
+          = do {
+
+            package Mite::Shim;
+            no warnings 'redefine';
+            (
+                sub { __PACKAGE__->HANDLE_after( $CALLER, "class", @_ ) },
+                sub { __PACKAGE__->HANDLE_around( $CALLER, "class", @_ ) },
+                sub { __PACKAGE__->HANDLE_before( $CALLER, "class", @_ ) },
+                sub { },
+                sub { __PACKAGE__->HANDLE_has( $CALLER, field => @_ ) },
+                sub { __PACKAGE__->HANDLE_has( $CALLER, has   => @_ ) },
+                sub { __PACKAGE__->HANDLE_has( $CALLER, param => @_ ) },
+                sub { __PACKAGE__->HANDLE_signature_for( $CALLER, @_ ) },
+                sub { __PACKAGE__->HANDLE_with( $CALLER, @_ ) },
+            );
+          };
+    }
+
+    # Mite imports
     BEGIN {
         require Scalar::Util;
         *STRICT  = \&Mite::Shim::STRICT;
@@ -154,6 +180,53 @@
               or croak "Type check failed in constructor: %s should be %s",
               "imported_functions", "Map[MethodName,Str]";
             $self->{"imported_functions"} = $value;
+        };
+
+        # Attribute imported_keywords (type: Map[MethodName,Str])
+        # has declaration, file lib/Mite/Package.pm, line 39
+        do {
+            my $value =
+              exists( $args->{"imported_keywords"} )
+              ? $args->{"imported_keywords"}
+              : $self->_build_imported_keywords;
+            do {
+
+                package Mite::Shim;
+                ( ref($value) eq 'HASH' ) and do {
+                    my $ok = 1;
+                    for my $v ( values %{$value} ) {
+                        ( $ok = 0, last ) unless do {
+
+                            package Mite::Shim;
+                            defined($v) and do {
+                                ref( \$v ) eq 'SCALAR'
+                                  or ref( \( my $val = $v ) ) eq 'SCALAR';
+                            }
+                        }
+                    };
+                    for my $k ( keys %{$value} ) {
+                        ( $ok = 0, last )
+                          unless (
+                            (
+                                do {
+
+                                    package Mite::Shim;
+                                    defined($k) and do {
+                                        ref( \$k ) eq 'SCALAR'
+                                          or ref( \( my $val = $k ) ) eq
+                                          'SCALAR';
+                                    }
+                                }
+                            )
+                            && ( do { local $_ = $k; /\A[^\W0-9]\w*\z/ } )
+                          );
+                    };
+                    $ok;
+                }
+              }
+              or croak "Type check failed in constructor: %s should be %s",
+              "imported_keywords", "Map[MethodName,Str]";
+            $self->{"imported_keywords"} = $value;
         };
 
         # Attribute extends (type: ArrayRef[ValidClassName])
@@ -426,7 +499,7 @@
 
         # Unrecognized parameters
         my @unknown = grep not(
-/\A(?:attributes|extends|imported_functions|method_signatures|name|parents|role(?:_args|s)|s(?:him_name|ource|uperclass_args))\z/
+/\A(?:attributes|extends|imported_(?:functions|keywords)|method_signatures|name|parents|role(?:_args|s)|s(?:him_name|ource|uperclass_args))\z/
         ), keys %{$args};
         @unknown
           and croak(

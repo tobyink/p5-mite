@@ -82,23 +82,31 @@ before inject_mite_functions => sub {
     my $shim      = $self->shim_name;
     my $package   = $self->name;
     my $kind      = $self->kind;
-    my $parse_mm_args = $shim->can( 'parse_mm_args' );
+    my $parse_mm_args = $shim->can( '_parse_mm_args' ) || \&Mite::Shim::_parse_mm_args;
 
     no strict 'refs';
 
-    *{ $package .'::signature_for' } = sub {
-        my $name = shift;
-        if ( $name =~ /^\+/ ) {
-            $name =~ s/^\+//;
-            $self->extend_method_signature( $name, @_ );
-        }
-        else {
-            $self->add_method_signature( $name, @_ );
-        }
-        return;
-    } if $requested->( 'signature_for', 1 );
+    if ( $requested->( 'signature_for', true ) ) {
+
+        *{ $package .'::signature_for' } = sub {
+            my $name = shift;
+            if ( $name =~ /^\+/ ) {
+                $name =~ s/^\+//;
+                $self->extend_method_signature( $name, @_ );
+            }
+            else {
+                $self->add_method_signature( $name, @_ );
+            }
+            return;
+        };
+
+        $self->imported_keywords->{signature_for} = 'sub { __PACKAGE__->HANDLE_signature_for( $CALLER, @_ ) }';
+    }
 
     for my $modifier ( qw( before after around ) ) {
+
+        $requested->( $modifier, true ) or next;
+
         *{ $package .'::'. $modifier } = sub {
             my ( $names, $coderef ) = &$parse_mm_args;
             CodeRef->check( $coderef )
@@ -107,7 +115,12 @@ before inject_mite_functions => sub {
                 or croak "Expected a list of method names to modify";
             $self->add_required_methods( @$names ) if $kind eq 'role';
             return;
-        } if $requested->( $modifier, 1 );
+        };
+
+        $self->imported_keywords->{$modifier} =
+            sprintf 'sub { __PACKAGE__->HANDLE_%s( $CALLER, %s, @_ ) }',
+            $modifier, B::perlstring( $kind );
+
     }
 };
 

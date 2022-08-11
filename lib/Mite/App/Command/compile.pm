@@ -30,7 +30,7 @@ sub execute {
 
     if ( $self->config->data->{dogfood} ) {
         $project->_module_fakeout_namespace(
-            sprintf 'A%02d::B%02d', int(rand(100)), int(rand(100))
+            $ENV{FAKEOUT_NAMESPACE} = sprintf 'A%02d::B%02d', int(69), int(71)
         );
     }
 

@@ -9,6 +9,32 @@
     our $MITE_SHIM    = "Mite::Shim";
     our $MITE_VERSION = "0.010001";
 
+    # Mite keywords
+    BEGIN {
+        my $CALLER = "Mite::Attribute";
+        (
+            *after, *around, *before,        *extends, *field,
+            *has,   *param,  *signature_for, *with
+          )
+          = do {
+
+            package Mite::Shim;
+            no warnings 'redefine';
+            (
+                sub { __PACKAGE__->HANDLE_after( $CALLER, "class", @_ ) },
+                sub { __PACKAGE__->HANDLE_around( $CALLER, "class", @_ ) },
+                sub { __PACKAGE__->HANDLE_before( $CALLER, "class", @_ ) },
+                sub { },
+                sub { __PACKAGE__->HANDLE_has( $CALLER, field => @_ ) },
+                sub { __PACKAGE__->HANDLE_has( $CALLER, has   => @_ ) },
+                sub { __PACKAGE__->HANDLE_has( $CALLER, param => @_ ) },
+                sub { __PACKAGE__->HANDLE_signature_for( $CALLER, @_ ) },
+                sub { __PACKAGE__->HANDLE_with( $CALLER, @_ ) },
+            );
+          };
+    }
+
+    # Mite imports
     BEGIN {
         require Scalar::Util;
         *STRICT  = \&Mite::Shim::STRICT;

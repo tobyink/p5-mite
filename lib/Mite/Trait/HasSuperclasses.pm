@@ -134,19 +134,24 @@ before inject_mite_functions => sub {
 
     no strict 'refs';
 
-    *{ $package .'::extends' } = sub {
-        return $self->handle_extends_keyword(
-            defined( $fake_ns )
-                ? map Str->check($_) ? "$fake_ns\::$_" : $_, @_
-                : @_
-        );
-    } if $requested->( 'extends', 1 );
+    if ( $requested->( 'extends', 1 ) ) {
+
+        *{ $package .'::extends' } = sub {
+            return $self->handle_extends_keyword(
+                defined( $fake_ns )
+                    ? map Str->check($_) ? "$fake_ns\::$_" : $_, @_
+                    : @_
+            );
+        };
+
+        $self->imported_keywords->{'extends'} = 'sub {}';
+    }
 };
 
 around compilation_stages => sub {
     my ( $next, $self ) = ( shift, shift );
     my @stages = $self->$next( @_ );
-    push @stages, '_compile_extends';
+    push @stages, qw( _compile_extends );
     return @stages;
 };
 

@@ -65,6 +65,7 @@ before inject_mite_functions => sub {
     my $shim      = $self->shim_name;
     my $package   = $self->name;
     my $kind      = $self->kind;
+
     my $ctxt      = sub {
         my $level = shift;
         my @info  = caller( $level );
@@ -119,27 +120,41 @@ before inject_mite_functions => sub {
         return;
     };
 
-    *{ $package .'::has' } = $has
-        if $requested->( 'has', 1 );
+    if ( $requested->( 'has', true ) ) {
 
-    *{"$package\::param"} = sub {
-        my ( $names, %spec ) = @_;
-        $spec{is} = ro unless exists $spec{is};
-        $spec{required} = true unless exists $spec{required};
-        $spec{definition_context} ||= $ctxt->( 1, file => "$file", type => $kind, context => 'param declaration' );
-        $has->( $names, %spec );
-    } if $requested->( param => 0 );
+        *{ $package .'::has' } = $has;
 
-    *{"$package\::field"} = sub {
-        my ( $names, %spec ) = @_;
-        $spec{is} ||= ( $spec{builder} || exists $spec{default} ) ? lazy : rwp;
-        $spec{init_arg} = undef unless exists $spec{init_arg};
-        if ( defined $spec{init_arg} and $spec{init_arg} !~ /^_/ ) {
-            croak "A defined 'field.init_arg' must begin with an underscore: %s ", $spec{init_arg};
-        }
-        $spec{definition_context} ||= $ctxt->( 1, file => "$file", type => $kind, context => 'field declaration' );
-        $has->( $names, %spec );
-    } if $requested->( field => 0 );
+        $self->imported_keywords->{has} = 'sub { __PACKAGE__->HANDLE_has( $CALLER, has => @_ ) }';
+    }
+
+    if ( $requested->( 'param', false ) ) {
+
+        *{"$package\::param"} = sub {
+            my ( $names, %spec ) = @_;
+            $spec{is} = ro unless exists $spec{is};
+            $spec{required} = true unless exists $spec{required};
+            $spec{definition_context} ||= $ctxt->( 1, file => "$file", type => $kind, context => 'param declaration' );
+            $has->( $names, %spec );
+        };
+
+        $self->imported_keywords->{param} = 'sub { __PACKAGE__->HANDLE_has( $CALLER, param => @_ ) }';
+    }
+
+    if ( $requested->( 'field', false ) ) {
+
+        *{"$package\::field"} = sub {
+            my ( $names, %spec ) = @_;
+            $spec{is} ||= ( $spec{builder} || exists $spec{default} ) ? lazy : rwp;
+            $spec{init_arg} = undef unless exists $spec{init_arg};
+            if ( defined $spec{init_arg} and $spec{init_arg} !~ /^_/ ) {
+                croak "A defined 'field.init_arg' must begin with an underscore: %s ", $spec{init_arg};
+            }
+            $spec{definition_context} ||= $ctxt->( 1, file => "$file", type => $kind, context => 'field declaration' );
+            $has->( $names, %spec );
+        };
+
+        $self->imported_keywords->{field} = 'sub { __PACKAGE__->HANDLE_has( $CALLER, field => @_ ) }';
+    }
 };
 
 sub _compile_init_attributes {

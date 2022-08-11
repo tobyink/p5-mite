@@ -152,13 +152,18 @@ before inject_mite_functions => sub {
 
     no strict 'refs';
 
-    *{ $package .'::with' } = sub {
-        return $self->handle_with_keyword(
-            defined( $fake_ns )
-                ? ( map Str->check($_) ? "$fake_ns\::$_" : $_, @_ )
-                : @_
-        );
-    } if $requested->( 'with', 1 );
+    if ( $requested->( 'with', 1 ) ) {
+
+        *{ $package .'::with' } = sub {
+            return $self->handle_with_keyword(
+                defined( $fake_ns )
+                    ? ( map Str->check($_) ? "$fake_ns\::$_" : $_, @_ )
+                    : @_
+            );
+        };
+
+        $self->imported_keywords->{with} = 'sub { __PACKAGE__->HANDLE_with( $CALLER, @_ ) }';
+    }
 };
 
 around compilation_stages => sub {

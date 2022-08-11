@@ -9,6 +9,33 @@
     our $MITE_SHIM    = "Mite::Shim";
     our $MITE_VERSION = "0.010001";
 
+    # Mite keywords
+    BEGIN {
+        my $CALLER = "Mite::Trait::HasDestructor";
+        (
+            *after,    *around,        *before,
+            *field,    *has,           *param,
+            *requires, *signature_for, *with
+          )
+          = do {
+
+            package Mite::Shim;
+            no warnings 'redefine';
+            (
+                sub { __PACKAGE__->HANDLE_after( $CALLER, "role", @_ ) },
+                sub { __PACKAGE__->HANDLE_around( $CALLER, "role", @_ ) },
+                sub { __PACKAGE__->HANDLE_before( $CALLER, "role", @_ ) },
+                sub { __PACKAGE__->HANDLE_has( $CALLER, field => @_ ) },
+                sub { __PACKAGE__->HANDLE_has( $CALLER, has   => @_ ) },
+                sub { __PACKAGE__->HANDLE_has( $CALLER, param => @_ ) },
+                sub { },
+                sub { __PACKAGE__->HANDLE_signature_for( $CALLER, @_ ) },
+                sub { __PACKAGE__->HANDLE_with( $CALLER, @_ ) },
+            );
+          };
+    }
+
+    # Mite imports
     BEGIN {
         require Scalar::Util;
         *STRICT  = \&Mite::Shim::STRICT;
