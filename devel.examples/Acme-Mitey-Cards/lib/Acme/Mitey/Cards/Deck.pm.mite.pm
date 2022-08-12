@@ -7,7 +7,7 @@
 
     our $USES_MITE    = "Mite::Class";
     our $MITE_SHIM    = "Acme::Mitey::Cards::Mite";
-    our $MITE_VERSION = "0.010002";
+    our $MITE_VERSION = "0.010003";
 
     # Mite keywords
     BEGIN {
