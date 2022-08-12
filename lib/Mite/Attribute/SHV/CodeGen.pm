@@ -4,8 +4,9 @@ use warnings;
 
 package Mite::Attribute::SHV::CodeGen;
 
-if ( ! $ENV{MITE_COMPILE_SELF} ) {
-	# SHV uses Mite, so cannot be required by Mite during bootstrapping
+# SHV uses Mite, so cannot be required by Mite during bootstrapping
+require Mite::Shim;
+if ( not Mite::Shim::_is_compiling() ) {
 	require Sub::HandlesVia::CodeGenerator;
 	our @ISA = 'Sub::HandlesVia::CodeGenerator';
 }
