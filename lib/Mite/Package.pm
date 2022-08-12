@@ -33,6 +33,11 @@ has imported_functions =>
   isa           => Map[ MethodName, Str ],
   builder       => sub { {} };
 
+has imported_keywords =>
+  is            => ro,
+  isa           => Map[ MethodName, Str ],
+  builder       => sub { {} };
+
 sub kind { 'package' }
 
 sub BUILD {
@@ -137,6 +142,7 @@ sub compilation_stages {
         _compile_package
         _compile_pragmas
         _compile_uses_mite
+        _compile_imported_keywords
         _compile_imported_functions
         _compile_meta_method
     );
@@ -169,11 +175,35 @@ sub _compile_uses_mite {
     join "\n", @code;
 }
 
+sub _compile_imported_keywords {
+    my $self = shift;
+
+    my %func = %{ $self->imported_keywords or {} } or return;
+    my @keywords = sort keys %func;
+    my $keyword_slots = join q{, }, map "*$_", @keywords;
+    my $coderefs = join "\n", map "            $func{$_},", @keywords;
+
+    return sprintf <<'CODE', B::perlstring( $self->shim_name ), B::perlstring( $self->name ), $keyword_slots, $self->shim_name, $coderefs;
+# Mite keywords
+BEGIN {
+    my ( $SHIM, $CALLER ) = ( %s, %s );
+    ( %s ) = do {
+        package %s;
+        no warnings 'redefine';
+        (
+%s
+        );
+    };
+};
+CODE
+}
+
 sub _compile_imported_functions {
     my $self = shift;
     my %func = %{ $self->imported_functions } or return;
 
     return join "\n",
+        '# Mite imports',
         'BEGIN {',
         ( $func{blessed} ? '    require Scalar::Util;' : () ),
         map(

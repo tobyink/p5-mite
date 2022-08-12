@@ -9,6 +9,34 @@
     our $MITE_SHIM    = "Mite::Shim";
     our $MITE_VERSION = "0.010001";
 
+    # Mite keywords
+    BEGIN {
+        my ( $SHIM, $CALLER ) =
+          ( "Mite::Shim", "Mite::Trait::HasDestructor" );
+        (
+            *after,    *around,        *before,
+            *field,    *has,           *param,
+            *requires, *signature_for, *with
+          )
+          = do {
+
+            package Mite::Shim;
+            no warnings 'redefine';
+            (
+                sub { $SHIM->HANDLE_after( $CALLER, "role", @_ ) },
+                sub { $SHIM->HANDLE_around( $CALLER, "role", @_ ) },
+                sub { $SHIM->HANDLE_before( $CALLER, "role", @_ ) },
+                sub { $SHIM->HANDLE_has( $CALLER, field => @_ ) },
+                sub { $SHIM->HANDLE_has( $CALLER, has   => @_ ) },
+                sub { $SHIM->HANDLE_has( $CALLER, param => @_ ) },
+                sub { },
+                sub { $SHIM->HANDLE_signature_for( $CALLER, "role", @_ ) },
+                sub { $SHIM->HANDLE_with( $CALLER, @_ ) },
+            );
+          };
+    }
+
+    # Mite imports
     BEGIN {
         require Scalar::Util;
         *STRICT  = \&Mite::Shim::STRICT;
@@ -93,7 +121,8 @@
         my $shim = "Mite::Shim";
         for my $modifier_rule (@METHOD_MODIFIERS) {
             my ( $modification, $names, $coderef ) = @$modifier_rule;
-            $shim->$modification( $target, $names, $coderef );
+            my $handler = "HANDLE_$modification";
+            $shim->$handler( $target, "class", $names, $coderef );
         }
 
         return;

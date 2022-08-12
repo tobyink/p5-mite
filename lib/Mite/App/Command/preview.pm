@@ -27,12 +27,15 @@ sub execute {
 
     return 0 if $self->should_exit_quietly;
 
+    my $file = $self->kingpin_command->args->get( 'file' )->value;
+
     my $project = $self->project;
     $project->load_directory;
 
-    my $file   = $self->kingpin_command->args->get( 'file' )->value;
-    my $source = $project->source_for( $file );
+    $project->load_files( [ $file ], '.' )
+        unless $project->sources->{$file};
 
+    my $source = $project->source_for( $file );
     print $source->compile;
 
     return 0;

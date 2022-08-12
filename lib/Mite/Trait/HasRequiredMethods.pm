@@ -30,10 +30,15 @@ before inject_mite_functions => sub {
 
     no strict 'refs';
 
-    *{ $package .'::requires' } = sub {
-        $self->add_required_methods( @_ );
-        return;
-    } if $requested->( 'requires', 1 );
+    if ( $requested->( 'requires', 1 ) ) {
+
+        *{ $package .'::requires' } = sub {
+            $self->add_required_methods( @_ );
+            return;
+        };
+
+        $self->imported_keywords->{requires} = 'sub {}';
+    }
 };
 
 around _compile_mop_required_methods => sub {
