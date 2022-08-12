@@ -4,6 +4,7 @@ package Mite::Shim;
 use 5.008001;
 use strict;
 use warnings;
+no strict 'refs';
 
 if ( $] < 5.009005 ) { require MRO::Compat; }
 else                 { require mro;         }
@@ -42,7 +43,7 @@ sub _error_handler {
             ref($_) ? Data::Dumper::Dumper($_) : defined($_) ? $_ : '(undef)'
         } @args;
     }
-    my $next = do { no strict 'refs'; require Carp; \&{"Carp::$func"} };
+    my $next = do { require Carp; \&{"Carp::$func"} };
     @_ = ( $message );
     goto $next;
 }
@@ -53,7 +54,6 @@ sub confess { unshift @_, 'confess'; goto \&_error_handler }
 
 # Exportable guard function
 {
-    no strict 'refs';
     my $GUARD_PACKAGE = __PACKAGE__ . '::Guard';
     *{"$GUARD_PACKAGE\::DESTROY"} = sub { $_[0][0] or $_[0][1]->() };
     *{"$GUARD_PACKAGE\::restore"} = sub { $_[0]->DESTROY; $_[0][0] = true };
@@ -67,24 +67,17 @@ sub _is_compiling {
 }
 
 sub import {
-    my $class = shift;
+    my $me = shift;
     my %arg = map { lc($_) => true } @_;
     my ( $caller, $file ) = caller;
-
-    # Turn on warnings and strict in the caller
-    warnings->import;
-    strict->import;
-
-    my $kind = $arg{'-role'} ? 'role' : 'class';
 
     if( _is_compiling() ) {
         require Mite::Project;
         Mite::Project->default->inject_mite_functions(
-            package     => $caller,
-            file        => $file,
-            arg         => \%arg,
-            kind        => $kind,
-            shim        => $class,
+            package => $caller,
+            file    => $file,
+            arg     => \%arg,
+            shim    => $me,
         );
     }
     else {
@@ -100,18 +93,16 @@ sub import {
         }
     }
 
-    if ( _HAS_AUTOCLEAN and not $arg{'-unclean'} ) {
-        'namespace::autoclean'->import( -cleanee => $caller );
-    }
-
-    ## Bootstrapping
-    #$class->_inject_mite_functions( $caller, $file, $kind, \%arg );
+    warnings->import;
+    strict->import;
+    'namespace::autoclean'->import( -cleanee => $caller )
+        if _HAS_AUTOCLEAN && !$arg{'-unclean'};
 }
 
 {
     my ( $cb_before, $cb_after );
     sub _finalize_application_roletiny {
-        my ( $class, $role, $caller, $args ) = @_;
+        my ( $me, $role, $caller, $args ) = @_;
         if ( $INC{'Role/Hooks.pm'} ) {
             $cb_before ||= \%Role::Hooks::CALLBACKS_BEFORE_APPLY;
             $cb_after  ||= \%Role::Hooks::CALLBACKS_AFTER_APPLY;
@@ -125,7 +116,7 @@ sub import {
             my @args         = @$_;
             my $modification = shift @args;
             my $handler      = "HANDLE_$modification";
-            $class->$handler( $caller, undef, @args );
+            $me->$handler( $caller, undef, @args );
         }
         if ( $cb_after ) {
             $_->( $role, $caller ) for @{ $cb_after->{$role} || [] };
@@ -161,7 +152,6 @@ sub HANDLE_has {
     }
     my %spec = @_;
     my $code;
-    no strict 'refs';
     for my $name ( ref($names) ? @$names : $names ) {
         $name =~ s/^\+//;
         'CODE' eq ref( $code = $spec{default} )
@@ -177,10 +167,7 @@ sub HANDLE_has {
 }
 
 {
-    my $_kind = sub {
-        no strict 'refs';
-        ${ shift() . '::USES_MITE' } =~ /role/i ? 'role' : 'class';
-    };
+    my $_kind = sub { ${ shift() . '::USES_MITE' } =~ /Role/ ? 'role' : 'class' };
 
     sub _get_orig_method {
         my ( $caller, $name ) = @_;
@@ -201,7 +188,6 @@ sub HANDLE_has {
         my ( $names, $coderef ) = &_parse_mm_args;
         $kind ||= $caller->$_kind;
         if ( $kind eq 'role' ) {
-            no strict 'refs';
             push @{"$caller\::METHOD_MODIFIERS"},
                 [ before => $names, $coderef ];
             return;
@@ -228,7 +214,6 @@ BEFORE
         my ( $names, $coderef ) = &_parse_mm_args;
         $kind ||= $caller->$_kind;
         if ( $kind eq 'role' ) {
-            no strict 'refs';
             push @{"$caller\::METHOD_MODIFIERS"},
                 [ after => $names, $coderef ];
             return;
@@ -266,7 +251,6 @@ AFTER
         my ( $names, $coderef ) = &_parse_mm_args;
         $kind ||= $caller->$_kind;
         if ( $kind eq 'role' ) {
-            no strict 'refs';
             push @{"$caller\::METHOD_MODIFIERS"},
                 [ around => $names, $coderef ];
             return;
@@ -289,7 +273,6 @@ AROUND
 
 # Usage: $me, $caller, $caller_kind, @signature_for_args
 sub HANDLE_signature_for {
-    no strict 'refs';
     my ( $me, $caller, $kind, $name ) = @_;
     $name =~ s/^\+//;
     $me->HANDLE_around( $caller, $kind, $name, ${"$caller\::SIGNATURE_FOR"}{$name} );

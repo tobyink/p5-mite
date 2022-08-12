@@ -441,22 +441,23 @@
         $out{"file"} = $in{"file"} if exists( $in{"file"} );
         delete( $in{"file"} );
 
-        # Parameter kind (type: Str)
-        $dtmp = exists( $in{"kind"} ) ? $in{"kind"} : "class";
-        do {
+        # Parameter kind (type: Optional[Str])
+        if ( exists( $in{"kind"} ) ) {
+            do {
 
-            package Mite::Shim;
-            defined($dtmp) and do {
-                ref( \$dtmp ) eq 'SCALAR'
-                  or ref( \( my $val = $dtmp ) ) eq 'SCALAR';
-            }
-          }
-          or croak(
+                package Mite::Shim;
+                defined( $in{"kind"} ) and do {
+                    ref( \$in{"kind"} ) eq 'SCALAR'
+                      or ref( \( my $val = $in{"kind"} ) ) eq 'SCALAR';
+                }
+              }
+              or croak(
 "Type check failed in signature for inject_mite_functions: %s should be %s",
-            "\$_{\"kind\"}", "Str"
-          );
-        $out{"kind"} = $dtmp;
-        delete( $in{"kind"} );
+                "\$_{\"kind\"}", "Optional[Str]"
+              );
+            $out{"kind"} = $in{"kind"};
+            delete( $in{"kind"} );
+        }
 
         # Parameter arg (type: HashRef)
         $dtmp = exists( $in{"arg"} ) ? $in{"arg"} : {};

@@ -82,8 +82,8 @@ signature_for inject_mite_functions => (
     named => [
         package   => Any,
         file      => Any,
-        kind      => Str,        { default => 'class' },
-        arg       => HashRef,    { default => {}      },
+        kind      => Optional[Str],
+        arg       => HashRef, { default => {} },
         shim      => Str,
         x_source  => Optional[Object],
         x_pkg     => Optional[Object],
@@ -93,6 +93,7 @@ signature_for inject_mite_functions => (
 
 sub inject_mite_functions {
     my ( $self, $package, $file, $kind, $arg, $shim, $source, $pkg ) = @_;
+    $kind //= ( $arg->{'-role'} ? 'role' : 'class' );
 
     my $fake_ns = $self->can('_module_fakeout_namespace') && $self->_module_fakeout_namespace;
     if ( defined( $fake_ns ) and not $package =~ /^\Q$fake_ns/ ) {
