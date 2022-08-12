@@ -229,6 +229,10 @@
             $self->{"imported_keywords"} = $value;
         };
 
+        # Attribute arg
+        # has declaration, file lib/Mite/Package.pm, line 41
+        $self->{"arg"} = ( exists( $args->{"arg"} ) ? $args->{"arg"} : {} );
+
         # Attribute attributes (type: HashRef[Mite::Attribute])
         # has declaration, file lib/Mite/Trait/HasAttributes.pm, line 16
         do {
@@ -423,7 +427,7 @@
 
         # Unrecognized parameters
         my @unknown = grep not(
-/\A(?:attributes|imported_(?:functions|keywords)|method_signatures|name|r(?:equired_methods|ole(?:_args|s))|s(?:him_name|ource))\z/
+/\A(?:a(?:rg|ttributes)|imported_(?:functions|keywords)|method_signatures|name|r(?:equired_methods|ole(?:_args|s))|s(?:him_name|ource))\z/
         ), keys %{$args};
         @unknown
           and croak(
@@ -644,10 +648,6 @@
     }
     sub _compile_with { goto \&Mite::Trait::HasRoles::_compile_with; }
     sub _get_role     { goto \&Mite::Trait::HasRoles::_get_role; }
-
-    sub _needs_accessors {
-        goto \&Mite::Trait::HasAttributes::_needs_accessors;
-    }
 
     sub add_attribute {
         goto \&Mite::Trait::HasAttributes::add_attribute;

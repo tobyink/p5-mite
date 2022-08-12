@@ -50,12 +50,92 @@ sub methods_to_export {
     return \%methods;
 }
 
+sub accessors_to_export {
+    my $self = shift;
+    return {} unless $self->arg->{'-runtime'};
+
+    my @accessors = map $_->associated_methods,
+        sort { $a->_order <=> $b->_order }
+        values %{ $self->attributes };
+
+    return { map { $_ => $self->name . "::$_"; } @accessors };
+}
+
 around compilation_stages => sub {
     my ( $next, $self ) = ( shift, shift );
     my @stages = $self->$next( @_ );
-    push @stages, '_compile_callback';
+    push @stages, qw(
+        _compile_callback
+    );
+    push @stages, '_compile_apply'
+        if $self->arg->{'-runtime'};
     return @stages;
 };
+
+sub _compile_apply {
+    my $self = shift;
+    my $name = $self->name;
+
+    my $methods = {
+        %{ $self->methods_to_export },
+        %{ $self->accessors_to_export },
+    };
+    my $method_hash = join qq{,\n},
+        map sprintf(
+            '        %s => %s',
+            B::perlstring( $_ ),
+            B::perlstring( $methods->{$_} =~ /^\Q$name\E::(\w+)$/ ? $1 : $methods->{$_} )
+        ),
+        sort keys %$methods;
+
+    return sprintf <<'CODE', $method_hash;
+{
+    our ( %%METHODS ) = (
+%s
+    );
+
+    my %%DONE;
+    sub APPLY_TO {
+        my $to = shift;
+        if ( ref $to ) {
+            my $new_class = CREATE_CLASS( ref $to );
+            return bless( $to, $new_class );
+        }
+        return if $DONE{$to};
+        {
+            no strict 'refs';
+            ${"$to\::USES_MITE"} = 'Mite::Class';
+            for my $method ( keys %%METHODS ) {
+                $to->can($method) or *{"$to\::$method"} = \&{ $METHODS{$method} };
+            }
+            for ( "DOES", "does" ) {
+                $to->can( $_ ) or *{"$to\::$_"} = sub { shift->isa( @_ ) };
+            }
+        }
+        __PACKAGE__->__FINALIZE_APPLICATION__( $to );
+        $MITE_SHIM->HANDLE_around( $to, "class", [ "DOES", "does" ], sub {
+            my ( $next, $self, $role ) = @_;
+            return 1 if $role eq __PACKAGE__;
+            return 1 if $role eq $to;
+            return $self->$next( $role );
+        } );
+        $DONE{$to}++;
+        return;
+    }
+
+    sub CREATE_CLASS {
+        my $base      = shift;
+        my $new_class = "$base\::__WITH__::" . __PACKAGE__;
+        {
+            no strict 'refs';
+            @{"$new_class\::ISA"} = $base;
+        }
+        APPLY_TO( $new_class );
+        return $new_class;
+    }
+}
+CODE
+}
 
 sub _compile_callback {
     my $self = shift;
@@ -115,6 +195,11 @@ sub __FINALIZE_APPLICATION__ {
     return;
 }
 CODE
+}
+
+sub _needs_accessors {
+    my $self = shift;
+    $self->arg->{'-runtime'} ? true : false;
 }
 
 sub _mop_metaclass {

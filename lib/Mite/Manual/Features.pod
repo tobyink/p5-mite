@@ -134,6 +134,36 @@ The idea is that if your project uses autolax, you can set C<PERL_STRICT> in
 your testing environment to get more rigorous checks, fix any errors you find,
 and then run your code without C<PERL_STRICT> in your production environment.
 
+=head2 Run-Time Role Application
+
+If you add the C<< -runtime >> option when creating a Mite role:
+
+    package Your::Project::SomeRole;
+    use Your::Project::Mite -role, -runtime;
+
+Then your role will include a couple of functions:
+
+    # Applies the role to an existing object
+    #
+    Your::Project::SomeRole::APPLY_TO( $object );
+
+    # Applies the role to an existing class
+    #
+    Your::Project::SomeRole::APPLY_TO( 'Some::Class' );
+
+    # Applies the role to an existing class, but does not modify the
+    # existing class.
+    #
+    my $new_class = Your::Project::SomeRole::CREATE_CLASS( 'Some::Class' );
+
+As this functionality is relatively heavy, it is not included in roles
+by default, which is why the C<< -runtime >> option is needed as a way
+to opt in.
+
+When applying a role to an existing class, the class's constructor
+I<< will not be modified >>, so any attributes defined in the role will
+only be available to get and set via accessor methods.
+
 =head1 BUGS
 
 Please report any bugs to L<https://github.com/tobyink/p5-mite/issues>.

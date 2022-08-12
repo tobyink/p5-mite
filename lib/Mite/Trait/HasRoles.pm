@@ -56,6 +56,7 @@ sub methods_to_import_from_roles {
         does
         __META__
         __FINALIZE_APPLICATION__
+        CREATE_CLASS
     );
 
     return \%methods;

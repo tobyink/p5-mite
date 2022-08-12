@@ -242,13 +242,17 @@
             $self->{"imported_keywords"} = $value;
         };
 
+        # Attribute arg
+        # has declaration, file lib/Mite/Package.pm, line 41
+        $self->{"arg"} = ( exists( $args->{"arg"} ) ? $args->{"arg"} : {} );
+
         # Call BUILD methods
         $self->BUILDALL($args) if ( !$no_build and @{ $meta->{BUILD} || [] } );
 
         # Unrecognized parameters
         my @unknown = grep not(
-            /\A(?:imported_(?:functions|keywords)|name|s(?:him_name|ource))\z/),
-          keys %{$args};
+/\A(?:arg|imported_(?:functions|keywords)|name|s(?:him_name|ource))\z/
+        ), keys %{$args};
         @unknown
           and croak(
             "Unexpected keys in constructor: " . join( q[, ], sort @unknown ) );
@@ -286,6 +290,20 @@
 
     my $__XS = !$ENV{MITE_PURE_PERL}
       && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
+
+    # Accessors for arg
+    # has declaration, file lib/Mite/Package.pm, line 41
+    if ($__XS) {
+        Class::XSAccessor->import(
+            chained     => 1,
+            "accessors" => { "arg" => "arg" },
+        );
+    }
+    else {
+        *arg = sub {
+            @_ > 1 ? do { $_[0]{"arg"} = $_[1]; $_[0]; } : ( $_[0]{"arg"} );
+        };
+    }
 
     # Accessors for imported_functions
     # has declaration, file lib/Mite/Package.pm, line 34

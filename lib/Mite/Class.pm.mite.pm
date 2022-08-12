@@ -229,6 +229,10 @@
             $self->{"imported_keywords"} = $value;
         };
 
+        # Attribute arg
+        # has declaration, file lib/Mite/Package.pm, line 41
+        $self->{"arg"} = ( exists( $args->{"arg"} ) ? $args->{"arg"} : {} );
+
         # Attribute extends (type: ArrayRef[ValidClassName])
         # has declaration, file lib/Mite/Trait/HasSuperclasses.pm, line 28
         do {
@@ -499,7 +503,7 @@
 
         # Unrecognized parameters
         my @unknown = grep not(
-/\A(?:attributes|extends|imported_(?:functions|keywords)|method_signatures|name|parents|role(?:_args|s)|s(?:him_name|ource|uperclass_args))\z/
+/\A(?:a(?:rg|ttributes)|extends|imported_(?:functions|keywords)|method_signatures|name|parents|role(?:_args|s)|s(?:him_name|ource|uperclass_args))\z/
         ), keys %{$args};
         @unknown
           and croak(

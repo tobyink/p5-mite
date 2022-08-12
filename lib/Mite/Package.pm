@@ -38,6 +38,10 @@ has imported_keywords =>
   isa           => Map[ MethodName, Str ],
   builder       => sub { {} };
 
+has arg =>
+  is            => rw,
+  default       => {};
+
 sub kind { 'package' }
 
 sub BUILD {

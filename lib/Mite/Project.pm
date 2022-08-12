@@ -110,6 +110,7 @@ sub inject_mite_functions {
         $kind eq 'role' ? 'Mite::Role' : 'Mite::Class',
     );
     $pkg->shim_name( $shim );
+    $pkg->arg( $arg );
     $pkg->inject_mite_functions( $file, $arg );
 }
 

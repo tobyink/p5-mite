@@ -344,6 +344,31 @@ sub _all_aliases {
     map $self->_expand_name($_), @$aliases;
 }
 
+sub associated_methods {
+    my $self = shift;
+
+    my @methods = grep defined, (
+        $self->_all_aliases,
+        map(
+            $self->_expand_name($self->$_),
+            qw( reader writer accessor clearer predicate lvalue local_writer builder trigger cloner_method ),
+        ),
+    );
+
+    if ( ref $self->handles ) {
+        if ( ! $self->handles_via ) {
+            push @methods, sprintf '_assert_blessed_%s', $self->name;
+        }
+        push @methods, map $self->_expand_name($_), sort keys %{ $self->handles };
+    }
+    elsif ( $self->handles ) {
+        my %delegations = $self->_compile_native_delegations;
+        push @methods, sort keys %delegations;
+    }
+
+    return @methods;
+}
+
 sub _build_type {
     my $self = shift;
 
@@ -1134,7 +1159,7 @@ sub compile {
 
     $code .= "\n";
 
-    if ( my $alias_is_for = $self->alias_is_for ) {
+    if ( $self->alias and my $alias_is_for = $self->alias_is_for ) {
         $code .= sprintf "# Aliases for %s\n", $self->name;
         $code .= '# ' . $self->definition_context_to_pretty_string. "\n";
         my $alias_target = $self->_expand_name( $self->$alias_is_for );
