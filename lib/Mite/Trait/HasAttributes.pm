@@ -6,7 +6,7 @@ package Mite::Trait::HasAttributes;
 use Mite::Miteception -role, -all;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.010002';
+our $VERSION   = '0.010003';
 
 requires qw( _function_for_croak );
 

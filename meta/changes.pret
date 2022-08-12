@@ -1,6 +1,15 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.010003 cpan:TOBYINK`
+	issued  2022-08-12;
+	changeset [
+		item [
+			a dcs:Addition;
+			label "Support runtime application of roles to classes/objects.";
+		];
+	].
+
 `Mite 0.010002 cpan:TOBYINK`
 	issued  2022-08-12;
 	changeset [
