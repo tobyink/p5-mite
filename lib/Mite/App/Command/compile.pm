@@ -28,6 +28,9 @@ sub execute {
 
     my $project = $self->project;
 
+    # This is a hack to force Mite::* modules which are already loaded
+    # to be loaded again so Mite can compile itself.
+    #
     if ( $self->config->data->{dogfood} ) {
         $project->_module_fakeout_namespace(
             sprintf 'A%02d::B%02d', int(rand 100), int(rand 100)
