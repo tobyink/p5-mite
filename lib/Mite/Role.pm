@@ -67,12 +67,12 @@ around compilation_stages => sub {
     push @stages, qw(
         _compile_callback
     );
-    push @stages, '_compile_apply'
+    push @stages, '_compile_runtime_application'
         if $self->arg->{'-runtime'};
     return @stages;
 };
 
-sub _compile_apply {
+sub _compile_runtime_application {
     my $self = shift;
     my $name = $self->name;
 
