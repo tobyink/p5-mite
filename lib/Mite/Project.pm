@@ -192,7 +192,8 @@ signature_for load_files => (
 sub load_files {
     my ( $self, $files, $inc_dir ) = @_;
 
-    local $ENV{MITE_COMPILE} = 1;
+    local $Mite::COMPILING = $self->config->data->{shim}
+        // do { warn 'Attempting to compile, but no shim in config'; exit 1; };
     local @INC = @INC;
     unshift @INC, $inc_dir if defined $inc_dir;
     for my $file (@$files) {
