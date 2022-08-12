@@ -179,7 +179,7 @@ sub HANDLE_has {
 {
     my $_kind = sub {
         no strict 'refs';
-        ${ shift . '::USES_MITE' } =~ /role/i ? 'role' : 'class';
+        ${ shift() . '::USES_MITE' } =~ /role/i ? 'role' : 'class';
     };
 
     sub _get_orig_method {
