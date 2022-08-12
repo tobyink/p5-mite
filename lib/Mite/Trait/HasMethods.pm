@@ -100,7 +100,9 @@ before inject_mite_functions => sub {
             return;
         };
 
-        $self->imported_keywords->{signature_for} = 'sub { __PACKAGE__->HANDLE_signature_for( $CALLER, @_ ) }';
+        $self->imported_keywords->{signature_for} =
+            sprintf 'sub { $SHIM->HANDLE_signature_for( $CALLER, %s, @_ ) }',
+            B::perlstring( $kind );
     }
 
     for my $modifier ( qw( before after around ) ) {
@@ -118,7 +120,7 @@ before inject_mite_functions => sub {
         };
 
         $self->imported_keywords->{$modifier} =
-            sprintf 'sub { __PACKAGE__->HANDLE_%s( $CALLER, %s, @_ ) }',
+            sprintf 'sub { $SHIM->HANDLE_%s( $CALLER, %s, @_ ) }',
             $modifier, B::perlstring( $kind );
 
     }

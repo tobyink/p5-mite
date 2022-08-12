@@ -124,7 +124,7 @@ before inject_mite_functions => sub {
 
         *{ $package .'::has' } = $has;
 
-        $self->imported_keywords->{has} = 'sub { __PACKAGE__->HANDLE_has( $CALLER, has => @_ ) }';
+        $self->imported_keywords->{has} = 'sub { $SHIM->HANDLE_has( $CALLER, has => @_ ) }';
     }
 
     if ( $requested->( 'param', false ) ) {
@@ -137,7 +137,7 @@ before inject_mite_functions => sub {
             $has->( $names, %spec );
         };
 
-        $self->imported_keywords->{param} = 'sub { __PACKAGE__->HANDLE_has( $CALLER, param => @_ ) }';
+        $self->imported_keywords->{param} = 'sub { $SHIM->HANDLE_has( $CALLER, param => @_ ) }';
     }
 
     if ( $requested->( 'field', false ) ) {
@@ -153,7 +153,7 @@ before inject_mite_functions => sub {
             $has->( $names, %spec );
         };
 
-        $self->imported_keywords->{field} = 'sub { __PACKAGE__->HANDLE_has( $CALLER, field => @_ ) }';
+        $self->imported_keywords->{field} = 'sub { $SHIM->HANDLE_has( $CALLER, field => @_ ) }';
     }
 };
 

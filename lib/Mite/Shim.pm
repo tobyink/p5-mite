@@ -286,10 +286,9 @@ AROUND
 # Usage: $me, $caller, $caller_kind, @signature_for_args
 sub HANDLE_signature_for {
     no strict 'refs';
-    my ( $me, $caller, $kind, $name ) = ( @_ % 2 == 0 ) ? @_ : ( $_[0], $_[1], undef, $_[2] );
-    $kind //= do { no strict 'refs'; local $_ = ${"$caller\::USES_MITE"}; s/Mite:://; lc($_) };
+    my ( $me, $caller, $kind, $name ) = @_;
     $name =~ s/^\+//;
-    $me->around( $caller, $kind, $name, ${"$caller\::SIGNATURE_FOR"}{$name} );
+    $me->HANDLE_around( $caller, $kind, $name, ${"$caller\::SIGNATURE_FOR"}{$name} );
     return;
 }
 

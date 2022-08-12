@@ -162,7 +162,7 @@ before inject_mite_functions => sub {
             );
         };
 
-        $self->imported_keywords->{with} = 'sub { __PACKAGE__->HANDLE_with( $CALLER, @_ ) }';
+        $self->imported_keywords->{with} = 'sub { $SHIM->HANDLE_with( $CALLER, @_ ) }';
     }
 };
 

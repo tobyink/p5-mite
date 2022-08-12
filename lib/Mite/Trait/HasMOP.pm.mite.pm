@@ -11,7 +11,8 @@
 
     # Mite keywords
     BEGIN {
-        my $CALLER = "Mite::Trait::HasMOP";
+        my ( $SHIM, $CALLER ) =
+          ( "Mite::Shim", "Mite::Trait::HasMOP" );
         (
             *after,    *around,        *before,
             *field,    *has,           *param,
@@ -22,15 +23,15 @@
             package Mite::Shim;
             no warnings 'redefine';
             (
-                sub { __PACKAGE__->HANDLE_after( $CALLER, "role", @_ ) },
-                sub { __PACKAGE__->HANDLE_around( $CALLER, "role", @_ ) },
-                sub { __PACKAGE__->HANDLE_before( $CALLER, "role", @_ ) },
-                sub { __PACKAGE__->HANDLE_has( $CALLER, field => @_ ) },
-                sub { __PACKAGE__->HANDLE_has( $CALLER, has   => @_ ) },
-                sub { __PACKAGE__->HANDLE_has( $CALLER, param => @_ ) },
+                sub { $SHIM->HANDLE_after( $CALLER, "role", @_ ) },
+                sub { $SHIM->HANDLE_around( $CALLER, "role", @_ ) },
+                sub { $SHIM->HANDLE_before( $CALLER, "role", @_ ) },
+                sub { $SHIM->HANDLE_has( $CALLER, field => @_ ) },
+                sub { $SHIM->HANDLE_has( $CALLER, has   => @_ ) },
+                sub { $SHIM->HANDLE_has( $CALLER, param => @_ ) },
                 sub { },
-                sub { __PACKAGE__->HANDLE_signature_for( $CALLER, @_ ) },
-                sub { __PACKAGE__->HANDLE_with( $CALLER, @_ ) },
+                sub { $SHIM->HANDLE_signature_for( $CALLER, "role", @_ ) },
+                sub { $SHIM->HANDLE_with( $CALLER, @_ ) },
             );
           };
     }

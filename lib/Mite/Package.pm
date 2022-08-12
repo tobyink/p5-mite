@@ -183,10 +183,10 @@ sub _compile_imported_keywords {
     my $keyword_slots = join q{, }, map "*$_", @keywords;
     my $coderefs = join "\n", map "            $func{$_},", @keywords;
 
-    return sprintf <<'CODE', B::perlstring( $self->name ), $keyword_slots, $self->shim_name, $coderefs;
+    return sprintf <<'CODE', B::perlstring( $self->shim_name ), B::perlstring( $self->name ), $keyword_slots, $self->shim_name, $coderefs;
 # Mite keywords
 BEGIN {
-    my $CALLER = %s;
+    my ( $SHIM, $CALLER ) = ( %s, %s );
     ( %s ) = do {
         package %s;
         no warnings 'redefine';
