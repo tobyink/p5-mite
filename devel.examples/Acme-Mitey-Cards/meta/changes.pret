@@ -119,3 +119,12 @@
 			label "Signature improvements.";
 		];
 	].
+
+`Acme-Mitey-Cards 0.014 cpan:TOBYINK`
+	issued  2022-08-12;
+	changeset [
+		item [
+			a dcs:Update;
+			label "Rebuild with Mite 0.010002.";
+		];
+	].
