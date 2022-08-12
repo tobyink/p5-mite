@@ -244,26 +244,16 @@ sub BUILD {
     }
 
     if ( defined $self->lvalue ) {
-        if ( $self->lazy ) {
-            require Mite::Shim;
-            Mite::Shim::croak( 'Attributes with lazy defaults cannot have an lvalue accessor' );
-        }
-        elsif ( $self->trigger ) {
-            require Mite::Shim;
-            Mite::Shim::croak( 'Attributes with triggers cannot have an lvalue accessor' );
-        }
-        elsif ( $self->weak_ref ) {
-            require Mite::Shim;
-            Mite::Shim::croak( 'Attributes with weak_ref cannot have an lvalue accessor' );
-        }
-        elsif ( $self->type or $self->coerce ) {
-            require Mite::Shim;
-            Mite::Shim::croak( 'Attributes with type constraints or coercions cannot have an lvalue accessor' );
-        }
-        elsif ( $self->cloner_method ) {
-            require Mite::Shim;
-            Mite::Shim::croak( 'Attributes with autoclone cannot have an lvalue accessor' );
-        }
+        croak( 'Attributes with lazy defaults cannot have an lvalue accessor' )
+            if $self->lazy;
+        croak( 'Attributes with triggers cannot have an lvalue accessor' )
+            if $self->trigger;
+        croak( 'Attributes with weak_ref cannot have an lvalue accessor' )
+            if $self->weak_ref;
+        croak( 'Attributes with type constraints or coercions cannot have an lvalue accessor' )
+            if $self->type || $self->coerce;
+        croak( 'Attributes with autoclone cannot have an lvalue accessor' )
+            if $self->cloner_method;
     }
 }
 
