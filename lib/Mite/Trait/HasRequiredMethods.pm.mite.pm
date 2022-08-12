@@ -7,7 +7,7 @@
 
     our $USES_MITE    = "Mite::Role";
     our $MITE_SHIM    = "Mite::Shim";
-    our $MITE_VERSION = "0.010001";
+    our $MITE_VERSION = "0.010002";
 
     # Mite keywords
     BEGIN {

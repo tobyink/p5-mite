@@ -6,7 +6,7 @@ package Mite::Trait::HasSuperclasses;
 use Mite::Miteception -role, -all;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.010001';
+our $VERSION   = '0.010002';
 
 # Super classes as class names
 has extends =>

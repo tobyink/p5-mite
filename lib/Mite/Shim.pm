@@ -157,11 +157,11 @@ sub HANDLE_has {
         'CODE' eq ref( $code = $spec{default} )
             and ${"$caller\::__$name\_DEFAULT__"} = $code;
         'CODE' eq ref( $code = $spec{builder} )
-           and *{"$caller\::_build_$name"} = $code;
+            and *{"$caller\::_build_$name"} = $code;
         'CODE' eq ref( $code = $spec{trigger} )
-           and *{"$caller\::_trigger_$name"} = $code;
-       'CODE' eq ref( $code = $spec{clone} )
-           and *{"$caller\::_clone_$name"} = $code;
+            and *{"$caller\::_trigger_$name"} = $code;
+        'CODE' eq ref( $code = $spec{clone} )
+            and *{"$caller\::_clone_$name"} = $code;
     }
     return;
 }

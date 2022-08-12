@@ -7,7 +7,7 @@ use Mite::Miteception -all;
 extends qw(Mite::App::Command);
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.010001';
+our $VERSION   = '0.010002';
 
 sub abstract {
     return "Preview the .mite.pm for a file.";
