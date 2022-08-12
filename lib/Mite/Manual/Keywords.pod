@@ -235,6 +235,34 @@ signature has named parameters or vice versa. If you need to radically change
 the parent class's signature, it's best not to use the C<< + >> sign, and
 instead define a whole new signature for the child class.
 
+A role can define a signature and this signature will be applied to classes
+that consume the role:
+
+    package Your::Project::MessageTarget;
+    use Your::Project::Mite -role, -all;
+    
+    signature_for send_message => (
+        named => [
+            subject => Str,
+            body    => Str,
+        ],
+    );
+    
+    package Your::Project::Console;
+    use Your::Project::Mite -all;
+    with 'Your::Project::MessageTarget';
+    
+    has handle => sub { \*STDOUT };
+    
+    sub send_message {
+        my ( $self, $arg ) = @_;
+        print { $self->handle } $arg->subject, "\n";
+        print { $self->handle } $arg->body, "\n\n";
+        return;
+    }
+
+Using C<< + >> to extend signatures from roles is not currently supported.
+
 =head2 C<true> and C<false>
 
 Although they're not imported by default, you can import C<true> and
