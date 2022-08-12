@@ -120,7 +120,8 @@
         my $shim = "Mite::Shim";
         for my $modifier_rule (@METHOD_MODIFIERS) {
             my ( $modification, $names, $coderef ) = @$modifier_rule;
-            $shim->$modification( $target, $names, $coderef );
+            my $handler = "HANDLE_$modification";
+            $shim->$handler( $target, "class", $names, $coderef );
         }
 
         return;
