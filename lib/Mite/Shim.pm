@@ -1,17 +1,12 @@
 # NOTE: Since the intention is to ship this file with a project, this file
 # cannot have any non-core dependencies.
+package Mite::Shim;
 use 5.008001;
 use strict;
 use warnings;
 
-package Mite::Shim;
-
-if ( $] < 5.009005 ) {
-    require MRO::Compat;
-}
-else {
-    require mro;
-}
+if ( $] < 5.009005 ) { require MRO::Compat; }
+else                 { require mro;         }
 
 defined ${^GLOBAL_PHASE}
 or eval { require Devel::GlobalDestruction; 1 }
@@ -127,9 +122,10 @@ sub import {
         'Role::Tiny'->_check_requires( $caller, $role );
         my $info = $Role::Tiny::INFO{$role};
         for ( @{ $info->{modifiers} || [] } ) {
-            my @args = @$_;
-            my $kind = shift @args;
-            $class->$kind( $caller, @args );
+            my @args         = @$_;
+            my $modification = shift @args;
+            my $handler      = "HANDLE_$modification";
+            $class->$handler( $caller, undef, @args );
         }
         if ( $cb_after ) {
             $_->( $role, $caller ) for @{ $cb_after->{$role} || [] };
@@ -181,6 +177,11 @@ sub HANDLE_has {
 }
 
 {
+    my $_kind = sub {
+        no strict 'refs';
+        ${ shift . '::USES_MITE' } =~ /role/i ? 'role' : 'class';
+    };
+
     sub _get_orig_method {
         my ( $caller, $name ) = @_;
         my $orig = $caller->can( $name );
@@ -198,6 +199,7 @@ sub HANDLE_has {
     sub HANDLE_before {
         my ( $me, $caller, $kind ) = ( shift, shift, shift );
         my ( $names, $coderef ) = &_parse_mm_args;
+        $kind ||= $caller->$_kind;
         if ( $kind eq 'role' ) {
             no strict 'refs';
             push @{"$caller\::METHOD_MODIFIERS"},
@@ -224,6 +226,7 @@ BEFORE
     sub HANDLE_after {
         my ( $me, $caller, $kind ) = ( shift, shift, shift );
         my ( $names, $coderef ) = &_parse_mm_args;
+        $kind ||= $caller->$_kind;
         if ( $kind eq 'role' ) {
             no strict 'refs';
             push @{"$caller\::METHOD_MODIFIERS"},
@@ -261,6 +264,7 @@ AFTER
     sub HANDLE_around {
         my ( $me, $caller, $kind ) = ( shift, shift, shift );
         my ( $names, $coderef ) = &_parse_mm_args;
+        $kind ||= $caller->$_kind;
         if ( $kind eq 'role' ) {
             no strict 'refs';
             push @{"$caller\::METHOD_MODIFIERS"},
@@ -290,187 +294,6 @@ sub HANDLE_signature_for {
     $name =~ s/^\+//;
     $me->HANDLE_around( $caller, $kind, $name, ${"$caller\::SIGNATURE_FOR"}{$name} );
     return;
-}
-
-## Bootstrapping
-
-*parse_mm_args = \&_parse_mm_args;
-
-sub _inject_mite_functions {
-    my ( $class, $caller, $file, $kind, $arg ) = ( shift, @_ );
-    my $requested = sub { $arg->{$_[0]} ? true : $arg->{'!'.$_[0]} ? false : $arg->{'-all'} ? true : $_[1]; };
-
-    no strict 'refs';
-    no warnings 'redefine';
-    my $has = $class->_make_has( $caller, $file, $kind );
-    *{"$caller\::has"}   = $has if $requested->( has   => true  );
-    *{"$caller\::param"} = $has if $requested->( param => false );
-    *{"$caller\::field"} = $has if $requested->( field => false );
-
-    *{"$caller\::with"} = $class->_make_with( $caller, $file, $kind )
-        if $requested->( with => true );
-
-    *{"$caller\::signature_for"} = sub {
-        my ( $name ) = @_;
-        $name =~ s/^\+//;
-        $class->around( $caller, $name, ${"$caller\::SIGNATURE_FOR"}{$name} );
-    } if $requested->( signature_for => false );
-
-    *{"$caller\::extends"} = sub {}
-        if $kind eq 'class' && $requested->( extends => true );
-    *{"$caller\::requires"} = sub {}
-        if $kind eq 'role' && $requested->( requires => true );
-
-    my $MM = ( $kind eq 'class' ) ? [] : \@{"$caller\::METHOD_MODIFIERS"};
-
-    for my $modifier ( qw/ before after around / ) {
-        next unless $requested->( $modifier => true );
-
-        if ( $kind eq 'class' ) {
-            *{"$caller\::$modifier"} = sub {
-                $class->$modifier( $caller, @_ );
-                return;
-            };
-        }
-        else {
-            *{"$caller\::$modifier"} = sub {
-                my ( $names, $coderef ) = &parse_mm_args;
-                push @$MM, [ $modifier, $names, $coderef ];
-                return;
-            };
-        }
-    }
-}
-
-sub _make_has {
-    my ( $class, $caller, $file, $kind ) = @_;
-
-    no strict 'refs';
-    return sub {
-        my $names = shift;
-        if ( @_ % 2 ) {
-            my $default = shift;
-            unshift @_, ( 'CODE' eq ref( $default ) )
-                ? ( is => lazy, builder => $default )
-                : ( is => ro, default => $default );
-        }
-        my %spec = @_;
-        my $code;
-
-        for my $name ( ref($names) ? @$names : $names ) {
-           $name =~ s/^\+//;
-
-           'CODE' eq ref( $code = $spec{default} )
-               and ${"$caller\::__$name\_DEFAULT__"} = $code;
-
-           'CODE' eq ref( $code = $spec{builder} )
-               and *{"$caller\::_build_$name"} = $code;
-
-           'CODE' eq ref( $code = $spec{trigger} )
-               and *{"$caller\::_trigger_$name"} = $code;
-
-           'CODE' eq ref( $code = $spec{clone} )
-               and *{"$caller\::_clone_$name"} = $code;
-        }
-
-        return;
-    };
-}
-
-sub _make_with {
-    my ( $class, $caller, $file, $kind ) = @_;
-
-    return sub {
-        while ( @_ ) {
-            my $role = shift;
-            my $args = ref($_[0]) ? shift : undef;
-            if ( $INC{'Role/Tiny.pm'} and 'Role::Tiny'->is_role( $role ) ) {
-                $class->_finalize_application_roletiny( $role, $caller, $args );
-            }
-            else {
-                $role->__FINALIZE_APPLICATION__( $caller, $args );
-            }
-        }
-        return;
-    };
-}
-
-{
-    my $get_orig = sub {
-        my ( $caller, $name ) = @_;
-
-        my $orig = $caller->can( $name );
-        return $orig if $orig;
-
-        croak "Cannot modify method $name in $caller: no such method";
-    };
-
-    sub before {
-        my ( $me, $caller ) = ( shift, shift );
-        my ( $names, $coderef ) = &parse_mm_args;
-        for my $name ( @$names ) {
-            my $orig = $get_orig->( $caller, $name );
-            local $@;
-            eval <<"BEFORE" or die $@;
-                package $caller;
-                no warnings 'redefine';
-                sub $name {
-                    \$coderef->( \@_ );
-                    \$orig->( \@_ );
-                }
-                1;
-BEFORE
-        }
-        return;
-    }
-
-    sub after {
-        my ( $me, $caller ) = ( shift, shift );
-        my ( $names, $coderef ) = &parse_mm_args;
-        for my $name ( @$names ) {
-            my $orig = $get_orig->( $caller, $name );
-            local $@;
-            eval <<"AFTER" or die $@;
-                package $caller;
-                no warnings 'redefine';
-                sub $name {
-                    my \@r;
-                    if ( wantarray ) {
-                        \@r = \$orig->( \@_ );
-                    }
-                    elsif ( defined wantarray ) {
-                        \@r = scalar \$orig->( \@_ );
-                    }
-                    else {
-                        \$orig->( \@_ );
-                        1;
-                    }
-                    \$coderef->( \@_ );
-                    wantarray ? \@r : \$r[0];
-                }
-                1;
-AFTER
-        }
-        return;
-    }
-
-    sub around {
-        my ( $me, $caller ) = ( shift, shift );
-        my ( $names, $coderef ) = &parse_mm_args;
-        for my $name ( @$names ) {
-            my $orig = $get_orig->( $caller, $name );
-            local $@;
-            eval <<"AROUND" or die $@;
-                package $caller;
-                no warnings 'redefine';
-                sub $name {
-                    \$coderef->( \$orig, \@_ );
-                }
-                1;
-AROUND
-        }
-        return;
-    }
 }
 
 1;
