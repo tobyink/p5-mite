@@ -14,14 +14,14 @@ use Mite::Types ();
 sub import {
 	'Mite::Types'->import::into( 1, qw( -types slurpy ) );
 
-	if ( $ENV{MITE_COMPILE_SELF} ) {
+	if ( Mite::Shim::_is_compiling() and defined $Mite::REAL_FILENAME ) {
 		my $class = shift;
 		my %arg = map { lc($_) => 1 } @_;
 		my ( $caller, $file ) = caller;
 		require Mite::Project;
 		Mite::Project->default->inject_mite_functions(
 			 package     => $caller,
-			 file        => $ENV{MITE_COMPILE_SELF},
+			 file        => $Mite::REAL_FILENAME,
 			 arg         => \%arg,
 			 kind        => ( $arg{'-role'} ? 'role' : 'class' ),
 			 shim        => 'Mite::Shim',

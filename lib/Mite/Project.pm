@@ -103,7 +103,7 @@ sub inject_mite_functions {
     warn "Gather: $package\n" if $self->debug;
 
     $source //= $self->source_for(
-        Path::Tiny::path( $ENV{MITE_COMPILE_SELF} // $file )
+        Path::Tiny::path( $Mite::REAL_FILENAME // $file )
     );
     $pkg //= $source->class_for(
         $package,
@@ -229,7 +229,7 @@ sub _load_file {
 
         do {
             local $@;
-            local $ENV{MITE_COMPILE_SELF} = "$file";
+            local $Mite::REAL_FILENAME = "$file";
             eval("$code; 1") or do die($@);
         };
 
