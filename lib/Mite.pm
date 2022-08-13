@@ -23,27 +23,36 @@ Start a project:
 
     $ mite init Foo
 
-Write a class:
+Write a class (F<lib/Foo.pm>):
 
-    $ cat lib/Foo.pm
     package Foo;
     
-    # Load the Mite shim
     use Foo::Mite;
     
-    # Subclass of Bar
-    extends "Bar";
-    
-    # A read/write string attribute
     has attribute => (
         is      => 'rw',
     );
     
-    # A read-only attribute with a default
     has another_attribute => (
         is      => 'ro',
-        default => 1,
+        default => 'Hello world',
     );
+    
+    1;
+
+Write another class (F<lib/Foo/Bar.pm>):
+
+    package Foo::Bar;
+    
+    use Foo::Mite;
+    extends 'Foo';
+    
+    sub my_method {
+        my $class = shift;
+        print $class->new->another_attribute, "\n";
+    }
+    
+    1;
 
 Compile your project:
 
@@ -51,7 +60,7 @@ Compile your project:
 
 Use your project:
 
-    $ perl -Ilib -MFoo -E'say Foo->new->another_attribute'
+    $ perl -Ilib -MFoo::Bar -E'Foo::Bar->my_method'
 
 =head1 DESCRIPTION
 
