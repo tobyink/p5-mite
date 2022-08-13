@@ -6,7 +6,7 @@ package Mite::Trait::HasDestructor;
 use Mite::Miteception -role, -all;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.010003';
+our $VERSION   = '0.010004';
 
 requires qw(
     linear_isa

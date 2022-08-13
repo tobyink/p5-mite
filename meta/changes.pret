@@ -1,6 +1,15 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.010004 cpan:TOBYINK`
+	issued  2022-08-13;
+	changeset [
+		item [
+			a dcs:Change;
+			label "Use $Mite::COMPILING package variable to indicate when Mite is compiling code, not MITE_COMPILE environment variable. This should be checked via Your::Project::Shim::_is_compiling() though, if you need to check it at all which is unlikely.";
+		];
+	].
+
 `Mite 0.010003 cpan:TOBYINK`
 	issued  2022-08-12;
 	changeset [
