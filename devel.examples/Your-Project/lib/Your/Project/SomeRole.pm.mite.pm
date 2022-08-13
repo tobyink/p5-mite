@@ -7,7 +7,28 @@
 
     our $USES_MITE    = "Mite::Role";
     our $MITE_SHIM    = "Your::Project::Mite";
-    our $MITE_VERSION = "0.009001";
+    our $MITE_VERSION = "0.010003";
+
+    # Mite keywords
+    BEGIN {
+        my ( $SHIM, $CALLER ) =
+          ( "Your::Project::Mite", "Your::Project::SomeRole" );
+        ( *after, *around, *before, *has, *requires, *signature_for, *with ) =
+          do {
+
+            package Your::Project::Mite;
+            no warnings 'redefine';
+            (
+                sub { $SHIM->HANDLE_after( $CALLER, "role", @_ ) },
+                sub { $SHIM->HANDLE_around( $CALLER, "role", @_ ) },
+                sub { $SHIM->HANDLE_before( $CALLER, "role", @_ ) },
+                sub { $SHIM->HANDLE_has( $CALLER, has => @_ ) },
+                sub { },
+                sub { $SHIM->HANDLE_signature_for( $CALLER, "role", @_ ) },
+                sub { $SHIM->HANDLE_with( $CALLER, @_ ) },
+            );
+          };
+    }
 
     # Gather metadata for constructor and destructor
     sub __META__ {
@@ -75,7 +96,8 @@
         my $shim = "Your::Project::Mite";
         for my $modifier_rule (@METHOD_MODIFIERS) {
             my ( $modification, $names, $coderef ) = @$modifier_rule;
-            $shim->$modification( $target, $names, $coderef );
+            my $handler = "HANDLE_$modification";
+            $shim->$handler( $target, "class", $names, $coderef );
         }
 
         return;

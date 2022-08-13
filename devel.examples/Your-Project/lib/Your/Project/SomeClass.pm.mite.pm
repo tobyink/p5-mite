@@ -7,13 +7,48 @@
 
     our $USES_MITE    = "Mite::Class";
     our $MITE_SHIM    = "Your::Project::Mite";
-    our $MITE_VERSION = "0.009001";
+    our $MITE_VERSION = "0.010003";
 
+    # Mite keywords
     BEGIN {
-        require Your::Project::SomeRole;
+        my ( $SHIM, $CALLER ) =
+          ( "Your::Project::Mite", "Your::Project::SomeClass" );
+        ( *after, *around, *before, *extends, *has, *signature_for, *with ) =
+          do {
 
-        our %DOES =
-          ( "Your::Project::SomeClass" => 1, "Your::Project::SomeRole" => 1 );
+            package Your::Project::Mite;
+            no warnings 'redefine';
+            (
+                sub { $SHIM->HANDLE_after( $CALLER, "class", @_ ) },
+                sub { $SHIM->HANDLE_around( $CALLER, "class", @_ ) },
+                sub { $SHIM->HANDLE_before( $CALLER, "class", @_ ) },
+                sub { },
+                sub { $SHIM->HANDLE_has( $CALLER, has => @_ ) },
+                sub { $SHIM->HANDLE_signature_for( $CALLER, "class", @_ ) },
+                sub { $SHIM->HANDLE_with( $CALLER, @_ ) },
+            );
+          };
+    }
+
+    # Gather metadata for constructor and destructor
+    sub __META__ {
+        no strict 'refs';
+        no warnings 'once';
+        my $class = shift;
+        $class = ref($class) || $class;
+        my $linear_isa = mro::get_linear_isa($class);
+        return {
+            BUILD => [
+                map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
+                map { "$_\::BUILD" } reverse @$linear_isa
+            ],
+            DEMOLISH => [
+                map   { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
+                  map { "$_\::DEMOLISH" } @$linear_isa
+            ],
+            HAS_BUILDARGS        => $class->can('BUILDARGS'),
+            HAS_FOREIGNBUILDARGS => $class->can('FOREIGNBUILDARGS'),
+        };
     }
 
     # Standard Moose/Moo-style constructor
@@ -77,25 +112,11 @@
         return;
     }
 
-    # Gather metadata for constructor and destructor
-    sub __META__ {
-        no strict 'refs';
-        no warnings 'once';
-        my $class = shift;
-        $class = ref($class) || $class;
-        my $linear_isa = mro::get_linear_isa($class);
-        return {
-            BUILD => [
-                map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
-                map { "$_\::BUILD" } reverse @$linear_isa
-            ],
-            DEMOLISH => [
-                map   { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
-                  map { "$_\::DEMOLISH" } @$linear_isa
-            ],
-            HAS_BUILDARGS        => $class->can('BUILDARGS'),
-            HAS_FOREIGNBUILDARGS => $class->can('FOREIGNBUILDARGS'),
-        };
+    BEGIN {
+        require Your::Project::SomeRole;
+
+        our %DOES =
+          ( "Your::Project::SomeClass" => 1, "Your::Project::SomeRole" => 1 );
     }
 
     # See UNIVERSAL
