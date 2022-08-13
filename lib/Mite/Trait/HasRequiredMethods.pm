@@ -6,7 +6,7 @@ package Mite::Trait::HasRequiredMethods;
 use Mite::Miteception -role, -all;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.010004';
+our $VERSION   = '0.010005';
 
 has required_methods =>
   is            => ro,

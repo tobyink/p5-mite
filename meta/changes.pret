@@ -1,6 +1,23 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.010005 cpan:TOBYINK`
+	issued  2022-08-13;
+	changeset [
+		item [
+			a dcs:BackCompat;
+			label "Mite now uses the PERL_ONLY environment variable to disable XS, not MITE_PURE_PERL.";
+		];
+		item [
+			a dcs:Change;
+			label "__META__ functions no longer have `no warnings qw(once)` because a higher scope is already doing that.";
+		];
+		item [
+			a dcs:Documentation;
+			label "More interesting SYNOPSIS section in Mite.pm.";
+		];
+	].
+
 `Mite 0.010004 cpan:TOBYINK`
 	issued  2022-08-13;
 	changeset [

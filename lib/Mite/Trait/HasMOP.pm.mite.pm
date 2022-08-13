@@ -7,7 +7,7 @@
 
     our $USES_MITE    = "Mite::Role";
     our $MITE_SHIM    = "Mite::Shim";
-    our $MITE_VERSION = "0.010004";
+    our $MITE_VERSION = "0.010005";
 
     # Mite keywords
     BEGIN {
@@ -57,7 +57,6 @@
     # Gather metadata for constructor and destructor
     sub __META__ {
         no strict 'refs';
-        no warnings 'once';
         my $class = shift;
         $class = ref($class) || $class;
         my $linear_isa = mro::get_linear_isa($class);

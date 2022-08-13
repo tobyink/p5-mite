@@ -7,7 +7,7 @@
 
     our $USES_MITE    = "Mite::Class";
     our $MITE_SHIM    = "Mite::Shim";
-    our $MITE_VERSION = "0.010004";
+    our $MITE_VERSION = "0.010005";
 
     # Mite keywords
     BEGIN {
@@ -512,7 +512,7 @@
         return $self;
     }
 
-    my $__XS = !$ENV{MITE_PURE_PERL}
+    my $__XS = !$ENV{PERL_ONLY}
       && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
     # Accessors for attributes
