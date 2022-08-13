@@ -142,15 +142,15 @@ jobs:
         if: matrix.coverage
         working-directory: ./build/
         run: cover -delete
-      - name: Test suite (MITE_PURE_PERL=0)
+      - name: Test suite (PERL_ONLY=0)
         working-directory: ./build/
         env:
-          MITE_PURE_PERL: 0
+          PERL_ONLY: 0
         run: gha-prove -b -r t
-      - name: Test suite (MITE_PURE_PERL=1)
+      - name: Test suite (PERL_ONLY=1)
         working-directory: ./build/
         env:
-          MITE_PURE_PERL: 1
+          PERL_ONLY: 1
         run: gha-prove -b -r t
       - name: Coveralls.io report
         if: success() && matrix.coverage

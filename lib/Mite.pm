@@ -76,7 +76,7 @@ Mite writes pure Perl code and your module will run with no
 dependencies.  It will also write code to use other, faster modules to
 do the same job, if available.
 
-These optimizations can be turned off by setting the C<MITE_PURE_PERL>
+These optimizations can be turned off by setting the C<PERL_ONLY>
 environment variable true.
 
 You may wish to add these as recommended dependencies.

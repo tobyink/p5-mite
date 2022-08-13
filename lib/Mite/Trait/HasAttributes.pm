@@ -218,7 +218,7 @@ sub _compile_attribute_accessors {
     my $attributes = $self->attributes;
     keys %$attributes or return '';
 
-    my $code = 'my $__XS = !$ENV{MITE_PURE_PERL} && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };' . "\n\n";
+    my $code = 'my $__XS = !$ENV{PERL_ONLY} && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };' . "\n\n";
     for my $name ( sort keys %$attributes ) {
         my $guard = $attributes->{$name}->locally_set_compiling_class( $self );
         $code .= $attributes->{$name}->compile( xs_condition => '$__XS' );

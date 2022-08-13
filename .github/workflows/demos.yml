@@ -95,5 +95,5 @@ jobs:
         run: prove -lr t
         working-directory: devel.examples/${{ matrix.demo }}
       - name: Run ${{ matrix.demo }} test suite in PP mode
-        run: prove -Msetenv=MITE_PURE_PERL,1 -lr t
+        run: prove -Msetenv=PERL_ONLY,1 -lr t
         working-directory: devel.examples/${{ matrix.demo }}

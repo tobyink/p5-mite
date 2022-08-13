@@ -1084,7 +1084,7 @@ sub compile {
     my %args = @_;
 
     my $xs_condition = $args{xs_condition}
-        || '!$ENV{MITE_PURE_PERL} && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") }';
+        || '!$ENV{PERL_ONLY} && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") }';
     my $slot_name = $self->name;
 
     my %xs_option_name = (
