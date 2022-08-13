@@ -225,7 +225,6 @@ sub _compile_meta_method {
 # Gather metadata for constructor and destructor
 sub __META__ {
     no strict 'refs';
-    no warnings 'once';
     my $class      = shift; $class = ref($class) || $class;
     my $linear_isa = mro::get_linear_isa( $class );
     return {
