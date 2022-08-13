@@ -1,6 +1,10 @@
 {
     package Test::Mite;
 
+    BEGIN {
+        $ENV{TEST_MITE_SHIM} = 'Mite::Shim';
+    };
+
     use strict;
     use warnings;
     use feature ':5.10';
