@@ -128,13 +128,14 @@ before inject_mite_functions => sub {
     my ( $self, $file, $arg ) = ( shift, @_ );
 
     my $requested = sub { $arg->{$_[0]} ? 1 : $arg->{'!'.$_[0]} ? 0 : $arg->{'-all'} ? 1 : $_[1]; };
+    my $defaults  = ! $arg->{'!-defaults'};
     my $shim      = $self->shim_name;
     my $package   = $self->name;
     my $fake_ns   = $self->project->can('_module_fakeout_namespace') && $self->project->_module_fakeout_namespace;
 
     no strict 'refs';
 
-    if ( $requested->( 'extends', 1 ) ) {
+    if ( $requested->( 'extends', $defaults ) ) {
 
         *{ $package .'::extends' } = sub {
             return $self->handle_extends_keyword(

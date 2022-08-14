@@ -62,6 +62,7 @@ before inject_mite_functions => sub {
     my ( $self, $file, $arg ) = ( shift, @_ );
 
     my $requested = sub { $arg->{$_[0]} ? 1 : $arg->{'!'.$_[0]} ? 0 : $arg->{'-all'} ? 1 : $_[1]; };
+    my $defaults  = ! $arg->{'!-defaults'};
     my $shim      = $self->shim_name;
     my $package   = $self->name;
     my $kind      = $self->kind;
@@ -120,7 +121,7 @@ before inject_mite_functions => sub {
         return;
     };
 
-    if ( $requested->( 'has', true ) ) {
+    if ( $requested->( 'has', $defaults ) ) {
 
         *{ $package .'::has' } = $has;
 

@@ -79,6 +79,7 @@ before inject_mite_functions => sub {
     my ( $self, $file, $arg ) = ( shift, @_ );
 
     my $requested = sub { $arg->{$_[0]} ? 1 : $arg->{'!'.$_[0]} ? 0 : $arg->{'-all'} ? 1 : $_[1]; };
+    my $defaults  = ! $arg->{'!-defaults'};
     my $shim      = $self->shim_name;
     my $package   = $self->name;
     my $kind      = $self->kind;
@@ -86,7 +87,7 @@ before inject_mite_functions => sub {
 
     no strict 'refs';
 
-    if ( $requested->( 'signature_for', true ) ) {
+    if ( $requested->( 'signature_for', $defaults ) ) {
 
         *{ $package .'::signature_for' } = sub {
             my $name = shift;
@@ -107,7 +108,7 @@ before inject_mite_functions => sub {
 
     for my $modifier ( qw( before after around ) ) {
 
-        $requested->( $modifier, true ) or next;
+        $requested->( $modifier, $defaults ) or next;
 
         *{ $package .'::'. $modifier } = sub {
             my ( $names, $coderef ) = &$parse_mm_args;
@@ -122,7 +123,6 @@ before inject_mite_functions => sub {
         $self->imported_keywords->{$modifier} =
             sprintf 'sub { $SHIM->HANDLE_%s( $CALLER, %s, @_ ) }',
             $modifier, B::perlstring( $kind );
-
     }
 };
 

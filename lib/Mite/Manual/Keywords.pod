@@ -36,10 +36,12 @@ Options starting with a hyphen are either a bundle of keywords, or
 are a pragma which affect your class as a whole.
 
 By default, classes get the C<has>, C<extends>, C<with>, C<before>, C<after>,
-and C<around> keywords imported into them.
+C<around>, and C<signature_for> keywords imported into them.
 
 By default, roles get C<has>, C<requires>, C<with>, C<before>, C<after>,
-and C<around> keywords imported into them.
+C<around>, and C<signature_for> keywords imported into them.
+
+The C<< !-defaults >> flag suppresses the defaults from being imported.
 
 The C<< -all >> flag imports everything possible.
 

@@ -10,12 +10,20 @@ package MyTest1;
 use Mite::Shim qw( -bool -is -unclean );
 package MyTest2;
 use Mite::Shim qw( !has !before !after !around -unclean );
+package MyTest3;
+use Mite::Shim qw( !-defaults has -unclean );
 1;
 CODE
 
     for my $func ( qw/ has before after around true false rw ro rwp / ) {
         ok MyTest1->can( $func ), "MyTest1 can $func";
         ok !MyTest2->can( $func ), "MyTest2 can't $func";
+        if ( $func eq 'has' ) {
+            ok MyTest3->can( $func ), "MyTest3 can $func";
+        }
+        else {
+            ok !MyTest3->can( $func ), "MyTest3 can't $func";
+        }
     }
 
     ok MyTest1->can( 'extends' );
