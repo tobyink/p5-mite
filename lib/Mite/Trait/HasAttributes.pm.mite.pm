@@ -139,7 +139,7 @@
           );
         push( @out, $SLURPY );
 
-        return ( &$__NEXT__( @head, @out ) );
+        do { @_ = ( @head, @out ); goto $__NEXT__ };
     };
 
     # Callback which classes consuming this role will call

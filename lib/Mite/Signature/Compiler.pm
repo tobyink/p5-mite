@@ -4,7 +4,7 @@ use warnings;
 
 package Mite::Signature::Compiler;
 
-use Type::Params::Signature 1.016002 ();
+use Type::Params::Signature 1.016008 ();
 use Types::Standard qw( Slurpy );
 use Scalar::Util ();
 
@@ -18,28 +18,6 @@ sub BUILD {
 	# This is not a Mite class, so manually call
 	# parent BUILD:
 	$self->SUPER::BUILD( @_ );
-}
-
-sub _coderef_start_extra {
-	my ( $self, $coderef ) = ( shift, @_ );
-
-	if ( $self->{is_wrapper} ) {
-		$coderef->add_line( 'my $__NEXT__ = shift;' );
-		$coderef->add_gap;
-		return $self;
-	}
-
-	return $self->SUPER::_coderef_start_extra( @_ );
-}
-
-sub _make_return_expression {
-	my $self = shift;
-
-	if ( $self->{is_wrapper} ) {
-		return sprintf 'return( &$__NEXT__( %s ) )', join( q{, }, $self->_make_return_list );
-	}
-
-	return $self->SUPER::_make_return_expression( @_ );
 }
 
 sub _make_general_fail {

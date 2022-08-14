@@ -402,7 +402,7 @@
             "\$_[1]", "Defined"
           );
 
-        return ( &$__NEXT__( @head, @_ ) );
+        do { @_ = ( @head, @_ ); goto $__NEXT__ };
     };
 
     1;

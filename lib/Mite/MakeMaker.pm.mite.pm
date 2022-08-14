@@ -327,7 +327,7 @@
           );
         push( @out, $tmp );
 
-        return ( &$__NEXT__( @head, @out ) );
+        do { @_ = ( @head, @out ); goto $__NEXT__ };
     };
 
     $SIGNATURE_FOR{"fix_pm_to_blib"} = sub {
@@ -459,7 +459,7 @@
           );
         push( @out, $tmp );
 
-        return ( &$__NEXT__( @head, @out ) );
+        do { @_ = ( @head, @out ); goto $__NEXT__ };
     };
 
     1;

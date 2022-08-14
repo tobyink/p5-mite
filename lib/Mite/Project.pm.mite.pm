@@ -399,7 +399,7 @@
           );
         push( @out, $_[1] );
 
-        return ( &$__NEXT__( @head, @out ) );
+        do { @_ = ( @head, @out ); goto $__NEXT__ };
     };
 
     $SIGNATURE_FOR{"inject_mite_functions"} = sub {
@@ -533,13 +533,13 @@
               )
         ) if keys %in;
 
-        return (
-            &$__NEXT__(
-                @head,            $out{"package"}, $out{"file"},
-                $out{"kind"},     $out{"arg"},     $out{"shim"},
-                $out{"x_source"}, $out{"x_pkg"}
-            )
-        );
+        do {
+            @_ = (
+                @head,       $out{"package"}, $out{"file"},     $out{"kind"},
+                $out{"arg"}, $out{"shim"},    $out{"x_source"}, $out{"x_pkg"}
+            );
+            goto $__NEXT__;
+        };
     };
 
     $SIGNATURE_FOR{"load_files"} = sub {
@@ -568,10 +568,10 @@
 
         # Parameter $_[1] (type: Any)
         $#_ >= 1
-          or return ( &$__NEXT__( @head, @_ ) );
+          or do { @_ = ( @head, @_ ); goto $__NEXT__ };
         1;    # ... nothing to do
 
-        return ( &$__NEXT__( @head, @_ ) );
+        do { @_ = ( @head, @_ ); goto $__NEXT__ };
     };
 
     1;
