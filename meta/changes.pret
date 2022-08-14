@@ -1,6 +1,15 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.010007 cpan:TOBYINK`
+	issued  2022-08-14;
+	changeset [
+		item [
+			a dcs:Packaging;
+			label "Previous release was missing its changelog entry.";
+		];
+	].
+
 `Mite 0.010006 cpan:TOBYINK`
 	issued  2022-08-14;
 	changeset [
