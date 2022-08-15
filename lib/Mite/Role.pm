@@ -16,7 +16,7 @@ with qw(
 );
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.010007';
+our $VERSION   = '0.010008';
 
 use Path::Tiny;
 use B ();

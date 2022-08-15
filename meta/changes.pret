@@ -1,6 +1,31 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.010008 cpan:TOBYINK`
+	issued  2022-08-14;
+	changeset [
+		item [
+			a dcs:Change;
+			label "Allow `!-defaults` in import list to suppress the default imports.";
+		];
+		item [
+			a dcs:Addition;
+			label "`mite exec` command which compiles your project in memory to run a script.";
+		];
+		item [
+			a dcs:Change;
+			label "If you use Moose to entend a Mite class and inherit its `DOES`/`does` method, then the inherited method will now check with Moose to see if your class does roles.";
+		];
+		item [
+			a dcs:Change;
+			label "If you build a MOP for your project, then Moose classes extending Mite classes will know they need to rebuild the constructor when being made immutable. (And you really should make them immutable!)";
+		];
+		item [
+			a dcs:Change;
+			label "If you build a MOP for your project, then Moose classes consuming Mite roles will not have Mite's builtin subs added to them (like __FINALIZE_APPLICATION__).";
+		];
+	].
+
 `Mite 0.010007 cpan:TOBYINK`
 	issued  2022-08-14;
 	changeset [
