@@ -213,4 +213,17 @@ BEGIN {
 END
 }
 
+around _compile_mop_postamble => sub {
+    my ( $next, $self ) = ( shift, shift );
+    my $code = $self->$next( @_ );
+
+    my @superclasses = @{ $self->superclasses || [] }
+        or return $code;
+    $code .= sprintf "Moose::Util::find_meta( %s )->superclasses( %s );\n",
+        B::perlstring( $self->name ),
+        join q{, }, map B::perlstring( $_ ), @superclasses;
+
+    return $code;
+};
+
 1;

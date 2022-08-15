@@ -104,7 +104,7 @@
 
         my @missing_methods;
         @missing_methods = grep( !$target->can($_),
-            "_compile_mop", "_mop_attribute_metaclass", "_mop_metaclass" )
+            "_mop_attribute_metaclass", "_mop_metaclass" )
           and croak( "$me requires $target to implement methods: " . join q[, ],
             @missing_methods );
 
@@ -128,3 +128,4 @@
 
     1;
 }
+

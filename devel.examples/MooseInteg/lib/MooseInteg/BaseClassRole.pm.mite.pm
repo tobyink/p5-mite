@@ -1,5 +1,5 @@
 {
-package MooseInteg::SomeRole;
+package MooseInteg::BaseClassRole;
 use strict;
 use warnings;
 no warnings qw( once void );
@@ -9,7 +9,7 @@ our $MITE_SHIM = "MooseInteg::Mite";
 our $MITE_VERSION = "0.010007";
 # Mite keywords
 BEGIN {
-    my ( $SHIM, $CALLER ) = ( "MooseInteg::Mite", "MooseInteg::SomeRole" );
+    my ( $SHIM, $CALLER ) = ( "MooseInteg::Mite", "MooseInteg::BaseClassRole" );
     ( *after, *around, *before, *has, *requires, *signature_for, *with ) = do {
         package MooseInteg::Mite;
         no warnings 'redefine';
@@ -82,7 +82,7 @@ sub __FINALIZE_APPLICATION__ {
     return if $type ne 'Mite::Class';
 
     my @missing_methods;
-    @missing_methods = grep( !$target->can($_), "number" )
+    @missing_methods = ()
         and MooseInteg::Mite::croak( "$me requires $target to implement methods: " . join q[, ], @missing_methods );
 
     my @roles = (  );

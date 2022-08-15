@@ -226,4 +226,14 @@ sub _compile_mop_tc {
         B::perlstring( shift->name );
 }
 
+around _compile_mop => sub {
+    my ( $next, $self ) = ( shift, shift );
+
+    my $code = $self->$next( @_ );
+    $code .= sprintf "Moose::Util::MetaRole::apply_metaroles( for => %s, role_metaroles => { role => [ \$ROLE_TRAIT ] } );\n",
+        $self->name;
+
+    return $code;
+};
+
 1;

@@ -174,13 +174,47 @@ sub write_mopper {
 }
 
 sub _compile_mop_header {
-    return sprintf <<'CODE', shift->config->data->{mop};
+    my $self = shift;
+    return sprintf <<'CODE', $self->config->data->{mop}, $self->config->data->{mop}, $self->config->data->{mop};
 package %s;
 
 use Moose ();
 use Moose::Util ();
+use Moose::Util::MetaRole ();
 use Moose::Util::TypeConstraints ();
 use constant { true => !!1, false => !!0 };
+
+my $CLASS_TRAIT = do {
+    package %s::Class;
+    use Moose::Role;
+    around _immutable_options => sub {
+        my ( $next, $self, @args ) = ( shift, shift, @_ );
+        return $self->$next( replace_constructor => 1, @args );
+    };
+    __PACKAGE__;
+};
+
+my $ROLE_TRAIT = do {
+    package %s::Role;
+    use Moose::Role;
+    my $built_ins = qr/\A( DOES | does | __META__ | __FINALIZE_APPLICATION__ |
+        CREATE_CLASS | APPLY_TO )\z/x;
+    around get_method => sub {
+        my ( $next, $self, $method_name ) = ( shift, shift, @_ );
+        return if $method_name =~ $built_ins;
+        return $self->$next( @_ );
+    };
+    around get_method_list => sub {
+        my ( $next, $self ) = ( shift, shift );
+        return grep !/$built_ins/, $self->$next( @_ );
+    };
+    around _get_local_methods => sub {
+        my ( $next, $self ) = ( shift, shift );
+        my %%map = %%{ $self->_full_method_map };
+        return map $map{$_}, $self->get_method_list;
+    };
+    __PACKAGE__;
+};
 
 CODE
 }

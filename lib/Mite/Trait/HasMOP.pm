@@ -9,7 +9,6 @@ our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.010007';
 
 requires qw(
-    _compile_mop
     _mop_metaclass
     _mop_attribute_metaclass
 );
@@ -61,13 +60,7 @@ sub _compile_mop_tc {
 }
 
 sub _compile_mop_postamble {
-    my $self = shift;
-    my $code = '';
-    for my $role ( @{ $self->roles } ) {
-        $code .= sprintf "\$PACKAGE->add_role( Moose::Util::find_meta( %s ) );\n",
-            B::perlstring( $role->name );
-    }
-    return $code;
+    return '';
 }
 
 1;

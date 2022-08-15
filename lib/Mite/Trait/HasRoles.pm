@@ -57,6 +57,7 @@ sub methods_to_import_from_roles {
         __META__
         __FINALIZE_APPLICATION__
         CREATE_CLASS
+        APPLY_TO
     );
 
     return \%methods;
@@ -224,6 +225,9 @@ sub DOES {
     our %DOES;
     return $DOES{$role} if exists $DOES{$role};
     return 1 if $role eq __PACKAGE__;
+    if ( $INC{'Moose/Util.pm'} and my $meta = Moose::Util::find_meta( ref $self or $self ) ) {
+        $meta->can( 'does_role' ) and $meta->does_role( $role ) and return 1;
+    }
     return $self->SUPER::DOES( $role );
 }
 
@@ -250,5 +254,20 @@ sub _compile_composed_methods {
 
     return $code;
 }
+
+around _compile_mop_postamble => sub {
+    my ( $next, $self ) = ( shift, shift );
+    my $code = $self->$next( @_ );
+
+    my @roles = @{ $self->roles || [] }
+        or return $code;
+
+    for my $role ( @roles ) {
+        $code .= sprintf "Moose::Util::find_meta( %s )->add_role( Moose::Util::find_meta( %s ) );\n",
+            B::perlstring( $self->name ), B::perlstring( $role->name );
+    }
+
+    return $code;
+};
 
 1;

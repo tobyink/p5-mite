@@ -104,8 +104,9 @@
 
         my @missing_methods;
         @missing_methods = grep( !$target->can($_),
-            "compilation_stages", "inject_mite_functions",
-            "native_methods",     "source" )
+            "_compile_mop_postamble", "compilation_stages",
+            "inject_mite_functions",  "native_methods",
+            "source" )
           and croak( "$me requires $target to implement methods: " . join q[, ],
             @missing_methods );
 
@@ -129,3 +130,4 @@
 
     1;
 }
+

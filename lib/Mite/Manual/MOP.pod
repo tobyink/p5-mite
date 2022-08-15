@@ -36,10 +36,7 @@ Third parties can now use Moose to extend your project.
     
     has sku => ( is => 'ro', isa => 'Str' );
     
-    __PACKAGE__->meta->make_immutable( replace_constructor => 1 );
-
-Note that the C<replace_constructor> option is required, as Moose is otherwise
-reluctant to override a non-Moose constructor.
+    __PACKAGE__->meta->make_immutable;
 
 =head2 Dependencies
 

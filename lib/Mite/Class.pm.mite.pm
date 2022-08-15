@@ -865,6 +865,10 @@
         goto \&Mite::Trait::HasMOP::_compile_mop_modifiers;
     }
 
+    sub _compile_mop_postamble {
+        goto \&Mite::Trait::HasMOP::_compile_mop_postamble;
+    }
+
     sub _compile_mop_required_methods {
         goto \&Mite::Trait::HasMOP::_compile_mop_required_methods;
     }
@@ -945,3 +949,4 @@
 
     1;
 }
+

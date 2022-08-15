@@ -16,6 +16,6 @@ around number => sub {
 	2 + $self->$next( @_ );
 };
 
-__PACKAGE__->meta->make_immutable( replace_constructor => 1 );
+__PACKAGE__->meta->make_immutable;
 
 1;

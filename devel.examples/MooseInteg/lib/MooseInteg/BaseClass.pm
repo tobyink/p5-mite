@@ -1,6 +1,7 @@
 package MooseInteg::BaseClass;
 
 use MooseInteg::Mite;
+with 'MooseInteg::BaseClassRole';
 
 has foo => (
 	is => 'rw',
