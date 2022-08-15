@@ -175,7 +175,7 @@ sub write_mopper {
 
 sub _compile_mop_header {
     my $self = shift;
-    return sprintf <<'CODE', $self->config->data->{mop}, $self->config->data->{mop}, $self->config->data->{mop};
+    return sprintf <<'CODE', ( $self->config->data->{mop} ) x 3;
 package %s;
 
 use Moose ();
@@ -184,19 +184,23 @@ use Moose::Util::MetaRole ();
 use Moose::Util::TypeConstraints ();
 use constant { true => !!1, false => !!0 };
 
-my $CLASS_TRAIT = do {
-    package %s::Class;
-    use Moose::Role;
+my $META_CLASS = do {
+    package %s::Meta::Class;
+    use Moose;
+    extends 'Moose::Meta::Class';
     around _immutable_options => sub {
         my ( $next, $self, @args ) = ( shift, shift, @_ );
         return $self->$next( replace_constructor => 1, @args );
     };
+    __PACKAGE__->meta->make_immutable;
+
     __PACKAGE__;
 };
 
-my $ROLE_TRAIT = do {
-    package %s::Role;
-    use Moose::Role;
+my $META_ROLE = do {
+    package %s::Meta::Role;
+    use Moose;
+    extends 'Moose::Meta::Role';
     my $built_ins = qr/\A( DOES | does | __META__ | __FINALIZE_APPLICATION__ |
         CREATE_CLASS | APPLY_TO )\z/x;
     around get_method => sub {
@@ -213,6 +217,8 @@ my $ROLE_TRAIT = do {
         my %%map = %%{ $self->_full_method_map };
         return map $map{$_}, $self->get_method_list;
     };
+    __PACKAGE__->meta->make_immutable;
+
     __PACKAGE__;
 };
 

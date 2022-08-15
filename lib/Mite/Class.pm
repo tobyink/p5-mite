@@ -116,7 +116,7 @@ sub _needs_accessors {
 }
 
 sub _mop_metaclass {
-    return 'Moose::Meta::Class';
+    return '$META_CLASS';
 }
 
 sub _mop_attribute_metaclass {

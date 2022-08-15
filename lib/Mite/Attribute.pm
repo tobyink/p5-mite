@@ -1437,9 +1437,9 @@ CODE
     return sprintf <<'CODE', $self->_q_name, $self->compiling_class->_mop_attribute_metaclass, $self->_q_name, $opts_string, $accessors_code, $self->_q_name;
 $ATTR{%s} = %s->new( %s,%s);
 %sdo {
-	no warnings 'redefine';
-	local *Moose::Meta::Attribute::install_accessors = sub {};
-	$PACKAGE->add_attribute( $ATTR{%s} );
+    no warnings 'redefine';
+    local *Moose::Meta::Attribute::install_accessors = sub {};
+    $PACKAGE->add_attribute( $ATTR{%s} );
 };
 CODE
 }

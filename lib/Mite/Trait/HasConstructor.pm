@@ -157,14 +157,4 @@ sub BUILDALL {
 CODE
 }
 
-around _compile_mop => sub {
-    my ( $next, $self ) = ( shift, shift );
-
-    my $code = $self->$next( @_ );
-    $code .= sprintf "Moose::Util::MetaRole::apply_metaroles( for => %s, class_metaroles => { class => [ \$CLASS_TRAIT ] } );\n",
-        $self->name;
-
-    return $code;
-};
-
 1;

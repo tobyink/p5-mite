@@ -6,19 +6,23 @@ use Moose::Util::MetaRole ();
 use Moose::Util::TypeConstraints ();
 use constant { true => !!1, false => !!0 };
 
-my $CLASS_TRAIT = do {
-    package MooseInteg::MOP::Class;
-    use Moose::Role;
+my $META_CLASS = do {
+    package MooseInteg::MOP::Meta::Class;
+    use Moose;
+    extends 'Moose::Meta::Class';
     around _immutable_options => sub {
         my ( $next, $self, @args ) = ( shift, shift, @_ );
         return $self->$next( replace_constructor => 1, @args );
     };
+    __PACKAGE__->meta->make_immutable;
+
     __PACKAGE__;
 };
 
-my $ROLE_TRAIT = do {
-    package MooseInteg::MOP::Role;
-    use Moose::Role;
+my $META_ROLE = do {
+    package MooseInteg::MOP::Meta::Role;
+    use Moose;
+    extends 'Moose::Meta::Role';
     my $built_ins = qr/\A( DOES | does | __META__ | __FINALIZE_APPLICATION__ |
         CREATE_CLASS | APPLY_TO )\z/x;
     around get_method => sub {
@@ -35,13 +39,15 @@ my $ROLE_TRAIT = do {
         my %map = %{ $self->_full_method_map };
         return map $map{$_}, $self->get_method_list;
     };
+    __PACKAGE__->meta->make_immutable;
+
     __PACKAGE__;
 };
 
 require "MooseInteg/BaseClass.pm";
 
 {
-    my $PACKAGE = Moose::Meta::Class->initialize( "MooseInteg::BaseClass", package => "MooseInteg::BaseClass" );
+    my $PACKAGE = $META_CLASS->initialize( "MooseInteg::BaseClass", package => "MooseInteg::BaseClass" );
     my %ATTR;
     $ATTR{"xyzzy"} = Moose::Meta::Attribute->new( "xyzzy",
         __hack_no_process_options => true,
@@ -67,9 +73,9 @@ require "MooseInteg/BaseClass.pm";
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
-    	no warnings 'redefine';
-    	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$PACKAGE->add_attribute( $ATTR{"xyzzy"} );
+        no warnings 'redefine';
+        local *Moose::Meta::Attribute::install_accessors = sub {};
+        $PACKAGE->add_attribute( $ATTR{"xyzzy"} );
     };
     $ATTR{"foo"} = Moose::Meta::Attribute->new( "foo",
         __hack_no_process_options => true,
@@ -95,9 +101,9 @@ require "MooseInteg/BaseClass.pm";
         $PACKAGE->add_method( $ACCESSOR->name, $ACCESSOR );
     }
     do {
-    	no warnings 'redefine';
-    	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$PACKAGE->add_attribute( $ATTR{"foo"} );
+        no warnings 'redefine';
+        local *Moose::Meta::Attribute::install_accessors = sub {};
+        $PACKAGE->add_attribute( $ATTR{"foo"} );
     };
     $ATTR{"hashy"} = Moose::Meta::Attribute->new( "hashy",
         __hack_no_process_options => true,
@@ -134,9 +140,9 @@ require "MooseInteg/BaseClass.pm";
         $PACKAGE->add_method( $DELEGATION->name, $DELEGATION );
     }
     do {
-    	no warnings 'redefine';
-    	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$PACKAGE->add_attribute( $ATTR{"hashy"} );
+        no warnings 'redefine';
+        local *Moose::Meta::Attribute::install_accessors = sub {};
+        $PACKAGE->add_attribute( $ATTR{"hashy"} );
     };
     $PACKAGE->add_method(
         "meta" => Moose::Meta::Method::Meta->_new(
@@ -147,12 +153,11 @@ require "MooseInteg/BaseClass.pm";
     );
     Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( "MooseInteg::BaseClass" );
 }
-Moose::Util::MetaRole::apply_metaroles( for => MooseInteg::BaseClass, class_metaroles => { class => [ $CLASS_TRAIT ] } );
 
 require "MooseInteg/BaseClassRole.pm";
 
 {
-    my $PACKAGE = Moose::Meta::Role->initialize( "MooseInteg::BaseClassRole", package => "MooseInteg::BaseClassRole" );
+    my $PACKAGE = $META_ROLE->initialize( "MooseInteg::BaseClassRole", package => "MooseInteg::BaseClassRole" );
     my %ATTR;
     $ATTR{"xyzzy"} = Moose::Meta::Role::Attribute->new( "xyzzy",
         __hack_no_process_options => true,
@@ -167,9 +172,9 @@ require "MooseInteg/BaseClassRole.pm";
     );
     delete $ATTR{"xyzzy"}{original_options}{$_} for qw( associated_role );
     do {
-    	no warnings 'redefine';
-    	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$PACKAGE->add_attribute( $ATTR{"xyzzy"} );
+        no warnings 'redefine';
+        local *Moose::Meta::Attribute::install_accessors = sub {};
+        $PACKAGE->add_attribute( $ATTR{"xyzzy"} );
     };
     for ( @MooseInteg::BaseClassRole::METHOD_MODIFIERS ) {
         my ( $type, $names, $code ) = @$_;
@@ -184,12 +189,11 @@ require "MooseInteg/BaseClassRole.pm";
     );
     Moose::Util::TypeConstraints::find_or_create_does_type_constraint( "MooseInteg::BaseClassRole" );
 }
-Moose::Util::MetaRole::apply_metaroles( for => MooseInteg::BaseClassRole, role_metaroles => { role => [ $ROLE_TRAIT ] } );
 
 require "MooseInteg/SomeRole.pm";
 
 {
-    my $PACKAGE = Moose::Meta::Role->initialize( "MooseInteg::SomeRole", package => "MooseInteg::SomeRole" );
+    my $PACKAGE = $META_ROLE->initialize( "MooseInteg::SomeRole", package => "MooseInteg::SomeRole" );
     my %ATTR;
     $ATTR{"bar"} = Moose::Meta::Role::Attribute->new( "bar",
         __hack_no_process_options => true,
@@ -205,9 +209,9 @@ require "MooseInteg/SomeRole.pm";
     );
     delete $ATTR{"bar"}{original_options}{$_} for qw( associated_role );
     do {
-    	no warnings 'redefine';
-    	local *Moose::Meta::Attribute::install_accessors = sub {};
-    	$PACKAGE->add_attribute( $ATTR{"bar"} );
+        no warnings 'redefine';
+        local *Moose::Meta::Attribute::install_accessors = sub {};
+        $PACKAGE->add_attribute( $ATTR{"bar"} );
     };
     $PACKAGE->add_required_methods( "number" );
     for ( @MooseInteg::SomeRole::METHOD_MODIFIERS ) {
@@ -223,7 +227,6 @@ require "MooseInteg/SomeRole.pm";
     );
     Moose::Util::TypeConstraints::find_or_create_does_type_constraint( "MooseInteg::SomeRole" );
 }
-Moose::Util::MetaRole::apply_metaroles( for => MooseInteg::SomeRole, role_metaroles => { role => [ $ROLE_TRAIT ] } );
 
 Moose::Util::find_meta( "MooseInteg::BaseClass" )->add_role( Moose::Util::find_meta( "MooseInteg::BaseClassRole" ) );
 

@@ -203,7 +203,7 @@ sub _needs_accessors {
 }
 
 sub _mop_metaclass {
-    return 'Moose::Meta::Role';
+    return '$META_ROLE';
 }
 
 sub _mop_attribute_metaclass {
@@ -225,15 +225,5 @@ sub _compile_mop_tc {
     return sprintf '    Moose::Util::TypeConstraints::find_or_create_does_type_constraint( %s );',
         B::perlstring( shift->name );
 }
-
-around _compile_mop => sub {
-    my ( $next, $self ) = ( shift, shift );
-
-    my $code = $self->$next( @_ );
-    $code .= sprintf "Moose::Util::MetaRole::apply_metaroles( for => %s, role_metaroles => { role => [ \$ROLE_TRAIT ] } );\n",
-        $self->name;
-
-    return $code;
-};
 
 1;
