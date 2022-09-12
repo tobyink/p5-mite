@@ -14,7 +14,7 @@
 		];
 		item [
 			a dcs:Change;
-			label "If you use Moose to entend a Mite class and inherit its `DOES`/`does` method, then the inherited method will now check with Moose to see if your class does roles.";
+			label "If you use Moose to extend a Mite class and inherit its `DOES`/`does` method, then the inherited method will now check with Moose to see if your class does roles.";
 		];
 		item [
 			a dcs:Change;
