@@ -128,3 +128,17 @@
 			label "Rebuild with Mite 0.010002.";
 		];
 	].
+
+`Acme-Mitey-Cards 0.015 cpan:TOBYINK`
+	issued  2022-11-09;
+	changeset [
+		item [
+			a dcs:Update;
+			label "Rebuild with Mite 0.011000.";
+		];
+		item [
+			a dcs:Addition;
+			label "Acme::Mitey::Cards::MOP.";
+		];
+	].
+
