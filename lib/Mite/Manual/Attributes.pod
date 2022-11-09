@@ -23,7 +23,10 @@ Mite::Manual::Attributes - options for defining attributes with Mite
         lazy          => false,
         isa           => 'Object',
         coerce        => false,
+        clone         => false,
+        locked        => false,
         handles       => { quux => 'quuux' },
+        handles_via   => [ 'Blessed' ],
         trigger       => '_trigger_myattr',
     );
 
