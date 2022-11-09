@@ -75,6 +75,12 @@
         };
     }
 
+    # Moose-compatibility method
+    sub meta {
+        require Acme::Mitey::Cards::MOP;
+        Moose::Util::find_meta( ref $_[0] or $_[0] );
+    }
+
     # Standard Moose/Moo-style constructor
     sub new {
         my $class = ref( $_[0] ) ? ref(shift) : shift;

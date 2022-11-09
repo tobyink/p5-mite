@@ -4,3 +4,4 @@ project: Acme::Mitey::Cards
 shim: Acme::Mitey::Cards::Mite
 source_from: lib
 perltidy: true
+mop: Acme::Mitey::Cards::MOP
