@@ -14,9 +14,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Cache ~/perl5
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           key: ${{ runner.os }}-dist-locallib
           path: ~/perl5
@@ -45,7 +45,7 @@ jobs:
           eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
           ~/perl5/bin/distinkt-dist --TRAVIS --targetdir=build
       - name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: dist
           path: ./
@@ -55,7 +55,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Get dist artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: dist
       - name: Install dependencies
@@ -89,7 +89,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os:                 [ 'ubuntu-20.04', 'macos-11' ]
+        os:                 [ 'ubuntu-latest', 'macos-latest' ]
         perl:               [ '5.10.1', '5.12', '5.30', '5.32', '5.34', '5.36' ]
         coverage:           [ false ]
         threaded:           [ true ]
@@ -107,7 +107,7 @@ jobs:
             joblabel: '(Coverage)'
     steps:
       - name: Get dist artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: dist
       - name: Set up perl
