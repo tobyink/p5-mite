@@ -79,6 +79,9 @@ jobs:
         if: matrix.demo == 'MooseInteg'
         run: |
           cpanm -n Moose
+      - name: Install Test::Requires
+        run: |
+          cpanm -n Test::Requires
       - name: Configure Mite
         working-directory: ./build/
         run: perl Makefile.PL
