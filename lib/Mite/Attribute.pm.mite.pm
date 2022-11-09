@@ -7,7 +7,7 @@
 
     our $USES_MITE    = "Mite::Class";
     our $MITE_SHIM    = "Mite::Shim";
-    our $MITE_VERSION = "0.010007";
+    our $MITE_VERSION = "0.010008";
 
     # Mite keywords
     BEGIN {
@@ -232,7 +232,7 @@
             $self->{"weak_ref"} = $value;
         };
 
-        # Attribute is (type: Enum["ro","rw","rwp","lazy","bare"])
+        # Attribute is (type: Enum["ro","rw","rwp","lazy","bare","locked"])
         # has declaration, file lib/Mite/Attribute.pm, line 66
         do {
             my $value = exists( $args->{"is"} ) ? $args->{"is"} : "bare";
@@ -241,10 +241,11 @@
                 package Mite::Shim;
                 (         defined($value)
                       and !ref($value)
-                      and $value =~ m{\A(?:(?:bare|lazy|r(?:wp?|o)))\z} );
+                      and $value =~
+                      m{\A(?:(?:bare|l(?:azy|ocked)|r(?:wp?|o)))\z} );
               }
               or croak "Type check failed in constructor: %s should be %s",
-              "is", "Enum[\"ro\",\"rw\",\"rwp\",\"lazy\",\"bare\"]";
+              "is", "Enum[\"ro\",\"rw\",\"rwp\",\"lazy\",\"bare\",\"locked\"]";
             $self->{"is"} = $value;
         };
 
@@ -887,8 +888,24 @@
             $self->{"coerce"} = $value;
         };
 
-        # Attribute default (type: Undef|Str|CodeRef|ScalarRef|Dict[]|Tuple[])
+        # Attribute locked (type: Bool)
         # has declaration, file lib/Mite/Attribute.pm, line 102
+        do {
+            my $value = exists( $args->{"locked"} ) ? $args->{"locked"} : false;
+            (
+                !ref $value
+                  and (!defined $value
+                    or $value eq q()
+                    or $value eq '0'
+                    or $value eq '1' )
+              )
+              or croak "Type check failed in constructor: %s should be %s",
+              "locked", "Bool";
+            $self->{"locked"} = $value;
+        };
+
+        # Attribute default (type: Undef|Str|CodeRef|ScalarRef|Dict[]|Tuple[])
+        # has declaration, file lib/Mite/Attribute.pm, line 107
         if ( exists $args->{"default"} ) {
             do {
 
@@ -944,7 +961,7 @@
         }
 
         # Attribute default_is_trusted (type: Bool)
-        # has declaration, file lib/Mite/Attribute.pm, line 108
+        # has declaration, file lib/Mite/Attribute.pm, line 113
         do {
             my $value = exists( $args->{"default_is_trusted"} )
               ? do {
@@ -981,7 +998,7 @@
         };
 
         # Attribute default_does_trigger (type: Bool)
-        # has declaration, file lib/Mite/Attribute.pm, line 108
+        # has declaration, file lib/Mite/Attribute.pm, line 113
         do {
             my $value = exists( $args->{"default_does_trigger"} )
               ? do {
@@ -1018,7 +1035,7 @@
         };
 
         # Attribute skip_argc_check (type: Bool)
-        # has declaration, file lib/Mite/Attribute.pm, line 108
+        # has declaration, file lib/Mite/Attribute.pm, line 113
         do {
             my $value = exists( $args->{"skip_argc_check"} )
               ? do {
@@ -1055,7 +1072,7 @@
         };
 
         # Attribute lazy (type: Bool)
-        # has declaration, file lib/Mite/Attribute.pm, line 115
+        # has declaration, file lib/Mite/Attribute.pm, line 120
         do {
             my $value = exists( $args->{"lazy"} ) ? $args->{"lazy"} : false;
             (
@@ -1071,7 +1088,7 @@
         };
 
         # Attribute coderef_default_variable (type: NonEmptyStr)
-        # has declaration, file lib/Mite/Attribute.pm, line 127
+        # has declaration, file lib/Mite/Attribute.pm, line 132
         if ( exists $args->{"coderef_default_variable"} ) {
             (
                 (
@@ -1103,7 +1120,7 @@
         }
 
         # Attribute trigger (type: MethodNameTemplate|One|CodeRef)
-        # has declaration, file lib/Mite/Attribute.pm, line 129
+        # has declaration, file lib/Mite/Attribute.pm, line 134
         if ( exists $args->{"trigger"} ) {
             do {
 
@@ -1178,7 +1195,7 @@
         }
 
         # Attribute builder (type: MethodNameTemplate|One|CodeRef)
-        # has declaration, file lib/Mite/Attribute.pm, line 129
+        # has declaration, file lib/Mite/Attribute.pm, line 134
         if ( exists $args->{"builder"} ) {
             do {
 
@@ -1253,7 +1270,7 @@
         }
 
         # Attribute clone (type: MethodNameTemplate|One|CodeRef|Undef)
-        # has declaration, file lib/Mite/Attribute.pm, line 134
+        # has declaration, file lib/Mite/Attribute.pm, line 139
         if ( exists $args->{"clone"} ) {
             do {
 
@@ -1323,7 +1340,7 @@
         }
 
         # Attribute clone_on_read (type: Bool)
-        # has declaration, file lib/Mite/Attribute.pm, line 143
+        # has declaration, file lib/Mite/Attribute.pm, line 148
         if ( exists $args->{"clone_on_read"} ) {
             do {
                 my $coerced_value = do {
@@ -1355,7 +1372,7 @@
         }
 
         # Attribute clone_on_write (type: Bool)
-        # has declaration, file lib/Mite/Attribute.pm, line 143
+        # has declaration, file lib/Mite/Attribute.pm, line 148
         if ( exists $args->{"clone_on_write"} ) {
             do {
                 my $coerced_value = do {
@@ -1387,13 +1404,13 @@
         }
 
         # Attribute documentation
-        # has declaration, file lib/Mite/Attribute.pm, line 145
+        # has declaration, file lib/Mite/Attribute.pm, line 150
         if ( exists $args->{"documentation"} ) {
             $self->{"documentation"} = $args->{"documentation"};
         }
 
         # Attribute handles (type: HandlesHash|Enum["1","2"])
-        # has declaration, file lib/Mite/Attribute.pm, line 149
+        # has declaration, file lib/Mite/Attribute.pm, line 154
         if ( exists $args->{"handles"} ) {
             do {
                 my $coerced_value = do {
@@ -1643,7 +1660,7 @@
         }
 
         # Attribute handles_via (type: ArrayRef[Str])
-        # has declaration, file lib/Mite/Attribute.pm, line 155
+        # has declaration, file lib/Mite/Attribute.pm, line 160
         if ( exists $args->{"handles_via"} ) {
             do {
                 my $coerced_value = do {
@@ -1707,7 +1724,7 @@
         }
 
         # Attribute alias (type: AliasList)
-        # has declaration, file lib/Mite/Attribute.pm, line 165
+        # has declaration, file lib/Mite/Attribute.pm, line 170
         do {
             my $value =
               exists( $args->{"alias"} )
@@ -1854,7 +1871,7 @@
 
         # Unrecognized parameters
         my @unknown = grep not(
-/\A(?:_class_for_default|a(?:ccessor|lias)|builder|c(?:l(?:ass|earer|one(?:_on_(?:read|write))?)|o(?:deref_default_variable|erce))|d(?:ef(?:ault(?:_(?:does_trigger|is_trusted))?|inition_context)|o(?:cumentation|es))|enum|handles(?:_via)?|i(?:nit_arg|sa?)|l(?:azy|ocal_writer|value)|name|predicate|re(?:ader|quired)|skip_argc_check|t(?:rigger|ype)|w(?:eak_ref|riter))\z/
+/\A(?:_class_for_default|a(?:ccessor|lias)|builder|c(?:l(?:ass|earer|one(?:_on_(?:read|write))?)|o(?:deref_default_variable|erce))|d(?:ef(?:ault(?:_(?:does_trigger|is_trusted))?|inition_context)|o(?:cumentation|es))|enum|handles(?:_via)?|i(?:nit_arg|sa?)|l(?:azy|oc(?:al_writer|ked)|value)|name|predicate|re(?:ader|quired)|skip_argc_check|t(?:rigger|ype)|w(?:eak_ref|riter))\z/
         ), keys %{$args};
         @unknown
           and croak(
@@ -2095,7 +2112,7 @@
     }
 
     # Accessors for alias
-    # has declaration, file lib/Mite/Attribute.pm, line 165
+    # has declaration, file lib/Mite/Attribute.pm, line 170
     sub alias {
         @_ > 1
           ? do {
@@ -2222,7 +2239,7 @@
     }
 
     # Accessors for alias_is_for
-    # has declaration, file lib/Mite/Attribute.pm, line 167
+    # has declaration, file lib/Mite/Attribute.pm, line 172
     sub alias_is_for {
         @_ == 1 or croak('Reader "alias_is_for" usage: $self->alias_is_for()');
         (
@@ -2232,7 +2249,7 @@
     }
 
     # Accessors for builder
-    # has declaration, file lib/Mite/Attribute.pm, line 129
+    # has declaration, file lib/Mite/Attribute.pm, line 134
     if ($__XS) {
         Class::XSAccessor->import(
             chained             => 1,
@@ -2476,7 +2493,7 @@
     }
 
     # Accessors for clone
-    # has declaration, file lib/Mite/Attribute.pm, line 134
+    # has declaration, file lib/Mite/Attribute.pm, line 139
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,
@@ -2492,7 +2509,7 @@
     }
 
     # Accessors for clone_on_read
-    # has declaration, file lib/Mite/Attribute.pm, line 143
+    # has declaration, file lib/Mite/Attribute.pm, line 148
     sub clone_on_read {
         @_ == 1
           or croak('Reader "clone_on_read" usage: $self->clone_on_read()');
@@ -2530,7 +2547,7 @@
     }
 
     # Accessors for clone_on_write
-    # has declaration, file lib/Mite/Attribute.pm, line 143
+    # has declaration, file lib/Mite/Attribute.pm, line 148
     sub clone_on_write {
         @_ == 1
           or croak('Reader "clone_on_write" usage: $self->clone_on_write()');
@@ -2568,7 +2585,7 @@
     }
 
     # Accessors for coderef_default_variable
-    # has declaration, file lib/Mite/Attribute.pm, line 127
+    # has declaration, file lib/Mite/Attribute.pm, line 132
     sub coderef_default_variable {
         @_ > 1
           ? do {
@@ -2683,7 +2700,7 @@
     }
 
     # Accessors for default
-    # has declaration, file lib/Mite/Attribute.pm, line 102
+    # has declaration, file lib/Mite/Attribute.pm, line 107
     if ($__XS) {
         Class::XSAccessor->import(
             chained             => 1,
@@ -2737,7 +2754,7 @@
     }
 
     # Accessors for default_does_trigger
-    # has declaration, file lib/Mite/Attribute.pm, line 108
+    # has declaration, file lib/Mite/Attribute.pm, line 113
     sub default_does_trigger {
         @_ > 1
           ? do {
@@ -2771,7 +2788,7 @@
     }
 
     # Accessors for default_is_trusted
-    # has declaration, file lib/Mite/Attribute.pm, line 108
+    # has declaration, file lib/Mite/Attribute.pm, line 113
     sub default_is_trusted {
         @_ > 1
           ? do {
@@ -2819,7 +2836,7 @@
     }
 
     # Accessors for documentation
-    # has declaration, file lib/Mite/Attribute.pm, line 145
+    # has declaration, file lib/Mite/Attribute.pm, line 150
     if ($__XS) {
         Class::XSAccessor->import(
             chained             => 1,
@@ -2909,7 +2926,7 @@
     }
 
     # Accessors for handles
-    # has declaration, file lib/Mite/Attribute.pm, line 149
+    # has declaration, file lib/Mite/Attribute.pm, line 154
     if ($__XS) {
         Class::XSAccessor->import(
             chained             => 1,
@@ -3152,7 +3169,7 @@
     }
 
     # Accessors for handles_via
-    # has declaration, file lib/Mite/Attribute.pm, line 155
+    # has declaration, file lib/Mite/Attribute.pm, line 160
     if ($__XS) {
         Class::XSAccessor->import(
             chained             => 1,
@@ -3313,10 +3330,14 @@
                 package Mite::Shim;
                 (         defined( $_[1] )
                       and !ref( $_[1] )
-                      and $_[1] =~ m{\A(?:(?:bare|lazy|r(?:wp?|o)))\z} );
+                      and $_[1] =~
+                      m{\A(?:(?:bare|l(?:azy|ocked)|r(?:wp?|o)))\z} );
               }
-              or croak( "Type check failed in %s: value should be %s",
-                "accessor", "Enum[\"ro\",\"rw\",\"rwp\",\"lazy\",\"bare\"]" );
+              or croak(
+                "Type check failed in %s: value should be %s",
+                "accessor",
+                "Enum[\"ro\",\"rw\",\"rwp\",\"lazy\",\"bare\",\"locked\"]"
+              );
             $_[0]{"is"} = $_[1];
             $_[0];
           }
@@ -3339,7 +3360,7 @@
     }
 
     # Accessors for lazy
-    # has declaration, file lib/Mite/Attribute.pm, line 115
+    # has declaration, file lib/Mite/Attribute.pm, line 120
     sub lazy {
         @_ > 1
           ? do {
@@ -3505,6 +3526,26 @@
                 )
             )
         }
+    }
+
+    # Accessors for locked
+    # has declaration, file lib/Mite/Attribute.pm, line 102
+    sub locked {
+        @_ > 1
+          ? do {
+            (
+                !ref $_[1]
+                  and (!defined $_[1]
+                    or $_[1] eq q()
+                    or $_[1] eq '0'
+                    or $_[1] eq '1' )
+              )
+              or croak( "Type check failed in %s: value should be %s",
+                "accessor", "Bool" );
+            $_[0]{"locked"} = $_[1];
+            $_[0];
+          }
+          : ( $_[0]{"locked"} );
     }
 
     # Accessors for lvalue
@@ -4018,7 +4059,7 @@
     }
 
     # Accessors for skip_argc_check
-    # has declaration, file lib/Mite/Attribute.pm, line 108
+    # has declaration, file lib/Mite/Attribute.pm, line 113
     sub skip_argc_check {
         @_ > 1
           ? do {
@@ -4052,7 +4093,7 @@
     }
 
     # Accessors for trigger
-    # has declaration, file lib/Mite/Attribute.pm, line 129
+    # has declaration, file lib/Mite/Attribute.pm, line 134
     if ($__XS) {
         Class::XSAccessor->import(
             chained             => 1,
@@ -4336,6 +4377,11 @@
         our %DOES;
         return $DOES{$role} if exists $DOES{$role};
         return 1            if $role eq __PACKAGE__;
+        if ( $INC{'Moose/Util.pm'}
+            and my $meta = Moose::Util::find_meta( ref $self or $self ) )
+        {
+            $meta->can('does_role') and $meta->does_role($role) and return 1;
+        }
         return $self->SUPER::DOES($role);
     }
 
@@ -4346,4 +4392,3 @@
 
     1;
 }
-

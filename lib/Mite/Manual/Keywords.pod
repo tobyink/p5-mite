@@ -347,6 +347,33 @@ A function similar to C<guard> from L<Scope::Guard> can be imported.
         print "Hello ";
     };
 
+=head C<lock> and C<unlock>
+
+These can be used to lock and unlock locked attributes.
+
+    use Your::Project::Mite qw( lock unlock true false );
+    
+    has numbers => (
+        is      => 'ro',
+        default => [],
+        locked  => true,
+    );
+    
+    ...
+    
+    sub push_number {
+        my ( $self, $number ) = @_;
+        my $guard = unlock( $self->numbers );
+        push @{ $self->numbers }, $number;
+        return $self;
+    }
+
+C<< lock($ref) >> will make an arrayref or hashref read-only.
+
+C<< unlock($ref) >> will make a locked arrayref or hashref read-write, and
+return a guard object. When the guard object goes out of scope, the reference
+will automatically lock itself again!
+
 =head1 BUGS
 
 Please report any bugs to L<https://github.com/tobyink/p5-mite/issues>.

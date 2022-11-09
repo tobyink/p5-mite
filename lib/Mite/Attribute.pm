@@ -65,7 +65,7 @@ has weak_ref =>
 
 has is =>
   is            => rw,
-  enum          => [ ro, rw, rwp, 'lazy', bare ],
+  enum          => [ ro, rw, rwp, 'lazy', bare, 'locked' ],
   default       => bare;
 
 has [ 'reader', 'writer', 'accessor', 'clearer', 'predicate', 'lvalue', 'local_writer' ] =>
@@ -95,6 +95,11 @@ has type =>
   builder       => true;
 
 has coerce =>
+  is            => rw,
+  isa           => Bool,
+  default       => false;
+
+has locked =>
   is            => rw,
   isa           => Bool,
   default       => false;
@@ -184,6 +189,20 @@ for my $function ( qw/ carp croak confess / ) {
     };
 }
 
+sub _function_for_lock {
+    my $self = shift;
+    my $ns = $self->compiling_class->imported_functions->{lock} ? ''
+        : ( eval { $self->compiling_class->shim_name } || eval { $self->class->shim_name } || die() );
+    return "$ns\::lock";
+}
+
+sub _function_for_unlock {
+    my $self = shift;
+    my $ns = $self->compiling_class->imported_functions->{unlock} ? ''
+        : ( eval { $self->compiling_class->shim_name } || eval { $self->class->shim_name } || die() );
+    return "$ns\::unlock";
+}
+
 my @method_name_generator = (
     { # public
         reader        => sub { "get_$_" },
@@ -220,6 +239,10 @@ sub BUILD {
     if ( $self->is eq 'lazy' ) {
         $self->lazy( true );
         $self->builder( true ) unless $self->has_builder || $self->has_default;
+        $self->is( ro );
+    }
+    elsif ( $self->is eq 'locked' ) {
+        $self->locked( true );
         $self->is( ro );
     }
 
@@ -728,6 +751,11 @@ sub compile_init {
             $selfvar, $self->_q_name, $selfvar, $self->_q_name;
     }
 
+    if ( $self->locked ) {
+        push @code, sprintf '%s(%s->{%s}) if ref %s->{%s};',
+            $self->_function_for_lock, $selfvar, $self->_q_name, $selfvar, $self->_q_name;
+    }
+
     for ( @code ) {
         $_ = "$_;" unless /;\s*$/;
     }
@@ -771,12 +799,16 @@ my %code_template;
         my $code = sprintf '$_[0]{%s}', $self->_q_name;
         if ( $self->lazy ) {
             my $checked_default = $self->_compile_checked_default( '$_[0]' );
+            my $maybe_lock = '';
             if ( $self->default_does_trigger ) {
                 $checked_default = sprintf 'do { my $default = %s; %s; $default }',
                     $checked_default, $self->_compile_trigger( '$_[0]', '$default' );
             }
-            $code = sprintf '( exists($_[0]{%s}) ? $_[0]{%s} : ( $_[0]{%s} = %s ) )',
-                $self->_q_name, $self->_q_name, $self->_q_name, $checked_default;
+            if ( $self->locked ) {
+                $maybe_lock = $self->_function_for_lock;
+            }
+            $code = sprintf '( exists($_[0]{%s}) ? $_[0]{%s} : %s( $_[0]{%s} = %s ) )',
+                $self->_q_name, $self->_q_name, $maybe_lock, $self->_q_name, $checked_default;
         }
         if ( $self->clone_on_read ) {
             $code = $self->_compile_clone( '$_[0]', $code );
@@ -829,6 +861,10 @@ my %code_template;
         if ( $self->weak_ref ) {
             $code .= sprintf 'require Scalar::Util && Scalar::Util::weaken($_[0]{%s}) if ref $_[0]{%s}; ',
                 $self->_q_name, $self->_q_name;
+        }
+        if ( $self->locked ) {
+            $code .= sprintf '%s($_[0]{%s}) if ref $_[0]{%s}; ',
+                $self->_function_for_lock, $self->_q_name, $self->_q_name;
         }
         $code .= '$_[0];';
         return $make_usage->( $self, $code, '@_ == 2', ' $newvalue ', label => 'writer', %arg );
@@ -953,6 +989,16 @@ sub _shv_codegen {
     my $writer_method = $self->_expand_name(
         $self->writer // $self->accessor
     );
+    my $prelude = $self->locked
+        ? do {
+            my $name = $self->_q_name;
+            my $key  = $self->_function_for_unlock;
+            sub {
+                sprintf 'my $mite_guard = %s(%s->{%s});',
+                    $key, shift->generate_self, $name;
+            };
+        }
+        : sub { '' };
 
     require Mite::Attribute::SHV::CodeGen;
 
@@ -1006,6 +1052,7 @@ sub _shv_codegen {
             return sprintf 'do { %s or %s("Type check failed in delegated method: expected %%s, got value %%s", %s, %s); %s };',
                 $type->inline_check( $varname ), $self->_function_for_croak, $self->_q( $type->display_name ), $varname, $varname;
         },
+        generator_for_prelude => $prelude,
     );
     $codegen->{mite_attribute} = $self;
     return $codegen;
@@ -1116,7 +1163,7 @@ sub compile {
     }
 
     # Class::XSAccessor can't do type checks, triggers, weaken, or cloning
-    if ( $self->type or $self->weak_ref or $self->trigger or $self->clone_on_write ) {
+    if ( $self->type or $self->weak_ref or $self->locked or $self->trigger or $self->clone_on_write ) {
         delete $want_xs{writer};
         delete $want_xs{accessor};
     }

@@ -79,11 +79,13 @@ name; a B<MethodNameTemplate> may also contain "%s" as a placeholder;
 B<One> means the literal string "1". Other type constraints are
 self-explanatory.)
 
-=head3 C<is> B<< Enum[ "ro", "rw", "bare", "rwp", "lazy" ] >>
+=head3 C<is> B<< Enum[ "ro", "rw", "bare", "rwp", "lazy", "locked" ] >>
+
+These are all just shortcuts for defining other options.
 
 Supported values for C<is> include "ro", "rw", and "bare" like Moose,
-but also "rwp" and "lazy" like Moo. These are all just shortcuts for
-defining other options.
+but also "rwp" and "lazy" like Moo. Lastly "locked" is an alias for "ro",
+but also sets the C<locked> option to true.
 
 The default is C<< is => 'bare' >>.
 
@@ -94,7 +96,8 @@ will generate a reader called "get_foo" if your attribute is called
 "foo" and "_get__foo" if your attribute is called "_foo".
 
 If your attribute is defined as C<< is => "ro" >>, C<< is => "rwp" >>,
-or C<< is => "lazy" >> then C<reader> defaults to C<< $name >>.
+C<< is => "lazy" >>, or C<< is => "locked" >>, then C<reader> defaults to
+C<< $name >>.
 
 If your reader contains "%s" this will be replaced by the name of the
 attribute. This allows:
@@ -418,6 +421,37 @@ the name of the attribute.
 
 Indicates that the attribute should weaken its reference to the
 attribute value.
+
+=head3 C<locked> B<Bool>
+
+If an attribute is locked and its value is set to an unblessed arrayref or
+hashref, then the array or hash will be marked as read-only. This means that
+if you've defined an attribute like this:
+
+    has numbers => (
+        is          => ro,
+        isa         => 'ArrayRef',
+        locked      => true,
+        default     => [],
+    );
+
+People will not be able to do C<< push( @{ $object->numbers }, 1 ) >>, and it
+will throw an exception!
+
+To allow people to push to the array:
+
+    has numbers => (
+        is          => ro,
+        isa         => 'ArrayRef',
+        locked      => true,
+        default     => [],
+        handles_via => 'Array',
+        handles     => { add_number => 'push', remove_number => 'pop' },
+    );
+
+Then they can use C<< $object->add_number( 1 ) >>.
+
+Defaults to false, unless C<< is => "locked" >.
 
 =head3 C<clone> B<< MethodNameTemplate | One | CodeRef | Undef >>
 

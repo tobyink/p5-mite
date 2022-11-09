@@ -87,7 +87,7 @@ sub inject_mite_functions {
         *{"$package\::$f"} = \&{"$shim\::$f"};
         $self->imported_functions->{$f} = "$shim\::$f";
     }
-    for my $f ( qw/ carp croak confess guard STRICT / ) {
+    for my $f ( qw/ carp croak confess guard STRICT lock unlock / ) {
         next unless $requested->( $f, false );
         *{"$package\::$f"} = \&{"$shim\::$f"};
         $self->imported_functions->{$f} = "$shim\::$f";
