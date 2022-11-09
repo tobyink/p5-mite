@@ -7,7 +7,7 @@
 
     our $USES_MITE    = "Mite::Class";
     our $MITE_SHIM    = "Mite::Shim";
-    our $MITE_VERSION = "0.010008";
+    our $MITE_VERSION = "0.011000";
 
     # Mite keywords
     BEGIN {
@@ -47,10 +47,12 @@
         *false   = \&Mite::Shim::false;
         *guard   = \&Mite::Shim::guard;
         *lazy    = \&Mite::Shim::lazy;
+        *lock    = \&Mite::Shim::lock;
         *ro      = \&Mite::Shim::ro;
         *rw      = \&Mite::Shim::rw;
         *rwp     = \&Mite::Shim::rwp;
         *true    = \&Mite::Shim::true;
+        *unlock  = \&Mite::Shim::unlock;
     }
 
     # Gather metadata for constructor and destructor
