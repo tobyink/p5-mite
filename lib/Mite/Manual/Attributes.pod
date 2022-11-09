@@ -451,7 +451,7 @@ To allow people to push to the array:
 
 Then they can use C<< $object->add_number( 1 ) >>.
 
-Defaults to false, unless C<< is => "locked" >.
+Defaults to false, unless C<< is => "locked" >>.
 
 =head3 C<clone> B<< MethodNameTemplate | One | CodeRef | Undef >>
 
