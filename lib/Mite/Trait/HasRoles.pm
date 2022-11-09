@@ -6,7 +6,7 @@ package Mite::Trait::HasRoles;
 use Mite::Miteception -role, -all;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.010008';
+our $VERSION   = '0.011000';
 
 requires qw(
     source
