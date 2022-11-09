@@ -7,7 +7,7 @@
 
     our $USES_MITE    = "Mite::Class";
     our $MITE_SHIM    = "Acme::Mitey::Cards::Mite";
-    our $MITE_VERSION = "0.010003";
+    our $MITE_VERSION = "0.011000";
 
     # Mite keywords
     BEGIN {
@@ -47,16 +47,17 @@
         *false   = \&Acme::Mitey::Cards::Mite::false;
         *guard   = \&Acme::Mitey::Cards::Mite::guard;
         *lazy    = \&Acme::Mitey::Cards::Mite::lazy;
+        *lock    = \&Acme::Mitey::Cards::Mite::lock;
         *ro      = \&Acme::Mitey::Cards::Mite::ro;
         *rw      = \&Acme::Mitey::Cards::Mite::rw;
         *rwp     = \&Acme::Mitey::Cards::Mite::rwp;
         *true    = \&Acme::Mitey::Cards::Mite::true;
+        *unlock  = \&Acme::Mitey::Cards::Mite::unlock;
     }
 
     # Gather metadata for constructor and destructor
     sub __META__ {
         no strict 'refs';
-        no warnings 'once';
         my $class = shift;
         $class = ref($class) || $class;
         my $linear_isa = mro::get_linear_isa($class);
@@ -183,7 +184,7 @@
         return;
     }
 
-    my $__XS = !$ENV{MITE_PURE_PERL}
+    my $__XS = !$ENV{PERL_ONLY}
       && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
     # Accessors for abbreviation
@@ -247,6 +248,11 @@
         our %DOES;
         return $DOES{$role} if exists $DOES{$role};
         return 1            if $role eq __PACKAGE__;
+        if ( $INC{'Moose/Util.pm'}
+            and my $meta = Moose::Util::find_meta( ref $self or $self ) )
+        {
+            $meta->can('does_role') and $meta->does_role($role) and return 1;
+        }
         return $self->SUPER::DOES($role);
     }
 
@@ -275,7 +281,7 @@
           or croak( "Type check failed in signature for clubs: %s should be %s",
             "\$_[0]", "Defined" );
 
-        return ( &$__NEXT__( @head, @_ ) );
+        do { @_ = ( @head, @_ ); goto $__NEXT__ };
     };
 
     $SIGNATURE_FOR{"diamonds"} = sub {
@@ -296,7 +302,7 @@
           croak( "Type check failed in signature for diamonds: %s should be %s",
             "\$_[0]", "Defined" );
 
-        return ( &$__NEXT__( @head, @_ ) );
+        do { @_ = ( @head, @_ ); goto $__NEXT__ };
     };
 
     $SIGNATURE_FOR{"hearts"} = sub {
@@ -317,7 +323,7 @@
           croak( "Type check failed in signature for hearts: %s should be %s",
             "\$_[0]", "Defined" );
 
-        return ( &$__NEXT__( @head, @_ ) );
+        do { @_ = ( @head, @_ ); goto $__NEXT__ };
     };
 
     $SIGNATURE_FOR{"spades"} = sub {
@@ -338,7 +344,7 @@
           croak( "Type check failed in signature for spades: %s should be %s",
             "\$_[0]", "Defined" );
 
-        return ( &$__NEXT__( @head, @_ ) );
+        do { @_ = ( @head, @_ ); goto $__NEXT__ };
     };
 
     $SIGNATURE_FOR{"standard_suits"} = sub {
@@ -360,7 +366,7 @@
             "\$_[0]", "Defined"
           );
 
-        return ( &$__NEXT__( @head, @_ ) );
+        do { @_ = ( @head, @_ ); goto $__NEXT__ };
     };
 
     1;
