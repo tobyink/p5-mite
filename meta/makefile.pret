@@ -10,9 +10,9 @@
 	:runtime-requirement    [ :on "Import::Into 0"^^:CpanId ];
 	:runtime-requirement    [ :on "Path::Tiny 0.052"^^:CpanId ];
 	:runtime-requirement    [ :on "Regexp::Util 0.004"^^:CpanId ];
-	:runtime-requirement    [ :on "Sub::HandlesVia 0.034"^^:CpanId ];
+	:runtime-requirement    [ :on "Sub::HandlesVia 0.045"^^:CpanId ];
 	:runtime-requirement    [ :on "Types::Path::Tiny 0"^^:CpanId ];
-	:runtime-requirement    [ :on "Types::Standard 1.016008"^^:CpanId ];
+	:runtime-requirement    [ :on "Types::Standard 2.000000"^^:CpanId ];
 	:runtime-requirement    [ :on "YAML::XS 0.41"^^:CpanId ];
 	:runtime-recommendation [ :on "Class::XSAccessor 1.19"^^:CpanId ];
 	:test-requirement       [ :on "Test::Output 1.02"^^:CpanId ];
