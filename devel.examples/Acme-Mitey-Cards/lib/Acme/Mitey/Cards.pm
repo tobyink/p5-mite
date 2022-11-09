@@ -36,6 +36,8 @@ Acme::Mitey::Cards - demo of Mite
 
 This is a small distribution to test/demonstrate L<Mite>.
 
+It's an object-oriented library for modelling playing cards.
+
 =head1 BUGS
 
 Please report any bugs to
