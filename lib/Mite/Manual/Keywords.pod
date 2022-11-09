@@ -290,6 +290,8 @@ Again, these can make attribute definitions prettier:
     
     has foo => ( is => rw, required => true );
 
+Even though C<< is => 'locked' >> is allowed, there's no C<locked> export.
+
 =head2 C<carp>, C<croak>, and C<confess>
 
 These functions can be exported to your class:
