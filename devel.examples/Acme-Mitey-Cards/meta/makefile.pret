@@ -7,7 +7,8 @@
 	:test-requirement       [ :on "Test::More 0.96"^^:CpanId ];
 	:test-requirement       [ :on "Test::Requires"^^:CpanId ];
 	:test-recommendation    [ :on "Moose 2"^^:CpanId ];
-	:develop-requirement    [ :on "Mite 0.002004"^^:CpanId ];
+	:test-recommendation    [ :on "Type::Tiny 2"^^:CpanId ];
+	:develop-requirement    [ :on "Mite 0.011000"^^:CpanId ];
 	:develop-recommendation [ :on "Dist::Inkt 0.001"^^:CpanId ];
 	.
 
