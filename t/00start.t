@@ -15,8 +15,10 @@ my %modules = (
 		Module::Pluggable 5.2
 		Import::Into 0
 		Path::Tiny 0.052
+		Regexp::Util 0.004
+		Sub::HandlesVia 0.045
 		Types::Path::Tiny 0
-		Types::Standard 1.016000
+		Types::Standard 2.000000
 		YAML::XS 0.41
 		Class::XSAccessor 1.19
 	) },
