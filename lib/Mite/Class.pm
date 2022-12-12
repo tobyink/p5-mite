@@ -18,7 +18,7 @@ with qw(
 );
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.011000';
+our $VERSION   = '0.012000';
 
 use Path::Tiny;
 use mro;

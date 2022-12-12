@@ -6,7 +6,7 @@ package Mite::Trait::HasMOP;
 use Mite::Miteception -role, -all;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.011000';
+our $VERSION   = '0.012000';
 
 requires qw(
     _mop_metaclass

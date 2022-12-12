@@ -1,6 +1,15 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.012000 cpan:TOBYINK`
+	issued  2022-12-12;
+	changeset [
+		item [
+			a dcs:Change;
+			label "Mite shims should play more nicely with FatPacker and custom require hooks.";
+		];
+	].
+
 `Mite 0.011000 cpan:TOBYINK`
 	issued  2022-11-09;
 	changeset [

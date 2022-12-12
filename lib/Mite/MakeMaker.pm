@@ -6,7 +6,7 @@ package Mite::MakeMaker;
 use Mite::Miteception -all;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.011000';
+our $VERSION   = '0.012000';
 
 use File::Find;
 use autodie;
