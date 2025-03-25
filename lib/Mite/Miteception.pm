@@ -45,10 +45,7 @@ sub load_mite_file {
 		 Carp::croak("Compiled Mite file ($mite_file) for $file is missing");
 	}
 
-	{
-		 local @INC = ('.', @INC);
-		 require $mite_file;
-	}
+	require $mite_file;
 }
 
 1;
