@@ -111,7 +111,6 @@ sub import {
     else {
         # Changes to this filename must be coordinated with Mite::Compiled
         my $mite_file = $file . '.mite.pm';
-        local @INC = ( '.', @INC );
         local $@;
         if ( not eval { require $mite_file; 1 } ) {
             my $e = $@;
