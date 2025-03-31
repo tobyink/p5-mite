@@ -6,7 +6,7 @@ no warnings qw( once void );
 
 our $USES_MITE = "Mite::Role";
 our $MITE_SHIM = "MooseInteg::Mite";
-our $MITE_VERSION = "0.010007";
+our $MITE_VERSION = "0.013000";
 # Mite keywords
 BEGIN {
     my ( $SHIM, $CALLER ) = ( "MooseInteg::Mite", "MooseInteg::SomeRole" );

@@ -1,6 +1,15 @@
 # This file acts as the project's changelog.
 #
 
+`Mite 0.013000 cpan:TOBYINK`
+	issued  2025-03-31;
+	changeset [
+		item [
+			a dcs:SecurityFix;
+			label "Avoid adding '.' to @INC. Note this might break improvements from 0.012000.";
+		];
+	].
+
 `Mite 0.012000 cpan:TOBYINK`
 	issued  2022-12-12;
 	changeset [

@@ -6,7 +6,7 @@ no warnings qw( once void );
 
 our $USES_MITE = "Mite::Role";
 our $MITE_SHIM = "Bad::Example::Mite";
-our $MITE_VERSION = "0.010003";
+our $MITE_VERSION = "0.013000";
 # Mite keywords
 BEGIN {
     my ( $SHIM, $CALLER ) = ( "Bad::Example::Mite", "Bad::Example::Role2" );
@@ -28,7 +28,6 @@ BEGIN {
 # Gather metadata for constructor and destructor
 sub __META__ {
     no strict 'refs';
-    no warnings 'once';
     my $class      = shift; $class = ref($class) || $class;
     my $linear_isa = mro::get_linear_isa( $class );
     return {
@@ -51,6 +50,9 @@ sub DOES {
     our %DOES;
     return $DOES{$role} if exists $DOES{$role};
     return 1 if $role eq __PACKAGE__;
+    if ( $INC{'Moose/Util.pm'} and my $meta = Moose::Util::find_meta( ref $self or $self ) ) {
+        $meta->can( 'does_role' ) and $meta->does_role( $role ) and return 1;
+    }
     return $self->SUPER::DOES( $role );
 }
 

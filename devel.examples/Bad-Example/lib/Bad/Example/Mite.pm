@@ -17,13 +17,9 @@ or do {
 };
 
 # Constants
-sub true  () { !!1 }
-sub false () { !!0 }
-sub ro    () { 'ro' }
-sub rw    () { 'rw' }
-sub rwp   () { 'rwp' }
-sub lazy  () { 'lazy' }
-sub bare  () { 'bare' }
+sub true  () { !!1 }    sub false () { !!0 }
+sub ro    () { 'ro' }   sub rw    () { 'rw' }   sub rwp   () { 'rwp' }
+sub lazy  () { 'lazy' } sub bare  () { 'bare' }
 
 # More complicated constants
 BEGIN {
@@ -62,39 +58,75 @@ sub confess { unshift @_, 'confess'; goto \&_error_handler }
     *guard = sub (&) { bless [ 0, @_ ] => $GUARD_PACKAGE };
 }
 
+# Exportable lock and unlock
+sub _lul {
+    my ( $lul, $ref ) = @_;
+    if ( ref $ref eq 'ARRAY' ) {
+        &Internals::SvREADONLY( $ref, $lul );
+        &Internals::SvREADONLY( \$_, $lul ) for @$ref;
+        return;
+    }
+    if ( ref $ref eq 'HASH' ) {
+        &Internals::hv_clear_placeholders( $ref );
+        &Internals::SvREADONLY( $ref, $lul );
+        &Internals::SvREADONLY( \$_, $lul ) for values %$ref;
+        return;
+    }
+    return;
+}
+
+sub lock {
+    unshift @_, true;
+    goto \&_lul;
+}
+
+sub unlock {
+    my $ref = shift;
+    _lul( 0 , $ref );
+    &guard( sub { _lul( 1, $ref ) } );
+}
+
 sub _is_compiling {
     defined $Mite::COMPILING and $Mite::COMPILING eq __PACKAGE__;
 }
 
 sub import {
     my $me = shift;
-    my %arg = map { lc($_) => true } @_;
+    my %arg = map +( lc($_) => true ), @_;
     my ( $caller, $file ) = caller;
 
     if( _is_compiling() ) {
         require Mite::Project;
-        Mite::Project->default->inject_mite_functions(
-            package => $caller,
-            file    => $file,
-            arg     => \%arg,
-            shim    => $me,
+        'Mite::Project'->default->inject_mite_functions(
+            'package' => $caller,
+            'file'    => $file,
+            'arg'     => \%arg,
+            'shim'    => $me,
         );
     }
     else {
-        # Changes to this filename must be coordinated with Mite::Compiled
-        my $mite_file = $file . ".mite.pm";
-        if( !-e $mite_file ) {
-            croak "Compiled Mite file ($mite_file) for $file is missing";
+        # Try to determine original filename for caller, minus libdir.
+        # This would normally be in %INC but caller hasn't finished loading yet.
+        require File::Spec;
+        my $orig = $file;
+        for my $base ( @INC ) {
+            $base eq substr $file, 0, length $base
+            and -f File::Spec->catfile( $base, substr $file, 1 + length $base )
+            and $orig = File::Spec->abs2rel( $file, $base )
+            and last;
         }
 
-        {
-            local @INC = ('.', @INC);
-            require $mite_file;
+        # Changes to this filename must be coordinated with Mite::Compiled
+        my $mite_file = $orig . '.mite.pm';
+        local $@;
+        if ( not eval { require $mite_file; 1 } ) {
+            my $e = $@;
+            croak "Compiled Mite file ($mite_file) for $file is missing or an error occurred loading it: $e";
         }
     }
 
-    warnings->import;
-    strict->import;
+    'warnings'->import;
+    'strict'->import;
     'namespace::autoclean'->import( -cleanee => $caller )
         if _HAS_AUTOCLEAN && !$arg{'-unclean'};
 }
