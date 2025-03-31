@@ -7,7 +7,7 @@
 
     our $USES_MITE    = "Mite::Class";
     our $MITE_SHIM    = "Mite::Shim";
-    our $MITE_VERSION = "0.011000";
+    our $MITE_VERSION = "0.012000";
 
     # Mite keywords
     BEGIN {
@@ -66,8 +66,8 @@
                 map { "$_\::BUILD" } reverse @$linear_isa
             ],
             DEMOLISH => [
-                map   { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
-                  map { "$_\::DEMOLISH" } @$linear_isa
+                map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
+                map { "$_\::DEMOLISH" } @$linear_isa
             ],
             HAS_BUILDARGS        => $class->can('BUILDARGS'),
             HAS_FOREIGNBUILDARGS => $class->can('FOREIGNBUILDARGS'),
@@ -165,7 +165,7 @@
             my $value = exists( $args->{"debug"} ) ? $args->{"debug"} : false;
             (
                 !ref $value
-                  and (!defined $value
+                  and ( !defined $value
                     or $value eq q()
                     or $value eq '0'
                     or $value eq '1' )
@@ -274,7 +274,7 @@
           ? do {
             (
                 !ref $_[1]
-                  and (!defined $_[1]
+                  and ( !defined $_[1]
                     or $_[1] eq q()
                     or $_[1] eq '0'
                     or $_[1] eq '1' )
@@ -348,8 +348,7 @@
             (
                 do {
                     use Scalar::Util ();
-                    Scalar::Util::blessed( $_[0] )
-                      and $_[0]->isa(q[Path::Tiny]);
+                    Scalar::Util::blessed( $_[0] ) and $_[0]->isa(q[Path::Tiny]);
                 }
             )
         ) ? $_[0] : (
@@ -415,7 +414,7 @@
         my ( %out, %in, %tmp, $tmp, $dtmp, @head );
 
         @_ == 2 && ( ref( $_[1] ) eq 'HASH' )
-          or @_ % 2 == 1 && @_ >= 7 && @_ <= 15
+          or @_ % 2 == 1 && @_ >= 7
           or
           croak( "Wrong number of parameters in signature for %s: got %d, %s",
             "inject_mite_functions", scalar(@_), "that does not seem right" );
@@ -536,7 +535,7 @@
               . sprintf(
                 q{Unrecognized parameter%s: %s},
                 keys(%in) > 1 ? q{s} : q{},
-                join( q{, }, sort keys %in )
+                join q{, } => ( sort keys %in )
               )
         ) if keys %in;
 

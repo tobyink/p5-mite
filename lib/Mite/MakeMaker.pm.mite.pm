@@ -7,7 +7,7 @@
 
     our $USES_MITE    = "Mite::Class";
     our $MITE_SHIM    = "Mite::Shim";
-    our $MITE_VERSION = "0.011000";
+    our $MITE_VERSION = "0.012000";
 
     # Mite keywords
     BEGIN {
@@ -66,8 +66,8 @@
                 map { "$_\::BUILD" } reverse @$linear_isa
             ],
             DEMOLISH => [
-                map   { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
-                  map { "$_\::DEMOLISH" } @$linear_isa
+                map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
+                map { "$_\::DEMOLISH" } @$linear_isa
             ],
             HAS_BUILDARGS        => $class->can('BUILDARGS'),
             HAS_FOREIGNBUILDARGS => $class->can('FOREIGNBUILDARGS'),
@@ -174,8 +174,7 @@
             (
                 do {
                     use Scalar::Util ();
-                    Scalar::Util::blessed( $_[0] )
-                      and $_[0]->isa(q[Path::Tiny]);
+                    Scalar::Util::blessed( $_[0] ) and $_[0]->isa(q[Path::Tiny]);
                 }
             )
         ) ? $_[0] : (
@@ -229,8 +228,7 @@
             (
                 do {
                     use Scalar::Util ();
-                    Scalar::Util::blessed( $_[1] )
-                      and $_[1]->isa(q[Path::Tiny]);
+                    Scalar::Util::blessed( $_[1] ) and $_[1]->isa(q[Path::Tiny]);
                 }
             )
         ) ? $_[1] : (
@@ -284,8 +282,7 @@
             (
                 do {
                     use Scalar::Util ();
-                    Scalar::Util::blessed( $_[2] )
-                      and $_[2]->isa(q[Path::Tiny]);
+                    Scalar::Util::blessed( $_[2] ) and $_[2]->isa(q[Path::Tiny]);
                 }
             )
         ) ? $_[2] : (
@@ -361,8 +358,7 @@
             (
                 do {
                     use Scalar::Util ();
-                    Scalar::Util::blessed( $_[0] )
-                      and $_[0]->isa(q[Path::Tiny]);
+                    Scalar::Util::blessed( $_[0] ) and $_[0]->isa(q[Path::Tiny]);
                 }
             )
         ) ? $_[0] : (
@@ -416,8 +412,7 @@
             (
                 do {
                     use Scalar::Util ();
-                    Scalar::Util::blessed( $_[1] )
-                      and $_[1]->isa(q[Path::Tiny]);
+                    Scalar::Util::blessed( $_[1] ) and $_[1]->isa(q[Path::Tiny]);
                 }
             )
         ) ? $_[1] : (

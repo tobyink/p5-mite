@@ -7,7 +7,7 @@
 
     our $USES_MITE    = "Mite::Class";
     our $MITE_SHIM    = "Mite::Shim";
-    our $MITE_VERSION = "0.011000";
+    our $MITE_VERSION = "0.012000";
 
     # Mite keywords
     BEGIN {
@@ -66,8 +66,8 @@
                 map { "$_\::BUILD" } reverse @$linear_isa
             ],
             DEMOLISH => [
-                map   { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
-                  map { "$_\::DEMOLISH" } @$linear_isa
+                map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
+                map { "$_\::DEMOLISH" } @$linear_isa
             ],
             HAS_BUILDARGS        => $class->can('BUILDARGS'),
             HAS_FOREIGNBUILDARGS => $class->can('FOREIGNBUILDARGS'),
@@ -147,7 +147,7 @@
             my $value = exists( $args->{"method"} ) ? $args->{"method"} : true;
             (
                 !ref $value
-                  and (!defined $value
+                  and ( !defined $value
                     or $value eq q()
                     or $value eq '0'
                     or $value eq '1' )
@@ -216,7 +216,7 @@
                 (
                     (
                         !ref $value
-                          and (!defined $value
+                          and ( !defined $value
                             or $value eq q()
                             or $value eq '0'
                             or $value eq '1' )
@@ -497,7 +497,7 @@
                     my $default_value = $_[0]->_build_should_bless;
                     (
                         !ref $default_value
-                          and (!defined $default_value
+                          and ( !defined $default_value
                             or $default_value eq q()
                             or $default_value eq '0'
                             or $default_value eq '1' )

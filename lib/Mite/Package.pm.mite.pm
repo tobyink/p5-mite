@@ -7,7 +7,7 @@
 
     our $USES_MITE    = "Mite::Class";
     our $MITE_SHIM    = "Mite::Shim";
-    our $MITE_VERSION = "0.011000";
+    our $MITE_VERSION = "0.012000";
 
     # Mite keywords
     BEGIN {
@@ -66,8 +66,8 @@
                 map { "$_\::BUILD" } reverse @$linear_isa
             ],
             DEMOLISH => [
-                map   { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
-                  map { "$_\::DEMOLISH" } @$linear_isa
+                map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
+                map { "$_\::DEMOLISH" } @$linear_isa
             ],
             HAS_BUILDARGS        => $class->can('BUILDARGS'),
             HAS_FOREIGNBUILDARGS => $class->can('FOREIGNBUILDARGS'),
@@ -376,11 +376,8 @@
                     do { local $_ = $_[1]; /\A[^\W0-9]\w*(?:::[^\W0-9]\w*)*\z/ }
                   )
               )
-              or croak(
-                "Type check failed in %s: value should be %s",
-                "accessor",
-                "ValidClassName"
-              );
+              or croak( "Type check failed in %s: value should be %s",
+                "accessor", "ValidClassName" );
             $_[0]{"shim_name"} = $_[1];
             $_[0];
           }
@@ -411,9 +408,7 @@
                           )
                           or croak(
                             "Type check failed in default: %s should be %s",
-                            "shim_name",
-                            "ValidClassName"
-                          );
+                            "shim_name", "ValidClassName" );
                         $default_value;
                     }
                 )

@@ -7,7 +7,7 @@
 
     our $USES_MITE    = "Mite::Class";
     our $MITE_SHIM    = "Mite::Shim";
-    our $MITE_VERSION = "0.011000";
+    our $MITE_VERSION = "0.012000";
 
     # Mite keywords
     BEGIN {
@@ -65,8 +65,8 @@
                 map { "$_\::BUILD" } reverse @$linear_isa
             ],
             DEMOLISH => [
-                map   { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
-                  map { "$_\::DEMOLISH" } @$linear_isa
+                map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
+                map { "$_\::DEMOLISH" } @$linear_isa
             ],
             HAS_BUILDARGS        => $class->can('BUILDARGS'),
             HAS_FOREIGNBUILDARGS => $class->can('FOREIGNBUILDARGS'),
@@ -190,7 +190,7 @@
                     (
                         (
                             !ref $to_coerce
-                              and (!defined $to_coerce
+                              and ( !defined $to_coerce
                                 or $to_coerce eq q()
                                 or $to_coerce eq '0'
                                 or $to_coerce eq '1' )
@@ -203,7 +203,7 @@
                 (
                     (
                         !ref $coerced_value
-                          and (!defined $coerced_value
+                          and ( !defined $coerced_value
                             or $coerced_value eq q()
                             or $coerced_value eq '0'
                             or $coerced_value eq '1' )
@@ -224,7 +224,7 @@
               exists( $args->{"weak_ref"} ) ? $args->{"weak_ref"} : false;
             (
                 !ref $value
-                  and (!defined $value
+                  and ( !defined $value
                     or $value eq q()
                     or $value eq '0'
                     or $value eq '1' )
@@ -880,7 +880,7 @@
             my $value = exists( $args->{"coerce"} ) ? $args->{"coerce"} : false;
             (
                 !ref $value
-                  and (!defined $value
+                  and ( !defined $value
                     or $value eq q()
                     or $value eq '0'
                     or $value eq '1' )
@@ -896,7 +896,7 @@
             my $value = exists( $args->{"locked"} ) ? $args->{"locked"} : false;
             (
                 !ref $value
-                  and (!defined $value
+                  and ( !defined $value
                     or $value eq q()
                     or $value eq '0'
                     or $value eq '1' )
@@ -972,7 +972,7 @@
                     (
                         (
                             !ref $to_coerce
-                              and (!defined $to_coerce
+                              and ( !defined $to_coerce
                                 or $to_coerce eq q()
                                 or $to_coerce eq '0'
                                 or $to_coerce eq '1' )
@@ -985,7 +985,7 @@
                 (
                     (
                         !ref $coerced_value
-                          and (!defined $coerced_value
+                          and ( !defined $coerced_value
                             or $coerced_value eq q()
                             or $coerced_value eq '0'
                             or $coerced_value eq '1' )
@@ -1009,7 +1009,7 @@
                     (
                         (
                             !ref $to_coerce
-                              and (!defined $to_coerce
+                              and ( !defined $to_coerce
                                 or $to_coerce eq q()
                                 or $to_coerce eq '0'
                                 or $to_coerce eq '1' )
@@ -1022,7 +1022,7 @@
                 (
                     (
                         !ref $coerced_value
-                          and (!defined $coerced_value
+                          and ( !defined $coerced_value
                             or $coerced_value eq q()
                             or $coerced_value eq '0'
                             or $coerced_value eq '1' )
@@ -1046,7 +1046,7 @@
                     (
                         (
                             !ref $to_coerce
-                              and (!defined $to_coerce
+                              and ( !defined $to_coerce
                                 or $to_coerce eq q()
                                 or $to_coerce eq '0'
                                 or $to_coerce eq '1' )
@@ -1059,7 +1059,7 @@
                 (
                     (
                         !ref $coerced_value
-                          and (!defined $coerced_value
+                          and ( !defined $coerced_value
                             or $coerced_value eq q()
                             or $coerced_value eq '0'
                             or $coerced_value eq '1' )
@@ -1079,7 +1079,7 @@
             my $value = exists( $args->{"lazy"} ) ? $args->{"lazy"} : false;
             (
                 !ref $value
-                  and (!defined $value
+                  and ( !defined $value
                     or $value eq q()
                     or $value eq '0'
                     or $value eq '1' )
@@ -1350,7 +1350,7 @@
                     (
                         (
                             !ref $to_coerce
-                              and (!defined $to_coerce
+                              and ( !defined $to_coerce
                                 or $to_coerce eq q()
                                 or $to_coerce eq '0'
                                 or $to_coerce eq '1' )
@@ -1362,7 +1362,7 @@
                 };
                 (
                     !ref $coerced_value
-                      and (!defined $coerced_value
+                      and ( !defined $coerced_value
                         or $coerced_value eq q()
                         or $coerced_value eq '0'
                         or $coerced_value eq '1' )
@@ -1382,7 +1382,7 @@
                     (
                         (
                             !ref $to_coerce
-                              and (!defined $to_coerce
+                              and ( !defined $to_coerce
                                 or $to_coerce eq q()
                                 or $to_coerce eq '0'
                                 or $to_coerce eq '1' )
@@ -1394,7 +1394,7 @@
                 };
                 (
                     !ref $coerced_value
-                      and (!defined $coerced_value
+                      and ( !defined $coerced_value
                         or $coerced_value eq q()
                         or $coerced_value eq '0'
                         or $coerced_value eq '1' )
@@ -1446,8 +1446,8 @@
                                                                         \(
                                                                             my $val
                                                                               = $v
-                                                                        )
-                                                                      ) eq
+                                                                        ) )
+                                                                      eq
                                                                       'SCALAR';
                                                                 }
                                                             }
@@ -1483,8 +1483,8 @@
                                                                         \(
                                                                             my $val
                                                                               = $k
-                                                                        )
-                                                                      ) eq
+                                                                        ) )
+                                                                      eq
                                                                       'SCALAR';
                                                                 }
                                                             }
@@ -1510,8 +1510,8 @@
                                                                         \(
                                                                             my $val
                                                                               = $k
-                                                                        )
-                                                                      ) eq
+                                                                        ) )
+                                                                      eq
                                                                       'SCALAR';
                                                                 }
                                                             }
@@ -1571,11 +1571,9 @@
                                                             ref( \$v ) eq
                                                               'SCALAR'
                                                               or ref(
-                                                                \(
-                                                                    my $val =
-                                                                      $v
-                                                                )
-                                                              ) eq 'SCALAR';
+                                                                \( my $val =
+                                                                      $v ) ) eq
+                                                              'SCALAR';
                                                         }
                                                     }
                                                 )
@@ -1605,11 +1603,9 @@
                                                             ref( \$k ) eq
                                                               'SCALAR'
                                                               or ref(
-                                                                \(
-                                                                    my $val =
-                                                                      $k
-                                                                )
-                                                              ) eq 'SCALAR';
+                                                                \( my $val =
+                                                                      $k ) ) eq
+                                                              'SCALAR';
                                                         }
                                                     }
                                                 )
@@ -1629,11 +1625,9 @@
                                                             ref( \$k ) eq
                                                               'SCALAR'
                                                               or ref(
-                                                                \(
-                                                                    my $val =
-                                                                      $k
-                                                                )
-                                                              ) eq 'SCALAR';
+                                                                \( my $val =
+                                                                      $k ) ) eq
+                                                              'SCALAR';
                                                         }
                                                     }
                                                 )
@@ -1755,11 +1749,9 @@
                                                             ref( \$i ) eq
                                                               'SCALAR'
                                                               or ref(
-                                                                \(
-                                                                    my $val =
-                                                                      $i
-                                                                )
-                                                              ) eq 'SCALAR';
+                                                                \( my $val =
+                                                                      $i ) ) eq
+                                                              'SCALAR';
                                                         }
                                                     }
                                                 )
@@ -1779,11 +1771,9 @@
                                                             ref( \$i ) eq
                                                               'SCALAR'
                                                               or ref(
-                                                                \(
-                                                                    my $val =
-                                                                      $i
-                                                                )
-                                                              ) eq 'SCALAR';
+                                                                \( my $val =
+                                                                      $i ) ) eq
+                                                              'SCALAR';
                                                         }
                                                     }
                                                 )
@@ -2049,11 +2039,9 @@
                                                         ref( \$default_value )
                                                           eq 'SCALAR'
                                                           or ref(
-                                                            \(
-                                                                my $val =
+                                                            \( my $val =
                                                                   $default_value
-                                                            )
-                                                          ) eq 'SCALAR';
+                                                            ) ) eq 'SCALAR';
                                                     }
                                                 }
                                             )
@@ -2074,11 +2062,9 @@
                                                         ref( \$default_value )
                                                           eq 'SCALAR'
                                                           or ref(
-                                                            \(
-                                                                my $val =
+                                                            \( my $val =
                                                                   $default_value
-                                                            )
-                                                          ) eq 'SCALAR';
+                                                            ) ) eq 'SCALAR';
                                                     }
                                                 }
                                             )
@@ -2430,11 +2416,9 @@
                                                         ref( \$default_value )
                                                           eq 'SCALAR'
                                                           or ref(
-                                                            \(
-                                                                my $val =
+                                                            \( my $val =
                                                                   $default_value
-                                                            )
-                                                          ) eq 'SCALAR';
+                                                            ) ) eq 'SCALAR';
                                                     }
                                                 }
                                             )
@@ -2455,11 +2439,9 @@
                                                         ref( \$default_value )
                                                           eq 'SCALAR'
                                                           or ref(
-                                                            \(
-                                                                my $val =
+                                                            \( my $val =
                                                                   $default_value
-                                                            )
-                                                          ) eq 'SCALAR';
+                                                            ) ) eq 'SCALAR';
                                                     }
                                                 }
                                             )
@@ -2523,7 +2505,7 @@
                         (
                             (
                                 !ref $to_coerce
-                                  and (!defined $to_coerce
+                                  and ( !defined $to_coerce
                                     or $to_coerce eq q()
                                     or $to_coerce eq '0'
                                     or $to_coerce eq '1' )
@@ -2535,7 +2517,7 @@
                     };
                     (
                         !ref $default_value
-                          and (!defined $default_value
+                          and ( !defined $default_value
                             or $default_value eq q()
                             or $default_value eq '0'
                             or $default_value eq '1' )
@@ -2561,7 +2543,7 @@
                         (
                             (
                                 !ref $to_coerce
-                                  and (!defined $to_coerce
+                                  and ( !defined $to_coerce
                                     or $to_coerce eq q()
                                     or $to_coerce eq '0'
                                     or $to_coerce eq '1' )
@@ -2573,7 +2555,7 @@
                     };
                     (
                         !ref $default_value
-                          and (!defined $default_value
+                          and ( !defined $default_value
                             or $default_value eq q()
                             or $default_value eq '0'
                             or $default_value eq '1' )
@@ -2604,11 +2586,8 @@
                 )
                   && ( length( $_[1] ) > 0 )
               )
-              or croak(
-                "Type check failed in %s: value should be %s",
-                "accessor",
-                "NonEmptyStr"
-              );
+              or croak( "Type check failed in %s: value should be %s",
+                "accessor", "NonEmptyStr" );
             $_[0]{"coderef_default_variable"} = $_[1];
             $_[0];
           }
@@ -2655,7 +2634,7 @@
           ? do {
             (
                 !ref $_[1]
-                  and (!defined $_[1]
+                  and ( !defined $_[1]
                     or $_[1] eq q()
                     or $_[1] eq '0'
                     or $_[1] eq '1' )
@@ -2765,7 +2744,7 @@
                 (
                     (
                         !ref $to_coerce
-                          and (!defined $to_coerce
+                          and ( !defined $to_coerce
                             or $to_coerce eq q()
                             or $to_coerce eq '0'
                             or $to_coerce eq '1' )
@@ -2776,7 +2755,7 @@
             };
             (
                 !ref $value
-                  and (!defined $value
+                  and ( !defined $value
                     or $value eq q()
                     or $value eq '0'
                     or $value eq '1' )
@@ -2799,7 +2778,7 @@
                 (
                     (
                         !ref $to_coerce
-                          and (!defined $to_coerce
+                          and ( !defined $to_coerce
                             or $to_coerce eq q()
                             or $to_coerce eq '0'
                             or $to_coerce eq '1' )
@@ -2810,7 +2789,7 @@
             };
             (
                 !ref $value
-                  and (!defined $value
+                  and ( !defined $value
                     or $value eq q()
                     or $value eq '0'
                     or $value eq '1' )
@@ -2974,8 +2953,7 @@
                                                                   or ref(
                                                                     \(
                                                                         my $val
-                                                                          = $v
-                                                                    )
+                                                                          = $v )
                                                                   ) eq 'SCALAR';
                                                             }
                                                         }
@@ -3008,8 +2986,7 @@
                                                                   or ref(
                                                                     \(
                                                                         my $val
-                                                                          = $k
-                                                                    )
+                                                                          = $k )
                                                                   ) eq 'SCALAR';
                                                             }
                                                         }
@@ -3032,8 +3009,7 @@
                                                                   or ref(
                                                                     \(
                                                                         my $val
-                                                                          = $k
-                                                                    )
+                                                                          = $k )
                                                                   ) eq 'SCALAR';
                                                             }
                                                         }
@@ -3368,7 +3344,7 @@
           ? do {
             (
                 !ref $_[1]
-                  and (!defined $_[1]
+                  and ( !defined $_[1]
                     or $_[1] eq q()
                     or $_[1] eq '0'
                     or $_[1] eq '1' )
@@ -3466,11 +3442,9 @@
                                                         ref( \$default_value )
                                                           eq 'SCALAR'
                                                           or ref(
-                                                            \(
-                                                                my $val =
+                                                            \( my $val =
                                                                   $default_value
-                                                            )
-                                                          ) eq 'SCALAR';
+                                                            ) ) eq 'SCALAR';
                                                     }
                                                 }
                                             )
@@ -3491,11 +3465,9 @@
                                                         ref( \$default_value )
                                                           eq 'SCALAR'
                                                           or ref(
-                                                            \(
-                                                                my $val =
+                                                            \( my $val =
                                                                   $default_value
-                                                            )
-                                                          ) eq 'SCALAR';
+                                                            ) ) eq 'SCALAR';
                                                     }
                                                 }
                                             )
@@ -3537,7 +3509,7 @@
           ? do {
             (
                 !ref $_[1]
-                  and (!defined $_[1]
+                  and ( !defined $_[1]
                     or $_[1] eq q()
                     or $_[1] eq '0'
                     or $_[1] eq '1' )
@@ -3635,11 +3607,9 @@
                                                         ref( \$default_value )
                                                           eq 'SCALAR'
                                                           or ref(
-                                                            \(
-                                                                my $val =
+                                                            \( my $val =
                                                                   $default_value
-                                                            )
-                                                          ) eq 'SCALAR';
+                                                            ) ) eq 'SCALAR';
                                                     }
                                                 }
                                             )
@@ -3660,11 +3630,9 @@
                                                         ref( \$default_value )
                                                           eq 'SCALAR'
                                                           or ref(
-                                                            \(
-                                                                my $val =
+                                                            \( my $val =
                                                                   $default_value
-                                                            )
-                                                          ) eq 'SCALAR';
+                                                            ) ) eq 'SCALAR';
                                                     }
                                                 }
                                             )
@@ -3717,11 +3685,8 @@
                 )
                   && ( length( $_[1] ) > 0 )
               )
-              or croak(
-                "Type check failed in %s: value should be %s",
-                "accessor",
-                "NonEmptyStr"
-              );
+              or croak( "Type check failed in %s: value should be %s",
+                "accessor", "NonEmptyStr" );
             $_[0]{"name"} = $_[1];
             $_[0];
           }
@@ -3813,11 +3778,9 @@
                                                         ref( \$default_value )
                                                           eq 'SCALAR'
                                                           or ref(
-                                                            \(
-                                                                my $val =
+                                                            \( my $val =
                                                                   $default_value
-                                                            )
-                                                          ) eq 'SCALAR';
+                                                            ) ) eq 'SCALAR';
                                                     }
                                                 }
                                             )
@@ -3838,11 +3801,9 @@
                                                         ref( \$default_value )
                                                           eq 'SCALAR'
                                                           or ref(
-                                                            \(
-                                                                my $val =
+                                                            \( my $val =
                                                                   $default_value
-                                                            )
-                                                          ) eq 'SCALAR';
+                                                            ) ) eq 'SCALAR';
                                                     }
                                                 }
                                             )
@@ -3962,11 +3923,9 @@
                                                         ref( \$default_value )
                                                           eq 'SCALAR'
                                                           or ref(
-                                                            \(
-                                                                my $val =
+                                                            \( my $val =
                                                                   $default_value
-                                                            )
-                                                          ) eq 'SCALAR';
+                                                            ) ) eq 'SCALAR';
                                                     }
                                                 }
                                             )
@@ -3987,11 +3946,9 @@
                                                         ref( \$default_value )
                                                           eq 'SCALAR'
                                                           or ref(
-                                                            \(
-                                                                my $val =
+                                                            \( my $val =
                                                                   $default_value
-                                                            )
-                                                          ) eq 'SCALAR';
+                                                            ) ) eq 'SCALAR';
                                                     }
                                                 }
                                             )
@@ -4036,7 +3993,7 @@
                 (
                     (
                         !ref $to_coerce
-                          and (!defined $to_coerce
+                          and ( !defined $to_coerce
                             or $to_coerce eq q()
                             or $to_coerce eq '0'
                             or $to_coerce eq '1' )
@@ -4047,7 +4004,7 @@
             };
             (
                 !ref $value
-                  and (!defined $value
+                  and ( !defined $value
                     or $value eq q()
                     or $value eq '0'
                     or $value eq '1' )
@@ -4070,7 +4027,7 @@
                 (
                     (
                         !ref $to_coerce
-                          and (!defined $to_coerce
+                          and ( !defined $to_coerce
                             or $to_coerce eq q()
                             or $to_coerce eq '0'
                             or $to_coerce eq '1' )
@@ -4081,7 +4038,7 @@
             };
             (
                 !ref $value
-                  and (!defined $value
+                  and ( !defined $value
                     or $value eq q()
                     or $value eq '0'
                     or $value eq '1' )
@@ -4211,7 +4168,7 @@
           ? do {
             (
                 !ref $_[1]
-                  and (!defined $_[1]
+                  and ( !defined $_[1]
                     or $_[1] eq q()
                     or $_[1] eq '0'
                     or $_[1] eq '1' )
@@ -4309,11 +4266,9 @@
                                                         ref( \$default_value )
                                                           eq 'SCALAR'
                                                           or ref(
-                                                            \(
-                                                                my $val =
+                                                            \( my $val =
                                                                   $default_value
-                                                            )
-                                                          ) eq 'SCALAR';
+                                                            ) ) eq 'SCALAR';
                                                     }
                                                 }
                                             )
@@ -4334,11 +4289,9 @@
                                                         ref( \$default_value )
                                                           eq 'SCALAR'
                                                           or ref(
-                                                            \(
-                                                                my $val =
+                                                            \( my $val =
                                                                   $default_value
-                                                            )
-                                                          ) eq 'SCALAR';
+                                                            ) ) eq 'SCALAR';
                                                     }
                                                 }
                                             )
